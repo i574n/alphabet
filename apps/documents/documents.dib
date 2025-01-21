@@ -137,7 +137,7 @@ let hangul workspace_root hangul_spec { ext dist_dir dist_path output_path } =
         runtime.execution_options fun x => { x with
             command =
                 inl hangulize_path =
-                    workspace_root </> $'$"../vault/deps/hangulize/cmd/hangulize/hangulize{!(platform.get_executable_suffix ())}"'
+                    workspace_root </> $'$"../alphabet/deps/hangulize/cmd/hangulize/hangulize{!(platform.get_executable_suffix ())}"'
                 $'$"{!hangulize_path} {!hangul_spec}"'
             stdin =
                 fun stdin =>
@@ -449,7 +449,7 @@ let run { source_dir dist_dir cache_dir hangul_spec }
 ///! rust -d async-walkdir encoding_rs encoding_rs_io futures futures-lite rayon regex sha2
 
 inl workspace_root = file_system.get_workspace_root ()
-inl source_dir = workspace_root </> "../vault/target/documents"
+inl source_dir = workspace_root </> "../alphabet/target/documents"
 inl dist_dir = source_dir </> "dist"
 inl cache_dir = source_dir </> "cache"
 inl file_name_no_ext = "test"
