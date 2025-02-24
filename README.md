@@ -41,12 +41,11 @@ Clone the repository:
 git clone https://github.com/i574n/alphabet.git
 ```
 
-Navigate to the directory, initialize dependencies then build the project:
+Navigate to the directory, initialize dependencies and build the project:
 
 ```powershell
 cd alphabet
-pwsh scripts/init.ps1
-pwsh scripts/build.ps1
+pwsh scripts/workflow.ps1
 ```
 
 ### Usage
