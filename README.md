@@ -81,7 +81,7 @@ Documentation
 </td>
 <td>
 
-- Repository File Tree (HTML)  
+- Repository file tree (HTML)  
 <https://i574n.github.io/alphabet>
 
 </td>
@@ -95,7 +95,7 @@ Documents Sample
 </td>
 <td>
 
-- Documents Notebook  
+- Documents notebook  
 <https://i574n.github.io/alphabet/apps/documents/documents.dib.html>
 
 </td>
