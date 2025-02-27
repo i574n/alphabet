@@ -12,7 +12,7 @@ $ErrorActionPreference = "Stop"
 $projectName = "documents"
 
 if (!$fast -and !$SkipNotebook) {
-    { . deps/spiral/workspace/target/release/spiral$(_exe) dib --path $ScriptDir/$projectName.dib } | Invoke-Block -Retries 3 -Location ../../../polyglot
+    { . deps/spiral/workspace/target/release/spiral$(_exe) dib --path "$ScriptDir/$projectName.dib" } | Invoke-Block -Retries 3 -Location ../../../polyglot
 }
 
 { . ../../deps/polyglot/apps/parser/dist/DibParser$(_exe) "$projectName.dib" spi } | Invoke-Block
