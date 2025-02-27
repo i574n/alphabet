@@ -129,7 +129,7 @@ let hangul workspace_root hangul_spec { ext dist_dir dist_path output_path } =
         |> am.map sm'.trim
     inl text =
         lines
-        |> am.filter ((<>.) "")
+        |> am.filter fun line => line <>. ""
         |> seq.of_array'
         |> sm'.concat "\n"
         |> fun x => $'$"{!x}\n\n"'
@@ -156,7 +156,7 @@ let hangul workspace_root hangul_spec { ext dist_dir dist_path output_path } =
             |> fun x => a x : _ int _
         inl result_len = result |> am'.length
         (("", (0, 0)), lines)
-        ||> am.fold fun (acc, (i, n)) x =>
+        ||> am.fold fun acc, (i, n) x =>
             if x = ""
             then $'$"{!acc}\n"', (i + 1, n + 1)
             else
@@ -166,6 +166,10 @@ let hangul workspace_root hangul_spec { ext dist_dir dist_path output_path } =
                     then acc
                     else
                         inl line = result |> am'.index i
+                        inl line =
+                            if line |> sm'.contains "://"
+                            then x
+                            else line
                         if i = result_len - 1
                         then $'$"{!acc}{!line}"'
                         else $'$"{!acc}{!line}\n"'
@@ -463,7 +467,7 @@ source_dir |> file_system.create_dir |> ignore
 dist_dir |> file_system.create_dir |> ignore
 cache_dir |> file_system.create_dir |> ignore
 
-inl text = "# a\n\n## b\n\n---\n\nabc\nabc\n\nabc\n\nabc\n"
+inl text = "# a\n\n## b\n\n---\n\nabc\nabc\n\nabc\n\nhttp://abc.com\nabc\n"
 text |> file_system.write_all_text (source_dir </> file_name)
 text |> file_system.write_all_text (dist_dir </> file_name)
 
@@ -576,7 +580,7 @@ run {
 
 hangul_path
 |> file_system.read_all_text
-|> _assert_eq "# 아\n\n## 브\n\n---\n\n아브크\n아브크\n\n아브크\n\n아브크\n"
+|> _assert_eq "# 아\n\n## 브\n\n---\n\n아브크\n아브크\n\n아브크\n\nhttp://abc.com\n아브크\n"
 
 html_path
 |> file_system.read_all_text
