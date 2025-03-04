@@ -112,7 +112,3 @@ Contributions are welcome! Please see the [CONTRIBUTING.md](https://github.com/i
 This project is licensed under the AGPLv3 License. See the [LICENSE](https://github.com/i574n/alphabet/blob/main/LICENSE) file for details.
 
 Built with ❤️ for linguists, developers, and anyone passionate about languages.
-
----
-
-[![Star History Chart](https://api.star-history.com/svg?repos=i574n/alphabet&type=Timeline)]
