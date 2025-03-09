@@ -835,59 +835,64 @@ mod module_b8cdef03 {
         }
         pub fn method2() -> (Documents::US1, Documents::US2) {
             let v1_1: string = Documents::method3(string("TRACE_LEVEL"));
-            let v6: Documents::US1 = if string("Verbose") == (v1_1.clone()) {
+            let v5: string = toLower(string("Critical"));
+            let v11: string = toLower(string("Warning"));
+            let v17: string = toLower(string("Info"));
+            let v23: string = toLower(string("Debug"));
+            let v29: string = toLower(string("Verbose"));
+            let v36: Documents::US1 = if string("Verbose") == (v1_1.clone()) {
                 Documents::US1::US1_0(Documents::US0::US0_0)
             } else {
                 Documents::US1::US1_1
             };
             (
-                match &v6 {
-                    Documents::US1::US1_0(v6_0_0) => Documents::US1::US1_0(
-                        match &v6 {
+                match &v36 {
+                    Documents::US1::US1_0(v36_0_0) => Documents::US1::US1_0(
+                        match &v36 {
                             Documents::US1::US1_0(x) => x.clone(),
                             _ => unreachable!(),
                         }
                         .clone(),
                     ),
                     _ => {
-                        let v13: Documents::US1 = if string("Debug") == (v1_1.clone()) {
+                        let v43: Documents::US1 = if string("Debug") == (v1_1.clone()) {
                             Documents::US1::US1_0(Documents::US0::US0_1)
                         } else {
                             Documents::US1::US1_1
                         };
-                        match &v13 {
-                            Documents::US1::US1_0(v13_0_0) => Documents::US1::US1_0(
-                                match &v13 {
+                        match &v43 {
+                            Documents::US1::US1_0(v43_0_0) => Documents::US1::US1_0(
+                                match &v43 {
                                     Documents::US1::US1_0(x) => x.clone(),
                                     _ => unreachable!(),
                                 }
                                 .clone(),
                             ),
                             _ => {
-                                let v20: Documents::US1 = if string("Info") == (v1_1.clone()) {
+                                let v50: Documents::US1 = if string("Info") == (v1_1.clone()) {
                                     Documents::US1::US1_0(Documents::US0::US0_2)
                                 } else {
                                     Documents::US1::US1_1
                                 };
-                                match &v20 {
-                                    Documents::US1::US1_0(v20_0_0) => Documents::US1::US1_0(
-                                        match &v20 {
+                                match &v50 {
+                                    Documents::US1::US1_0(v50_0_0) => Documents::US1::US1_0(
+                                        match &v50 {
                                             Documents::US1::US1_0(x) => x.clone(),
                                             _ => unreachable!(),
                                         }
                                         .clone(),
                                     ),
                                     _ => {
-                                        let v27: Documents::US1 =
+                                        let v57: Documents::US1 =
                                             if string("Warning") == (v1_1.clone()) {
                                                 Documents::US1::US1_0(Documents::US0::US0_3)
                                             } else {
                                                 Documents::US1::US1_1
                                             };
-                                        match &v27 {
-                                            Documents::US1::US1_0(v27_0_0) => {
+                                        match &v57 {
+                                            Documents::US1::US1_0(v57_0_0) => {
                                                 Documents::US1::US1_0(
-                                                    match &v27 {
+                                                    match &v57 {
                                                         Documents::US1::US1_0(x) => x.clone(),
                                                         _ => unreachable!(),
                                                     }
@@ -895,16 +900,16 @@ mod module_b8cdef03 {
                                                 )
                                             }
                                             _ => {
-                                                let v34: Documents::US1 =
+                                                let v64: Documents::US1 =
                                                     if string("Critical") == (v1_1.clone()) {
                                                         Documents::US1::US1_0(Documents::US0::US0_4)
                                                     } else {
                                                         Documents::US1::US1_1
                                                     };
-                                                match &v34 {
-                                                    Documents::US1::US1_0(v34_0_0) => {
+                                                match &v64 {
+                                                    Documents::US1::US1_0(v64_0_0) => {
                                                         Documents::US1::US1_0(
-                                                            match &v34 {
+                                                            match &v64 {
                                                                 Documents::US1::US1_0(x) => {
                                                                     x.clone()
                                                                 }
@@ -913,7 +918,138 @@ mod module_b8cdef03 {
                                                             .clone(),
                                                         )
                                                     }
-                                                    _ => Documents::US1::US1_1,
+                                                    _ => {
+                                                        let v71: Documents::US1 =
+                                                            if (v29.clone()) == (v1_1.clone()) {
+                                                                Documents::US1::US1_0(
+                                                                    Documents::US0::US0_0,
+                                                                )
+                                                            } else {
+                                                                Documents::US1::US1_1
+                                                            };
+                                                        match &v71 {
+                                                            Documents::US1::US1_0(v71_0_0) => {
+                                                                Documents::US1::US1_0(
+                                                                    match &v71 {
+                                                                        Documents::US1::US1_0(
+                                                                            x,
+                                                                        ) => x.clone(),
+                                                                        _ => unreachable!(),
+                                                                    }
+                                                                    .clone(),
+                                                                )
+                                                            }
+                                                            _ => {
+                                                                let v78: Documents::US1 = if (v23
+                                                                    .clone())
+                                                                    == (v1_1.clone())
+                                                                {
+                                                                    Documents::US1::US1_0(
+                                                                        Documents::US0::US0_1,
+                                                                    )
+                                                                } else {
+                                                                    Documents::US1::US1_1
+                                                                };
+                                                                match &v78 {
+                                                                 Documents::US1::US1_0(v78_0_0)
+                                                                 =>
+                                                                 Documents::US1::US1_0(match &v78
+                                                                                           {
+                                                                                           Documents::US1::US1_0(x)
+                                                                                           =>
+                                                                                           x.clone(),
+                                                                                           _
+                                                                                           =>
+                                                                                           unreachable!(),
+                                                                                       }.clone()),
+                                                                 _ => {
+                                                                     let v85:
+                                                                             Documents::US1 =
+                                                                         if (v17.clone())
+                                                                                ==
+                                                                                (v1_1.clone())
+                                                                            {
+                                                                             Documents::US1::US1_0(Documents::US0::US0_2)
+                                                                         } else {
+                                                                             Documents::US1::US1_1
+                                                                         };
+                                                                     match &v85
+                                                                         {
+                                                                         Documents::US1::US1_0(v85_0_0)
+                                                                         =>
+                                                                         Documents::US1::US1_0(match &v85
+                                                                                                   {
+                                                                                                   Documents::US1::US1_0(x)
+                                                                                                   =>
+                                                                                                   x.clone(),
+                                                                                                   _
+                                                                                                   =>
+                                                                                                   unreachable!(),
+                                                                                               }.clone()),
+                                                                         _ =>
+                                                                         {
+                                                                             let v92:
+                                                                                     Documents::US1 =
+                                                                                 if (v11.clone())
+                                                                                        ==
+                                                                                        (v1_1.clone())
+                                                                                    {
+                                                                                     Documents::US1::US1_0(Documents::US0::US0_3)
+                                                                                 } else {
+                                                                                     Documents::US1::US1_1
+                                                                                 };
+                                                                             match &v92
+                                                                                 {
+                                                                                 Documents::US1::US1_0(v92_0_0)
+                                                                                 =>
+                                                                                 Documents::US1::US1_0(match &v92
+                                                                                                           {
+                                                                                                           Documents::US1::US1_0(x)
+                                                                                                           =>
+                                                                                                           x.clone(),
+                                                                                                           _
+                                                                                                           =>
+                                                                                                           unreachable!(),
+                                                                                                       }.clone()),
+                                                                                 _
+                                                                                 =>
+                                                                                 {
+                                                                                     let v99:
+                                                                                             Documents::US1 =
+                                                                                         if (v5.clone())
+                                                                                                ==
+                                                                                                (v1_1.clone())
+                                                                                            {
+                                                                                             Documents::US1::US1_0(Documents::US0::US0_4)
+                                                                                         } else {
+                                                                                             Documents::US1::US1_1
+                                                                                         };
+                                                                                     match &v99
+                                                                                         {
+                                                                                         Documents::US1::US1_0(v99_0_0)
+                                                                                         =>
+                                                                                         Documents::US1::US1_0(match &v99
+                                                                                                                   {
+                                                                                                                   Documents::US1::US1_0(x)
+                                                                                                                   =>
+                                                                                                                   x.clone(),
+                                                                                                                   _
+                                                                                                                   =>
+                                                                                                                   unreachable!(),
+                                                                                                               }.clone()),
+                                                                                         _
+                                                                                         =>
+                                                                                         Documents::US1::US1_1,
+                                                                                     }
+                                                                                 }
+                                                                             }
+                                                                         }
+                                                                     }
+                                                                 }
+                                                             }
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
