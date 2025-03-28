@@ -1,7 +1,9 @@
+cargo-features = ["edition2024"]
+
 [package]
 name = "documents"
 version = "0.0.1"
-edition = "2021"
+edition = "2024"
 
 [workspace]
 
