@@ -71,9 +71,9 @@ let crowbook hangul { ext dist_dir dist_path output_path } =
             | "html" =>
                 $'$"--set"'
                 +. $'$" html.css.add \\\\\\"\'"'
-                +. $'$" body {{ color: #e8e6e3; background-color: #202324; }}"'
-                +. $'$" a {{ color: #989693; }}"'
-                +. $'$" pre {{ background-color: #1b1b1b; padding: 10px; }}"'
+                +. $'$" body {{ color: \#e8e6e3; background-color: \#202324; }}"'
+                +. $'$" a {{ color: \#989693; }}"'
+                +. $'$" pre {{ background-color: \#1b1b1b; padding: 10px; }}"'
                 +. $'$" \'\\\\\\""'
                 +. default ext
             | "pdf" =>
@@ -94,8 +94,8 @@ let crowbook hangul { ext dist_dir dist_path output_path } =
                 $'$"--set"'
                 +. $'$" epub.version 3"'
                 +. $'$" html.css.add \\\\\\"\' "'
-                +. $'$" body {{ color: #e8e6e3; background-color: #202324; }} "'
-                +. $'$" a {{ color: #989693; }} "'
+                +. $'$" body {{ color: \#e8e6e3; background-color: \#202324; }} "'
+                +. $'$" a {{ color: \#989693; }} "'
                 +. $'$" \'\\\\\\""'
                 +. default ext
             | _ => ""

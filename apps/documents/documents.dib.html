@@ -7327,6 +7327,7 @@ a.anchor-link {
                     processEnvironments: true
                 },
                 displayAlign: 'center',
+                messageStyle: 'none',
                 CommonHTML: {
                     linebreaks: {
                     automatic: true
@@ -7667,9 +7668,9 @@ a.anchor-link {
             <span class="o">|</span> <span class="s2">"html"</span> <span class="o">=&gt;</span>
                 <span class="err">$</span><span class="s1">'$"--set"'</span>
                 <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" html.css.add </span><span class="se">\\\\\\</span><span class="s1">"</span><span class="se">\'</span><span class="s1">"'</span>
-                <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" body {{ color: #e8e6e3; background-color: #202324; }}"'</span>
-                <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" a {{ color: #989693; }}"'</span>
-                <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" pre {{ background-color: #1b1b1b; padding: 10px; }}"'</span>
+                <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" body {{ color: \#e8e6e3; background-color: \#202324; }}"'</span>
+                <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" a {{ color: \#989693; }}"'</span>
+                <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" pre {{ background-color: \#1b1b1b; padding: 10px; }}"'</span>
                 <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" </span><span class="se">\'\\\\\\</span><span class="s1">""'</span>
                 <span class="o">+.</span> <span class="n">default</span> <span class="n">ext</span>
             <span class="o">|</span> <span class="s2">"pdf"</span> <span class="o">=&gt;</span>
@@ -7690,8 +7691,8 @@ a.anchor-link {
                 <span class="err">$</span><span class="s1">'$"--set"'</span>
                 <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" epub.version 3"'</span>
                 <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" html.css.add </span><span class="se">\\\\\\</span><span class="s1">"</span><span class="se">\'</span><span class="s1"> "'</span>
-                <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" body {{ color: #e8e6e3; background-color: #202324; }} "'</span>
-                <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" a {{ color: #989693; }} "'</span>
+                <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" body {{ color: \#e8e6e3; background-color: \#202324; }} "'</span>
+                <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" a {{ color: \#989693; }} "'</span>
                 <span class="o">+.</span> <span class="err">$</span><span class="s1">'$" </span><span class="se">\'\\\\\\</span><span class="s1">""'</span>
                 <span class="o">+.</span> <span class="n">default</span> <span class="n">ext</span>
             <span class="o">|</span> <span class="n">_</span> <span class="o">=&gt;</span> <span class="s2">""</span>
@@ -8327,129 +8328,129 @@ a.anchor-link {
 00:00:00 <span class="ansi-black-intense-fg">v</span> #22 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 39 }
 00:00:00 <span class="ansi-green-intense-fg">i</span> #23 documents.hangul / { exit_code = 0; result_len = 49; output_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md }
 00:00:00 <span class="ansi-blue-intense-fg">d</span> #24 file_system.file_copy / { old_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md; new_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md; result = 77 }
-00:00:00 <span class="ansi-blue-intense-fg">d</span> #25 runtime.execute_with_options / { file_name = crowbook; arguments = ["--verbose", "--to", "html", "--single", "c:/home/git/alphabet/target/documents/dist/test.md", "--output", "c:/home/git/alphabet/target/documents/dist/test.md.html", "--set", "html.css.add", "' body { color: #e8e6e3; background-color: #202324; } a { color: #989693; } pre { background-color: #1b1b1b; padding: 10px; } '"]; options = { command = crowbook --verbose --to html --single "c:/home/git/alphabet/target/documents/dist/test.md" --output "c:/home/git/alphabet/target/documents/dist/test.md.html" --set html.css.add \"' body { color: #e8e6e3; background-color: #202324; } a { color: #989693; } pre { background-color: #1b1b1b; padding: 10px; } '\" rendering.num_depth 6 rendering.highlight.theme \"Solarized (dark)\"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
+00:00:00 <span class="ansi-blue-intense-fg">d</span> #25 runtime.execute_with_options / { file_name = crowbook; arguments = ["--verbose", "--to", "epub", "--single", "c:/home/git/alphabet/target/documents/dist/test.md", "--output", "c:/home/git/alphabet/target/documents/dist/test.md.epub", "--set", "epub.version", "3", "html.css.add", "'  body { color: #e8e6e3; background-color: #202324; }  a { color: #989693; }  '"]; options = { command = crowbook --verbose --to epub --single "c:/home/git/alphabet/target/documents/dist/test.md" --output "c:/home/git/alphabet/target/documents/dist/test.md.epub" --set epub.version 3 html.css.add \"'  body { color: #e8e6e3; background-color: #202324; }  a { color: #989693; }  '\" rendering.num_depth 6 rendering.highlight.theme \"Solarized (dark)\"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
     "\\?\C:\home\git\alphabet\target\documents\dist",
 ) } }
-00:00:00 <span class="ansi-blue-intense-fg">d</span> #26 runtime.execute_with_options / { file_name = crowbook; arguments = ["--verbose", "--to", "pdf", "--single", "c:/home/git/alphabet/target/documents/dist/test.md", "--output", "c:/home/git/alphabet/target/documents/dist/test.md.pdf", "--set", "tex.paper.size", "a4paper", "tex.template.add", "\\pagenumbering{gobble}", "rendering.num_depth", "6", "rendering.highlight.theme", "Solarized (dark)"]; options = { command = crowbook --verbose --to pdf --single "c:/home/git/alphabet/target/documents/dist/test.md" --output "c:/home/git/alphabet/target/documents/dist/test.md.pdf" --set tex.paper.size a4paper tex.template.add "\pagenumbering{gobble}" rendering.num_depth 6 rendering.highlight.theme \"Solarized (dark)\"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
+00:00:00 <span class="ansi-blue-intense-fg">d</span> #26 runtime.execute_with_options / { file_name = crowbook; arguments = ["--verbose", "--to", "epub", "--single", "c:/home/git/alphabet/target/documents/dist/test.hangul.md", "--output", "c:/home/git/alphabet/target/documents/dist/test.hangul.md.epub", "--set", "epub.version", "3", "html.css.add", "'  body { color: #e8e6e3; background-color: #202324; }  a { color: #989693; }  '"]; options = { command = crowbook --verbose --to epub --single "c:/home/git/alphabet/target/documents/dist/test.hangul.md" --output "c:/home/git/alphabet/target/documents/dist/test.hangul.md.epub" --set epub.version 3 html.css.add \"'  body { color: #e8e6e3; background-color: #202324; }  a { color: #989693; }  '\" rendering.num_depth 6 rendering.highlight.theme \"Solarized (dark)\"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
     "\\?\C:\home\git\alphabet\target\documents\dist",
 ) } }
-00:00:00 <span class="ansi-blue-intense-fg">d</span> #27 runtime.execute_with_options / { file_name = crowbook; arguments = ["--verbose", "--to", "epub", "--single", "c:/home/git/alphabet/target/documents/dist/test.hangul.md", "--output", "c:/home/git/alphabet/target/documents/dist/test.hangul.md.epub", "--set", "epub.version", "3", "html.css.add", "'  body { color: #e8e6e3; background-color: #202324; }  a { color: #989693; }  '"]; options = { command = crowbook --verbose --to epub --single "c:/home/git/alphabet/target/documents/dist/test.hangul.md" --output "c:/home/git/alphabet/target/documents/dist/test.hangul.md.epub" --set epub.version 3 html.css.add \"'  body { color: #e8e6e3; background-color: #202324; }  a { color: #989693; }  '\" rendering.num_depth 6 rendering.highlight.theme \"Solarized (dark)\"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
+00:00:00 <span class="ansi-blue-intense-fg">d</span> #27 runtime.execute_with_options / { file_name = crowbook; arguments = ["--verbose", "--to", "pdf", "--single", "c:/home/git/alphabet/target/documents/dist/test.md", "--output", "c:/home/git/alphabet/target/documents/dist/test.md.pdf", "--set", "tex.paper.size", "a4paper", "tex.template.add", "\\pagenumbering{gobble}", "rendering.num_depth", "6", "rendering.highlight.theme", "Solarized (dark)"]; options = { command = crowbook --verbose --to pdf --single "c:/home/git/alphabet/target/documents/dist/test.md" --output "c:/home/git/alphabet/target/documents/dist/test.md.pdf" --set tex.paper.size a4paper tex.template.add "\pagenumbering{gobble}" rendering.num_depth 6 rendering.highlight.theme \"Solarized (dark)\"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
     "\\?\C:\home\git\alphabet\target\documents\dist",
 ) } }
 00:00:00 <span class="ansi-blue-intense-fg">d</span> #28 runtime.execute_with_options / { file_name = crowbook; arguments = ["--verbose", "--to", "html", "--single", "c:/home/git/alphabet/target/documents/dist/test.hangul.md", "--output", "c:/home/git/alphabet/target/documents/dist/test.hangul.md.html", "--set", "html.css.add", "' body { color: #e8e6e3; background-color: #202324; } a { color: #989693; } pre { background-color: #1b1b1b; padding: 10px; } '"]; options = { command = crowbook --verbose --to html --single "c:/home/git/alphabet/target/documents/dist/test.hangul.md" --output "c:/home/git/alphabet/target/documents/dist/test.hangul.md.html" --set html.css.add \"' body { color: #e8e6e3; background-color: #202324; } a { color: #989693; } pre { background-color: #1b1b1b; padding: 10px; } '\" rendering.num_depth 6 rendering.highlight.theme \"Solarized (dark)\"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
     "\\?\C:\home\git\alphabet\target\documents\dist",
 ) } }
-00:00:00 <span class="ansi-blue-intense-fg">d</span> #29 runtime.execute_with_options / { file_name = crowbook; arguments = ["--verbose", "--to", "epub", "--single", "c:/home/git/alphabet/target/documents/dist/test.md", "--output", "c:/home/git/alphabet/target/documents/dist/test.md.epub", "--set", "epub.version", "3", "html.css.add", "'  body { color: #e8e6e3; background-color: #202324; }  a { color: #989693; }  '"]; options = { command = crowbook --verbose --to epub --single "c:/home/git/alphabet/target/documents/dist/test.md" --output "c:/home/git/alphabet/target/documents/dist/test.md.epub" --set epub.version 3 html.css.add \"'  body { color: #e8e6e3; background-color: #202324; }  a { color: #989693; }  '\" rendering.num_depth 6 rendering.highlight.theme \"Solarized (dark)\"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
+00:00:00 <span class="ansi-blue-intense-fg">d</span> #29 runtime.execute_with_options / { file_name = crowbook; arguments = ["--verbose", "--to", "html", "--single", "c:/home/git/alphabet/target/documents/dist/test.md", "--output", "c:/home/git/alphabet/target/documents/dist/test.md.html", "--set", "html.css.add", "' body { color: #e8e6e3; background-color: #202324; } a { color: #989693; } pre { background-color: #1b1b1b; padding: 10px; } '"]; options = { command = crowbook --verbose --to html --single "c:/home/git/alphabet/target/documents/dist/test.md" --output "c:/home/git/alphabet/target/documents/dist/test.md.html" --set html.css.add \"' body { color: #e8e6e3; background-color: #202324; } a { color: #989693; } pre { background-color: #1b1b1b; padding: 10px; } '\" rendering.num_depth 6 rendering.highlight.theme \"Solarized (dark)\"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
     "\\?\C:\home\git\alphabet\target\documents\dist",
 ) } }
 00:00:00 <span class="ansi-black-intense-fg">v</span> #30 ! CROWBOOK 0.17.0
-00:00:00 <span class="ansi-black-intense-fg">v</span> #31 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Ignoring YAML block:
-00:00:00 <span class="ansi-black-intense-fg">v</span> #32 !
-00:00:00 <span class="ansi-black-intense-fg">v</span> #33 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Attempting to generate html...
-00:00:00 <span class="ansi-black-intense-fg">v</span> #34 ! CROWBOOK 0.17.0
-00:00:00 <span class="ansi-black-intense-fg">v</span> #35 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::toc: rendered elem: "&lt;li&gt;&lt;a href=\"#link-1\"&gt;a&lt;/a&gt;&lt;/li&gt;"
-00:00:00 <span class="ansi-black-intense-fg">v</span> #36 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Ignoring YAML block:
-00:00:00 <span class="ansi-black-intense-fg">v</span> #37 !
-00:00:00 <span class="ansi-black-intense-fg">v</span> #37 ! 18:58:11 <span class="ansi-blue-fg">[INFO] </span>crowbook::book: Succesfully generated HTML (standalone page): test.md.html
-00:00:00 <span class="ansi-black-intense-fg">v</span> #39 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Attempting to generate pdf...
-00:00:00 <span class="ansi-black-intense-fg">v</span> #40 ! CROWBOOK 0.17.0
-00:00:00 <span class="ansi-black-intense-fg">v</span> #41 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::latex: Attempting to run LaTeX on generated file
-00:00:00 <span class="ansi-black-intense-fg">v</span> #42 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Ignoring YAML block:
-00:00:00 <span class="ansi-black-intense-fg">v</span> #43 !
-00:00:00 <span class="ansi-black-intense-fg">v</span> #44 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Attempting to generate epub...
-00:00:00 <span class="ansi-black-intense-fg">v</span> #45 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 437 }
-00:00:00 <span class="ansi-blue-intense-fg">d</span> #46 file_system.file_copy / { old_path = c:/home/git/alphabet/target/documents/dist/test.md.html; new_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.html; result = 11631 }
-00:00:00 <span class="ansi-black-intense-fg">v</span> #47 ! CROWBOOK 0.17.0
-00:00:00 <span class="ansi-black-intense-fg">v</span> #48 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Ignoring YAML block:
-00:00:00 <span class="ansi-black-intense-fg">v</span> #49 !
-00:00:00 <span class="ansi-black-intense-fg">v</span> #50 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Attempting to generate html...
-00:00:00 <span class="ansi-black-intense-fg">v</span> #51 ! CROWBOOK 0.17.0
-00:00:00 <span class="ansi-black-intense-fg">v</span> #52 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::toc: rendered elem: "&lt;li&gt;&lt;a href=\"#link-1\"&gt;아&lt;/a&gt;&lt;/li&gt;"
-00:00:00 <span class="ansi-black-intense-fg">v</span> #53 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Ignoring YAML block:
-00:00:00 <span class="ansi-black-intense-fg">v</span> #54 !
-00:00:00 <span class="ansi-black-intense-fg">v</span> #55 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Attempting to generate epub...
-00:00:00 <span class="ansi-black-intense-fg">v</span> #56 ! 18:58:11 <span class="ansi-blue-fg">[INFO] </span>crowbook::book: Succesfully generated HTML (standalone page): test.hangul.md.html
-00:00:00 <span class="ansi-black-intense-fg">v</span> #57 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 444 }
-00:00:00 <span class="ansi-blue-intense-fg">d</span> #58 file_system.file_copy / { old_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.html; new_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.html; result = 11657 }
-00:00:00 <span class="ansi-blue-intense-fg">d</span> #59 runtime.execute_with_options / { file_name = crowbook; arguments = ["--verbose", "--to", "pdf", "--single", "c:/home/git/alphabet/target/documents/dist/test.hangul.md", "--output", "c:/home/git/alphabet/target/documents/dist/test.hangul.md.pdf", "--set", "tex.paper.size", "a4paper", "tex.template.add", "\\pagenumbering{gobble}", "tex.template.add", "\\usepackage{polyglossia}", "tex.template.add", "\\setmainlanguage{korean}", "tex.template.add", "\\setmainfont{NanumGothicCoding}", "tex.font.size", "13", "rendering.num_depth", "6", "rendering.highlight.theme", "Solarized (dark)"]; options = { command = crowbook --verbose --to pdf --single "c:/home/git/alphabet/target/documents/dist/test.hangul.md" --output "c:/home/git/alphabet/target/documents/dist/test.hangul.md.pdf" --set tex.paper.size a4paper tex.template.add "\pagenumbering{gobble}" tex.template.add "\usepackage{polyglossia}" tex.template.add "\setmainlanguage{korean}" tex.template.add "\setmainfont{NanumGothicCoding}" tex.font.size 13 rendering.num_depth 6 rendering.highlight.theme \"Solarized (dark)\"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
+00:00:00 <span class="ansi-black-intense-fg">v</span> #30 ! CROWBOOK 0.17.0
+00:00:00 <span class="ansi-black-intense-fg">v</span> #30 ! CROWBOOK 0.17.0
+00:00:00 <span class="ansi-black-intense-fg">v</span> #30 ! CROWBOOK 0.17.0
+00:00:00 <span class="ansi-black-intense-fg">v</span> #33 ! CROWBOOK 0.17.0
+00:00:00 <span class="ansi-blue-intense-fg">d</span> #34 runtime.execute_with_options / { file_name = crowbook; arguments = ["--verbose", "--to", "pdf", "--single", "c:/home/git/alphabet/target/documents/dist/test.hangul.md", "--output", "c:/home/git/alphabet/target/documents/dist/test.hangul.md.pdf", "--set", "tex.paper.size", "a4paper", "tex.template.add", "\\pagenumbering{gobble}", "tex.template.add", "\\usepackage{polyglossia}", "tex.template.add", "\\setmainlanguage{korean}", "tex.template.add", "\\setmainfont{NanumGothicCoding}", "tex.font.size", "13", "rendering.num_depth", "6", "rendering.highlight.theme", "Solarized (dark)"]; options = { command = crowbook --verbose --to pdf --single "c:/home/git/alphabet/target/documents/dist/test.hangul.md" --output "c:/home/git/alphabet/target/documents/dist/test.hangul.md.pdf" --set tex.paper.size a4paper tex.template.add "\pagenumbering{gobble}" tex.template.add "\usepackage{polyglossia}" tex.template.add "\setmainlanguage{korean}" tex.template.add "\setmainfont{NanumGothicCoding}" tex.font.size 13 rendering.num_depth 6 rendering.highlight.theme \"Solarized (dark)\"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
     "\\?\C:\home\git\alphabet\target\documents\dist",
 ) } }
-00:00:00 <span class="ansi-black-intense-fg">v</span> #60 ! CROWBOOK 0.17.0
-00:00:00 <span class="ansi-black-intense-fg">v</span> #61 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Ignoring YAML block:
-00:00:00 <span class="ansi-black-intense-fg">v</span> #62 !
-00:00:00 <span class="ansi-black-intense-fg">v</span> #63 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Attempting to generate pdf...
-00:00:00 <span class="ansi-black-intense-fg">v</span> #64 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::latex: Attempting to run LaTeX on generated file
-00:00:00 <span class="ansi-black-intense-fg">v</span> #65 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: Add resource: "stylesheet.css"
-00:00:00 <span class="ansi-black-intense-fg">v</span> #66 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: render_opf...
-00:00:00 <span class="ansi-black-intense-fg">v</span> #67 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: id="title_page.xhtml", mime="application/xhtml+xml"
-00:00:00 <span class="ansi-black-intense-fg">v</span> #68 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: content = Content { file: "title_page.xhtml", mime: "application/xhtml+xml", itemref: true, cover: false, reftype: Some(TitlePage), title: "Title" }
-00:00:00 <span class="ansi-black-intense-fg">v</span> #69 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: id="chapter_000.xhtml", mime="application/xhtml+xml"
-00:00:00 <span class="ansi-black-intense-fg">v</span> #70 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: content = Content { file: "chapter_000.xhtml", mime: "application/xhtml+xml", itemref: true, cover: false, reftype: Some(Text), title: "아" }
-00:00:00 <span class="ansi-black-intense-fg">v</span> #71 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: Add resource: "stylesheet.css"
-00:00:00 <span class="ansi-black-intense-fg">v</span> #72 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: id="stylesheet.css", mime="text/css"
-00:00:00 <span class="ansi-black-intense-fg">v</span> #73 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::toc: rendered elem: "&lt;li&gt;&lt;a href=\"title_page.xhtml\"&gt;Title&lt;/a&gt;&lt;/li&gt;"
-00:00:00 <span class="ansi-black-intense-fg">v</span> #73 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: render_opf...
-00:00:00 <span class="ansi-black-intense-fg">v</span> #75 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::toc: rendered elem: "&lt;li&gt;&lt;a href=\"chapter_000.xhtml\"&gt;아&lt;/a&gt;&lt;/li&gt;"
-00:00:00 <span class="ansi-black-intense-fg">v</span> #76 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: id="title_page.xhtml", mime="application/xhtml+xml"
-00:00:00 <span class="ansi-black-intense-fg">v</span> #77 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: content = Content { file: "title_page.xhtml", mime: "application/xhtml+xml", itemref: true, cover: false, reftype: Some(TitlePage), title: "Title" }
-00:00:00 <span class="ansi-black-intense-fg">v</span> #78 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: id="chapter_000.xhtml", mime="application/xhtml+xml"
-00:00:00 <span class="ansi-black-intense-fg">v</span> #79 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: content = Content { file: "chapter_000.xhtml", mime: "application/xhtml+xml", itemref: true, cover: false, reftype: Some(Text), title: "a" }
-00:00:00 <span class="ansi-black-intense-fg">v</span> #80 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: id="stylesheet.css", mime="text/css"
-00:00:00 <span class="ansi-black-intense-fg">v</span> #81 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::toc: rendered elem: "&lt;li&gt;&lt;a href=\"title_page.xhtml\"&gt;Title&lt;/a&gt;&lt;/li&gt;"
-00:00:00 <span class="ansi-black-intense-fg">v</span> #82 ! 18:58:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::toc: rendered elem: "&lt;li&gt;&lt;a href=\"chapter_000.xhtml\"&gt;a&lt;/a&gt;&lt;/li&gt;"
-00:00:00 <span class="ansi-black-intense-fg">v</span> #83 ! 18:58:12 <span class="ansi-blue-fg">[INFO] </span>crowbook::book: Succesfully generated EPUB: test.hangul.md.epub
-00:00:00 <span class="ansi-black-intense-fg">v</span> #84 ! 18:58:12 <span class="ansi-blue-fg">[INFO] </span>crowbook::book: Succesfully generated EPUB: test.md.epub
-00:00:00 <span class="ansi-black-intense-fg">v</span> #85 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 1489 }
-00:00:00 <span class="ansi-black-intense-fg">v</span> #86 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 1482 }
-00:00:00 <span class="ansi-blue-intense-fg">d</span> #87 file_system.file_copy / { old_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.epub; new_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.epub; result = 5575 }
-00:00:00 <span class="ansi-blue-intense-fg">d</span> #88 file_system.file_copy / { old_path = c:/home/git/alphabet/target/documents/dist/test.md.epub; new_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.epub; result = 5525 }
-00:00:11 <span class="ansi-black-intense-fg">v</span> #89 ! 18:58:22 <span class="ansi-blue-fg">[INFO] </span>crowbook::book: Succesfully generated PDF: test.md.pdf
-00:00:11 <span class="ansi-black-intense-fg">v</span> #90 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 404 }
-00:00:11 <span class="ansi-blue-intense-fg">d</span> #91 file_system.file_copy / { old_path = c:/home/git/alphabet/target/documents/dist/test.md.pdf; new_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.pdf; result = 6126 }
-00:00:11 <span class="ansi-black-intense-fg">v</span> #92 ! 18:58:23 <span class="ansi-blue-fg">[INFO] </span>crowbook::book: Succesfully generated PDF: test.hangul.md.pdf
-00:00:11 <span class="ansi-black-intense-fg">v</span> #93 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 411 }
-00:00:11 <span class="ansi-blue-intense-fg">d</span> #94 file_system.file_copy / { old_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.pdf; new_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.pdf; result = 8022 }
-__assert_eq / actual: "[Ok(("c:/home/git/alphabet/target/documents/dist/test.md", [Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.md.html")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.md.pdf")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.md.epub")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md.html")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md.pdf")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md.epub"))]))]" / expected: "[Ok(("c:/home/git/alphabet/target/documents/dist/test.md", [Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.md.html")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.md.pdf")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.md.epub")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md.html")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md.pdf")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md.epub"))]))]"
-00:00:11 <span class="ansi-black-intense-fg">v</span> #95 file_system.create_dir / { dir = c:/home/git\polyglot\../alphabet/target/documents\dist }
-00:00:11 <span class="ansi-blue-intense-fg">d</span> #96 documents.run / { source_dir = \\?\C:\home\git\alphabet\target\documents; dist_dir = \\?\C:\home\git\alphabet\target\documents\dist; cache_dir = \\?\C:\home\git\alphabet\target\documents\cache; hangul_spec = por-br }
-00:00:11 <span class="ansi-blue-intense-fg">d</span> #97 documents.run / { files_len = 1 }
-00:00:11 <span class="ansi-blue-intense-fg">d</span> #98 runtime.execute_with_options / { file_name = git; arguments = ["ls-tree", "--format='%(objectname)'", "origin/gh-pages", "c:/home/git/alphabet/target/documents/test.md"]; options = { command = git ls-tree --format='%(objectname)' origin/gh-pages "c:/home/git/alphabet/target/documents/test.md"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
+00:00:00 <span class="ansi-black-intense-fg">v</span> #35 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Ignoring YAML block:
+00:00:00 <span class="ansi-black-intense-fg">v</span> #35 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Ignoring YAML block:
+00:00:00 <span class="ansi-black-intense-fg">v</span> #35 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Ignoring YAML block:
+00:00:00 <span class="ansi-black-intense-fg">v</span> #35 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Ignoring YAML block:
+00:00:00 <span class="ansi-black-intense-fg">v</span> #35 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Ignoring YAML block:
+00:00:00 <span class="ansi-black-intense-fg">v</span> #39 !
+00:00:00 <span class="ansi-black-intense-fg">v</span> #39 !
+00:00:00 <span class="ansi-black-intense-fg">v</span> #40 !
+00:00:00 <span class="ansi-black-intense-fg">v</span> #41 !
+00:00:00 <span class="ansi-black-intense-fg">v</span> #41 !
+00:00:00 <span class="ansi-black-intense-fg">v</span> #44 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Attempting to generate epub...
+00:00:00 <span class="ansi-black-intense-fg">v</span> #44 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Attempting to generate html...
+00:00:00 <span class="ansi-black-intense-fg">v</span> #44 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Attempting to generate epub...
+00:00:00 <span class="ansi-black-intense-fg">v</span> #45 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Attempting to generate pdf...
+00:00:00 <span class="ansi-black-intense-fg">v</span> #47 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Attempting to generate html...
+00:00:00 <span class="ansi-black-intense-fg">v</span> #49 ! CROWBOOK 0.17.0
+00:00:00 <span class="ansi-black-intense-fg">v</span> #50 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Ignoring YAML block:
+00:00:00 <span class="ansi-black-intense-fg">v</span> #51 !
+00:00:00 <span class="ansi-black-intense-fg">v</span> #52 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::book: Attempting to generate pdf...
+00:00:00 <span class="ansi-black-intense-fg">v</span> #53 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::toc: rendered elem: "&lt;li&gt;&lt;a href=\"#link-1\"&gt;a&lt;/a&gt;&lt;/li&gt;"
+00:00:00 <span class="ansi-black-intense-fg">v</span> #54 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::latex: Attempting to run LaTeX on generated file
+00:00:00 <span class="ansi-black-intense-fg">v</span> #54 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) crowbook::latex: Attempting to run LaTeX on generated file
+00:00:00 <span class="ansi-black-intense-fg">v</span> #56 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::toc: rendered elem: "&lt;li&gt;&lt;a href=\"#link-1\"&gt;아&lt;/a&gt;&lt;/li&gt;"
+00:00:00 <span class="ansi-black-intense-fg">v</span> #57 ! 19:17:11 <span class="ansi-blue-fg">[INFO] </span>crowbook::book: Succesfully generated HTML (standalone page): test.hangul.md.html
+00:00:00 <span class="ansi-black-intense-fg">v</span> #58 ! 19:17:11 <span class="ansi-blue-fg">[INFO] </span>crowbook::book: Succesfully generated HTML (standalone page): test.md.html
+00:00:00 <span class="ansi-black-intense-fg">v</span> #59 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 437 }
+00:00:00 <span class="ansi-black-intense-fg">v</span> #60 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 444 }
+00:00:00 <span class="ansi-blue-intense-fg">d</span> #61 file_system.file_copy / { old_path = c:/home/git/alphabet/target/documents/dist/test.md.html; new_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.html; result = 11632 }
+00:00:00 <span class="ansi-blue-intense-fg">d</span> #62 file_system.file_copy / { old_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.html; new_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.html; result = 11658 }
+00:00:00 <span class="ansi-black-intense-fg">v</span> #63 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: Add resource: "stylesheet.css"
+00:00:00 <span class="ansi-black-intense-fg">v</span> #64 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: render_opf...
+00:00:00 <span class="ansi-black-intense-fg">v</span> #65 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: id="title_page.xhtml", mime="application/xhtml+xml"
+00:00:00 <span class="ansi-black-intense-fg">v</span> #66 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: Add resource: "stylesheet.css"
+00:00:00 <span class="ansi-black-intense-fg">v</span> #66 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: content = Content { file: "title_page.xhtml", mime: "application/xhtml+xml", itemref: true, cover: false, reftype: Some(TitlePage), title: "Title" }
+00:00:00 <span class="ansi-black-intense-fg">v</span> #68 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: id="chapter_000.xhtml", mime="application/xhtml+xml"
+00:00:00 <span class="ansi-black-intense-fg">v</span> #68 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: render_opf...
+00:00:00 <span class="ansi-black-intense-fg">v</span> #70 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: content = Content { file: "chapter_000.xhtml", mime: "application/xhtml+xml", itemref: true, cover: false, reftype: Some(Text), title: "아" }
+00:00:00 <span class="ansi-black-intense-fg">v</span> #70 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: id="title_page.xhtml", mime="application/xhtml+xml"
+00:00:00 <span class="ansi-black-intense-fg">v</span> #72 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: id="stylesheet.css", mime="text/css"
+00:00:00 <span class="ansi-black-intense-fg">v</span> #73 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: content = Content { file: "title_page.xhtml", mime: "application/xhtml+xml", itemref: true, cover: false, reftype: Some(TitlePage), title: "Title" }
+00:00:00 <span class="ansi-black-intense-fg">v</span> #74 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: id="chapter_000.xhtml", mime="application/xhtml+xml"
+00:00:00 <span class="ansi-black-intense-fg">v</span> #75 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::toc: rendered elem: "&lt;li&gt;&lt;a href=\"title_page.xhtml\"&gt;Title&lt;/a&gt;&lt;/li&gt;"
+00:00:00 <span class="ansi-black-intense-fg">v</span> #75 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: content = Content { file: "chapter_000.xhtml", mime: "application/xhtml+xml", itemref: true, cover: false, reftype: Some(Text), title: "a" }
+00:00:00 <span class="ansi-black-intense-fg">v</span> #77 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::epub: id="stylesheet.css", mime="text/css"
+00:00:00 <span class="ansi-black-intense-fg">v</span> #77 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::toc: rendered elem: "&lt;li&gt;&lt;a href=\"chapter_000.xhtml\"&gt;아&lt;/a&gt;&lt;/li&gt;"
+00:00:00 <span class="ansi-black-intense-fg">v</span> #79 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::toc: rendered elem: "&lt;li&gt;&lt;a href=\"title_page.xhtml\"&gt;Title&lt;/a&gt;&lt;/li&gt;"
+00:00:00 <span class="ansi-black-intense-fg">v</span> #80 ! 19:17:11 <span class="ansi-cyan-fg">[DEBUG] </span>(1) epub_builder::toc: rendered elem: "&lt;li&gt;&lt;a href=\"chapter_000.xhtml\"&gt;a&lt;/a&gt;&lt;/li&gt;"
+00:00:00 <span class="ansi-black-intense-fg">v</span> #81 ! 19:17:11 <span class="ansi-blue-fg">[INFO] </span>crowbook::book: Succesfully generated EPUB: test.md.epub
+00:00:00 <span class="ansi-black-intense-fg">v</span> #81 ! 19:17:11 <span class="ansi-blue-fg">[INFO] </span>crowbook::book: Succesfully generated EPUB: test.hangul.md.epub
+00:00:00 <span class="ansi-black-intense-fg">v</span> #83 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 1482 }
+00:00:00 <span class="ansi-black-intense-fg">v</span> #83 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 1489 }
+00:00:00 <span class="ansi-blue-intense-fg">d</span> #85 file_system.file_copy / { old_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.epub; new_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.epub; result = 5573 }
+00:00:00 <span class="ansi-blue-intense-fg">d</span> #86 file_system.file_copy / { old_path = c:/home/git/alphabet/target/documents/dist/test.md.epub; new_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.epub; result = 5522 }
+00:00:07 <span class="ansi-black-intense-fg">v</span> #87 ! 19:17:19 <span class="ansi-blue-fg">[INFO] </span>crowbook::book: Succesfully generated PDF: test.md.pdf
+00:00:07 <span class="ansi-black-intense-fg">v</span> #88 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 404 }
+00:00:07 <span class="ansi-blue-intense-fg">d</span> #89 file_system.file_copy / { old_path = c:/home/git/alphabet/target/documents/dist/test.md.pdf; new_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.pdf; result = 6126 }
+00:00:07 <span class="ansi-black-intense-fg">v</span> #90 ! 19:17:19 <span class="ansi-blue-fg">[INFO] </span>crowbook::book: Succesfully generated PDF: test.hangul.md.pdf
+00:00:07 <span class="ansi-black-intense-fg">v</span> #91 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 411 }
+00:00:07 <span class="ansi-blue-intense-fg">d</span> #92 file_system.file_copy / { old_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.pdf; new_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.pdf; result = 8019 }
+{ name = __assert_eq; actual = [Ok(("c:/home/git/alphabet/target/documents/dist/test.md", [Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.md.html")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.md.pdf")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.md.epub")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md.html")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md.pdf")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md.epub"))]))]; expected = [Ok(("c:/home/git/alphabet/target/documents/dist/test.md", [Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.md.html")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.md.pdf")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.md.epub")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md.html")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md.pdf")), Some(Ok("c:/home/git/alphabet/target/documents/dist/test.hangul.md.epub"))]))] }
+00:00:07 <span class="ansi-black-intense-fg">v</span> #93 file_system.create_dir / { dir = c:/home/git\polyglot\../alphabet/target/documents\dist }
+00:00:07 <span class="ansi-blue-intense-fg">d</span> #94 documents.run / { source_dir = \\?\C:\home\git\alphabet\target\documents; dist_dir = \\?\C:\home\git\alphabet\target\documents\dist; cache_dir = \\?\C:\home\git\alphabet\target\documents\cache; hangul_spec = por-br }
+00:00:07 <span class="ansi-blue-intense-fg">d</span> #95 documents.run / { files_len = 1 }
+00:00:07 <span class="ansi-blue-intense-fg">d</span> #96 runtime.execute_with_options / { file_name = git; arguments = ["ls-tree", "--format='%(objectname)'", "origin/gh-pages", "c:/home/git/alphabet/target/documents/test.md"]; options = { command = git ls-tree --format='%(objectname)' origin/gh-pages "c:/home/git/alphabet/target/documents/test.md"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
     "\\?\C:\home\git\alphabet\target\documents",
 ) } }
-00:00:11 <span class="ansi-black-intense-fg">v</span> #99 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 0 }
-00:00:11 <span class="ansi-blue-intense-fg">d</span> #100 runtime.execute_with_options / { file_name = git; arguments = ["hash-object", "c:/home/git/alphabet/target/documents/dist/test.md"]; options = { command = git hash-object "c:/home/git/alphabet/target/documents/dist/test.md"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
+00:00:07 <span class="ansi-black-intense-fg">v</span> #97 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 0 }
+00:00:08 <span class="ansi-blue-intense-fg">d</span> #98 runtime.execute_with_options / { file_name = git; arguments = ["hash-object", "c:/home/git/alphabet/target/documents/dist/test.md"]; options = { command = git hash-object "c:/home/git/alphabet/target/documents/dist/test.md"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
     "\\?\C:\home\git\alphabet\target\documents\dist",
 ) } }
-00:00:11 <span class="ansi-black-intense-fg">v</span> #101 &gt; 6358eb3bcf1cbb2b0cdddbd569507e44386e02c3
-00:00:11 <span class="ansi-black-intense-fg">v</span> #102 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 40 }
-00:00:11 <span class="ansi-green-intense-fg">i</span> #103 documents.run / par_map / files' = [] / listm.iter / { output_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.epub; output_cache_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.epub }
-00:00:11 <span class="ansi-blue-intense-fg">d</span> #104 file_system.file_copy / { old_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.epub; new_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.epub; result = 5575 }
-00:00:11 <span class="ansi-green-intense-fg">i</span> #105 documents.run / par_map / files' = [] / listm.iter / { output_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.pdf; output_cache_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.pdf }
-00:00:11 <span class="ansi-blue-intense-fg">d</span> #106 file_system.file_copy / { old_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.pdf; new_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.pdf; result = 8022 }
-00:00:11 <span class="ansi-green-intense-fg">i</span> #107 documents.run / par_map / files' = [] / listm.iter / { output_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.html; output_cache_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.html }
-00:00:11 <span class="ansi-blue-intense-fg">d</span> #108 file_system.file_copy / { old_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.html; new_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.html; result = 11657 }
-00:00:11 <span class="ansi-green-intense-fg">i</span> #109 documents.run / par_map / files' = [] / listm.iter / { output_path = c:/home/git/alphabet/target/documents/dist/test.md.epub; output_cache_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.epub }
-00:00:11 <span class="ansi-blue-intense-fg">d</span> #110 file_system.file_copy / { old_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.epub; new_path = c:/home/git/alphabet/target/documents/dist/test.md.epub; result = 5525 }
-00:00:11 <span class="ansi-green-intense-fg">i</span> #111 documents.run / par_map / files' = [] / listm.iter / { output_path = c:/home/git/alphabet/target/documents/dist/test.md.pdf; output_cache_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.pdf }
-00:00:11 <span class="ansi-blue-intense-fg">d</span> #112 file_system.file_copy / { old_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.pdf; new_path = c:/home/git/alphabet/target/documents/dist/test.md.pdf; result = 6126 }
-00:00:11 <span class="ansi-green-intense-fg">i</span> #113 documents.run / par_map / files' = [] / listm.iter / { output_path = c:/home/git/alphabet/target/documents/dist/test.md.html; output_cache_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.html }
-00:00:11 <span class="ansi-blue-intense-fg">d</span> #114 file_system.file_copy / { old_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.html; new_path = c:/home/git/alphabet/target/documents/dist/test.md.html; result = 11631 }
-00:00:11 <span class="ansi-green-intense-fg">i</span> #115 documents.run / par_map / files' = [] / listm.iter / { output_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md; output_cache_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md }
-00:00:11 <span class="ansi-blue-intense-fg">d</span> #116 file_system.file_copy / { old_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md; new_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md; result = 77 }
-__assert_eq / actual: "[Ok(("c:/home/git/alphabet/target/documents/dist/test.md", []))]" / expected: "[Ok(("c:/home/git/alphabet/target/documents/dist/test.md", []))]"
-00:00:11 <span class="ansi-blue-intense-fg">d</span> #117 documents.run / { source_dir = \\?\C:\home\git\alphabet\target\documents; dist_dir = \\?\C:\home\git\alphabet\target\documents\dist; cache_dir = \\?\C:\home\git\alphabet\target\documents\cache; hangul_spec = por-br }
-00:00:12 <span class="ansi-blue-intense-fg">d</span> #118 documents.run / { files_len = 1 }
-00:00:12 <span class="ansi-blue-intense-fg">d</span> #119 runtime.execute_with_options / { file_name = git; arguments = ["ls-tree", "--format='%(objectname)'", "origin/gh-pages", "c:/home/git/alphabet/target/documents/test.md"]; options = { command = git ls-tree --format='%(objectname)' origin/gh-pages "c:/home/git/alphabet/target/documents/test.md"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
+00:00:08 <span class="ansi-black-intense-fg">v</span> #99 &gt; 6358eb3bcf1cbb2b0cdddbd569507e44386e02c3
+00:00:08 <span class="ansi-black-intense-fg">v</span> #100 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 40 }
+00:00:08 <span class="ansi-green-intense-fg">i</span> #101 documents.run / par_map / files' = [] / listm.iter / { output_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.epub; output_cache_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.epub }
+00:00:08 <span class="ansi-blue-intense-fg">d</span> #102 file_system.file_copy / { old_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.epub; new_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.epub; result = 5573 }
+00:00:08 <span class="ansi-green-intense-fg">i</span> #103 documents.run / par_map / files' = [] / listm.iter / { output_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.pdf; output_cache_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.pdf }
+00:00:08 <span class="ansi-blue-intense-fg">d</span> #104 file_system.file_copy / { old_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.pdf; new_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.pdf; result = 8019 }
+00:00:08 <span class="ansi-green-intense-fg">i</span> #105 documents.run / par_map / files' = [] / listm.iter / { output_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.html; output_cache_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.html }
+00:00:08 <span class="ansi-blue-intense-fg">d</span> #106 file_system.file_copy / { old_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md.html; new_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md.html; result = 11658 }
+00:00:08 <span class="ansi-green-intense-fg">i</span> #107 documents.run / par_map / files' = [] / listm.iter / { output_path = c:/home/git/alphabet/target/documents/dist/test.md.epub; output_cache_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.epub }
+00:00:08 <span class="ansi-blue-intense-fg">d</span> #108 file_system.file_copy / { old_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.epub; new_path = c:/home/git/alphabet/target/documents/dist/test.md.epub; result = 5522 }
+00:00:08 <span class="ansi-green-intense-fg">i</span> #109 documents.run / par_map / files' = [] / listm.iter / { output_path = c:/home/git/alphabet/target/documents/dist/test.md.pdf; output_cache_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.pdf }
+00:00:08 <span class="ansi-blue-intense-fg">d</span> #110 file_system.file_copy / { old_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.pdf; new_path = c:/home/git/alphabet/target/documents/dist/test.md.pdf; result = 6126 }
+00:00:08 <span class="ansi-green-intense-fg">i</span> #111 documents.run / par_map / files' = [] / listm.iter / { output_path = c:/home/git/alphabet/target/documents/dist/test.md.html; output_cache_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.html }
+00:00:08 <span class="ansi-blue-intense-fg">d</span> #112 file_system.file_copy / { old_path = \\?\C:\home\git\alphabet\target\documents\cache\test.md.html; new_path = c:/home/git/alphabet/target/documents/dist/test.md.html; result = 11632 }
+00:00:08 <span class="ansi-green-intense-fg">i</span> #113 documents.run / par_map / files' = [] / listm.iter / { output_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md; output_cache_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md }
+00:00:08 <span class="ansi-blue-intense-fg">d</span> #114 file_system.file_copy / { old_path = \\?\C:\home\git\alphabet\target\documents\cache\test.hangul.md; new_path = c:/home/git/alphabet/target/documents/dist/test.hangul.md; result = 77 }
+{ name = __assert_eq; actual = [Ok(("c:/home/git/alphabet/target/documents/dist/test.md", []))]; expected = [Ok(("c:/home/git/alphabet/target/documents/dist/test.md", []))] }
+00:00:08 <span class="ansi-blue-intense-fg">d</span> #115 documents.run / { source_dir = \\?\C:\home\git\alphabet\target\documents; dist_dir = \\?\C:\home\git\alphabet\target\documents\dist; cache_dir = \\?\C:\home\git\alphabet\target\documents\cache; hangul_spec = por-br }
+00:00:08 <span class="ansi-blue-intense-fg">d</span> #116 documents.run / { files_len = 1 }
+00:00:08 <span class="ansi-blue-intense-fg">d</span> #117 runtime.execute_with_options / { file_name = git; arguments = ["ls-tree", "--format='%(objectname)'", "origin/gh-pages", "c:/home/git/alphabet/target/documents/test.md"]; options = { command = git ls-tree --format='%(objectname)' origin/gh-pages "c:/home/git/alphabet/target/documents/test.md"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
     "\\?\C:\home\git\alphabet\target\documents",
 ) } }
-00:00:12 <span class="ansi-black-intense-fg">v</span> #120 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 0 }
-00:00:12 <span class="ansi-blue-intense-fg">d</span> #121 runtime.execute_with_options / { file_name = git; arguments = ["hash-object", "c:/home/git/alphabet/target/documents/dist/test.md"]; options = { command = git hash-object "c:/home/git/alphabet/target/documents/dist/test.md"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
+00:00:08 <span class="ansi-black-intense-fg">v</span> #118 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 0 }
+00:00:08 <span class="ansi-blue-intense-fg">d</span> #119 runtime.execute_with_options / { file_name = git; arguments = ["hash-object", "c:/home/git/alphabet/target/documents/dist/test.md"]; options = { command = git hash-object "c:/home/git/alphabet/target/documents/dist/test.md"; cancellation_token = None; environment_variables = Array(MutCell([])); on_line = None; stdin = None; trace = true; working_directory = Some(
     "\\?\C:\home\git\alphabet\target\documents\dist",
 ) } }
-00:00:12 <span class="ansi-black-intense-fg">v</span> #122 &gt; 6358eb3bcf1cbb2b0cdddbd569507e44386e02c3
-00:00:12 <span class="ansi-black-intense-fg">v</span> #123 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 40 }
-__assert_eq / actual: "[Ok(("c:/home/git/alphabet/target/documents/dist/test.md", [None, None, None, None, None, None, None]))]" / expected: "[Ok(("c:/home/git/alphabet/target/documents/dist/test.md", [None, None, None, None, None, None, None]))]"
-__assert_eq / actual: "# 아
+00:00:08 <span class="ansi-black-intense-fg">v</span> #120 &gt; 6358eb3bcf1cbb2b0cdddbd569507e44386e02c3
+00:00:08 <span class="ansi-black-intense-fg">v</span> #121 runtime.execute_with_options / result / { exit_code = 0; std_trace_length = 40 }
+{ name = __assert_eq; actual = [Ok(("c:/home/git/alphabet/target/documents/dist/test.md", [None, None, None, None, None, None, None]))]; expected = [Ok(("c:/home/git/alphabet/target/documents/dist/test.md", [None, None, None, None, None, None, None]))] }
+{ name = __assert_eq; actual = # 아
 
 ## 브
 
@@ -8462,7 +8463,7 @@ __assert_eq / actual: "# 아
 
 http://abc.com
 아브크
-" / expected: "# 아
+; expected = # 아
 
 ## 브
 
@@ -8475,13 +8476,13 @@ http://abc.com
 
 http://abc.com
 아브크
-"
-__assert_eq / actual: true / expected: true
-__assert_eq / actual: true / expected: true
-__assert_eq / actual: true / expected: true
-__assert_eq / actual: true / expected: true
-__assert_eq / actual: true / expected: true
-__assert_eq / actual: true / expected: true
+ }
+{ name = __assert_eq; actual = true; expected = true }
+{ name = __assert_eq; actual = true; expected = true }
+{ name = __assert_eq; actual = true; expected = true }
+{ name = __assert_eq; actual = true; expected = true }
+{ name = __assert_eq; actual = true; expected = true }
+{ name = __assert_eq; actual = true; expected = true }
 </pre>
 </div>
 </div>
