@@ -9,3 +9,5 @@ $ErrorActionPreference = "Stop"
 
 
 { pwsh ../apps/documents/build.ps1 } | Invoke-Block
+
+{ pwsh ../apps/hangul/build.ps1 } | Invoke-Block

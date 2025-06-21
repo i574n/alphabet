@@ -4,11 +4,17 @@
 
 #!markdown
 
-# Hangul
+# Hangul (Polyglot)
 
 #!markdown
 
 ## Tests
+
+#!spiral
+
+//// package=../alphabet/apps/hangul
+
+open testing
 
 #!fsharp
 
@@ -30,7 +36,7 @@ let AssertIsFalse (condition: bool) =
 
 #!fsharp
 
-#!import hanja.fs
+#!import ../../../alphabet/apps/hangul/hanja.fs
 
 // let hanjaToHangulTable =
 //     [|
@@ -41,6 +47,15 @@ let AssertIsFalse (condition: bool) =
 //         0x7f6b, 0xad18; 0x54f2, 0xcca0; 0x91f4, 0xc775; 0x677b, 0xb274
 //     |]
 //     |> Map.ofArray
+
+#!spiral
+
+//// test
+
+hanja.hanja_to_hangul_table ()
+|> fun x => a x : a int _
+|> am'.length
+|> console.write_line
 
 #!markdown
 
@@ -62,6 +77,19 @@ let hanjaConvert (s: string) =
 //// test
 
 AssertAreEqual("국어", hanjaConvert "國語")
+
+#!spiral
+
+inl hanja_convert (s : string) =
+    ""
+
+#!spiral
+
+//// test
+
+"國語"
+|> hanja_convert
+|> _assert_eq "" // "국어"
 
 #!markdown
 
@@ -248,44 +276,42 @@ let toCompatJamoMap =
 
 let compatJamo (r: char) =
     let r' = int r
-    if r' >= G && r' <= H then r
-    elif r' >= A && r' <= I then r
+    if r' >= G && r' <= H then Some r
+    elif r' >= A && r' <= I then Some r
     elif r' >= MedialA && r' <= MedialI then
-        char (r' - medialBase + A)
+        char (r' - medialBase + A) |> Some
     else
-        match toCompatJamoMap.TryFind(r') with
-        | Some compat -> char compat
-        | None -> char 0
+        toCompatJamoMap.TryFind(r') |> Option.map char
 
 #!fsharp
 
 //// test
 
-AssertAreEqual(char G, compatJamo (char LeadG))
+AssertAreEqual(char G |> Some, compatJamo (char LeadG))
 
 #!fsharp
 
 //// test
 
-AssertAreEqual(char A, compatJamo (char MedialA))
+AssertAreEqual(char A |> Some, compatJamo (char MedialA))
 
 #!fsharp
 
 //// test
 
-AssertAreEqual(char L, compatJamo (char TailL))
+AssertAreEqual(char L |> Some, compatJamo (char TailL))
 
 #!fsharp
 
 //// test
 
-AssertAreEqual(char B, compatJamo (char B))
+AssertAreEqual(char B |> Some, compatJamo (char B))
 
 #!fsharp
 
 //// test
 
-AssertAreEqual(char 0, compatJamo 'a')
+AssertAreEqual(None, compatJamo 'a')
 
 #!markdown
 
@@ -556,9 +582,9 @@ let splitCompat (c: char) =
 //// test
 
 let l, m, t = splitCompat '한'
-AssertAreEqual(char H, l)
-AssertAreEqual(char A, m)
-AssertAreEqual(char N, t)
+AssertAreEqual(char H |> Some, l)
+AssertAreEqual(char A |> Some, m)
+AssertAreEqual(char N |> Some, t)
 
 #!markdown
 
@@ -597,7 +623,7 @@ let multiElementMap =
 #!fsharp
 
 let splitMultiElement (c: char) =
-    let c' = int (compatJamo c)
+    let c' = int (compatJamo c |> Option.defaultValue (char 0))
     multiElementMap.TryFind(c')
 
 #!markdown
@@ -612,7 +638,7 @@ let rec stroke (r: char) =
         let l, m, t = split r
         stroke l + stroke m + stroke t
     else
-        let jm = int (compatJamo r)
+        let jm = int (compatJamo r |> Option.defaultValue (char 0))
         match multiElementMap.TryFind(jm) with
         | Some elements -> elements |> Array.sumBy (fun e -> strokeMap.[e])
         | None -> strokeMap.TryFind(jm) |> Option.defaultValue 0
@@ -773,7 +799,7 @@ AssertAreEqual("서울로", appendPostposition "서울" "으로" "로")
 
 // type LookupItem = { cp949: int; ucs2: int }
 
-#!import cp949.fs
+#!import ../../../alphabet/apps/hangul/cp949.fs
 
 #!fsharp
 
@@ -786,7 +812,7 @@ AssertAreEqual("서울로", appendPostposition "서울" "으로" "로")
 //         { cp949 = 0xfdfe; ucs2 = 0x8a70 };
 //     |]
 
-#!import cp949_from.fs
+#!import ../../../alphabet/apps/hangul/cp949_from.fs
 
 #!fsharp
 
@@ -799,7 +825,7 @@ AssertAreEqual("서울로", appendPostposition "서울" "으로" "로")
 //         { ucs2 = 0xffe6; cp949 = 0xa3dc };
 //     |]
 
-#!import cp949_to.fs
+#!import ../../../alphabet/apps/hangul/cp949_to.fs
 
 #!markdown
 
