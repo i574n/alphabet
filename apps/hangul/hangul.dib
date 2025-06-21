@@ -223,24 +223,21 @@ let [<Literal>] maxTailIdx = TailH - TailG
 
 #!markdown
 
-### compatJamoMap
+### toCompatJamoMap
 
 #!fsharp
 
-let compatJamoMap =
+let toCompatJamoMap =
     Map.ofList [
-        (LeadG, G); (LeadGG, GG); (LeadN, N); (LeadD, D); (LeadDD, DD); (LeadR, L);
-        (LeadM, M); (LeadB, B); (LeadBB, BB); (LeadS, S); (LeadSS, SS); (LeadZS, ZS);
-        (LeadJ, J); (LeadJJ, JJ); (LeadC, C); (LeadK, K); (LeadT, T); (LeadP, P); (LeadH, H);
-        (MedialA, A); (MedialAE, AE); (MedialYA, YA); (MedialYAE, YAE); (MedialEO, EO);
-        (MedialE, E); (MedialYEO, YEO); (MedialYE, YE); (MedialO, O); (MedialWA, WA);
-        (MedialWAE, WAE); (MedialOE, OE); (MedialYO, YO); (MedialU, U); (MedialWEO, WEO);
-        (MedialWE, WE); (MedialWI, WI); (MedialYU, YU); (MedialEU, EU); (MedialYI, YI); (MedialI, I);
-        (TailG, G); (TailGG, GG); (TailGS, GS); (TailN, N); (TailNJ, NJ); (TailNH, NH);
-        (TailD, D); (TailL, L); (TailLG, LG); (TailLM, LM); (TailLB, LB); (TailLS, LS);
-        (TailLT, LT); (TailLP, LP); (TailLH, LH); (TailM, M); (TailB, B); (TailBS, BS);
-        (TailS, S); (TailSS, SS); (TailNG, ZS); (TailJ, J); (TailC, C); (TailK, K);
-        (TailT, T); (TailP, P); (TailH, H)
+        (LeadG, G); (LeadGG, GG); (LeadN, N); (LeadD, D); (LeadDD, DD);
+        (LeadR, L); (LeadM, M); (LeadB, B); (LeadBB, BB); (LeadS, S);
+        (LeadSS, SS); (LeadZS, ZS); (LeadJ, J); (LeadJJ, JJ); (LeadC, C);
+        (LeadK, K); (LeadT, T); (LeadP, P); (LeadH, H); (TailG, G);
+        (TailGG, GG); (TailGS, GS); (TailN, N); (TailNJ, NJ); (TailNH, NH);
+        (TailD, D); (TailL, L); (TailLG, LG); (TailLM, LM); (TailLB, LB);
+        (TailLS, LS); (TailLT, LT); (TailLP, LP); (TailLH, LH); (TailM, M);
+        (TailB, B); (TailBS, BS); (TailS, S); (TailSS, SS); (TailNG, ZS);
+        (TailJ, J); (TailC, C); (TailK, K); (TailT, T); (TailP, P); (TailH, H)
     ]
 
 #!markdown
@@ -249,11 +246,16 @@ let compatJamoMap =
 
 #!fsharp
 
-let compatJamo (c: char) =
-    let c' = int c
-    match compatJamoMap.TryFind(c') with
-    | Some compat -> char compat
-    | None -> c
+let compatJamo (r: char) =
+    let r' = int r
+    if r' >= G && r' <= H then r
+    elif r' >= A && r' <= I then r
+    elif r' >= MedialA && r' <= MedialI then
+        char (r' - medialBase + A)
+    else
+        match toCompatJamoMap.TryFind(r') with
+        | Some compat -> char compat
+        | None -> char 0
 
 #!fsharp
 
@@ -283,7 +285,7 @@ AssertAreEqual(char B, compatJamo (char B))
 
 //// test
 
-AssertAreEqual('a', compatJamo 'a')
+AssertAreEqual(char 0, compatJamo 'a')
 
 #!markdown
 
@@ -805,20 +807,55 @@ AssertAreEqual("서울로", appendPostposition "서울" "으로" "로")
 
 #!fsharp
 
-let binarySearch (table: 'T[]) (compare: 'T -> int) =
+let binarySearch (length: int) (predicate: int -> bool) =
     let rec search low high =
-        if low > high then
-            None
+        if low >= high then
+            low
         else
             let mid = low + (high - low) / 2
-            let c = compare table.[mid]
-            if c < 0 then
-                search (mid + 1) high
-            elif c > 0 then
-                search low (mid - 1)
+            if predicate mid then
+                search low mid
             else
-                Some mid
-    search 0 (table.Length - 1)
+                search (mid + 1) high
+    search 0 length
+
+#!fsharp
+
+//// test
+
+let sortedArray1 = [| 10; 20; 30; 40; 50 |]
+let predicate1 i = sortedArray1.[i] >= 30
+let index1 = binarySearch sortedArray1.Length predicate1
+AssertAreEqual(2, index1)
+AssertAreEqual(30, sortedArray1.[index1])
+
+#!fsharp
+
+//// test
+
+let sortedArray2 = [| 10; 20; 30; 40; 50 |]
+let predicate2 i = sortedArray2.[i] >= 35
+let index2 = binarySearch sortedArray2.Length predicate2
+AssertAreEqual(3, index2)
+AssertAreEqual(40, sortedArray2.[index2])
+
+#!fsharp
+
+//// test
+
+let sortedArray3 = [| 10; 20; 30; 40; 50 |]
+let predicate3 i = sortedArray3.[i] >= 5
+let index3 = binarySearch sortedArray3.Length predicate3
+AssertAreEqual(0, index3)
+
+#!fsharp
+
+//// test
+
+let sortedArray4 = [| 10; 20; 30; 40; 50 |]
+let predicate4 i = sortedArray4.[i] >= 60
+let index4 = binarySearch sortedArray4.Length predicate4
+AssertAreEqual(5, index4)
 
 #!markdown
 
@@ -834,11 +871,13 @@ let fromCp949 (data: byte[]) =
             char b1 :: processBytes rest
         | b1 :: b2 :: rest ->
             let cp949code = (uint16 b1 <<< 8) ||| uint16 b2
-            let compareFunc (item: LookupItem) = int item.cp949 - int cp949code
+            let predicate i = cp949FromTable.[i].cp949 >= int cp949code
+            let idx = binarySearch cp949FromTable.Length predicate
             let charToYield =
-                match binarySearch cp949FromTable compareFunc with
-                | Some idx -> char cp949FromTable.[idx].ucs2
-                | None -> char 0xFFFD
+                if idx < cp949FromTable.Length && cp949FromTable.[idx].cp949 = int cp949code then
+                    char cp949FromTable.[idx].ucs2
+                else
+                    char 0xFFFD
             charToYield :: processBytes rest
         | _ -> [char 0xFFFD]
     data |> Array.toList |> processBytes |> List.toArray |> System.String
@@ -863,13 +902,14 @@ let toCp949 (s: string) =
         if ucs2code < 0x80us then
             [| byte ucs2code |]
         else
-            let compareFunc (item: LookupItem) = int item.ucs2 - int ucs2code
-            match binarySearch cp949ToTable compareFunc with
-            | Some idx ->
+            let predicate i = cp949ToTable.[i].ucs2 >= int ucs2code
+            let idx = binarySearch cp949ToTable.Length predicate
+
+            if idx < cp949ToTable.Length && cp949ToTable.[idx].ucs2 = int ucs2code then
                 let cp949code = cp949ToTable.[idx].cp949
                 [| byte (cp949code >>> 8); byte (cp949code &&& 0xFF) |]
-            | None ->
-                [| byte 0x3F |] // '?'
+            else
+                [| byte 0x3F |]
     )
     |> Seq.toArray
 
@@ -880,3 +920,24 @@ let toCp949 (s: string) =
 let utf8String = "가각"
 let expectedBytes = [|0xb0; 0xa1; 0xb0; 0xa2|] |> Array.map byte
 AssertAreEqual(expectedBytes, toCp949 utf8String)
+
+#!fsharp
+
+//// test
+
+let utf8String2 = "Hello, 안녕"
+let expectedBytes2 =
+    [|
+        0x48; 0x65; 0x6c; 0x6c; 0x6f; 0x2c; 0x20;
+        0xbe; 0xc8;
+        0xb3; 0xe7
+    |] |> Array.map byte
+AssertAreEqual(expectedBytes2, toCp949 utf8String2)
+
+#!fsharp
+
+//// test
+
+let utf8String3 = "—"
+let expectedBytes3 = [| byte 0x3F |]
+AssertAreEqual(expectedBytes3, toCp949 utf8String3)
