@@ -1,5 +1,3 @@
-type LookupItem = { cp949: int; ucs2: int }
-
 let cp949FromTable : LookupItem[] =
     [|
         { cp949 = 0x8141; ucs2 = 0xac02 };

@@ -65,6 +65,27 @@ AssertAreEqual("국어", hanjaConvert "國語")
 
 #!markdown
 
+### isHanja
+
+#!fsharp
+
+let isHanja (c: char) =
+    hanjaToHangulTable.ContainsKey(int c)
+
+#!fsharp
+
+//// test
+
+AssertIsTrue(isHanja '國')
+
+#!fsharp
+
+//// test
+
+AssertIsFalse(isHanja '가')
+
+#!markdown
+
 ## Hangul
 
 #!markdown
@@ -181,17 +202,88 @@ let [<Literal>] TailLP = 0x11b5
 let [<Literal>] TailLH = 0x11b6
 let [<Literal>] TailM = 0x11b7
 let [<Literal>] TailB = 0x11b8
-let [<Literal>] TailBB = 0x11b9
-let [<Literal>] TailBS = 0x11ba
-let [<Literal>] TailS = 0x11bb
-let [<Literal>] TailSS = 0x11bc
-let [<Literal>] TailNG = 0x11bd
-let [<Literal>] TailJ = 0x11be
-let [<Literal>] TailC = 0x11bf
-let [<Literal>] TailK = 0x11c0
-let [<Literal>] TailT = 0x11c1
-let [<Literal>] TailP = 0x11c2
-let [<Literal>] TailH = 0x11c5
+let [<Literal>] TailBS = 0x11b9
+let [<Literal>] TailS = 0x11ba
+let [<Literal>] TailSS = 0x11bb
+let [<Literal>] TailNG = 0x11bc
+let [<Literal>] TailJ = 0x11bd
+let [<Literal>] TailC = 0x11be
+let [<Literal>] TailK = 0x11bf
+let [<Literal>] TailT = 0x11c0
+let [<Literal>] TailP = 0x11c1
+let [<Literal>] TailH = 0x11c2
+
+let [<Literal>] leadBase = 0x1100
+let [<Literal>] medialBase = 0x1161
+let [<Literal>] tailBase = 0x11A8
+
+let [<Literal>] maxLeadIdx = LeadH - LeadG
+let [<Literal>] maxMedialIdx = MedialI - MedialA
+let [<Literal>] maxTailIdx = TailH - TailG
+
+#!markdown
+
+### compatJamoMap
+
+#!fsharp
+
+let compatJamoMap =
+    Map.ofList [
+        (LeadG, G); (LeadGG, GG); (LeadN, N); (LeadD, D); (LeadDD, DD); (LeadR, L);
+        (LeadM, M); (LeadB, B); (LeadBB, BB); (LeadS, S); (LeadSS, SS); (LeadZS, ZS);
+        (LeadJ, J); (LeadJJ, JJ); (LeadC, C); (LeadK, K); (LeadT, T); (LeadP, P); (LeadH, H);
+        (MedialA, A); (MedialAE, AE); (MedialYA, YA); (MedialYAE, YAE); (MedialEO, EO);
+        (MedialE, E); (MedialYEO, YEO); (MedialYE, YE); (MedialO, O); (MedialWA, WA);
+        (MedialWAE, WAE); (MedialOE, OE); (MedialYO, YO); (MedialU, U); (MedialWEO, WEO);
+        (MedialWE, WE); (MedialWI, WI); (MedialYU, YU); (MedialEU, EU); (MedialYI, YI); (MedialI, I);
+        (TailG, G); (TailGG, GG); (TailGS, GS); (TailN, N); (TailNJ, NJ); (TailNH, NH);
+        (TailD, D); (TailL, L); (TailLG, LG); (TailLM, LM); (TailLB, LB); (TailLS, LS);
+        (TailLT, LT); (TailLP, LP); (TailLH, LH); (TailM, M); (TailB, B); (TailBS, BS);
+        (TailS, S); (TailSS, SS); (TailNG, ZS); (TailJ, J); (TailC, C); (TailK, K);
+        (TailT, T); (TailP, P); (TailH, H)
+    ]
+
+#!markdown
+
+### compatJamo
+
+#!fsharp
+
+let compatJamo (c: char) =
+    let c' = int c
+    match compatJamoMap.TryFind(c') with
+    | Some compat -> char compat
+    | None -> c
+
+#!fsharp
+
+//// test
+
+AssertAreEqual(char G, compatJamo (char LeadG))
+
+#!fsharp
+
+//// test
+
+AssertAreEqual(char A, compatJamo (char MedialA))
+
+#!fsharp
+
+//// test
+
+AssertAreEqual(char L, compatJamo (char TailL))
+
+#!fsharp
+
+//// test
+
+AssertAreEqual(char B, compatJamo (char B))
+
+#!fsharp
+
+//// test
+
+AssertAreEqual('a', compatJamo 'a')
 
 #!markdown
 
@@ -243,27 +335,9 @@ let isMoeum (r: char) =
 #!fsharp
 
 let leadIdx (r: int) =
-    match r with
-    | LeadG -> Some 0
-    | LeadGG -> Some 1
-    | LeadN -> Some 2
-    | LeadD -> Some 3
-    | LeadDD -> Some 4
-    | LeadR -> Some 5
-    | LeadM -> Some 6
-    | LeadB -> Some 7
-    | LeadBB -> Some 8
-    | LeadS -> Some 9
-    | LeadSS -> Some 10
-    | LeadZS -> Some 11
-    | LeadJ -> Some 12
-    | LeadJJ -> Some 13
-    | LeadC -> Some 14
-    | LeadK -> Some 15
-    | LeadT -> Some 16
-    | LeadP -> Some 17
-    | LeadH -> Some 18
-    | _ -> None
+    let i = r - leadBase
+    if i >= 0 && i <= maxLeadIdx then Some i
+    else None
 
 #!markdown
 
@@ -272,29 +346,9 @@ let leadIdx (r: int) =
 #!fsharp
 
 let medialIdx (r: int) =
-    match r with
-    | MedialA -> Some 0
-    | MedialAE -> Some 1
-    | MedialYA -> Some 2
-    | MedialYAE -> Some 3
-    | MedialEO -> Some 4
-    | MedialE -> Some 5
-    | MedialYEO -> Some 6
-    | MedialYE -> Some 7
-    | MedialO -> Some 8
-    | MedialWA -> Some 9
-    | MedialWAE -> Some 10
-    | MedialOE -> Some 11
-    | MedialYO -> Some 12
-    | MedialU -> Some 13
-    | MedialWEO -> Some 14
-    | MedialWE -> Some 15
-    | MedialWI -> Some 16
-    | MedialYU -> Some 17
-    | MedialEU -> Some 18
-    | MedialYI -> Some 19
-    | MedialI -> Some 20
-    | _ -> None
+    let i = r - medialBase
+    if i >= 0 && i <= maxMedialIdx then Some i
+    else None
 
 #!markdown
 
@@ -303,36 +357,11 @@ let medialIdx (r: int) =
 #!fsharp
 
 let tailIdx (r: int) =
-    match r with
-    | 0 -> Some 0
-    | TailG -> Some 1
-    | TailGG -> Some 2
-    | TailGS -> Some 3
-    | TailN -> Some 4
-    | TailNJ -> Some 5
-    | TailNH -> Some 6
-    | TailD -> Some 7
-    | TailL -> Some 8
-    | TailLG -> Some 9
-    | TailLM -> Some 10
-    | TailLB -> Some 11
-    | TailLS -> Some 12
-    | TailLT -> Some 13
-    | TailLP -> Some 14
-    | TailLH -> Some 15
-    | TailM -> Some 16
-    | TailB -> Some 17
-    | TailBS -> Some 18
-    | TailS -> Some 19
-    | TailSS -> Some 20
-    | TailNG -> Some 21
-    | TailJ -> Some 22
-    | TailC -> Some 23
-    | TailK -> Some 24
-    | TailT -> Some 25
-    | TailP -> Some 26
-    | TailH -> Some 27
-    | _ -> None
+    if r = 0 then Some 0
+    else
+        let i = r - tailBase
+        if i >= 0 && i <= maxTailIdx then Some (i + 1)
+        else None
 
 #!markdown
 
@@ -398,7 +427,6 @@ let toTail (r: int) =
     | LH -> Some TailLH
     | M -> Some TailM
     | B -> Some TailB
-    | BB -> Some TailBB
     | BS -> Some TailBS
     | S -> Some TailS
     | SS -> Some TailSS
@@ -482,21 +510,6 @@ AssertAreEqual('양', join (char LeadZS) (char MedialYA) (char TailNG))
 
 #!markdown
 
-### indexToTailMap
-
-#!fsharp
-
-let indexToTailMap =
-    Map.ofList [
-        (1, TailG); (2, TailGG); (3, TailGS); (4, TailN); (5, TailNJ); (6, TailNH);
-        (7, TailD); (8, TailL); (9, TailLG); (10, TailLM); (11, TailLB); (12, TailLS);
-        (13, TailLT); (14, TailLP); (15, TailLH); (16, TailM); (17, TailB); (18, TailBS);
-        (19, TailS); (20, TailSS); (21, TailNG); (22, TailJ); (23, TailC); (24, TailK);
-        (25, TailT); (26, TailP); (27, TailH)
-    ]
-
-#!markdown
-
 ### split
 
 #!fsharp
@@ -513,9 +526,8 @@ let split (c: char) =
         let l = char (LeadG + lIndex)
         let m = char (MedialA + mIndex)
         let t =
-            match indexToTailMap.TryFind(tIndex) with
-            | Some tailChar -> char tailChar
-            | None -> char 0
+            if tIndex = 0 then char 0
+            else char (tailBase + tIndex - 1)
         l, m, t
 
 #!fsharp
@@ -529,45 +541,22 @@ AssertAreEqual(char 0, t)
 
 #!markdown
 
-### leadStrokeMap
+### splitCompat
 
 #!fsharp
 
-let leadStrokeMap =
-    Map.ofList [
-        (LeadG, 1); (LeadGG, 2); (LeadN, 1); (LeadD, 2); (LeadDD, 4); (LeadR, 3);
-        (LeadM, 3); (LeadB, 4); (LeadBB, 8); (LeadS, 2); (LeadSS, 4); (LeadZS, 1);
-        (LeadJ, 3); (LeadJJ, 6); (LeadC, 4); (LeadK, 2); (LeadT, 3); (LeadP, 4); (LeadH, 3);
-    ]
-
-#!markdown
-
-### medialStrokeMap
+let splitCompat (c: char) =
+    let l, m, t = split c
+    compatJamo l, compatJamo m, compatJamo t
 
 #!fsharp
 
-let medialStrokeMap =
-    Map.ofList [
-        (MedialA, 2); (MedialAE, 3); (MedialYA, 3); (MedialYAE, 4); (MedialEO, 2);
-        (MedialE, 3); (MedialYEO, 3); (MedialYE, 4); (MedialO, 2); (MedialWA, 4);
-        (MedialWAE, 5); (MedialOE, 3); (MedialYO, 3); (MedialU, 2); (MedialWEO, 4);
-        (MedialWE, 5); (MedialWI, 4); (MedialYU, 3); (MedialEU, 1); (MedialYI, 2); (MedialI, 1);
-    ]
+//// test
 
-#!markdown
-
-### tailStrokeMap
-
-#!fsharp
-
-let tailStrokeMap =
-    Map.ofList [
-        (TailG, 1); (TailGG, 2); (TailGS, 3); (TailN, 1); (TailNJ, 5); (TailNH, 5);
-        (TailD, 2); (TailL, 3); (TailLG, 4); (TailLM, 6); (TailLB, 7); (TailLS, 5);
-        (TailLT, 6); (TailLP, 7); (TailLH, 6); (TailM, 3); (TailB, 4); (TailBB, 8);
-        (TailBS, 6); (TailS, 2); (TailSS, 4); (TailNG, 1); (TailJ, 3); (TailC, 4);
-        (TailK, 2); (TailT, 3); (TailP, 4); (TailH, 3);
-    ]
+let l, m, t = splitCompat '한'
+AssertAreEqual(char H, l)
+AssertAreEqual(char A, m)
+AssertAreEqual(char N, t)
 
 #!markdown
 
@@ -584,17 +573,30 @@ let strokeMap =
 
 #!markdown
 
-### multiElementStrokes
+### multiElementMap
 
 #!fsharp
 
-let multiElementStrokes =
+let multiElementMap =
     Map.ofList [
-        (GG, 2); (GS, 3); (NJ, 5); (NH, 5); (DD, 4); (LG, 4); (LM, 6);
-        (LB, 7); (LS, 5); (LT, 6); (LP, 7); (LH, 6); (BB, 8); (BS, 6);
-        (SS, 4); (JJ, 6); (AE, 3); (E, 3); (YAE, 4); (YE, 4); (WA, 4);
-        (WAE, 5); (OE, 3); (WEO, 4); (WE, 5); (WI, 4); (YI, 2)
+        (GG, [|G; G|]); (GS, [|G; S|]); (NJ, [|N; J|]); (NH, [|N; H|]);
+        (DD, [|D; D|]); (LG, [|L; G|]); (LM, [|L; M|]); (LB, [|L; B|]);
+        (LS, [|L; S|]); (LT, [|L; T|]); (LP, [|L; P|]); (LH, [|L; H|]);
+        (BB, [|B; B|]); (BS, [|B; S|]); (SS, [|S; S|]); (JJ, [|J; J|]);
+        (AE, [|A; I|]); (E, [|EO; I|]); (YAE, [|YA; I|]); (YE, [|YEO; I|]);
+        (WA, [|O; A|]); (WAE, [|O; A; I|]); (OE, [|O; I|]); (WEO, [|U; EO|]);
+        (WE, [|U; E|]); (WI, [|U; I|]); (YI, [|EU; I|])
     ]
+
+#!markdown
+
+### splitMultiElement
+
+#!fsharp
+
+let splitMultiElement (c: char) =
+    let c' = int (compatJamo c)
+    multiElementMap.TryFind(c')
 
 #!markdown
 
@@ -608,21 +610,10 @@ let rec stroke (r: char) =
         let l, m, t = split r
         stroke l + stroke m + stroke t
     else
-        match leadStrokeMap.TryFind r' with
-        | Some s -> s
-        | None ->
-            match medialStrokeMap.TryFind r' with
-            | Some s -> s
-            | None ->
-                match tailStrokeMap.TryFind r' with
-                | Some s -> s
-                | None ->
-                    match strokeMap.TryFind r' with
-                    | Some s -> s
-                    | None ->
-                        match multiElementStrokes.TryFind r' with
-                        | Some s -> s
-                        | None -> 0
+        let jm = int (compatJamo r)
+        match multiElementMap.TryFind(jm) with
+        | Some elements -> elements |> Array.sumBy (fun e -> strokeMap.[e])
+        | None -> strokeMap.TryFind(jm) |> Option.defaultValue 0
 
 #!fsharp
 
@@ -739,8 +730,14 @@ AssertAreEqual(char 0, lastConsonant "물고기")
 #!fsharp
 
 let appendPostposition (s: string) (withConsonant: string) (withoutConsonant: string) =
-    if endsWithConsonant s then s + withConsonant
-    else s + withoutConsonant
+    let lastTail = lastConsonant s
+    if int lastTail <> 0 then
+        if withConsonant = "으로" && int lastTail = TailL then
+            s + withoutConsonant
+        else
+            s + withConsonant
+    else
+        s + withoutConsonant
 
 #!fsharp
 
@@ -754,13 +751,29 @@ AssertAreEqual("강이", appendPostposition "강" "이" "가")
 
 AssertAreEqual("물고기는", appendPostposition "물고기" "은" "는")
 
+#!fsharp
+
+//// test
+
+AssertAreEqual("집으로", appendPostposition "집" "으로" "로")
+
+#!fsharp
+
+//// test
+
+AssertAreEqual("서울로", appendPostposition "서울" "으로" "로")
+
 #!markdown
 
 ## CP949
 
 #!fsharp
 
-#!import cp949_from.fs
+// type LookupItem = { cp949: int; ucs2: int }
+
+#!import cp949.fs
+
+#!fsharp
 
 // let cp949FromTable : LookupItem[] =
 //     [|
@@ -771,9 +784,9 @@ AssertAreEqual("물고기는", appendPostposition "물고기" "은" "는")
 //         { cp949 = 0xfdfe; ucs2 = 0x8a70 };
 //     |]
 
-#!fsharp
+#!import cp949_from.fs
 
-#!import cp949_to.fs
+#!fsharp
 
 // let cp949ToTable : LookupItem[] =
 //     [|
@@ -784,13 +797,28 @@ AssertAreEqual("물고기는", appendPostposition "물고기" "은" "는")
 //         { ucs2 = 0xffe6; cp949 = 0xa3dc };
 //     |]
 
+#!import cp949_to.fs
+
 #!markdown
 
-### LookupItem
+### binarySearch
 
 #!fsharp
 
-type LookupItem = { cp949: int; ucs2: int }
+let binarySearch (table: 'T[]) (compare: 'T -> int) =
+    let rec search low high =
+        if low > high then
+            None
+        else
+            let mid = low + (high - low) / 2
+            let c = compare table.[mid]
+            if c < 0 then
+                search (mid + 1) high
+            elif c > 0 then
+                search low (mid - 1)
+            else
+                Some mid
+    search 0 (table.Length - 1)
 
 #!markdown
 
@@ -799,24 +827,21 @@ type LookupItem = { cp949: int; ucs2: int }
 #!fsharp
 
 let fromCp949 (data: byte[]) =
-    let mutable result = System.Text.StringBuilder()
-    let mutable i = 0
-    while i < data.Length do
-        if data.[i] < 0x80uy then
-            result.Append(char data.[i]) |> ignore
-            i <- i + 1
-        else
-            if i + 1 < data.Length then
-                let cp949code = (uint16 data.[i] <<< 8) ||| (uint16 data.[i+1]) |> int
-                let found = cp949FromTable |> Array.tryFind (fun item -> item.cp949 = cp949code)
-                match found with
-                | Some item -> result.Append(char item.ucs2) |> ignore
-                | None -> result.Append(char 0xFFFD) |> ignore
-                i <- i + 2
-            else
-                result.Append(char 0xFFFD) |> ignore
-                i <- i + 1
-    result.ToString()
+    let rec processBytes bytes =
+        match bytes with
+        | [] -> []
+        | b1 :: rest when b1 < 0x80uy ->
+            char b1 :: processBytes rest
+        | b1 :: b2 :: rest ->
+            let cp949code = (uint16 b1 <<< 8) ||| uint16 b2
+            let compareFunc (item: LookupItem) = int item.cp949 - int cp949code
+            let charToYield =
+                match binarySearch cp949FromTable compareFunc with
+                | Some idx -> char cp949FromTable.[idx].ucs2
+                | None -> char 0xFFFD
+            charToYield :: processBytes rest
+        | _ -> [char 0xFFFD]
+    data |> Array.toList |> processBytes |> List.toArray |> System.String
 
 #!fsharp
 
@@ -832,20 +857,21 @@ AssertAreEqual("가각", fromCp949 cp949Bytes)
 #!fsharp
 
 let toCp949 (s: string) =
-    let mutable result = System.Collections.Generic.List<byte>()
-    for c in s do
-        let ucs2code = int c
-        if ucs2code < 0x80 then
-            result.Add(byte ucs2code)
+    s
+    |> Seq.collect (fun c ->
+        let ucs2code = uint16 c
+        if ucs2code < 0x80us then
+            [| byte ucs2code |]
         else
-            let found = cp949ToTable |> Array.tryFind (fun item -> item.ucs2 = ucs2code)
-            match found with
-            | Some item ->
-                result.Add(byte (item.cp949 >>> 8))
-                result.Add(byte (item.cp949 &&& 0xFF))
+            let compareFunc (item: LookupItem) = int item.ucs2 - int ucs2code
+            match binarySearch cp949ToTable compareFunc with
+            | Some idx ->
+                let cp949code = cp949ToTable.[idx].cp949
+                [| byte (cp949code >>> 8); byte (cp949code &&& 0xFF) |]
             | None ->
-                result.Add(byte 0x3F) // '?'
-    result.ToArray()
+                [| byte 0x3F |] // '?'
+    )
+    |> Seq.toArray
 
 #!fsharp
 
@@ -854,71 +880,3 @@ let toCp949 (s: string) =
 let utf8String = "가각"
 let expectedBytes = [|0xb0; 0xa1; 0xb0; 0xa2|] |> Array.map byte
 AssertAreEqual(expectedBytes, toCp949 utf8String)
-
-#!markdown
-
-## Jamo
-
-#!markdown
-
-### compatJamoMap
-
-#!fsharp
-
-let compatJamoMap =
-    Map.ofList [
-        (LeadG, G); (LeadGG, GG); (LeadN, N); (LeadD, D); (LeadDD, DD); (LeadR, L);
-        (LeadM, M); (LeadB, B); (LeadBB, BB); (LeadS, S); (LeadSS, SS); (LeadZS, ZS);
-        (LeadJ, J); (LeadJJ, JJ); (LeadC, C); (LeadK, K); (LeadT, T); (LeadP, P); (LeadH, H);
-        (MedialA, A); (MedialAE, AE); (MedialYA, YA); (MedialYAE, YAE); (MedialEO, EO);
-        (MedialE, E); (MedialYEO, YEO); (MedialYE, YE); (MedialO, O); (MedialWA, WA);
-        (MedialWAE, WAE); (MedialOE, OE); (MedialYO, YO); (MedialU, U); (MedialWEO, WEO);
-        (MedialWE, WE); (MedialWI, WI); (MedialYU, YU); (MedialEU, EU); (MedialYI, YI); (MedialI, I);
-        (TailG, G); (TailGG, GG); (TailGS, GS); (TailN, N); (TailNJ, NJ); (TailNH, NH);
-        (TailD, D); (TailL, L); (TailLG, LG); (TailLM, LM); (TailLB, LB); (TailLS, LS);
-        (TailLT, LT); (TailLP, LP); (TailLH, LH); (TailM, M); (TailB, B); (TailBS, BS);
-        (TailS, S); (TailSS, SS); (TailNG, ZS); (TailJ, J); (TailC, C); (TailK, K);
-        (TailT, T); (TailP, P); (TailH, H)
-    ]
-
-#!markdown
-
-### compatJamo
-
-#!fsharp
-
-let compatJamo (c: char) =
-    let c' = int c
-    match compatJamoMap.TryFind(c') with
-    | Some compat -> char compat
-    | None -> c
-
-#!fsharp
-
-//// test
-
-AssertAreEqual(char G, compatJamo (char LeadG))
-
-#!fsharp
-
-//// test
-
-AssertAreEqual(char A, compatJamo (char MedialA))
-
-#!fsharp
-
-//// test
-
-AssertAreEqual(char L, compatJamo (char TailL))
-
-#!fsharp
-
-//// test
-
-AssertAreEqual(char B, compatJamo (char B))
-
-#!fsharp
-
-//// test
-
-AssertAreEqual('a', compatJamo 'a')
