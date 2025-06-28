@@ -11469,6 +11469,15 @@ mod module_b8cdef03 {
                             join(Documents::method143(), toArray_1(_let__v166)),
                             string("\n\n"),
                         ]));
+                        let v197: string = if if contains(v182.clone(), string(" the ")) {
+                            contains(v182.clone(), string(" and "))
+                        } else {
+                            false
+                        } {
+                            string("eng")
+                        } else {
+                            v1_1
+                        };
                         let patternInput: (i32, string) = Documents::method81(
                             concat(new_array(&[
                                 Documents::method26(
@@ -11485,7 +11494,7 @@ mod module_b8cdef03 {
                                     ])),
                                 ),
                                 string(" "),
-                                v1_1,
+                                v197,
                             ])),
                             None::<CancellationToken>,
                             new_empty::<(string, string)>(),
@@ -11502,73 +11511,78 @@ mod module_b8cdef03 {
                             None::<string>,
                             true,
                         );
-                        let v246: i32 = patternInput.0.clone();
-                        let v257: Array<string> =
+                        let v261: i32 = patternInput.0.clone();
+                        let v272: Array<string> =
                             split(patternInput.1.clone(), string("\n"), -1_i32, 0_i32);
-                        let v260: i32 = get_Count(v257.clone());
-                        let v262: LrcPtr<Documents::Mut8> = LrcPtr::new(Documents::Mut8 {
+                        let v275: i32 = get_Count(v272.clone());
+                        let v277: LrcPtr<Documents::Mut8> = LrcPtr::new(Documents::Mut8 {
                             l0: MutCell::new(0_i32),
                             l1: MutCell::new(string("")),
                             l2: MutCell::new(0_i32),
                             l3: MutCell::new(0_i32),
                         });
-                        while Documents::method183(v139, v262.clone()) {
-                            let v264: i32 = v262.l0.get().clone();
-                            let matchValue: string = v262.l1.get().clone();
-                            let matchValue_1: i32 = v262.l2.get().clone();
-                            let v267: i32 = v262.l3.get().clone();
-                            let v266: i32 = matchValue_1;
-                            let v265: string = matchValue;
-                            let v268: string = v128[v264].clone();
-                            let patternInput_2: (string, i32, i32) = if (v268.clone()) == string("")
+                        while Documents::method183(v139, v277.clone()) {
+                            let v279: i32 = v277.l0.get().clone();
+                            let matchValue: string = v277.l1.get().clone();
+                            let matchValue_1: i32 = v277.l2.get().clone();
+                            let v282: i32 = v277.l3.get().clone();
+                            let v281: i32 = matchValue_1;
+                            let v280: string = matchValue;
+                            let v283: string = v128[v279].clone();
+                            let patternInput_2: (string, i32, i32) = if (v283.clone()) == string("")
                             {
                                 (
-                                    concat(new_array(&[v265.clone(), string("\n")])),
-                                    (v266) + 1_i32,
-                                    (v267) + 1_i32,
+                                    concat(new_array(&[v280.clone(), string("\n")])),
+                                    (v281) + 1_i32,
+                                    (v282) + 1_i32,
                                 )
                             } else {
-                                let v273: i32 = (v266) - (v267);
+                                let v288: i32 = (v281) - (v282);
                                 (
-                                    if (v273) >= (v260) {
-                                        v265.clone()
+                                    if (v288) >= (v275) {
+                                        v280.clone()
                                     } else {
-                                        let v276: string = v257[v273].clone();
-                                        let v285: string = if contains(v276.clone(), string("://"))
+                                        let v291: string = v272[v288].clone();
+                                        let v300: string = if contains(v291.clone(), string("://"))
                                         {
-                                            v268
+                                            v283.clone()
                                         } else {
-                                            v276
+                                            v291
                                         };
-                                        if (v273) == ((v260) - 1_i32) {
-                                            concat(new_array(&[v265.clone(), v285.clone()]))
+                                        if (v288) == ((v275) - 1_i32) {
+                                            concat(new_array(&[
+                                                v280.clone(),
+                                                v300.clone(),
+                                                string("\n"),
+                                                v283.clone(),
+                                            ]))
                                         } else {
-                                            concat(new_array(&[v265, v285, string("\n")]))
+                                            sprintf!("{}{}\n{}\n", v280, v300, v283)
                                         }
                                     },
-                                    (v266) + 1_i32,
-                                    v267,
+                                    (v281) + 1_i32,
+                                    v282,
                                 )
                             };
-                            let v296: i32 = (v264) + 1_i32;
-                            v262.l0.set(v296);
-                            v262.l1.set(patternInput_2.0.clone());
-                            v262.l2.set(patternInput_2.1.clone());
-                            v262.l3.set(patternInput_2.2.clone());
+                            let v311: i32 = (v279) + 1_i32;
+                            v277.l0.set(v311);
+                            v277.l1.set(patternInput_2.0.clone());
+                            v277.l2.set(patternInput_2.1.clone());
+                            v277.l3.set(patternInput_2.2.clone());
                             ()
                         }
                         {
-                            let matchValue_3: string = v262.l1.get().clone();
-                            let matchValue_4: i32 = v262.l2.get().clone();
-                            let matchValue_5: i32 = v262.l3.get().clone();
-                            let v297: string = matchValue_3;
-                            std::fs::write(&*v2.clone(), &*v297.clone()).unwrap();
+                            let matchValue_3: string = v277.l1.get().clone();
+                            let matchValue_4: i32 = v277.l2.get().clone();
+                            let matchValue_5: i32 = v277.l3.get().clone();
+                            let v312: string = matchValue_3;
+                            std::fs::write(&*v2.clone(), &*v312.clone()).unwrap();
                             {
-                                let v612: () = {
-                                    Documents::closure79(v2, v246, v297.clone(), ());
+                                let v627: () = {
+                                    Documents::closure79(v2, v261, v312.clone(), ());
                                     ()
                                 };
-                                Documents::US37::US37_0(v246, v297)
+                                Documents::US37::US37_0(v261, v312)
                             }
                         }
                     }

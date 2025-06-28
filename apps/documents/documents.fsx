@@ -22449,132 +22449,149 @@ and method178 (v0 : string, v1 : string, v2 : string, v3 : string) : US37 =
     let v182 : string = $"{v179}
 
 "
-    let v184 : System.Threading.CancellationToken option = None
-    let v187 : (struct (string * string) []) = [||]
-    let v189 : (struct (int32 * string * bool) -> Async<unit>) option = None
-    let v193 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option = None
-    let v197 : string option = None
-    (* run_target_args'
-    let v201 : unit = ()
-    run_target_args' *)
-    
-#if FABLE_COMPILER || WASM || CONTRACT
-    
-#if FABLE_COMPILER_RUST && !WASM && !CONTRACT
-    let v202 : string = "cfg!(windows)"
-    let v203 : bool = Fable.Core.RustInterop.emitRustExpr () v202 
-    let _run_target_args'_v201 = v203 
-    #endif
-#if FABLE_COMPILER_RUST && WASM
-    let v204 : string = "cfg!(windows)"
-    let v205 : bool = Fable.Core.RustInterop.emitRustExpr () v204 
-    let _run_target_args'_v201 = v205 
-    #endif
-#if FABLE_COMPILER_RUST && CONTRACT
-    let v206 : string = "cfg!(windows)"
-    let v207 : bool = Fable.Core.RustInterop.emitRustExpr () v206 
-    let _run_target_args'_v201 = v207 
-    #endif
-#if FABLE_COMPILER_TYPESCRIPT
-    let v208 : US3 = US3_0
-    let v209 : US4 = US4_5(v208)
-    let v210 : string = $"platform.is_windows / target: {v209}"
-    let v211 : bool = failwith<bool> v210
-    let _run_target_args'_v201 = v211 
-    #endif
-#if FABLE_COMPILER_PYTHON
-    let v212 : US3 = US3_0
-    let v213 : US4 = US4_6(v212)
-    let v214 : string = $"platform.is_windows / target: {v213}"
-    let v215 : bool = failwith<bool> v214
-    let _run_target_args'_v201 = v215 
-    #endif
-#if !FABLE_COMPILER_RUST && !FABLE_COMPILER_TYPESCRIPT && !FABLE_COMPILER_PYTHON
-    let v216 : System.Runtime.InteropServices.OSPlatform = System.Runtime.InteropServices.OSPlatform.Windows
-    let v217 : (System.Runtime.InteropServices.OSPlatform -> bool) = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform
-    let v218 : bool = v217 v216
-    let _run_target_args'_v201 = v218 
-    #endif
-#else
-    let v219 : System.Runtime.InteropServices.OSPlatform = System.Runtime.InteropServices.OSPlatform.Windows
-    let v220 : (System.Runtime.InteropServices.OSPlatform -> bool) = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform
-    let v221 : bool = v220 v219
-    let _run_target_args'_v201 = v221 
-    #endif
-    let v222 : bool = _run_target_args'_v201 
-    let v233 : string =
-        if v222 then
-            let v231 : string = ".exe"
-            v231
+    let v185 : string = " the "
+    let v186 : bool = v182.Contains v185 
+    let v195 : bool =
+        if v186 then
+            let v191 : string = " and "
+            let v192 : bool = v182.Contains v191 
+            v192
         else
-            let v232 : string = ""
-            v232
-    let v234 : string = $"../alphabet/deps/hangulize/cmd/hangulize/hangulize{v233}"
-    let v235 : string = method26(v0, v234)
-    let v236 : string = $"{v235} {v1}"
-    let v239 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) = closure78(v182)
-    let v240 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option = Some v239 
-    let v244 : bool = true
-    let v245 : bool = true
-    let struct (v246 : int32, v247 : string) = method81(v236, v184, v187, v189, v240, v244, v197, v245)
-    let v257 : (string []) = v247.Split v123 
-    let v260 : int32 = v257.Length
-    let v261 : string = ""
-    let v262 : Mut8 = {l0 = 0; l1 = v261; l2 = 0; l3 = 0} : Mut8
-    while method183(v139, v262) do
-        let v264 : int32 = v262.l0
-        let struct (v265 : string, v266 : int32, v267 : int32) = v262.l1, v262.l2, v262.l3
-        let v268 : string = v128.[int v264]
-        let v269 : bool = v268 = ""
-        let struct (v293 : string, v294 : int32, v295 : int32) =
-            if v269 then
-                let v270 : string = $"{v265}
-"
-                let v271 : int32 = v266 + 1
-                let v272 : int32 = v267 + 1
-                struct (v270, v271, v272)
-            else
-                let v273 : int32 = v266 - v267
-                let v274 : bool = v273 >= v260
-                let v291 : string =
-                    if v274 then
-                        v265
-                    else
-                        let v276 : string = v257.[int v273]
-                        let v281 : string = "://"
-                        let v282 : bool = v276.Contains v281 
-                        let v285 : string =
-                            if v282 then
-                                v268
-                            else
-                                v276
-                        let v286 : int32 = v260 - 1
-                        let v287 : bool = v273 = v286
-                        if v287 then
-                            let v288 : string = $"{v265}{v285}"
-                            v288
-                        else
-                            let v289 : string = $"{v265}{v285}
-"
-                            v289
-                let v292 : int32 = v266 + 1
-                struct (v291, v292, v267)
-        let v296 : int32 = v264 + 1
-        v262.l0 <- v296
-        v262.l1 <- v293
-        v262.l2 <- v294
-        v262.l3 <- v295
-        ()
-    let struct (v297 : string, v298 : int32, v299 : int32) = v262.l1, v262.l2, v262.l3
+            false
+    let v197 : string =
+        if v195 then
+            let v196 : string = "eng"
+            v196
+        else
+            v1
+    let v199 : System.Threading.CancellationToken option = None
+    let v202 : (struct (string * string) []) = [||]
+    let v204 : (struct (int32 * string * bool) -> Async<unit>) option = None
+    let v208 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option = None
+    let v212 : string option = None
     (* run_target_args'
-    let v300 : unit = ()
+    let v216 : unit = ()
     run_target_args' *)
     
 #if FABLE_COMPILER || WASM || CONTRACT
     
 #if FABLE_COMPILER_RUST && !WASM && !CONTRACT
-    let v301 : string = "std::fs::write(&*$0, &*$1).unwrap()"
-    Fable.Core.RustInterop.emitRustExpr struct (v2, v297) v301 
+    let v217 : string = "cfg!(windows)"
+    let v218 : bool = Fable.Core.RustInterop.emitRustExpr () v217 
+    let _run_target_args'_v216 = v218 
+    #endif
+#if FABLE_COMPILER_RUST && WASM
+    let v219 : string = "cfg!(windows)"
+    let v220 : bool = Fable.Core.RustInterop.emitRustExpr () v219 
+    let _run_target_args'_v216 = v220 
+    #endif
+#if FABLE_COMPILER_RUST && CONTRACT
+    let v221 : string = "cfg!(windows)"
+    let v222 : bool = Fable.Core.RustInterop.emitRustExpr () v221 
+    let _run_target_args'_v216 = v222 
+    #endif
+#if FABLE_COMPILER_TYPESCRIPT
+    let v223 : US3 = US3_0
+    let v224 : US4 = US4_5(v223)
+    let v225 : string = $"platform.is_windows / target: {v224}"
+    let v226 : bool = failwith<bool> v225
+    let _run_target_args'_v216 = v226 
+    #endif
+#if FABLE_COMPILER_PYTHON
+    let v227 : US3 = US3_0
+    let v228 : US4 = US4_6(v227)
+    let v229 : string = $"platform.is_windows / target: {v228}"
+    let v230 : bool = failwith<bool> v229
+    let _run_target_args'_v216 = v230 
+    #endif
+#if !FABLE_COMPILER_RUST && !FABLE_COMPILER_TYPESCRIPT && !FABLE_COMPILER_PYTHON
+    let v231 : System.Runtime.InteropServices.OSPlatform = System.Runtime.InteropServices.OSPlatform.Windows
+    let v232 : (System.Runtime.InteropServices.OSPlatform -> bool) = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform
+    let v233 : bool = v232 v231
+    let _run_target_args'_v216 = v233 
+    #endif
+#else
+    let v234 : System.Runtime.InteropServices.OSPlatform = System.Runtime.InteropServices.OSPlatform.Windows
+    let v235 : (System.Runtime.InteropServices.OSPlatform -> bool) = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform
+    let v236 : bool = v235 v234
+    let _run_target_args'_v216 = v236 
+    #endif
+    let v237 : bool = _run_target_args'_v216 
+    let v248 : string =
+        if v237 then
+            let v246 : string = ".exe"
+            v246
+        else
+            let v247 : string = ""
+            v247
+    let v249 : string = $"../alphabet/deps/hangulize/cmd/hangulize/hangulize{v248}"
+    let v250 : string = method26(v0, v249)
+    let v251 : string = $"{v250} {v197}"
+    let v254 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) = closure78(v182)
+    let v255 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option = Some v254 
+    let v259 : bool = true
+    let v260 : bool = true
+    let struct (v261 : int32, v262 : string) = method81(v251, v199, v202, v204, v255, v259, v212, v260)
+    let v272 : (string []) = v262.Split v123 
+    let v275 : int32 = v272.Length
+    let v276 : string = ""
+    let v277 : Mut8 = {l0 = 0; l1 = v276; l2 = 0; l3 = 0} : Mut8
+    while method183(v139, v277) do
+        let v279 : int32 = v277.l0
+        let struct (v280 : string, v281 : int32, v282 : int32) = v277.l1, v277.l2, v277.l3
+        let v283 : string = v128.[int v279]
+        let v284 : bool = v283 = ""
+        let struct (v308 : string, v309 : int32, v310 : int32) =
+            if v284 then
+                let v285 : string = $"{v280}
+"
+                let v286 : int32 = v281 + 1
+                let v287 : int32 = v282 + 1
+                struct (v285, v286, v287)
+            else
+                let v288 : int32 = v281 - v282
+                let v289 : bool = v288 >= v275
+                let v306 : string =
+                    if v289 then
+                        v280
+                    else
+                        let v291 : string = v272.[int v288]
+                        let v296 : string = "://"
+                        let v297 : bool = v291.Contains v296 
+                        let v300 : string =
+                            if v297 then
+                                v283
+                            else
+                                v291
+                        let v301 : int32 = v275 - 1
+                        let v302 : bool = v288 = v301
+                        if v302 then
+                            let v303 : string = $"{v280}{v300}
+{v283}"
+                            v303
+                        else
+                            let v304 : string = $"{v280}{v300}
+{v283}
+"
+                            v304
+                let v307 : int32 = v281 + 1
+                struct (v306, v307, v282)
+        let v311 : int32 = v279 + 1
+        v277.l0 <- v311
+        v277.l1 <- v308
+        v277.l2 <- v309
+        v277.l3 <- v310
+        ()
+    let struct (v312 : string, v313 : int32, v314 : int32) = v277.l1, v277.l2, v277.l3
+    (* run_target_args'
+    let v315 : unit = ()
+    run_target_args' *)
+    
+#if FABLE_COMPILER || WASM || CONTRACT
+    
+#if FABLE_COMPILER_RUST && !WASM && !CONTRACT
+    let v316 : string = "std::fs::write(&*$0, &*$1).unwrap()"
+    Fable.Core.RustInterop.emitRustExpr struct (v2, v312) v316 
     #endif
 #if FABLE_COMPILER_RUST && WASM
     #endif
@@ -22587,13 +22604,13 @@ and method178 (v0 : string, v1 : string, v2 : string, v3 : string) : US37 =
 #if !FABLE_COMPILER_RUST && !FABLE_COMPILER_TYPESCRIPT && !FABLE_COMPILER_PYTHON
     #endif
 #else
-    System.IO.File.WriteAllText (v2, v297)
+    System.IO.File.WriteAllText (v2, v312)
     #endif
     // run_target_args' is_unit
-    let v610 : unit = ()
-    let v611 : (unit -> unit) = closure79(v2, v246, v297)
-    let v612 : unit = (fun () -> v611 (); v610) ()
-    US37_0(v246, v297)
+    let v625 : unit = ()
+    let v626 : (unit -> unit) = closure79(v2, v261, v312)
+    let v627 : unit = (fun () -> v626 (); v625) ()
+    US37_0(v261, v312)
 and method187 (v0 : int32, v1 : string) : string =
     let v2 : string = method13()
     let v3 : Mut3 = {l0 = v2} : Mut3

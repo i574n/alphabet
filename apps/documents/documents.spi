@@ -98,6 +98,11 @@ let hangul workspace_root hangul_spec { ext dist_dir dist_path output_path } =
         |> seq.of_array'
         |> sm'.concat "\n"
         |> fun x => $'$"{!x}\n\n"'
+    inl hangul_spec =
+        if (text |> sm'.contains " the ")
+            && (text |> sm'.contains " and ")
+        then "eng"
+        else hangul_spec
     inl exit_code, result =
         runtime.execution_options fun x => { x with
             command =
@@ -136,8 +141,8 @@ let hangul workspace_root hangul_spec { ext dist_dir dist_path output_path } =
                             then x
                             else line
                         if i = result_len - 1
-                        then $'$"{!acc}{!line}"'
-                        else $'$"{!acc}{!line}\n"'
+                        then $'$"{!acc}{!line}\n{!x}"'
+                        else $'$"{!acc}{!line}\n{!x}\n"'
                 acc, (i + 1, n)
         |> fst
     result |> file_system.write_all_text output_path
@@ -245,7 +250,8 @@ let run { source_dir dist_dir cache_dir hangul_spec }
                             |> file_system.path_buf_display
                             |> sm'.format'
                             |> sm'.from_std_string
-                        if (path |> sm'.ends_with ".md" |> not) || (path |> sm'.ends_with ".hangul.md")
+                        if (path |> sm'.ends_with ".md" |> not)
+                            || (path |> sm'.ends_with ".hangul.md")
                         then file_system.Ignore
                         else file_system.Continue
             |> async.stream_filter_map_futures fun (entry : _ _ file_system.async_walkdir_error) =>
