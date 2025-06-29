@@ -31,6 +31,8 @@ inl get_args () =
         dist_dir = "dist-dir", 'd'
         cache_dir = "cache-dir", 'c'
         hangul_spec = "hangul-spec", 'h'
+        filter = "filter", 'f'
+        transcribe_only = "transcribe-only", 't'
     }
 
 #!markdown
@@ -52,7 +54,14 @@ let get_command () =
         runtime.arg_required true
     )
     |> runtime.command_init_arg (get_args () .hangul_spec) (
-        runtime.arg_required true
+        id
+    )
+    |> runtime.command_init_arg (get_args () .filter) (
+        id
+    )
+    |> runtime.command_init_arg (get_args () .transcribe_only) (
+        runtime.arg_default_value "false"
+        >> runtime.arg_action runtime.SetTrue
     )
 
 #!markdown
@@ -120,7 +129,7 @@ let crowbook hangul { ext dist_dir dist_path output_path } =
 
 #!spiral
 
-let hangul workspace_root hangul_spec { ext dist_dir dist_path output_path } =
+let hangul workspace_root hangul_spec transcribe_only { ext dist_dir dist_path output_path } =
     inl lines =
         dist_path
         |> file_system.read_all_text
@@ -161,23 +170,28 @@ let hangul workspace_root hangul_spec { ext dist_dir dist_path output_path } =
             |> fun x => a x : _ int _
         inl result_len = result |> am'.length
         (("", (0, 0)), lines)
-        ||> am.fold fun acc, (i, n) x =>
-            if x = ""
-            then $'$"{!acc}\n"', (i + 1, n + 1)
+        ||> am.fold fun acc, (i, n) line =>
+            if line = ""
+            then acc ++# "\n", (i + 1, n + 1)
             else
                 inl acc =
                     inl i = i - n
                     if i >= result_len
                     then acc
                     else
-                        inl line = result |> am'.index i
-                        inl line =
-                            if line |> sm'.contains "://"
-                            then x
-                            else line
+                        inl new_line = result |> am'.index i
+                        inl new_line =
+                            if new_line |> sm'.contains "://"
+                            then line
+                            else new_line
+                        inl result = acc ++# new_line
+                        inl result =
+                            if transcribe_only
+                            then result
+                            else result ++# "\n" ++# line
                         if i = result_len - 1
-                        then $'$"{!acc}{!line}\n{!x}"'
-                        else $'$"{!acc}{!line}\n{!x}\n"'
+                        then result
+                        else result ++# "\n"
                 acc, (i + 1, n)
         |> fst
     result |> file_system.write_all_text output_path
@@ -262,7 +276,7 @@ inl files_fn { dist_dir cache_dir } fn dist_path ext =
 
 #!spiral
 
-let run { source_dir dist_dir cache_dir hangul_spec }
+let run { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
     : async.future_pin (
         resultm.result'
             (am'.vec (
@@ -279,7 +293,7 @@ let run { source_dir dist_dir cache_dir hangul_spec }
     inl cache_dir = cache_dir |> file_system.get_full_path
     trace Debug
         fun () => "documents.run"
-        fun () => { source_dir dist_dir cache_dir hangul_spec }
+        fun () => { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
     fun () =>
         inl files =
             dist_dir
@@ -301,6 +315,11 @@ let run { source_dir dist_dir cache_dir hangul_spec }
                             |> sm'.format'
                             |> sm'.from_std_string
                         if (path |> sm'.ends_with ".md" |> not)
+                            || (
+                                match filter with
+                                | Some filter => path |> sm'.contains filter |> not
+                                | None => false
+                            )
                             || (path |> sm'.ends_with ".hangul.md")
                         then file_system.Ignore
                         else file_system.Continue
@@ -358,7 +377,7 @@ let run { source_dir dist_dir cache_dir hangul_spec }
             inl files =
                 inl files_fn = files_fn { dist_dir cache_dir }
                 inl files = [
-                    "hangul.md", dist_path, hangul workspace_root hangul_spec |> files_fn
+                    "hangul.md", dist_path, hangul workspace_root hangul_spec transcribe_only |> files_fn
                 ]
                 inl { output_path } = fix_paths { dist_path cache_dir ext = "hangul.md" }
                 inl files' = [
@@ -666,10 +685,18 @@ inl main (args : array_base string) =
         arg_matches
         |> runtime.matches_get_one (get_args () .hangul_spec |> fst)
         |> optionm'.unbox
-        |> optionm.value
-        |> sm'.from_std_string
+        |> optionm.map sm'.from_std_string
+        |> optionm'.default_value "por-br"
+    inl filter =
+        arg_matches
+        |> runtime.matches_get_one (get_args () .filter |> fst)
+        |> optionm'.unbox
+        |> optionm.map sm'.from_std_string
+    inl transcribe_only =
+        arg_matches
+        |> runtime.matches_get_flag (get_args () .transcribe_only |> fst)
     inl result =
-        run { source_dir dist_dir cache_dir hangul_spec }
+        run { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
         |> async.block_on_futures
         |> resultm.unbox
     match result with
