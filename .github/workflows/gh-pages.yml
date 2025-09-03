@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-24.04, windows-2025]
     steps:
       - uses: actions/checkout@v4
 
@@ -21,7 +21,7 @@ jobs:
           components: "clippy,rust-src,rustfmt"
           targets: "wasm32-unknown-unknown"
 
-      - uses: erlef/setup-beam@v1
+      - uses: i574n/setup-beam-win25@v3
         with:
           otp-version: "27"
           gleam-version: "1.11.0"
@@ -37,11 +37,12 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12.11"
+          python-version: "3.12.10"
 
       - uses: actions/setup-go@v5
 
       - uses: awalsh128/cache-apt-pkgs-action@master
+        if: contains(matrix.os, 'ubuntu')
         with:
           packages: texlive-xetex pandoc fonts-nanum-coding
           version: 1.0
@@ -57,7 +58,7 @@ jobs:
   push:
     needs: build
     timeout-minutes: 180
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
