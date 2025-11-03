@@ -16,6 +16,7 @@ open rust
 #!spiral
 
 //// test
+//// test_force
 
 open testing
 

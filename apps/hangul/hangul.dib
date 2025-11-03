@@ -13,6 +13,7 @@
 #!spiral
 
 //// package=../alphabet/apps/hangul
+//// test_force
 
 open testing
 

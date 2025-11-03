@@ -8,10 +8,11 @@ $ErrorActionPreference = "Stop"
 
 $url = git ls-remote --get-url
 $owner = ($url -split '/' | Select-Object -Last 2 | Select-Object -First 1) -replace '\.git$', '' ?? $env:GITHUB_REPOSITORY_OWNER
-Write-Output "dep_hangulize.ps1 / url: $url / owner: $owner"
+$domain = ($url -split '/' | Select-Object -Last 3 | Select-Object -First 1) ?? $env:GITHUB_SERVER_URL -replace 'https?://', ''
+Write-Output "dep_hangulize.ps1 / url: $url / owner: $owner / domain: $domain"
 
 Set-Location (New-Item -ItemType Directory -Path "../deps" -Force)
-git clone --recurse-submodules https://github.com/$owner/hangulize.git
+git clone --recurse-submodules https://$domain/$owner/hangulize.git
 Set-Location hangulize
 git pull
 
