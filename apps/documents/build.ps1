@@ -15,7 +15,7 @@ if (!$fast -and !$SkipNotebook) {
     { . deps/spiral/workspace/target/release/spiral$(_exe) dib --path "$ScriptDir/$projectName.dib" } | Invoke-Block -Retries 3 -Location ../../../polyglot
 }
 
-{ . ../../deps/polyglot/apps/parser/dist/DibParser$(_exe) "$projectName.dib" spi } | Invoke-Block
+{ . deps/spiral/workspace/target/release/spiral$(_exe) dib-export "$ScriptDir/$projectName.dib" spi } | Invoke-Block
 
 { . ../../deps/polyglot/apps/spiral/dist/Supervisor$(_exe) --build-file "$projectName.spi" "$projectName.fsx" --timeout 300000 } | Invoke-Block
 
@@ -37,10 +37,10 @@ $targetDir = GetTargetDir $projectName
 cargo fmt --
 
 if (!$fast) {
-    { cargo test --release -- --show-output } | Invoke-Block
+    { cargo +nightly-2025-11-01 test --timings --release -- --show-output } | Invoke-Block
 }
 
-{ cargo build --release } | Invoke-Block
+{ cargo +nightly-2025-11-01 build --timings --release } | Invoke-Block
 
 Write-Output "alphabet/apps/documents/build.ps1 / `$targetDir = $targetDir / `$projectName: $projectName / `$env:CI:'$env:CI'"
 
