@@ -510,6 +510,8 @@ run {
     dist_dir
     cache_dir
     hangul_spec = "por-br"
+    filter = None
+    transcribe_only = false
 }
 |> async.block_on_futures
 |> resultm.unwrap'
@@ -549,6 +551,8 @@ run {
     dist_dir = dist_dir
     cache_dir = cache_dir
     hangul_spec = "por-br"
+    filter = None
+    transcribe_only = false
 }
 |> async.block_on_futures
 |> resultm.unwrap'
@@ -579,6 +583,8 @@ run {
     dist_dir = dist_dir
     cache_dir = cache_dir
     hangul_spec = "por-br"
+    filter = None
+    transcribe_only = false
 }
 |> async.block_on_futures
 |> resultm.unwrap'
