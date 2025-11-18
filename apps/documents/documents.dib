@@ -612,7 +612,30 @@ run {
 
 hangul_path
 |> file_system.read_all_text
-|> _assert_eq "# 아\n\n## 브\n\n---\n\n아브크\n아브크\n\n아브크\n\nhttp://abc.com\n아브크\n"
+|> _assert_eq (
+    "# 아"
+    ++\# "# a"
+    ++\# ""
+    ++\# "## 브"
+    ++\# "## b"
+    ++\# ""
+    ++\# "---"
+    ++\# "---"
+    ++\# ""
+    ++\# "아브크"
+    ++\# "abc"
+    ++\# "아브크"
+    ++\# "abc"
+    ++\# ""
+    ++\# "아브크"
+    ++\# "abc"
+    ++\# ""
+    ++\# "http://abc.com"
+    ++\# "http://abc.com"
+    ++\# "아브크"
+    ++\# "abc"
+    ++\# ""
+)
 
 html_path
 |> file_system.read_all_text
@@ -631,7 +654,7 @@ epub_path
 
 hangul_html_path
 |> file_system.read_all_text
-|> sm'.contains "<p class = \"rule\">***</p>\n<p id = \"para-1\">아브크 아브크</p>"
+|> sm'.contains "<p class = \"rule\">***</p>\n<p id = \"para-1\">아브크 abc 아브크 abc</p>"
 |> _assert_eq true
 
 hangul_pdf_path
