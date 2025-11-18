@@ -47,6 +47,5 @@ Write-Output "alphabet/apps/documents/build.ps1 / `$targetDir = $targetDir / `$p
 if ($env:CI) {
     Remove-Item $targetDir -Recurse -Force -ErrorAction Ignore
 
-    Remove-Item target/release/deps -Recurse -Force -ErrorAction Ignore
-    Remove-Item target/release/build -Recurse -Force -ErrorAction Ignore
+    ClearCargoTarget "."
 }
