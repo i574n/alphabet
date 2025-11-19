@@ -15,8 +15,7 @@ open rust
 
 #!spiral
 
-//// test
-//// test_force
+///- --test force
 
 open testing
 
@@ -109,13 +108,30 @@ let crowbook hangul { ext dist_dir dist_path output_path } =
                 +. $'$" \'\\\\\\""'
                 +. default ext
             | _ => ""
-        runtime.execution_options fun x => { x with
-            command =
-                $'$"crowbook --verbose --to {!ext}"'
-                +. $'$" --single \\\"{!dist_path}\\\" --output \\\"{!output_path}\\\" {!args}"'
-            working_directory = dist_dir |> Some |> optionm'.box
-        }
-        |> runtime.execute_with_options
+        inl exit_code, result =
+            runtime.execution_options fun x => { x with
+                command =
+                    $'$"crowbook --verbose --to {!ext}"'
+                    +. $'$" --single \\\"{!dist_path}\\\" --output \\\"{!output_path}\\\" {!args}"'
+                working_directory = dist_dir |> Some |> optionm'.box
+            }
+            |> runtime.execute_with_options
+
+        if exit_code = 0
+        then exit_code, result
+        else
+            trace Warning
+                fun () => "documents.crowbook / attempt error"
+                fun () => { exit_code output_path result }
+            runtime.execution_options fun x => { x with
+                command =
+                    $'$"crowbook --verbose --to {!ext}"'
+                    +. $'$" --single \\\"{!dist_path}\\\" --output \\\"{!output_path}\\\""'
+                working_directory = dist_dir |> Some |> optionm'.box
+            }
+            |> runtime.execute_with_options
+
+
     if result |> sm'.contains "ERROR" |> not
     then (exit_code, result) |> Ok
     else
@@ -475,8 +491,8 @@ let run { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
 
 #!spiral
 
-//// test
-///! rust -d async-walkdir encoding_rs encoding_rs_io futures futures-lite rayon regex sha2
+///- --test
+///> rust -d async-walkdir encoding_rs encoding_rs_io futures futures-lite rayon regex sha2
 
 inl workspace_root = file_system.get_workspace_root ()
 inl source_dir = workspace_root </> "../alphabet/target/documents"
@@ -684,7 +700,7 @@ inl tests () =
 
 #!spiral
 
-///! _
+///> _
 
 inl main (args : array_base string) =
     Info |> Some |> init_trace_state

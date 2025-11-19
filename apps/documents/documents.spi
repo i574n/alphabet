@@ -78,13 +78,30 @@ let crowbook hangul { ext dist_dir dist_path output_path } =
                 +. $'$" \'\\\\\\""'
                 +. default ext
             | _ => ""
-        runtime.execution_options fun x => { x with
-            command =
-                $'$"crowbook --verbose --to {!ext}"'
-                +. $'$" --single \\\"{!dist_path}\\\" --output \\\"{!output_path}\\\" {!args}"'
-            working_directory = dist_dir |> Some |> optionm'.box
-        }
-        |> runtime.execute_with_options
+        inl exit_code, result =
+            runtime.execution_options fun x => { x with
+                command =
+                    $'$"crowbook --verbose --to {!ext}"'
+                    +. $'$" --single \\\"{!dist_path}\\\" --output \\\"{!output_path}\\\" {!args}"'
+                working_directory = dist_dir |> Some |> optionm'.box
+            }
+            |> runtime.execute_with_options
+
+        if exit_code = 0
+        then exit_code, result
+        else
+            trace Warning
+                fun () => "documents.crowbook / attempt error"
+                fun () => { exit_code output_path result }
+            runtime.execution_options fun x => { x with
+                command =
+                    $'$"crowbook --verbose --to {!ext}"'
+                    +. $'$" --single \\\"{!dist_path}\\\" --output \\\"{!output_path}\\\""'
+                working_directory = dist_dir |> Some |> optionm'.box
+            }
+            |> runtime.execute_with_options
+
+
     if result |> sm'.contains "ERROR" |> not
     then (exit_code, result) |> Ok
     else
@@ -429,7 +446,7 @@ inl tests () =
     }
 
 /// ## main
-///! _
+///> _
 
 inl main (args : array_base string) =
     Info |> Some |> init_trace_state

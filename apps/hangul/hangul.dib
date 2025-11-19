@@ -13,7 +13,7 @@
 #!spiral
 
 //// package=../alphabet/apps/hangul
-//// test_force
+///- --test force
 
 open testing
 
@@ -51,7 +51,7 @@ let AssertIsFalse (condition: bool) =
 
 #!spiral
 
-//// test
+///- --test
 
 hanja.hanja_to_hangul_table ()
 |> fun x => a x : a int _
@@ -75,7 +75,7 @@ let hanjaConvert (s: string) =
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual("국어", hanjaConvert "國語")
 
@@ -86,7 +86,7 @@ inl hanja_convert (s : string) =
 
 #!spiral
 
-//// test
+///- --test
 
 "國語"
 |> hanja_convert
@@ -103,13 +103,13 @@ let isHanja (c: char) =
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertIsTrue(isHanja '國')
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertIsFalse(isHanja '가')
 
@@ -286,31 +286,31 @@ let compatJamo (r: char) =
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(char G |> Some, compatJamo (char LeadG))
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(char A |> Some, compatJamo (char MedialA))
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(char L |> Some, compatJamo (char TailL))
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(char B |> Some, compatJamo (char B))
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(None, compatJamo 'a')
 
@@ -515,25 +515,25 @@ let join (l: char) (m: char) (t: char) =
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual('서', join (char LeadS) (char MedialEO) (char 0))
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual('울', join (char LeadZS) (char MedialU) (char TailL))
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual('평', join (char LeadP) (char MedialYEO) (char TailNG))
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual('양', join (char LeadZS) (char MedialYA) (char TailNG))
 
@@ -561,7 +561,7 @@ let split (c: char) =
 
 #!fsharp
 
-//// test
+///- --test
 
 let i, m, t = split '자'
 AssertAreEqual(char LeadJ, i)
@@ -580,7 +580,7 @@ let splitCompat (c: char) =
 
 #!fsharp
 
-//// test
+///- --test
 
 let l, m, t = splitCompat '한'
 AssertAreEqual(char H |> Some, l)
@@ -646,55 +646,55 @@ let rec stroke (r: char) =
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(5, stroke '세')
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(5, stroke '상')
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(3, stroke '아')
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(0, stroke ' ')
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(4, stroke '안')
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(5, stroke '녕')
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(6, stroke (char JJ))
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(4, stroke (char YAE))
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(5, stroke (char WAE))
 
@@ -715,13 +715,13 @@ let endsWithConsonant (s: string) =
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertIsTrue(endsWithConsonant "강")
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertIsFalse(endsWithConsonant "물고기")
 
@@ -742,13 +742,13 @@ let lastConsonant (s: string) =
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(int (char TailNG), int (lastConsonant "강"))
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual(char 0, lastConsonant "물고기")
 
@@ -770,25 +770,25 @@ let appendPostposition (s: string) (withConsonant: string) (withoutConsonant: st
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual("강이", appendPostposition "강" "이" "가")
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual("물고기는", appendPostposition "물고기" "은" "는")
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual("집으로", appendPostposition "집" "으로" "로")
 
 #!fsharp
 
-//// test
+///- --test
 
 AssertAreEqual("서울로", appendPostposition "서울" "으로" "로")
 
@@ -848,7 +848,7 @@ let binarySearch (length: int) (predicate: int -> bool) =
 
 #!fsharp
 
-//// test
+///- --test
 
 let sortedArray1 = [| 10; 20; 30; 40; 50 |]
 let predicate1 i = sortedArray1.[i] >= 30
@@ -858,7 +858,7 @@ AssertAreEqual(30, sortedArray1.[index1])
 
 #!fsharp
 
-//// test
+///- --test
 
 let sortedArray2 = [| 10; 20; 30; 40; 50 |]
 let predicate2 i = sortedArray2.[i] >= 35
@@ -868,7 +868,7 @@ AssertAreEqual(40, sortedArray2.[index2])
 
 #!fsharp
 
-//// test
+///- --test
 
 let sortedArray3 = [| 10; 20; 30; 40; 50 |]
 let predicate3 i = sortedArray3.[i] >= 5
@@ -877,7 +877,7 @@ AssertAreEqual(0, index3)
 
 #!fsharp
 
-//// test
+///- --test
 
 let sortedArray4 = [| 10; 20; 30; 40; 50 |]
 let predicate4 i = sortedArray4.[i] >= 60
@@ -911,7 +911,7 @@ let fromCp949 (data: byte[]) =
 
 #!fsharp
 
-//// test
+///- --test
 
 let cp949Bytes = [|0xb0; 0xa1; 0xb0; 0xa2|] |> Array.map byte
 AssertAreEqual("가각", fromCp949 cp949Bytes)
@@ -942,7 +942,7 @@ let toCp949 (s: string) =
 
 #!fsharp
 
-//// test
+///- --test
 
 let utf8String = "가각"
 let expectedBytes = [|0xb0; 0xa1; 0xb0; 0xa2|] |> Array.map byte
@@ -950,7 +950,7 @@ AssertAreEqual(expectedBytes, toCp949 utf8String)
 
 #!fsharp
 
-//// test
+///- --test
 
 let utf8String2 = "Hello, 안녕"
 let expectedBytes2 =
@@ -963,7 +963,7 @@ AssertAreEqual(expectedBytes2, toCp949 utf8String2)
 
 #!fsharp
 
-//// test
+///- --test
 
 let utf8String3 = "—"
 let expectedBytes3 = [| byte 0x3F |]
