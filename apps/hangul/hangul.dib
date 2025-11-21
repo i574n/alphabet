@@ -13,7 +13,7 @@
 #!spiral
 
 //// package=../alphabet/apps/hangul
-///- --test force
+///- --test static
 
 open testing
 
