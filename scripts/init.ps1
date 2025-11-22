@@ -36,6 +36,6 @@ EnsureSymbolicLink -Path "../deps/spiral" -Target "../../spiral"
 { sudo apt install -y texlive-xetex pandoc fonts-nanum-coding } | Invoke-Block -Linux -Distro ubuntu -OnError Continue
 { apt install -y texlive-xetex pandoc fonts-nanum-coding } | Invoke-Block -Linux -Distro ubuntu -OnError Continue
 
-{ cargo binstall --timings --git https://github.com/crowdagger/crowbook.git --locked } | Invoke-Block -OnError Continue
+{ cargo binstall -y --git https://github.com/crowdagger/crowbook.git --locked crowbook } | Invoke-Block -OnError Continue
 
 { pwsh ./dep_hangulize.ps1 } | Invoke-Block
