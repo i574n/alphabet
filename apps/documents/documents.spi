@@ -17,7 +17,7 @@ inl get_args () =
 
 /// ## get_command
 let get_command () =
-    ##"command"
+    ###"command"
     |> runtime.new_command
     |> runtime.command_init_arg (get_args () .source_dir) (
         runtime.arg_required true

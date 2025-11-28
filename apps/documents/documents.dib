@@ -42,7 +42,7 @@ inl get_args () =
 #!spiral
 
 let get_command () =
-    ##"command"
+    ###"command"
     |> runtime.new_command
     |> runtime.command_init_arg (get_args () .source_dir) (
         runtime.arg_required true
@@ -214,7 +214,7 @@ let hangul workspace_root hangul_spec transcribe_only { ext dist_dir dist_path o
     result |> file_system.write_all_text output_path
     trace Info
         fun () => "documents.hangul"
-        fun () => { exit_code result_len = result |> sm'.length : int; output_path }
+        fun () => { exit_code result_len = ##result; output_path }
     (exit_code, result) |> Ok
     |> fun x => x : result (int * string) (int * string)
 
