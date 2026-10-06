@@ -30,7 +30,8 @@ inl get_args () =
         source_dir = "source-dir", 's'
         dist_dir = "dist-dir", 'd'
         cache_dir = "cache-dir", 'c'
-        hangul_spec = "hangul-spec", 'h'
+        // `-h` is clap's help flag (debug builds reject a duplicate short name).
+        hangul_spec = "hangul-spec", 'H'
         filter = "filter", 'f'
         transcribe_only = "transcribe-only", 't'
     }
@@ -313,50 +314,57 @@ let run { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
         fun () => { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
     fun () =>
         inl files =
-            dist_dir
-            |> file_system.new_walk_dir
-            |> file_system.walk_dir_filter fun entry => async.new_future_move_send fun () =>
-                entry
-                |> file_system.dir_entry_file_type
-                |> async.await_send
-                |> resultm.map_error' sm'.format'
-                |> resultm.unbox
-                |> function
-                    | Ok file_type when file_type |> file_system.file_type_is_dir =>
-                        file_system.Ignore
-                    | _ =>
-                        inl path =
+            run_target function
+                // Natively a synchronous walk with the same filters: async_walkdir's filter needs a Send + Sync
+                // closure returning a Send future, and native values are Rc-based.
+                | RustNative => fun () =>
+                    inl filter, has_filter = match filter with Some filter => filter, true | None => "", false
+                    $'{ let mut out: Vec<Rc<str>> = Vec::new(); let mut stack = vec\![std::path::PathBuf::from(&*!dist_dir)]; while let Some(dir) = stack.pop() { if let Ok(entries) = std::fs::read_dir(&dir) { for entry in entries.flatten() { let path = entry.path(); if path.is_dir() { stack.push(path) } else { let s = path.display().to_string(); if s.ends_with(".md") && \!s.ends_with(".hangul.md") && (\!!has_filter || s.contains(&*!filter)) { out.push(Rc::from(s.as_str())) } } } } } out }' : am'.vec string
+                | _ => fun () =>
+                    dist_dir
+                    |> file_system.new_walk_dir
+                    |> file_system.walk_dir_filter fun entry => async.new_future_move_send fun () =>
+                        entry
+                        |> file_system.dir_entry_file_type
+                        |> async.await_send
+                        |> resultm.map_error' sm'.format'
+                        |> resultm.unbox
+                        |> function
+                            | Ok file_type when file_type |> file_system.file_type_is_dir =>
+                                file_system.Ignore
+                            | _ =>
+                                inl path =
+                                    entry
+                                    |> file_system.dir_entry_path
+                                    |> file_system.path_buf_display
+                                    |> sm'.format'
+                                    |> sm'.from_std_string
+                                if (path |> sm'.ends_with ".md" |> not)
+                                    || (
+                                        match filter with
+                                        | Some filter => path |> sm'.contains filter |> not
+                                        | None => false
+                                    )
+                                    || (path |> sm'.ends_with ".hangul.md")
+                                then file_system.Ignore
+                                else file_system.Continue
+                    |> async.stream_filter_map_futures fun (entry : _ _ file_system.async_walkdir_error) =>
+                        match entry |> resultm.map_error' sm'.format' |> resultm.unbox with
+                        | Ok entry =>
                             entry
                             |> file_system.dir_entry_path
                             |> file_system.path_buf_display
                             |> sm'.format'
                             |> sm'.from_std_string
-                        if (path |> sm'.ends_with ".md" |> not)
-                            || (
-                                match filter with
-                                | Some filter => path |> sm'.contains filter |> not
-                                | None => false
-                            )
-                            || (path |> sm'.ends_with ".hangul.md")
-                        then file_system.Ignore
-                        else file_system.Continue
-            |> async.stream_filter_map_futures fun (entry : _ _ file_system.async_walkdir_error) =>
-                match entry |> resultm.map_error' sm'.format' |> resultm.unbox with
-                | Ok entry =>
-                    entry
-                    |> file_system.dir_entry_path
-                    |> file_system.path_buf_display
-                    |> sm'.format'
-                    |> sm'.from_std_string
-                    |> Some
-                | Error error =>
-                    trace Critical
-                        fun () => "documents.run / stream_filter_map"
-                        fun () => { error }
-                    None
-                |> optionm'.box
-            |> async.stream_collect_futures
-            |> async.await
+                            |> Some
+                        | Error error =>
+                            trace Critical
+                                fun () => "documents.run / stream_filter_map"
+                                fun () => { error }
+                            None
+                        |> optionm'.box
+                    |> async.stream_collect_futures
+                    |> async.await
         trace Debug
             fun () => "documents.run"
             fun () => { files_len = files |> am'.vec_len }
@@ -491,7 +499,7 @@ let run { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
 
 #!spiral
 
-///- --test
+///- --test --timeout 900000
 ///> rust -d async-walkdir encoding_rs encoding_rs_io futures futures-lite rayon regex sha2
 
 inl workspace_root = file_system.get_workspace_root ()
@@ -757,5 +765,18 @@ inl main (args : array_base string) =
             fun () => { error }
         1i32
 inl main () =
-    $'let tests () = !tests ()' : ()
-    $'let main args = !main args' : ()
+    // F# (the Fable path) gets `tests` and `main args`. The native Rust backend (`--backend Rust`, build.ps1's native
+    // section) runs `main` here: clap parses `std::env::args` itself (the args below only feed the `documents.main`
+    // trace) and a failure exits with its code. This `main` stays unit (a unit `main` exits with 0), since an i32 one
+    // would also change the F# output.
+    backend_switch {
+        Fsharp = fun () =>
+            $'let tests () = !tests ()' : ()
+            $'let main args = !main args' : ()
+        Rust = fun () =>
+            inl args =
+                $'Rc::new(RefCell::new(std::env::args().skip(1).map(|x| Rc::<str>::from(x)).collect::<Vec<Rc<str>>>()))'
+                : array_base string
+            inl exit_code = main args
+            $'if !exit_code \!= 0 { std::process::exit(!exit_code) }' : ()
+    } : ()

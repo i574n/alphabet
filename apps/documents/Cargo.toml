@@ -1,12 +1,12 @@
 [package]
 name = "documents"
 version = "0.0.1"
-edition = "2024"
+edition = "2021"
 
 [workspace]
 
+# documents.rs is the Spiral compiler's native Rust output of documents.spi (build.ps1 regenerates it).
 [dependencies]
-fable_library_rust = { path = "../../deps/polyglot/lib/rust/fable/fable_modules/fable-library-rust", default-features = false, features = ["static_do_bindings", "datetime", "guid", "threaded"] }
 inline_colorization = ">=0.1,<1"
 regex = "1.10"
 clap = "4.5"
@@ -18,11 +18,6 @@ async-walkdir = "2.0"
 rayon = "1.10"
 sha2 = "~0.11.0-pre.4"
 
-[dev-dependencies]
-
-[lib]
-path = "documents.rs"
-
 [[bin]]
 name = "documents"
-path = "main.rs"
+path = "documents.rs"

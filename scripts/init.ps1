@@ -17,7 +17,10 @@ if (!$fast) {
     Set-Location polyglot
     git pull
     Set-Location $ScriptDir
-    pwsh ../../polyglot/scripts/init.ps1
+    # alphabet's own builds use neither Fable nor dotnet-repl. The opt-ins serve what i574n.github runs after this init
+    # (its init reaches polyglot's only through dice's and alphabet's): workflow.dib through `spiral dib --path`
+    # (dotnet-repl) and spiral's and polyglot's builds (Fable fork, lib/typescript/fable).
+    pwsh ../../polyglot/scripts/init.ps1 -Fable 1 -Repl 1
 }
 
 . ../../polyglot/scripts/core.ps1
