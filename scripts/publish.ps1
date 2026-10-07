@@ -78,4 +78,4 @@ rsync -av `
     }
 }
 
-{ . ../deps/polyglot/apps/dir-tree-html/dist/DirTreeHtml$(_exe) --dir ../dist --html ../dist/index.html } | Invoke-Block
+{ . ../deps/spiral/apps/dir-tree-html/dist/DirTreeHtml$(_exe) --dir ../dist --html ../dist/index.html } | Invoke-Block
