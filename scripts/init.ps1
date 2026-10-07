@@ -27,9 +27,7 @@ if (!$fast) {
 EnsureSymbolicLink -Path "../deps/polyglot" -Target "../../polyglot"
 EnsureSymbolicLink -Path "../deps/spiral" -Target "../../spiral"
 
-{ pwsh ../deps/polyglot/apps/builder/build.ps1 -fast 1 } | Invoke-Block
 { pwsh ../deps/polyglot/apps/parser/build.ps1 -fast 1 } | Invoke-Block
-{ pwsh ../deps/polyglot/apps/spiral/build.ps1 -fast 1 } | Invoke-Block
 { pwsh ../deps/polyglot/deps/spiral/apps/spiral/build.ps1 -fast 1 } | Invoke-Block
 { pwsh ../deps/polyglot/apps/dir-tree-html/build.ps1 -fast 1 } | Invoke-Block
 

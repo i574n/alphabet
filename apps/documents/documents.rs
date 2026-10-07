@@ -1,4 +1,4 @@
-#![allow(unused_mut, unused_variables, unused_imports, unused_parens, unused_braces, unused_assignments, dead_code, non_snake_case, non_camel_case_types, unreachable_patterns, unreachable_code, while_true)]
+#![allow(unused_mut, unused_variables, unused_imports, unused_parens, unused_braces, unused_assignments, dead_code, non_snake_case, non_camel_case_types, unreachable_code, while_true)]
 #![recursion_limit = "512"]
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -122,53 +122,53 @@ impl US4 {
 }
 #[derive(Clone)]
 enum US5 {
-    US5_0,
-    US5_1,
+    US5_0(std::path::PathBuf),
+    US5_1(Rc<str>),
 }
 impl US5 {
     fn tag(&self) -> i32 {
         match self {
-            US5::US5_0 => 0,
-            US5::US5_1 => 1,
+            US5::US5_0(..) => 0,
+            US5::US5_1(..) => 1,
         }
     }
 }
 #[derive(Clone)]
 enum US6 {
-    US6_0(Rc<str>),
-    US6_1(Rc<str>),
+    US6_0(std::path::PathBuf),
+    US6_1,
 }
 impl US6 {
     fn tag(&self) -> i32 {
         match self {
             US6::US6_0(..) => 0,
-            US6::US6_1(..) => 1,
+            US6::US6_1 => 1,
         }
     }
 }
 #[derive(Clone)]
 enum US7 {
-    US7_0(std::path::PathBuf),
-    US7_1(Rc<str>),
+    US7_0,
+    US7_1,
 }
 impl US7 {
     fn tag(&self) -> i32 {
         match self {
-            US7::US7_0(..) => 0,
-            US7::US7_1(..) => 1,
+            US7::US7_0 => 0,
+            US7::US7_1 => 1,
         }
     }
 }
 #[derive(Clone)]
 enum US8 {
-    US8_0(std::path::PathBuf),
-    US8_1,
+    US8_0(Rc<str>),
+    US8_1(Rc<str>),
 }
 impl US8 {
     fn tag(&self) -> i32 {
         match self {
             US8::US8_0(..) => 0,
-            US8::US8_1 => 1,
+            US8::US8_1(..) => 1,
         }
     }
 }
@@ -536,9 +536,9 @@ fn method0(mut v0: US0) -> (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut
     let mut v28: Rc<RefCell<Mut5>> = Rc::new(RefCell::new(Mut5 { l0: 0i32, l1: v27.clone() }));
     while method2(v26, v28.clone()) {
         let mut v30: i32 = v28.borrow().l0.clone();
-        let mut v31: i32 = -(v30);
-        let mut v32: i32 = v31 + v26;
-        let mut v33: i32 = v32 - 1i32;
+        let mut v31: i32 = v30.wrapping_neg();
+        let mut v32: i32 = v31.wrapping_add(v26);
+        let mut v33: i32 = v32.wrapping_sub(1i32);
         let mut v34: US1 = v28.borrow().l1.clone();
         let (mut v35, mut v36): (Rc<str>, US0) = v25.clone().borrow()[v33 as usize].clone();
         let mut v43: US1 = match &v34 {
@@ -554,9 +554,8 @@ fn method0(mut v0: US0) -> (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut
                 let mut v37: US0 = v37.clone();
                 v34.clone()
             }
-            _ => unreachable!(),
         };
-        let mut v44: i32 = v30 + 1i32;
+        let mut v44: i32 = v30.wrapping_add(1i32);
         v28.borrow_mut().l0 = v44;
         v28.borrow_mut().l1 = v43.clone();
         ()
@@ -576,7 +575,6 @@ fn method0(mut v0: US0) -> (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut
             let mut v52: US0 = v52.clone();
             v52.clone()
         }
-        _ => unreachable!(),
     };
     let mut v55: Rc<RefCell<Mut4>> = Rc::new(RefCell::new(Mut4 { l0: v54.clone() }));
     let mut v56: Option<i64> = None;
@@ -608,7 +606,7 @@ fn closure3() -> Rc<dyn Fn() -> (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCel
 }
 fn method3(mut v0: Rc<RefCell<Mut0>>, mut v1: Rc<RefCell<Mut1>>, mut v2: Rc<RefCell<Mut2>>, mut v3: Rc<RefCell<Mut3>>, mut v4: Rc<RefCell<Mut4>>, mut v5: Option<i64>) -> Rc<str> {
     let mut v6: u64 = { #[cfg(target_arch = "wasm32")] let (h, m, s) = { let secs = near_sdk::env::block_timestamp() / 1_000_000_000; ((secs / 3600) % 24, (secs / 60) % 60, secs % 60) }; #[cfg(all(windows, not(target_arch = "wasm32")))] let (h, m, s) = { #[repr(C)] struct St([u16; 8]); unsafe extern "system" { fn GetLocalTime(t: *mut St); } let mut t = St([0; 8]); unsafe { GetLocalTime(&mut t) }; (t.0[4] as u64, t.0[5] as u64, t.0[6] as u64) }; #[cfg(all(unix, not(target_arch = "wasm32")))] let (h, m, s) = { #[repr(C, align(8))] struct Tm([i32; 16]); unsafe extern "C" { fn localtime_r(t: *const std::os::raw::c_long, tm: *mut Tm) -> *mut Tm; } let secs = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0) as std::os::raw::c_long; let mut tm = Tm([0; 16]); unsafe { localtime_r(&secs, &mut tm) }; (tm.0[2] as u64, tm.0[1] as u64, tm.0[0] as u64) }; #[cfg(not(any(windows, unix, target_arch = "wasm32")))] let (h, m, s) = { let secs = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0); ((secs / 3600) % 24, (secs / 60) % 60, secs % 60) }; h * 3600 + m * 60 + s };
-    let mut v7: u64 = v6 / 3600u64;
+    let mut v7: u64 = v6.wrapping_div(3600u64);
     let mut v8: bool = v7 < 10u64;
     let mut v11: Rc<str> = if v8 {
         let mut v9: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("0"); } LIT.with(|lit| lit.clone()) };
@@ -621,8 +619,8 @@ fn method3(mut v0: Rc<RefCell<Mut0>>, mut v1: Rc<RefCell<Mut1>>, mut v2: Rc<RefC
     let mut v13: Rc<str> = Rc::<str>::from(format!("{}{}", v11, v12));
     let mut v14: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(":"); } LIT.with(|lit| lit.clone()) };
     let mut v15: Rc<str> = Rc::<str>::from(format!("{}{}", v13, v14));
-    let mut v16: u64 = v6 / 60u64;
-    let mut v17: u64 = v16 % 60u64;
+    let mut v16: u64 = v6.wrapping_div(60u64);
+    let mut v17: u64 = v16.wrapping_rem(60u64);
     let mut v18: bool = v17 < 10u64;
     let mut v21: Rc<str> = if v18 {
         let mut v19: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("0"); } LIT.with(|lit| lit.clone()) };
@@ -635,7 +633,7 @@ fn method3(mut v0: Rc<RefCell<Mut0>>, mut v1: Rc<RefCell<Mut1>>, mut v2: Rc<RefC
     let mut v23: Rc<str> = Rc::<str>::from(format!("{}{}", v21, v22));
     let mut v24: Rc<str> = Rc::<str>::from(format!("{}{}", v15, v23));
     let mut v25: Rc<str> = Rc::<str>::from(format!("{}{}", v24, v14));
-    let mut v26: u64 = v6 % 60u64;
+    let mut v26: u64 = v6.wrapping_rem(60u64);
     let mut v27: bool = v26 < 10u64;
     let mut v30: Rc<str> = if v27 {
         let mut v28: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("0"); } LIT.with(|lit| lit.clone()) };
@@ -704,7 +702,7 @@ fn method9(mut v0: Rc<str>, mut v1: i32, mut v2: i32) -> i32 {
                 }
             };
             if v11 {
-                let mut v12: i32 = v2 + 1i32;
+                let mut v12: i32 = v2.wrapping_add(1i32);
                 (v0, v1, v2) = (v0.clone(), v1, v12);
                 continue;
             } else {
@@ -719,7 +717,7 @@ fn method10(mut v0: Rc<str>, mut v1: i32) -> i32 {
         if v2 {
             return -1i32;
         } else {
-            let mut v3: i32 = v1 - 1i32;
+            let mut v3: i32 = v1.wrapping_sub(1i32);
             let mut v4: u8 = v0.clone().as_bytes()[v3 as usize];
             let mut v5: bool = v4 == b' ';
             let mut v7: bool = if v5 {
@@ -741,7 +739,7 @@ fn method8(mut v0: Rc<str>) -> Rc<str> {
     let mut v1: i32 = (v0.clone().len() as i32);
     let mut v2: i32 = 0i32;
     let mut v3: i32 = method9(v0.clone(), v1, v2);
-    let mut v4: i32 = v1 - 1i32;
+    let mut v4: i32 = v1.wrapping_sub(1i32);
     let mut v5: Rc<str> = string_slice(&v0.clone(), v3 as i64, v4 as i64);
     let mut v6: i32 = (v5.clone().len() as i32);
     let mut v7: i32 = method10(v5.clone(), v6);
@@ -909,47 +907,7 @@ fn method24() -> Rc<str> {
     let mut v0: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("transcribe-only"); } LIT.with(|lit| lit.clone()) };
     v0.clone()
 }
-fn method27(mut v0: std::path::PathBuf) -> std::path::PathBuf {
-    v0.clone()
-}
-fn method26() -> Rc<str> {
-    let mut v3: Result<std::path::PathBuf, std::io::Error> = std::env::current_dir();
-    let mut v5: std::path::PathBuf = v3.unwrap();
-    let mut v6: std::path::PathBuf = method27(v5.clone());
-    let mut v8: std::path::Display = v6.display();
-    let mut v10: std::string::String = format!("{}", v8);
-    let mut v12: Rc<str> = Rc::<str>::from(String::as_str(&v10));
-    v12.clone()
-}
-fn method29(mut v0: Rc<str>, mut v1: Rc<str>) -> Rc<str> {
-    let mut v4: &str = &*v0;
-    let mut v6: std::string::String = String::from(v4);
-    let mut v8: std::path::PathBuf = std::path::PathBuf::from(v6);
-    let mut v10: &str = &*v1;
-    let mut v12: std::string::String = String::from(v10);
-    let mut v14: std::path::PathBuf = v8.join(v12);
-    let mut v15: std::path::PathBuf = method27(v14.clone());
-    let mut v17: std::path::Display = v15.display();
-    let mut v19: std::string::String = format!("{}", v17);
-    let mut v21: Rc<str> = Rc::<str>::from(String::as_str(&v19));
-    v21.clone()
-}
-fn method33(mut v0: Rc<str>) -> Option<Rc<str>> {
-    let mut v16: &str = &*v0;
-    let mut v18: std::string::String = String::from(v16);
-    let mut v20: std::path::PathBuf = std::path::PathBuf::from(v18);
-    let mut v22: Option<std::path::PathBuf> = v20.parent().map(std::path::PathBuf::from);
-    let mut v24: bool = true; let _optionm_map_ = v22.map(|x| { //;
-    let mut v26: std::path::PathBuf = x;
-    let mut v27: std::path::PathBuf = method27(v26.clone());
-    let mut v29: std::path::Display = v27.display();
-    let mut v31: std::string::String = format!("{}", v29);
-    let mut v33: Rc<str> = Rc::<str>::from(String::as_str(&v31));
-    let mut v35: bool = true; v33 });
-    let mut v37: Option<Rc<str>> = _optionm_map_;
-    v37.clone()
-}
-fn method34(mut v0: Option<Rc<str>>) -> Option<Rc<str>> {
+fn method31(mut v0: Option<Rc<str>>) -> Option<Rc<str>> {
     v0.clone()
 }
 fn closure6() -> Rc<dyn Fn((Rc<str>)) -> US4> {
@@ -959,200 +917,7 @@ fn closure6() -> Rc<dyn Fn((Rc<str>)) -> US4> {
     }); }
     CLOSURE.with(|closure| closure.clone())
 }
-fn method32(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<dyn Fn(Rc<str>) -> bool>, mut v4: Rc<str>) -> US6 {
-    loop {
-        let mut v5: Rc<str> = method29(v4.clone(), v0.clone());
-        let mut v6: bool = v3(v5.clone());
-        if v6 {
-            return US6::US6_0(v4.clone());
-        } else {
-            let mut v8: Option<Rc<str>> = method33(v4.clone());
-            let mut v9: Option<Rc<str>> = method34(v8.clone());
-            let mut v10: Rc<dyn Fn((Rc<str>)) -> US4> = closure6();
-            let mut v11: Option<US4> = v9.map(|x| v10(x));
-            let mut v12: US4 = US4::US4_1;
-            let mut v13: US4 = v11.unwrap_or(v12);
-            match &v13 {
-                US4::US4_1 => { // None
-                    let mut v18: Rc<str> = if v2 {
-                        let mut v16: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file"); } LIT.with(|lit| lit.clone()) };
-                        v16.clone()
-                    } else {
-                        let mut v17: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("dir"); } LIT.with(|lit| lit.clone()) };
-                        v17.clone()
-                    };
-                    let mut v21: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file_system.find_parent / No parent for "); } LIT.with(|lit| lit.clone()) };
-                    let mut v22: Rc<str> = Rc::<str>::from(format!("{}{}", v21, v18));
-                    let mut v23: Rc<str> = Rc::<str>::from(format!(" '{}' at '{}' (until '{}')", v0, v1, v4));
-                    let mut v24: Rc<str> = Rc::<str>::from(format!("{}{}", v22, v23));
-                    return US6::US6_1(v24.clone());
-                }
-                US4::US4_0(v14) => { // Some
-                    let mut v14: Rc<str> = v14.clone();
-                    (v0, v1, v2, v3, v4) = (v0.clone(), v1.clone(), v2, v3.clone(), v14.clone());
-                    continue;
-                }
-                _ => unreachable!(),
-            }
-        }
-    }
-}
-fn method31(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<dyn Fn(Rc<str>) -> bool>) -> US6 {
-    let mut v4: Rc<str> = method29(v1.clone(), v0.clone());
-    let mut v5: bool = v3(v4.clone());
-    if v5 {
-        US6::US6_0(v1.clone())
-    } else {
-        let mut v7: Option<Rc<str>> = method33(v1.clone());
-        let mut v8: Option<Rc<str>> = method34(v7.clone());
-        let mut v9: Rc<dyn Fn((Rc<str>)) -> US4> = closure6();
-        let mut v10: Option<US4> = v8.map(|x| v9(x));
-        let mut v11: US4 = US4::US4_1;
-        let mut v12: US4 = v10.unwrap_or(v11);
-        match &v12 {
-            US4::US4_1 => { // None
-                let mut v17: Rc<str> = if v2 {
-                    let mut v15: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file"); } LIT.with(|lit| lit.clone()) };
-                    v15.clone()
-                } else {
-                    let mut v16: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("dir"); } LIT.with(|lit| lit.clone()) };
-                    v16.clone()
-                };
-                let mut v18: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file_system.find_parent / No parent for "); } LIT.with(|lit| lit.clone()) };
-                let mut v19: Rc<str> = Rc::<str>::from(format!("{}{}", v18, v17));
-                let mut v20: Rc<str> = Rc::<str>::from(format!(" '{}' at '{}' (until '{}')", v0, v1, v1));
-                let mut v21: Rc<str> = Rc::<str>::from(format!("{}{}", v19, v20));
-                US6::US6_1(v21.clone())
-            }
-            US4::US4_0(v13) => { // Some
-                let mut v13: Rc<str> = v13.clone();
-                method32(v0.clone(), v1.clone(), v2, v3.clone(), v13.clone())
-            }
-            _ => unreachable!(),
-        }
-    }
-}
-fn method35(mut v0: Rc<str>) -> bool {
-    let mut v4: &str = &*v0;
-    let mut v6: std::string::String = String::from(v4);
-    let mut v8: std::path::PathBuf = std::path::PathBuf::from(v6);
-    let mut v10: bool = v8.exists();
-    if v10 {
-        let mut v12: bool = v8.is_file();
-        v12
-    } else {
-        false
-    }
-}
-fn closure7() -> Rc<dyn Fn(Rc<str>) -> bool> {
-    thread_local!{ static CLOSURE: Rc<dyn Fn(Rc<str>) -> bool> = Rc::new(move |mut v0: Rc<str>| -> bool {
-        method35(v0.clone())
-    }); }
-    CLOSURE.with(|closure| closure.clone())
-}
-fn method36(mut v0: Rc<str>) -> bool {
-    let mut v4: &str = &*v0;
-    let mut v6: std::string::String = String::from(v4);
-    let mut v8: std::path::PathBuf = std::path::PathBuf::from(v6);
-    let mut v10: bool = v8.exists();
-    if v10 {
-        let mut v12: bool = v8.is_dir();
-        v12
-    } else {
-        false
-    }
-}
-fn closure8() -> Rc<dyn Fn(Rc<str>) -> bool> {
-    thread_local!{ static CLOSURE: Rc<dyn Fn(Rc<str>) -> bool> = Rc::new(move |mut v0: Rc<str>| -> bool {
-        method36(v0.clone())
-    }); }
-    CLOSURE.with(|closure| closure.clone())
-}
-fn method30(mut v0: US5, mut v1: Rc<str>, mut v2: Rc<str>) -> US6 {
-    let mut v3: bool = match &v0 {
-        US5::US5_0 => { // File
-            true
-        }
-        _ => {
-            false
-        }
-    };
-    let mut v6: Rc<dyn Fn(Rc<str>) -> bool> = if v3 {
-        closure7()
-    } else {
-        closure8()
-    };
-    method31(v1.clone(), v2.clone(), v3, v6.clone())
-}
-fn method37() -> Rc<str> {
-    let mut v1: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("[93m"); } LIT.with(|lit| lit.clone()) };
-    ;
-    ;
-    ;
-    ;
-    ;
-    let mut v2: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("Warning"); } LIT.with(|lit| lit.clone()) };
-    let mut v3: Rc<str> = Rc::<str>::from(v2.to_lowercase());
-    let mut v4: u8 = v3.clone().as_bytes()[0i32 as usize];
-    let mut v5: Rc<str> = method5(v4);
-    let mut v6: Rc<str> = Rc::<str>::from(format!("{}{}", v1, v5));
-    let mut v7: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("[0m"); } LIT.with(|lit| lit.clone()) };
-    let mut v8: Rc<str> = Rc::<str>::from(format!("{}{}", v6, v7));
-    v8.clone()
-}
-fn method40(mut v0: Rc<RefCell<Mut3>>) -> () {
-    let mut v1: Rc<str> = v0.borrow().l0.clone();
-    let mut v2: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("dir"); } LIT.with(|lit| lit.clone()) };
-    let mut v3: Rc<str> = Rc::<str>::from(format!("{}{}", v1, v2));
-    v0.borrow_mut().l0 = v3.clone();
-    ()
-}
-fn method41(mut v0: Rc<RefCell<Mut3>>) -> () {
-    let mut v1: Rc<str> = v0.borrow().l0.clone();
-    let mut v2: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("; "); } LIT.with(|lit| lit.clone()) };
-    let mut v3: Rc<str> = Rc::<str>::from(format!("{}{}", v1, v2));
-    v0.borrow_mut().l0 = v3.clone();
-    ()
-}
-fn method42(mut v0: Rc<RefCell<Mut3>>) -> () {
-    let mut v1: Rc<str> = v0.borrow().l0.clone();
-    let mut v2: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("error"); } LIT.with(|lit| lit.clone()) };
-    let mut v3: Rc<str> = Rc::<str>::from(format!("{}{}", v1, v2));
-    v0.borrow_mut().l0 = v3.clone();
-    ()
-}
-fn method39(mut v0: Rc<str>, mut v1: Rc<str>) -> Rc<str> {
-    let mut v2: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
-    let mut v3: Rc<RefCell<Mut3>> = Rc::new(RefCell::new(Mut3 { l0: v2.clone() }));
-    method13(v3.clone());
-    method40(v3.clone());
-    method15(v3.clone());
-    method6(v3.clone(), v0.clone());
-    method41(v3.clone());
-    method42(v3.clone());
-    method15(v3.clone());
-    method6(v3.clone(), v1.clone());
-    method16(v3.clone());
-    let mut v4: Rc<str> = v3.borrow().l0.clone();
-    v4.clone()
-}
-fn method38(mut v0: Rc<RefCell<Mut0>>, mut v1: Rc<RefCell<Mut1>>, mut v2: Rc<RefCell<Mut2>>, mut v3: Rc<RefCell<Mut3>>, mut v4: Rc<RefCell<Mut4>>, mut v5: Option<i64>, mut v6: Rc<str>, mut v7: Rc<str>, mut v8: Rc<str>, mut v9: Rc<str>) -> Rc<str> {
-    let mut v10: i64 = v0.borrow().l0.clone();
-    let mut v11: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(" "); } LIT.with(|lit| lit.clone()) };
-    let mut v12: Rc<str> = Rc::<str>::from(format!("{}{}", v6, v11));
-    let mut v13: Rc<str> = method11(v10);
-    let mut v14: Rc<str> = Rc::<str>::from(format!("{}{}", v12, v13));
-    let mut v15: Rc<str> = Rc::<str>::from(format!("{}{}", v14, v7));
-    let mut v16: Rc<str> = Rc::<str>::from(format!("{}{}", v15, v11));
-    let mut v19: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file_system.get_workspace_root"); } LIT.with(|lit| lit.clone()) };
-    let mut v20: Rc<str> = Rc::<str>::from(format!("{}{}", v16, v19));
-    let mut v21: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(" / "); } LIT.with(|lit| lit.clone()) };
-    let mut v22: Rc<str> = Rc::<str>::from(format!("{}{}", v20, v21));
-    let mut v23: Rc<str> = method39(v8.clone(), v9.clone());
-    let mut v24: Rc<str> = Rc::<str>::from(format!("{}{}", v22, v23));
-    method8(v24.clone())
-}
-fn method47(mut v0: Rc<str>) -> Rc<str> {
+fn method30(mut v0: Rc<str>) -> Rc<str> {
     let mut v4: &str = &*v0;
     let mut v6: std::string::String = String::from(v4);
     let mut v8: std::path::PathBuf = std::path::PathBuf::from(v6);
@@ -1166,7 +931,7 @@ fn method47(mut v0: Rc<str>) -> Rc<str> {
     let mut v24: Rc<str> = Rc::<str>::from(String::as_str(&v22));
     let mut v26: bool = true; v24 });
     let mut v28: Option<Rc<str>> = _optionm_map_;
-    let mut v29: Option<Rc<str>> = method34(v28.clone());
+    let mut v29: Option<Rc<str>> = method31(v28.clone());
     let mut v30: Rc<dyn Fn((Rc<str>)) -> US4> = closure6();
     let mut v31: Option<US4> = v29.map(|x| v30(x));
     let mut v32: US4 = US4::US4_1;
@@ -1180,17 +945,34 @@ fn method47(mut v0: Rc<str>) -> Rc<str> {
             let mut v34: Rc<str> = v34.clone();
             v34.clone()
         }
-        _ => unreachable!(),
     }
 }
-fn method48(mut v0: Rc<str>) -> Rc<str> {
+fn method33(mut v0: std::path::PathBuf) -> std::path::PathBuf {
+    v0.clone()
+}
+fn method32(mut v0: Rc<str>) -> Option<Rc<str>> {
+    let mut v16: &str = &*v0;
+    let mut v18: std::string::String = String::from(v16);
+    let mut v20: std::path::PathBuf = std::path::PathBuf::from(v18);
+    let mut v22: Option<std::path::PathBuf> = v20.parent().map(std::path::PathBuf::from);
+    let mut v24: bool = true; let _optionm_map_ = v22.map(|x| { //;
+    let mut v26: std::path::PathBuf = x;
+    let mut v27: std::path::PathBuf = method33(v26.clone());
+    let mut v29: std::path::Display = v27.display();
+    let mut v31: std::string::String = format!("{}", v29);
+    let mut v33: Rc<str> = Rc::<str>::from(String::as_str(&v31));
+    let mut v35: bool = true; v33 });
+    let mut v37: Option<Rc<str>> = _optionm_map_;
+    v37.clone()
+}
+fn method34(mut v0: Rc<str>) -> Rc<str> {
     let mut v1: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
     let mut v2: Rc<RefCell<Mut3>> = Rc::new(RefCell::new(Mut3 { l0: v1.clone() }));
     method6(v2.clone(), v0.clone());
     let mut v3: Rc<str> = v2.borrow().l0.clone();
     v3.clone()
 }
-fn method50(mut v0: std::io::Error) -> Rc<str> {
+fn method36(mut v0: std::io::Error) -> Rc<str> {
     let mut v1: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
     let mut v2: Rc<RefCell<Mut3>> = Rc::new(RefCell::new(Mut3 { l0: v1.clone() }));
     let mut v5: std::string::String = format!("{:#?}", v0);
@@ -1199,42 +981,55 @@ fn method50(mut v0: std::io::Error) -> Rc<str> {
     let mut v8: Rc<str> = v2.borrow().l0.clone();
     v8.clone()
 }
-fn closure9() -> Rc<dyn Fn(std::io::Error) -> Rc<str>> {
+fn closure7() -> Rc<dyn Fn(std::io::Error) -> Rc<str>> {
     thread_local!{ static CLOSURE: Rc<dyn Fn(std::io::Error) -> Rc<str>> = Rc::new(move |mut v0: std::io::Error| -> Rc<str> {
-        method50(v0)
+        method36(v0)
     }); }
     CLOSURE.with(|closure| closure.clone())
 }
-fn method49() -> Rc<dyn Fn(std::io::Error) -> Rc<str>> {
+fn method35() -> Rc<dyn Fn(std::io::Error) -> Rc<str>> {
+    closure7()
+}
+fn closure8() -> Rc<dyn Fn(std::path::PathBuf) -> US5> {
+    thread_local!{ static CLOSURE: Rc<dyn Fn(std::path::PathBuf) -> US5> = Rc::new(move |mut v0: std::path::PathBuf| -> US5 {
+        US5::US5_0(v0.clone())
+    }); }
+    CLOSURE.with(|closure| closure.clone())
+}
+fn method37() -> Rc<dyn Fn(std::path::PathBuf) -> US5> {
+    closure8()
+}
+fn closure9() -> Rc<dyn Fn(Rc<str>) -> US5> {
+    thread_local!{ static CLOSURE: Rc<dyn Fn(Rc<str>) -> US5> = Rc::new(move |mut v0: Rc<str>| -> US5 {
+        US5::US5_1(v0.clone())
+    }); }
+    CLOSURE.with(|closure| closure.clone())
+}
+fn method38() -> Rc<dyn Fn(Rc<str>) -> US5> {
     closure9()
 }
-fn closure10() -> Rc<dyn Fn(std::path::PathBuf) -> US7> {
-    thread_local!{ static CLOSURE: Rc<dyn Fn(std::path::PathBuf) -> US7> = Rc::new(move |mut v0: std::path::PathBuf| -> US7 {
-        US7::US7_0(v0.clone())
-    }); }
-    CLOSURE.with(|closure| closure.clone())
+fn method39(mut v0: Rc<str>, mut v1: Rc<str>) -> Rc<str> {
+    let mut v4: &str = &*v0;
+    let mut v6: std::string::String = String::from(v4);
+    let mut v8: std::path::PathBuf = std::path::PathBuf::from(v6);
+    let mut v10: &str = &*v1;
+    let mut v12: std::string::String = String::from(v10);
+    let mut v14: std::path::PathBuf = v8.join(v12);
+    let mut v15: std::path::PathBuf = method33(v14.clone());
+    let mut v17: std::path::Display = v15.display();
+    let mut v19: std::string::String = format!("{}", v17);
+    let mut v21: Rc<str> = Rc::<str>::from(String::as_str(&v19));
+    v21.clone()
 }
-fn method51() -> Rc<dyn Fn(std::path::PathBuf) -> US7> {
-    closure10()
-}
-fn closure11() -> Rc<dyn Fn(Rc<str>) -> US7> {
-    thread_local!{ static CLOSURE: Rc<dyn Fn(Rc<str>) -> US7> = Rc::new(move |mut v0: Rc<str>| -> US7 {
-        US7::US7_1(v0.clone())
-    }); }
-    CLOSURE.with(|closure| closure.clone())
-}
-fn method52() -> Rc<dyn Fn(Rc<str>) -> US7> {
-    closure11()
-}
-fn method46(mut v0: Rc<str>, mut v1: Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>>>, mut v2: u8, mut v3: Rc<str>) -> Result<std::path::PathBuf, std::io::Error> {
-    let mut v4: Rc<str> = method47(v0.clone());
-    let mut v5: Option<Rc<str>> = method33(v0.clone());
-    let mut v6: Option<Rc<str>> = method34(v5.clone());
+fn method29(mut v0: Rc<str>, mut v1: Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>>>, mut v2: u8, mut v3: Rc<str>) -> Result<std::path::PathBuf, std::io::Error> {
+    let mut v4: Rc<str> = method30(v0.clone());
+    let mut v5: Option<Rc<str>> = method32(v0.clone());
+    let mut v6: Option<Rc<str>> = method31(v5.clone());
     let mut v7: Rc<dyn Fn((Rc<str>)) -> US4> = closure6();
     let mut v8: Option<US4> = v6.map(|x| v7(x));
     let mut v9: US4 = US4::US4_1;
     let mut v10: US4 = v8.unwrap_or(v9);
-    let mut v11: Rc<str> = method48(v3.clone());
+    let mut v11: Rc<str> = method34(v3.clone());
     let mut v12: bool = v2 >= 11u8;
     if v12 {
         let mut v13: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file_system.read_link / "); } LIT.with(|lit| lit.clone()) };
@@ -1250,16 +1045,16 @@ fn method46(mut v0: Rc<str>, mut v1: Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Resu
                 let mut v21: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                 let mut v22: bool = v0 != v21 ;
                 if v22 {
-                    let mut v23: u8 = v2 + 1u8;
+                    let mut v23: u8 = v2.wrapping_add(1u8);
                     let mut v24: Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>> = v1(v23);
                     let mut v25: Result<std::path::PathBuf, std::io::Error> = v24(v20.clone());
-                    let mut v26: Rc<dyn Fn(std::io::Error) -> Rc<str>> = method49();
+                    let mut v26: Rc<dyn Fn(std::io::Error) -> Rc<str>> = method35();
                     let mut v28: Result<std::path::PathBuf, Rc<str>> = v25.map_err(|x| v26(x));
-                    let mut v29: Rc<dyn Fn(std::path::PathBuf) -> US7> = method51();
-                    let mut v30: Rc<dyn Fn(Rc<str>) -> US7> = method52();
-                    let mut v31: US7 = match v28 { Ok(x) => v29(x), Err(e) => v30(e) };
+                    let mut v29: Rc<dyn Fn(std::path::PathBuf) -> US5> = method37();
+                    let mut v30: Rc<dyn Fn(Rc<str>) -> US5> = method38();
+                    let mut v31: US5 = match v28 { Ok(x) => v29(x), Err(e) => v30(e) };
                     match &v31 {
-                        US7::US7_1(v46) => { // Error
+                        US5::US5_1(v46) => { // Error
                             let mut v46: Rc<str> = v46.clone();
                             let mut v47: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file_system.read_link / "); } LIT.with(|lit| lit.clone()) };
                             let mut v48: Rc<str> = Rc::<str>::from(format!("error': {} / error: {} / name: {}", v46, v11, v4));
@@ -1268,19 +1063,18 @@ fn method46(mut v0: Rc<str>, mut v1: Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Resu
                             let mut v53: Result<std::path::PathBuf, std::io::Error> = Err(v51);
                             v53
                         }
-                        US7::US7_0(v32) => { // Ok
+                        US5::US5_0(v32) => { // Ok
                             let mut v32: std::path::PathBuf = v32.clone();
-                            let mut v33: std::path::PathBuf = method27(v32.clone());
+                            let mut v33: std::path::PathBuf = method33(v32.clone());
                             let mut v35: std::path::Display = v33.display();
                             let mut v36: Rc<str> = Rc::<str>::from(format!("{}", v35));
-                            let mut v37: Rc<str> = method29(v36.clone(), v4.clone());
+                            let mut v37: Rc<str> = method39(v36.clone(), v4.clone());
                             let mut v39: &str = &*v37;
                             let mut v41: std::string::String = String::from(v39);
                             let mut v43: std::path::PathBuf = std::path::PathBuf::from(v41);
                             let mut v45: Result<std::path::PathBuf, std::io::Error> = Ok(v43);
                             v45
                         }
-                        _ => unreachable!(),
                     }
                 } else {
                     let mut v56: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file_system.read_link / run / The file or directory is not a reparse point. / "); } LIT.with(|lit| lit.clone()) };
@@ -1302,15 +1096,15 @@ fn method46(mut v0: Rc<str>, mut v1: Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Resu
         }
     }
 }
-fn method54(mut v0: Rc<str>, mut v1: Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>>>, mut v2: u8, mut v3: Rc<str>, mut v4: Rc<str>) -> Result<std::path::PathBuf, std::io::Error> {
-    let mut v5: Rc<str> = method47(v4.clone());
-    let mut v6: Option<Rc<str>> = method33(v4.clone());
-    let mut v7: Option<Rc<str>> = method34(v6.clone());
+fn method41(mut v0: Rc<str>, mut v1: Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>>>, mut v2: u8, mut v3: Rc<str>, mut v4: Rc<str>) -> Result<std::path::PathBuf, std::io::Error> {
+    let mut v5: Rc<str> = method30(v4.clone());
+    let mut v6: Option<Rc<str>> = method32(v4.clone());
+    let mut v7: Option<Rc<str>> = method31(v6.clone());
     let mut v8: Rc<dyn Fn((Rc<str>)) -> US4> = closure6();
     let mut v9: Option<US4> = v7.map(|x| v8(x));
     let mut v10: US4 = US4::US4_1;
     let mut v11: US4 = v9.unwrap_or(v10);
-    let mut v12: Rc<str> = method48(v3.clone());
+    let mut v12: Rc<str> = method34(v3.clone());
     let mut v13: bool = v2 >= 11u8;
     if v13 {
         let mut v14: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file_system.read_link / "); } LIT.with(|lit| lit.clone()) };
@@ -1326,16 +1120,16 @@ fn method54(mut v0: Rc<str>, mut v1: Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Resu
                 let mut v23: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                 let mut v24: bool = v4 != v23 ;
                 if v24 {
-                    let mut v25: u8 = v2 + 1u8;
+                    let mut v25: u8 = v2.wrapping_add(1u8);
                     let mut v26: Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>> = v1(v25);
                     let mut v27: Result<std::path::PathBuf, std::io::Error> = v26(v22.clone());
-                    let mut v28: Rc<dyn Fn(std::io::Error) -> Rc<str>> = method49();
+                    let mut v28: Rc<dyn Fn(std::io::Error) -> Rc<str>> = method35();
                     let mut v30: Result<std::path::PathBuf, Rc<str>> = v27.map_err(|x| v28(x));
-                    let mut v31: Rc<dyn Fn(std::path::PathBuf) -> US7> = method51();
-                    let mut v32: Rc<dyn Fn(Rc<str>) -> US7> = method52();
-                    let mut v33: US7 = match v30 { Ok(x) => v31(x), Err(e) => v32(e) };
+                    let mut v31: Rc<dyn Fn(std::path::PathBuf) -> US5> = method37();
+                    let mut v32: Rc<dyn Fn(Rc<str>) -> US5> = method38();
+                    let mut v33: US5 = match v30 { Ok(x) => v31(x), Err(e) => v32(e) };
                     match &v33 {
-                        US7::US7_1(v55) => { // Error
+                        US5::US5_1(v55) => { // Error
                             let mut v55: Rc<str> = v55.clone();
                             let mut v56: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file_system.read_link / "); } LIT.with(|lit| lit.clone()) };
                             let mut v57: Rc<str> = Rc::<str>::from(format!("error': {} / error: {} / name: {}", v55, v12, v5));
@@ -1344,19 +1138,18 @@ fn method54(mut v0: Rc<str>, mut v1: Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Resu
                             let mut v62: Result<std::path::PathBuf, std::io::Error> = Err(v60);
                             v62
                         }
-                        US7::US7_0(v34) => { // Ok
+                        US5::US5_0(v34) => { // Ok
                             let mut v34: std::path::PathBuf = v34.clone();
-                            let mut v35: std::path::PathBuf = method27(v34.clone());
+                            let mut v35: std::path::PathBuf = method33(v34.clone());
                             let mut v37: std::path::Display = v35.display();
                             let mut v45: Rc<str> = Rc::<str>::from(format!("{}", v37));
-                            let mut v46: Rc<str> = method29(v45.clone(), v5.clone());
+                            let mut v46: Rc<str> = method39(v45.clone(), v5.clone());
                             let mut v48: &str = &*v46;
                             let mut v50: std::string::String = String::from(v48);
                             let mut v52: std::path::PathBuf = std::path::PathBuf::from(v50);
                             let mut v54: Result<std::path::PathBuf, std::io::Error> = Ok(v52);
                             v54
                         }
-                        _ => unreachable!(),
                     }
                 } else {
                     let mut v65: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file_system.read_link / run / The file or directory is not a reparse point. / "); } LIT.with(|lit| lit.clone()) };
@@ -1378,115 +1171,124 @@ fn method54(mut v0: Rc<str>, mut v1: Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Resu
         }
     }
 }
-fn method53(mut v0: Rc<str>, mut v1: u8, mut v2: Rc<str>) -> Result<std::path::PathBuf, std::io::Error> {
+fn method40(mut v0: Rc<str>, mut v1: u8, mut v2: Rc<str>) -> Result<std::path::PathBuf, std::io::Error> {
     let mut v10: Result<std::path::PathBuf, std::io::Error> = std::fs::read_link(&*v2);
-    let mut v11: Rc<dyn Fn(std::io::Error) -> Rc<str>> = method49();
+    let mut v11: Rc<dyn Fn(std::io::Error) -> Rc<str>> = method35();
     let mut v13: Result<std::path::PathBuf, Rc<str>> = v10.map_err(|x| v11(x));
-    let mut v14: Rc<dyn Fn(std::path::PathBuf) -> US7> = method51();
-    let mut v15: Rc<dyn Fn(Rc<str>) -> US7> = method52();
-    let mut v16: US7 = match v13 { Ok(x) => v14(x), Err(e) => v15(e) };
+    let mut v14: Rc<dyn Fn(std::path::PathBuf) -> US5> = method37();
+    let mut v15: Rc<dyn Fn(Rc<str>) -> US5> = method38();
+    let mut v16: US5 = match v13 { Ok(x) => v14(x), Err(e) => v15(e) };
     match &v16 {
-        US7::US7_1(v20) => { // Error
+        US5::US5_1(v20) => { // Error
             let mut v20: Rc<str> = v20.clone();
-            let mut v21: Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>>> = closure12(v0.clone());
-            method54(v0.clone(), v21.clone(), v1, v20.clone(), v2.clone())
+            let mut v21: Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>>> = closure10(v0.clone());
+            method41(v0.clone(), v21.clone(), v1, v20.clone(), v2.clone())
         }
-        US7::US7_0(v17) => { // Ok
+        US5::US5_0(v17) => { // Ok
             let mut v17: std::path::PathBuf = v17.clone();
             let mut v19: Result<std::path::PathBuf, std::io::Error> = Ok(v17);
             v19
         }
-        _ => unreachable!(),
     }
 }
-fn closure13(mut v0: Rc<str>, mut v1: u8) -> Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>> {
+fn closure11(mut v0: Rc<str>, mut v1: u8) -> Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>> {
     Rc::new(move |mut v2: Rc<str>| -> Result<std::path::PathBuf, std::io::Error> {
-        method53(v0.clone(), v1, v2.clone())
+        method40(v0.clone(), v1, v2.clone())
     })
 }
-fn closure12(mut v0: Rc<str>) -> Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>>> {
+fn closure10(mut v0: Rc<str>) -> Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>>> {
     Rc::new(move |mut v1: u8| -> Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>> {
-        closure13(v0.clone(), v1)
+        closure11(v0.clone(), v1)
     })
 }
-fn method45(mut v0: Rc<str>, mut v1: u8) -> Result<std::path::PathBuf, std::io::Error> {
+fn method28(mut v0: Rc<str>, mut v1: u8) -> Result<std::path::PathBuf, std::io::Error> {
     let mut v29: Result<std::path::PathBuf, std::io::Error> = std::fs::read_link(&*v0);
-    let mut v30: Rc<dyn Fn(std::io::Error) -> Rc<str>> = method49();
+    let mut v30: Rc<dyn Fn(std::io::Error) -> Rc<str>> = method35();
     let mut v32: Result<std::path::PathBuf, Rc<str>> = v29.map_err(|x| v30(x));
-    let mut v33: Rc<dyn Fn(std::path::PathBuf) -> US7> = method51();
-    let mut v34: Rc<dyn Fn(Rc<str>) -> US7> = method52();
-    let mut v36: US7 = match v32 { Ok(x) => v33(x), Err(e) => v34(e) };
+    let mut v33: Rc<dyn Fn(std::path::PathBuf) -> US5> = method37();
+    let mut v34: Rc<dyn Fn(Rc<str>) -> US5> = method38();
+    let mut v36: US5 = match v32 { Ok(x) => v33(x), Err(e) => v34(e) };
     match &v36 {
-        US7::US7_1(v40) => { // Error
+        US5::US5_1(v40) => { // Error
             let mut v40: Rc<str> = v40.clone();
-            let mut v41: Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>>> = closure12(v0.clone());
-            method46(v0.clone(), v41.clone(), v1, v40.clone())
+            let mut v41: Rc<dyn Fn(u8) -> Rc<dyn Fn(Rc<str>) -> Result<std::path::PathBuf, std::io::Error>>> = closure10(v0.clone());
+            method29(v0.clone(), v41.clone(), v1, v40.clone())
         }
-        US7::US7_0(v37) => { // Ok
+        US5::US5_0(v37) => { // Ok
             let mut v37: std::path::PathBuf = v37.clone();
             let mut v39: Result<std::path::PathBuf, std::io::Error> = Ok(v37);
             v39
         }
-        _ => unreachable!(),
     }
 }
-fn method44(mut v0: Rc<str>) -> Result<std::path::PathBuf, std::io::Error> {
-    let mut v3: bool = method36(v0.clone());
+fn method42(mut v0: Rc<str>) -> bool {
+    let mut v9: &str = &*v0;
+    let mut v11: std::string::String = String::from(v9);
+    let mut v13: std::path::PathBuf = std::path::PathBuf::from(v11);
+    let mut v15: bool = v13.exists();
+    if v15 {
+        let mut v17: bool = v13.is_dir();
+        v17
+    } else {
+        false
+    }
+}
+fn method27(mut v0: Rc<str>) -> Result<std::path::PathBuf, std::io::Error> {
+    let mut v3: bool = method42(v0.clone());
     if v3 {
         let mut v5: Result<std::path::PathBuf, std::io::Error> = std::fs::read_link(&*v0);
         v5
     } else {
         let mut v6: u8 = 0u8;
-        method45(v0.clone(), v6)
+        method28(v0.clone(), v6)
     }
 }
-fn method55(mut v0: Option<std::path::PathBuf>) -> Option<std::path::PathBuf> {
+fn method43(mut v0: Option<std::path::PathBuf>) -> Option<std::path::PathBuf> {
     v0.clone()
 }
-fn closure14() -> Rc<dyn Fn((std::path::PathBuf)) -> US8> {
-    thread_local!{ static CLOSURE: Rc<dyn Fn((std::path::PathBuf)) -> US8> = Rc::new(move |mut v0: (std::path::PathBuf)| -> US8 {
+fn closure12() -> Rc<dyn Fn((std::path::PathBuf)) -> US6> {
+    thread_local!{ static CLOSURE: Rc<dyn Fn((std::path::PathBuf)) -> US6> = Rc::new(move |mut v0: (std::path::PathBuf)| -> US6 {
         let mut v1: std::path::PathBuf = (v0);
-        US8::US8_0(v1.clone())
+        US6::US6_0(v1.clone())
     }); }
     CLOSURE.with(|closure| closure.clone())
 }
-fn method57(mut v0: Rc<str>) -> Rc<str> {
+fn method45(mut v0: Rc<str>) -> Rc<str> {
     v0.clone()
 }
-fn method56(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>) -> Rc<str> {
+fn method44(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>) -> Rc<str> {
     let mut v5: Result<regex::Regex, regex::Error> = regex::Regex::new(&v0);
     let mut v7: regex::Regex = v5.unwrap();
-    let mut v8: Rc<str> = method57(v2.clone());
+    let mut v8: Rc<str> = method45(v2.clone());
     let mut v10: std::borrow::Cow<str> = v7.replace_all(&*v8, &*v1);
     let mut v12: std::string::String = String::from(v10);
     let mut v14: Rc<str> = Rc::<str>::from(String::as_str(&v12));
     v14.clone()
 }
-fn method43(mut v0: Rc<str>) -> Rc<str> {
+fn method26(mut v0: Rc<str>) -> Rc<str> {
     let mut v1: bool = v0.clone() == { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
     if v1 {
         let mut v2: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
         v2.clone()
     } else {
-        let mut v3: Result<std::path::PathBuf, std::io::Error> = method44(v0.clone());
+        let mut v3: Result<std::path::PathBuf, std::io::Error> = method27(v0.clone());
         let mut v5: Option<std::path::PathBuf> = v3.ok();
-        let mut v6: Option<std::path::PathBuf> = method55(v5.clone());
-        let mut v7: Rc<dyn Fn((std::path::PathBuf)) -> US8> = closure14();
-        let mut v8: Option<US8> = v6.map(|x| v7(x));
-        let mut v9: US8 = US8::US8_1;
-        let mut v10: US8 = v8.unwrap_or(v9);
+        let mut v6: Option<std::path::PathBuf> = method43(v5.clone());
+        let mut v7: Rc<dyn Fn((std::path::PathBuf)) -> US6> = closure12();
+        let mut v8: Option<US6> = v6.map(|x| v7(x));
+        let mut v9: US6 = US6::US6_1;
+        let mut v10: US6 = v8.unwrap_or(v9);
         let mut v17: Rc<str> = match &v10 {
-            US8::US8_1 => { // None
+            US6::US6_1 => { // None
                 v0.clone()
             }
-            US8::US8_0(v11) => { // Some
+            US6::US6_0(v11) => { // Some
                 let mut v11: std::path::PathBuf = v11.clone();
-                let mut v12: std::path::PathBuf = method27(v11.clone());
+                let mut v12: std::path::PathBuf = method33(v11.clone());
                 let mut v14: std::path::Display = v12.display();
                 let mut v15: Rc<str> = Rc::<str>::from(format!("{}", v14));
                 v15.clone()
             }
-            _ => unreachable!(),
         };
         let mut v18: bool = v17.clone() == { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
         let mut v19: Rc<str> = if v18 {
@@ -1496,7 +1298,7 @@ fn method43(mut v0: Rc<str>) -> Rc<str> {
         };
         let mut v20: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("^\\\\\\\\\\?\\\\"); } LIT.with(|lit| lit.clone()) };
         let mut v21: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
-        let mut v22: Rc<str> = method56(v20.clone(), v21.clone(), v19.clone());
+        let mut v22: Rc<str> = method44(v20.clone(), v21.clone(), v19.clone());
         let mut v23: i32 = (v22.clone().len() as i32);
         let mut v24: bool = v23 < 2i32;
         if v24 {
@@ -1504,7 +1306,7 @@ fn method43(mut v0: Rc<str>) -> Rc<str> {
         } else {
             let mut v26: Rc<str> = string_slice(&v22.clone(), 0i32 as i64, 0i32 as i64);
             let mut v29: Rc<str> = Rc::<str>::from(v26.to_lowercase());
-            let mut v30: i32 = v23 - 1i32;
+            let mut v30: i32 = v23.wrapping_sub(1i32);
             let mut v32: Rc<str> = string_slice(&v22.clone(), 1i32 as i64, v30 as i64);
             let mut v33: Rc<str> = Rc::<str>::from(format!("{}{}", v29, v32));
             let mut v37: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("\\"); } LIT.with(|lit| lit.clone()) };
@@ -1514,14 +1316,202 @@ fn method43(mut v0: Rc<str>) -> Rc<str> {
         }
     }
 }
-fn method28(mut v0: Rc<str>) -> US4 {
-    let mut v1: US5 = US5::US5_1;
+fn method46() -> Rc<str> {
+    let mut v3: Result<std::path::PathBuf, std::io::Error> = std::env::current_dir();
+    let mut v5: std::path::PathBuf = v3.unwrap();
+    let mut v6: std::path::PathBuf = method33(v5.clone());
+    let mut v8: std::path::Display = v6.display();
+    let mut v10: std::string::String = format!("{}", v8);
+    let mut v12: Rc<str> = Rc::<str>::from(String::as_str(&v10));
+    v12.clone()
+}
+fn method50(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<dyn Fn(Rc<str>) -> bool>, mut v4: Rc<str>) -> US8 {
+    loop {
+        let mut v5: Rc<str> = method39(v4.clone(), v0.clone());
+        let mut v6: bool = v3(v5.clone());
+        if v6 {
+            return US8::US8_0(v4.clone());
+        } else {
+            let mut v8: Option<Rc<str>> = method32(v4.clone());
+            let mut v9: Option<Rc<str>> = method31(v8.clone());
+            let mut v10: Rc<dyn Fn((Rc<str>)) -> US4> = closure6();
+            let mut v11: Option<US4> = v9.map(|x| v10(x));
+            let mut v12: US4 = US4::US4_1;
+            let mut v13: US4 = v11.unwrap_or(v12);
+            match &v13 {
+                US4::US4_1 => { // None
+                    let mut v18: Rc<str> = if v2 {
+                        let mut v16: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file"); } LIT.with(|lit| lit.clone()) };
+                        v16.clone()
+                    } else {
+                        let mut v17: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("dir"); } LIT.with(|lit| lit.clone()) };
+                        v17.clone()
+                    };
+                    let mut v21: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file_system.find_parent / No parent for "); } LIT.with(|lit| lit.clone()) };
+                    let mut v22: Rc<str> = Rc::<str>::from(format!("{}{}", v21, v18));
+                    let mut v23: Rc<str> = Rc::<str>::from(format!(" '{}' at '{}' (until '{}')", v0, v1, v4));
+                    let mut v24: Rc<str> = Rc::<str>::from(format!("{}{}", v22, v23));
+                    return US8::US8_1(v24.clone());
+                }
+                US4::US4_0(v14) => { // Some
+                    let mut v14: Rc<str> = v14.clone();
+                    (v0, v1, v2, v3, v4) = (v0.clone(), v1.clone(), v2, v3.clone(), v14.clone());
+                    continue;
+                }
+            }
+        }
+    }
+}
+fn method49(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<dyn Fn(Rc<str>) -> bool>) -> US8 {
+    let mut v4: Rc<str> = method39(v1.clone(), v0.clone());
+    let mut v5: bool = v3(v4.clone());
+    if v5 {
+        US8::US8_0(v1.clone())
+    } else {
+        let mut v7: Option<Rc<str>> = method32(v1.clone());
+        let mut v8: Option<Rc<str>> = method31(v7.clone());
+        let mut v9: Rc<dyn Fn((Rc<str>)) -> US4> = closure6();
+        let mut v10: Option<US4> = v8.map(|x| v9(x));
+        let mut v11: US4 = US4::US4_1;
+        let mut v12: US4 = v10.unwrap_or(v11);
+        match &v12 {
+            US4::US4_1 => { // None
+                let mut v17: Rc<str> = if v2 {
+                    let mut v15: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file"); } LIT.with(|lit| lit.clone()) };
+                    v15.clone()
+                } else {
+                    let mut v16: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("dir"); } LIT.with(|lit| lit.clone()) };
+                    v16.clone()
+                };
+                let mut v18: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file_system.find_parent / No parent for "); } LIT.with(|lit| lit.clone()) };
+                let mut v19: Rc<str> = Rc::<str>::from(format!("{}{}", v18, v17));
+                let mut v20: Rc<str> = Rc::<str>::from(format!(" '{}' at '{}' (until '{}')", v0, v1, v1));
+                let mut v21: Rc<str> = Rc::<str>::from(format!("{}{}", v19, v20));
+                US8::US8_1(v21.clone())
+            }
+            US4::US4_0(v13) => { // Some
+                let mut v13: Rc<str> = v13.clone();
+                method50(v0.clone(), v1.clone(), v2, v3.clone(), v13.clone())
+            }
+        }
+    }
+}
+fn method51(mut v0: Rc<str>) -> bool {
+    let mut v4: &str = &*v0;
+    let mut v6: std::string::String = String::from(v4);
+    let mut v8: std::path::PathBuf = std::path::PathBuf::from(v6);
+    let mut v10: bool = v8.exists();
+    if v10 {
+        let mut v12: bool = v8.is_file();
+        v12
+    } else {
+        false
+    }
+}
+fn closure13() -> Rc<dyn Fn(Rc<str>) -> bool> {
+    thread_local!{ static CLOSURE: Rc<dyn Fn(Rc<str>) -> bool> = Rc::new(move |mut v0: Rc<str>| -> bool {
+        method51(v0.clone())
+    }); }
+    CLOSURE.with(|closure| closure.clone())
+}
+fn closure14() -> Rc<dyn Fn(Rc<str>) -> bool> {
+    thread_local!{ static CLOSURE: Rc<dyn Fn(Rc<str>) -> bool> = Rc::new(move |mut v0: Rc<str>| -> bool {
+        method42(v0.clone())
+    }); }
+    CLOSURE.with(|closure| closure.clone())
+}
+fn method48(mut v0: US7, mut v1: Rc<str>, mut v2: Rc<str>) -> US8 {
+    let mut v3: bool = match &v0 {
+        US7::US7_0 => { // File
+            true
+        }
+        _ => {
+            false
+        }
+    };
+    let mut v6: Rc<dyn Fn(Rc<str>) -> bool> = if v3 {
+        closure13()
+    } else {
+        closure14()
+    };
+    method49(v1.clone(), v2.clone(), v3, v6.clone())
+}
+fn method52() -> Rc<str> {
+    let mut v1: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("[93m"); } LIT.with(|lit| lit.clone()) };
+    ;
+    ;
+    ;
+    ;
+    ;
+    let mut v2: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("Warning"); } LIT.with(|lit| lit.clone()) };
+    let mut v3: Rc<str> = Rc::<str>::from(v2.to_lowercase());
+    let mut v4: u8 = v3.clone().as_bytes()[0i32 as usize];
+    let mut v5: Rc<str> = method5(v4);
+    let mut v6: Rc<str> = Rc::<str>::from(format!("{}{}", v1, v5));
+    let mut v7: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("[0m"); } LIT.with(|lit| lit.clone()) };
+    let mut v8: Rc<str> = Rc::<str>::from(format!("{}{}", v6, v7));
+    v8.clone()
+}
+fn method55(mut v0: Rc<RefCell<Mut3>>) -> () {
+    let mut v1: Rc<str> = v0.borrow().l0.clone();
+    let mut v2: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("dir"); } LIT.with(|lit| lit.clone()) };
+    let mut v3: Rc<str> = Rc::<str>::from(format!("{}{}", v1, v2));
+    v0.borrow_mut().l0 = v3.clone();
+    ()
+}
+fn method56(mut v0: Rc<RefCell<Mut3>>) -> () {
+    let mut v1: Rc<str> = v0.borrow().l0.clone();
+    let mut v2: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("; "); } LIT.with(|lit| lit.clone()) };
+    let mut v3: Rc<str> = Rc::<str>::from(format!("{}{}", v1, v2));
+    v0.borrow_mut().l0 = v3.clone();
+    ()
+}
+fn method57(mut v0: Rc<RefCell<Mut3>>) -> () {
+    let mut v1: Rc<str> = v0.borrow().l0.clone();
+    let mut v2: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("error"); } LIT.with(|lit| lit.clone()) };
+    let mut v3: Rc<str> = Rc::<str>::from(format!("{}{}", v1, v2));
+    v0.borrow_mut().l0 = v3.clone();
+    ()
+}
+fn method54(mut v0: Rc<str>, mut v1: Rc<str>) -> Rc<str> {
+    let mut v2: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
+    let mut v3: Rc<RefCell<Mut3>> = Rc::new(RefCell::new(Mut3 { l0: v2.clone() }));
+    method13(v3.clone());
+    method55(v3.clone());
+    method15(v3.clone());
+    method6(v3.clone(), v0.clone());
+    method56(v3.clone());
+    method57(v3.clone());
+    method15(v3.clone());
+    method6(v3.clone(), v1.clone());
+    method16(v3.clone());
+    let mut v4: Rc<str> = v3.borrow().l0.clone();
+    v4.clone()
+}
+fn method53(mut v0: Rc<RefCell<Mut0>>, mut v1: Rc<RefCell<Mut1>>, mut v2: Rc<RefCell<Mut2>>, mut v3: Rc<RefCell<Mut3>>, mut v4: Rc<RefCell<Mut4>>, mut v5: Option<i64>, mut v6: Rc<str>, mut v7: Rc<str>, mut v8: Rc<str>, mut v9: Rc<str>) -> Rc<str> {
+    let mut v10: i64 = v0.borrow().l0.clone();
+    let mut v11: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(" "); } LIT.with(|lit| lit.clone()) };
+    let mut v12: Rc<str> = Rc::<str>::from(format!("{}{}", v6, v11));
+    let mut v13: Rc<str> = method11(v10);
+    let mut v14: Rc<str> = Rc::<str>::from(format!("{}{}", v12, v13));
+    let mut v15: Rc<str> = Rc::<str>::from(format!("{}{}", v14, v7));
+    let mut v16: Rc<str> = Rc::<str>::from(format!("{}{}", v15, v11));
+    let mut v19: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("file_system.get_workspace_root"); } LIT.with(|lit| lit.clone()) };
+    let mut v20: Rc<str> = Rc::<str>::from(format!("{}{}", v16, v19));
+    let mut v21: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(" / "); } LIT.with(|lit| lit.clone()) };
+    let mut v22: Rc<str> = Rc::<str>::from(format!("{}{}", v20, v21));
+    let mut v23: Rc<str> = method54(v8.clone(), v9.clone());
+    let mut v24: Rc<str> = Rc::<str>::from(format!("{}{}", v22, v23));
+    method8(v24.clone())
+}
+fn method47(mut v0: Rc<str>) -> US4 {
+    let mut v1: US7 = US7::US7_1;
     let mut v2: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("spiral"); } LIT.with(|lit| lit.clone()) };
     let mut v3: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("workspace"); } LIT.with(|lit| lit.clone()) };
-    let mut v4: Rc<str> = method29(v2.clone(), v3.clone());
-    let mut v5: US6 = method30(v1.clone(), v4.clone(), v0.clone());
+    let mut v4: Rc<str> = method39(v2.clone(), v3.clone());
+    let mut v5: US8 = method48(v1.clone(), v4.clone(), v0.clone());
     match &v5 {
-        US6::US6_1(v9) => { // Error
+        US8::US8_1(v9) => { // Error
             let mut v9: Rc<str> = v9.clone();
             let mut v11: Rc<dyn Fn() -> (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>)> = closure2();
             { let _ = spiral_trace_hold(&v11); };
@@ -1544,7 +1534,6 @@ fn method28(mut v0: Rc<str>) -> US4 {
                 US0::US0_3 => { // Warning
                     40i32
                 }
-                _ => unreachable!(),
             };
             let mut v26: bool = v16.borrow().l0.clone();
             let mut v27: bool = v26 == false;
@@ -1561,12 +1550,12 @@ fn method28(mut v0: Rc<str>) -> US4 {
                 { let _ = spiral_trace_hold(&v11); };
                 let (mut v34, mut v35, mut v36, mut v37, mut v38, mut v39): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v13) };
                 let mut v40: Rc<str> = method3(v34.clone(), v35.clone(), v36.clone(), v37.clone(), v38.clone(), v39.clone());
-                let mut v41: Rc<str> = method37();
-                let mut v42: Rc<str> = method38(v34.clone(), v35.clone(), v36.clone(), v37.clone(), v38.clone(), v39.clone(), v40.clone(), v41.clone(), v0.clone(), v9.clone());
+                let mut v41: Rc<str> = method52();
+                let mut v42: Rc<str> = method53(v34.clone(), v35.clone(), v36.clone(), v37.clone(), v38.clone(), v39.clone(), v40.clone(), v41.clone(), v0.clone(), v9.clone());
                 { let _ = spiral_trace_hold(&v11); };
                 let (mut v45, mut v46, mut v47, mut v48, mut v49, mut v50): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v13) };
                 let mut v51: i64 = v45.borrow().l0.clone();
-                let mut v52: i64 = v51 + 1i64;
+                let mut v52: i64 = v51.wrapping_add(1i64);
                 v45.borrow_mut().l0 = v52;
                 let mut v53: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                 let mut v54: bool = cfg!(target_arch = "wasm32");
@@ -1615,12 +1604,11 @@ fn method28(mut v0: Rc<str>) -> US4 {
             };
             US4::US4_1
         }
-        US6::US6_0(v6) => { // Ok
+        US8::US8_0(v6) => { // Ok
             let mut v6: Rc<str> = v6.clone();
-            let mut v7: Rc<str> = method43(v6.clone());
+            let mut v7: Rc<str> = method26(v6.clone());
             US4::US4_0(v7.clone())
         }
-        _ => unreachable!(),
     }
 }
 fn method59(mut v0: i32, mut v1: Rc<RefCell<Mut6>>) -> bool {
@@ -1644,9 +1632,9 @@ fn method58(mut v0: Rc<str>) -> Rc<str> {
     let mut v10: bool = v8.exists();
     let mut v11: bool = v10 == false;
     if v11 {
-        let mut v12: Rc<str> = method26();
-        let mut v13: Rc<str> = method29(v12.clone(), v0.clone());
-        let mut v14: Rc<str> = method43(v13.clone());
+        let mut v12: Rc<str> = method46();
+        let mut v13: Rc<str> = method39(v12.clone(), v0.clone());
+        let mut v14: Rc<str> = method26(v13.clone());
         let mut v15: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("/"); } LIT.with(|lit| lit.clone()) };
         let mut v16: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(v14.split(&*v15).map(|x| Rc::<str>::from(x)).collect::<Vec<Rc<str>>>()));
         let mut v17: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(vec![]));
@@ -1654,14 +1642,14 @@ fn method58(mut v0: Rc<str>) -> Rc<str> {
         let mut v19: Rc<RefCell<Mut6>> = Rc::new(RefCell::new(Mut6 { l0: 0i32, l1: 0i32, l2: v17.clone() }));
         while method59(v18, v19.clone()) {
             let mut v21: i32 = v19.borrow().l0.clone();
-            let mut v22: i32 = -(v21);
-            let mut v23: i32 = v22 + v18;
-            let mut v24: i32 = v23 - 1i32;
+            let mut v22: i32 = v21.wrapping_neg();
+            let mut v23: i32 = v22.wrapping_add(v18);
+            let mut v24: i32 = v23.wrapping_sub(1i32);
             let (mut v25, mut v26): (i32, Rc<RefCell<Vec<Rc<str>>>>) = (v19.borrow().l1.clone(), v19.borrow().l2.clone());
             let mut v27: Rc<str> = v16.clone().borrow()[v24 as usize].clone();
             let mut v28: bool = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(".."); } LIT.with(|lit| lit.clone()) } == v27.clone();
             let (mut v71, mut v72): (i32, Rc<RefCell<Vec<Rc<str>>>>) = if v28 {
-                let mut v29: i32 = v25 + 1i32;
+                let mut v29: i32 = v25.wrapping_add(1i32);
                 (v29, v26.clone())
             } else {
                 let mut v30: bool = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("."); } LIT.with(|lit| lit.clone()) } == v27.clone();
@@ -1678,7 +1666,7 @@ fn method58(mut v0: Rc<str>) -> Rc<str> {
                             let mut v36: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(vec![v35.clone()]));
                             let mut v37: i32 = (v36.clone().borrow().len() as i32);
                             let mut v38: i32 = (v26.clone().borrow().len() as i32);
-                            let mut v39: i32 = v37 + v38;
+                            let mut v39: i32 = v37.wrapping_add(v38);
                             let mut v40: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(vec![<Rc<str>>::default(); v39 as usize]));
                             let mut v41: Rc<RefCell<Mut7>> = Rc::new(RefCell::new(Mut7 { l0: 0i32 }));
                             while method60(v39, v41.clone()) {
@@ -1688,12 +1676,12 @@ fn method58(mut v0: Rc<str>) -> Rc<str> {
                                     let mut v45: Rc<str> = v36.clone().borrow()[v43 as usize].clone();
                                     v45.clone()
                                 } else {
-                                    let mut v46: i32 = v43 - v37;
+                                    let mut v46: i32 = v43.wrapping_sub(v37);
                                     let mut v47: Rc<str> = v26.clone().borrow()[v46 as usize].clone();
                                     v47.clone()
                                 };
                                 v40.clone().borrow_mut()[v43 as usize] = v48.clone();
-                                let mut v49: i32 = v43 + 1i32;
+                                let mut v49: i32 = v43.wrapping_add(1i32);
                                 v41.borrow_mut().l0 = v49;
                                 ()
                             };
@@ -1702,7 +1690,7 @@ fn method58(mut v0: Rc<str>) -> Rc<str> {
                             let mut v50: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(vec![v27.clone()]));
                             let mut v51: i32 = (v50.clone().borrow().len() as i32);
                             let mut v52: i32 = (v26.clone().borrow().len() as i32);
-                            let mut v53: i32 = v51 + v52;
+                            let mut v53: i32 = v51.wrapping_add(v52);
                             let mut v54: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(vec![<Rc<str>>::default(); v53 as usize]));
                             let mut v55: Rc<RefCell<Mut7>> = Rc::new(RefCell::new(Mut7 { l0: 0i32 }));
                             while method60(v53, v55.clone()) {
@@ -1712,24 +1700,24 @@ fn method58(mut v0: Rc<str>) -> Rc<str> {
                                     let mut v59: Rc<str> = v50.clone().borrow()[v57 as usize].clone();
                                     v59.clone()
                                 } else {
-                                    let mut v60: i32 = v57 - v51;
+                                    let mut v60: i32 = v57.wrapping_sub(v51);
                                     let mut v61: Rc<str> = v26.clone().borrow()[v60 as usize].clone();
                                     v61.clone()
                                 };
                                 v54.clone().borrow_mut()[v57 as usize] = v62.clone();
-                                let mut v63: i32 = v57 + 1i32;
+                                let mut v63: i32 = v57.wrapping_add(1i32);
                                 v55.borrow_mut().l0 = v63;
                                 ()
                             };
                             (0i32, v54.clone())
                         }
                     } else {
-                        let mut v66: i32 = v25 - 1i32;
+                        let mut v66: i32 = v25.wrapping_sub(1i32);
                         (v66, v26.clone())
                     }
                 }
             };
-            let mut v73: i32 = v21 + 1i32;
+            let mut v73: i32 = v21.wrapping_add(1i32);
             v19.borrow_mut().l0 = v73;
             v19.borrow_mut().l1 = v71;
             v19.borrow_mut().l2 = v72.clone();
@@ -1744,7 +1732,7 @@ fn method58(mut v0: Rc<str>) -> Rc<str> {
     } else {
         let mut v81: Result<std::path::PathBuf, std::io::Error> = std::fs::canonicalize(&*v0);
         let mut v83: std::path::PathBuf = v81.unwrap();
-        let mut v84: std::path::PathBuf = method27(v83.clone());
+        let mut v84: std::path::PathBuf = method33(v83.clone());
         let mut v86: std::path::Display = v84.display();
         let mut v88: std::string::String = format!("{}", v86);
         let mut v90: Rc<str> = Rc::<str>::from(String::as_str(&v88));
@@ -1818,7 +1806,6 @@ fn method70(mut v0: US4) -> Rc<str> {
             let mut v21: Rc<str> = Rc::<str>::from(format!("{}{}", v20, v9));
             v21.clone()
         }
-        _ => unreachable!(),
     }
 }
 fn method71(mut v0: Rc<RefCell<Mut3>>) -> () {
@@ -1835,24 +1822,24 @@ fn method64(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, 
     method65(v7.clone());
     method15(v7.clone());
     method6(v7.clone(), v0.clone());
-    method41(v7.clone());
+    method56(v7.clone());
     method66(v7.clone());
     method15(v7.clone());
     method6(v7.clone(), v1.clone());
-    method41(v7.clone());
+    method56(v7.clone());
     method67(v7.clone());
     method15(v7.clone());
     method6(v7.clone(), v2.clone());
-    method41(v7.clone());
+    method56(v7.clone());
     method68(v7.clone());
     method15(v7.clone());
     method6(v7.clone(), v3.clone());
-    method41(v7.clone());
+    method56(v7.clone());
     method69(v7.clone());
     method15(v7.clone());
     let mut v9: Rc<str> = method70(v4.clone());
     method6(v7.clone(), v9.clone());
-    method41(v7.clone());
+    method56(v7.clone());
     method71(v7.clone());
     method15(v7.clone());
     let mut v12: Rc<str> = if v5 {
@@ -1928,7 +1915,7 @@ fn method77() -> Rc<str> {
 }
 fn method78(mut v0: Rc<str>) -> Rc<str> {
     let mut v1: Rc<str> = method58(v0.clone());
-    method43(v1.clone())
+    method26(v1.clone())
 }
 fn method80(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::AtomicBool>>, mut v2: Rc<RefCell<Vec<(Rc<str>, Rc<str>)>>>, mut v3: Option<Rc<dyn Fn(i32, Rc<str>, bool) -> std::pin::Pin<Box<dyn std::future::Future<Output = ()>>>>>, mut v4: Option<Rc<dyn Fn(std::sync::Arc<std::sync::Mutex<std::process::ChildStdin>>) -> ()>>, mut v5: bool, mut v6: Option<Rc<str>>, mut v7: bool) -> Rc<str> {
     v0.clone()
@@ -1990,7 +1977,7 @@ fn method82(mut v0: u8, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: i32) -> R
     method15(v6.clone());
     let mut v7: Rc<str> = Rc::<str>::from(format!("{}", v0 as char));
     method6(v6.clone(), v7.clone());
-    method41(v6.clone());
+    method56(v6.clone());
     method84(v6.clone());
     method15(v6.clone());
     method13(v6.clone());
@@ -1998,7 +1985,7 @@ fn method82(mut v0: u8, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: i32) -> R
     method15(v6.clone());
     let mut v8: Rc<str> = Rc::<str>::from(format!("{}", v1));
     method6(v6.clone(), v8.clone());
-    method41(v6.clone());
+    method56(v6.clone());
     method86(v6.clone());
     method15(v6.clone());
     method13(v6.clone());
@@ -2006,13 +1993,13 @@ fn method82(mut v0: u8, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: i32) -> R
     method15(v6.clone());
     let mut v9: Rc<str> = Rc::<str>::from(format!("{}", v2));
     method6(v6.clone(), v9.clone());
-    method41(v6.clone());
+    method56(v6.clone());
     method88(v6.clone());
     method15(v6.clone());
     let mut v10: Rc<str> = Rc::<str>::from(format!("{}", v3));
     method6(v6.clone(), v10.clone());
     method16(v6.clone());
-    method41(v6.clone());
+    method56(v6.clone());
     method89(v6.clone());
     method15(v6.clone());
     let mut v11: Rc<str> = Rc::<str>::from(format!("{}", v4));
@@ -2042,7 +2029,7 @@ fn method90(mut v0: Rc<str>, mut v1: i32, mut v2: i32) -> i32 {
             let mut v5: bool = b'\n' == v4;
             let mut v6: bool = v5 != true;
             if v6 {
-                let mut v7: i32 = v2 + 1i32;
+                let mut v7: i32 = v2.wrapping_add(1i32);
                 (v0, v1, v2) = (v0.clone(), v1, v7);
                 continue;
             } else {
@@ -2057,7 +2044,7 @@ fn closure17(mut v0: i32, mut v1: i32) -> Rc<dyn Fn(Rc<str>) -> Rc<str>> {
         if v3 {
             v2.clone()
         } else {
-            let mut v4: i32 = v1 + 1i32;
+            let mut v4: i32 = v1.wrapping_add(1i32);
             let mut v5: Rc<dyn Fn(Rc<str>) -> Rc<str>> = method91(v0, v4);
             let mut v6: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(" "); } LIT.with(|lit| lit.clone()) };
             let mut v7: Rc<str> = Rc::<str>::from(format!("{}{}", v2, v6));
@@ -2083,12 +2070,12 @@ fn method92(mut v0: u8, mut v1: i32, mut v2: i32) -> Rc<str> {
     method15(v4.clone());
     let mut v5: Rc<str> = Rc::<str>::from(format!("{}", v0 as char));
     method6(v4.clone(), v5.clone());
-    method41(v4.clone());
+    method56(v4.clone());
     method87(v4.clone());
     method15(v4.clone());
     let mut v6: Rc<str> = Rc::<str>::from(format!("{}", v1));
     method6(v4.clone(), v6.clone());
-    method41(v4.clone());
+    method56(v4.clone());
     method88(v4.clone());
     method15(v4.clone());
     let mut v7: Rc<str> = Rc::<str>::from(format!("{}", v2));
@@ -2101,7 +2088,7 @@ fn closure16() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
     thread_local!{ static CLOSURE: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = Rc::new(move |mut v0: Rc<str>, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: i32, mut v5: i32| -> Rc<str> {
         let mut v6: i32 = (v0.clone().len() as i32);
         let mut v7: i32 = method90(v0.clone(), v6, v1);
-        let mut v8: i32 = v1 + 80i32;
+        let mut v8: i32 = v1.wrapping_add(80i32);
         let mut v9: bool = v7 < v8;
         let mut v10: i32 = if v9 {
             v7
@@ -2114,14 +2101,14 @@ fn closure16() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
             v12.clone()
         } else {
             let mut v13: bool = v2 == v10;
-            let mut v14: i32 = v10 - 1i32;
+            let mut v14: i32 = v10.wrapping_sub(1i32);
             let mut v15: Rc<str> = string_slice(&v0.clone(), v2 as i64, v14 as i64);
             v15.clone()
         };
         let mut v17: i32 = (v16.clone().len() as i32);
         let mut v18: bool = v17 > 0i32;
         let mut v22: bool = if v18 {
-            let mut v19: i32 = v17 - 1i32;
+            let mut v19: i32 = v17.wrapping_sub(1i32);
             let mut v20: u8 = v16.clone().as_bytes()[v19 as usize];
             let mut v21: bool = v20 == b'\n';
             v21
@@ -2135,7 +2122,7 @@ fn closure16() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
             let mut v24: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("\n"); } LIT.with(|lit| lit.clone()) };
             v24.clone()
         };
-        let mut v26: i32 = v4 - 1i32;
+        let mut v26: i32 = v4.wrapping_sub(1i32);
         let mut v27: i32 = 0i32;
         let mut v28: Rc<dyn Fn(Rc<str>) -> Rc<str>> = method91(v26, v27);
         let mut v29: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
@@ -2170,7 +2157,7 @@ fn closure19() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
     thread_local!{ static CLOSURE: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = Rc::new(move |mut v0: Rc<str>, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: i32, mut v5: i32| -> Rc<str> {
         let mut v6: i32 = (v0.clone().len() as i32);
         let mut v7: i32 = method90(v0.clone(), v6, v1);
-        let mut v8: i32 = v1 + 80i32;
+        let mut v8: i32 = v1.wrapping_add(80i32);
         let mut v9: bool = v7 < v8;
         let mut v10: i32 = if v9 {
             v7
@@ -2183,14 +2170,14 @@ fn closure19() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
             v12.clone()
         } else {
             let mut v13: bool = v2 == v10;
-            let mut v14: i32 = v10 - 1i32;
+            let mut v14: i32 = v10.wrapping_sub(1i32);
             let mut v15: Rc<str> = string_slice(&v0.clone(), v2 as i64, v14 as i64);
             v15.clone()
         };
         let mut v17: i32 = (v16.clone().len() as i32);
         let mut v18: bool = v17 > 0i32;
         let mut v22: bool = if v18 {
-            let mut v19: i32 = v17 - 1i32;
+            let mut v19: i32 = v17.wrapping_sub(1i32);
             let mut v20: u8 = v16.clone().as_bytes()[v19 as usize];
             let mut v21: bool = v20 == b'\n';
             v21
@@ -2204,7 +2191,7 @@ fn closure19() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
             let mut v24: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("\n"); } LIT.with(|lit| lit.clone()) };
             v24.clone()
         };
-        let mut v26: i32 = v4 - 1i32;
+        let mut v26: i32 = v4.wrapping_sub(1i32);
         let mut v27: i32 = 0i32;
         let mut v28: Rc<dyn Fn(Rc<str>) -> Rc<str>> = method91(v26, v27);
         let mut v29: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
@@ -2261,7 +2248,7 @@ fn method95(mut v0: Rc<str>, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: i32)
     method96(v6.clone());
     method15(v6.clone());
     method6(v6.clone(), v0.clone());
-    method41(v6.clone());
+    method56(v6.clone());
     method97(v6.clone());
     method15(v6.clone());
     let mut v9: std::string::String = format!("{:#?}", (v1, v2, v3, v4));
@@ -2301,11 +2288,11 @@ fn method98(mut v0: u8, mut v1: Rc<str>, mut v2: i32, mut v3: i32, mut v4: i32, 
     method15(v7.clone());
     let mut v8: Rc<str> = Rc::<str>::from(format!("{}", v0 as char));
     method6(v7.clone(), v8.clone());
-    method41(v7.clone());
+    method56(v7.clone());
     method96(v7.clone());
     method15(v7.clone());
     method6(v7.clone(), v1.clone());
-    method41(v7.clone());
+    method56(v7.clone());
     method97(v7.clone());
     method15(v7.clone());
     let mut v10: std::string::String = format!("{:#?}", (v2, v3, v4, v5));
@@ -2355,14 +2342,14 @@ fn method100(mut v0: i32, mut v1: Rc<str>, mut v2: i32, mut v3: i32, mut v4: i32
             };
             let mut v14: bool = v13 == false;
             if v14 {
-                let mut v15: i32 = v2 + 1i32;
+                let mut v15: i32 = v2.wrapping_add(1i32);
                 let mut v16: bool = b'\n' == v10;
                 let (mut v20, mut v21, mut v22, mut v23): (i32, i32, i32, i32) = if v16 {
-                    let mut v17: i32 = v3 + v5;
-                    let mut v18: i32 = v4 + 1i32;
+                    let mut v17: i32 = v3.wrapping_add(v5);
+                    let mut v18: i32 = v4.wrapping_add(1i32);
                     (v17, v18, 1i32, v6)
                 } else {
-                    let mut v19: i32 = v5 + 1i32;
+                    let mut v19: i32 = v5.wrapping_add(1i32);
                     (v3, v4, v19, v6)
                 };
                 US10::US10_0(v10, v15, v20, v21, v22, v23)
@@ -2374,30 +2361,30 @@ fn method100(mut v0: i32, mut v1: Rc<str>, mut v2: i32, mut v3: i32, mut v4: i32
         match &v28 {
             US10::US10_1(v29, v30, v31, v32, v33, v34) => { // Error
                 let mut v29: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v29.clone();
-                let mut v30: i32 = v30.clone();
-                let mut v31: i32 = v31.clone();
-                let mut v32: i32 = v32.clone();
-                let mut v33: i32 = v33.clone();
-                let mut v34: i32 = v34.clone();
+                let mut v30: i32 = *v30;
+                let mut v31: i32 = *v31;
+                let mut v32: i32 = *v32;
+                let mut v33: i32 = *v33;
+                let mut v34: i32 = *v34;
                 let mut v35: bool = v0 >= v2;
                 let mut v40: Rc<str> = if v35 {
                     let mut v36: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                     v36.clone()
                 } else {
                     let mut v37: bool = v0 == v2;
-                    let mut v38: i32 = v2 - 1i32;
+                    let mut v38: i32 = v2.wrapping_sub(1i32);
                     let mut v39: Rc<str> = string_slice(&v1.clone(), v0 as i64, v38 as i64);
                     v39.clone()
                 };
                 return US11::US11_0(v40.clone(), v2, v3, v4, v5, v6);
             }
             US10::US10_0(v42, v43, v44, v45, v46, v47) => { // Ok
-                let mut v42: u8 = v42.clone();
-                let mut v43: i32 = v43.clone();
-                let mut v44: i32 = v44.clone();
-                let mut v45: i32 = v45.clone();
-                let mut v46: i32 = v46.clone();
-                let mut v47: i32 = v47.clone();
+                let mut v42: u8 = *v42;
+                let mut v43: i32 = *v43;
+                let mut v44: i32 = *v44;
+                let mut v45: i32 = *v45;
+                let mut v46: i32 = *v46;
+                let mut v47: i32 = *v47;
                 let mut v48: bool = v43 == v2;
                 let mut v49: bool = v48 != true;
                 if v49 {
@@ -2408,7 +2395,6 @@ fn method100(mut v0: i32, mut v1: Rc<str>, mut v2: i32, mut v3: i32, mut v4: i32
                     return US11::US11_1(v51.clone(), v2, v3, v4, v5, v6);
                 }
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -2432,7 +2418,7 @@ fn method101(mut v0: Rc<str>) -> Rc<str> {
 }
 fn closure24() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
     thread_local!{ static CLOSURE: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = Rc::new(move |mut v0: Rc<str>, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: i32, mut v5: i32| -> Rc<str> {
-        let mut v6: i32 = v1 + 80i32;
+        let mut v6: i32 = v1.wrapping_add(80i32);
         let mut v7: i32 = (v0.clone().len() as i32);
         let mut v8: bool = v7 < v6;
         let mut v9: i32 = if v8 {
@@ -2446,7 +2432,7 @@ fn closure24() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
             v11.clone()
         } else {
             let mut v12: bool = v1 == v9;
-            let mut v13: i32 = v9 - 1i32;
+            let mut v13: i32 = v9.wrapping_sub(1i32);
             let mut v14: Rc<str> = string_slice(&v0.clone(), v1 as i64, v13 as i64);
             v14.clone()
         };
@@ -2491,15 +2477,15 @@ fn method103(mut v0: Rc<dyn Fn() -> Rc<str>>, mut v1: Rc<str>, mut v2: Rc<str>, 
     method15(v5.clone());
     let mut v6: Rc<str> = v0();
     method6(v5.clone(), v6.clone());
-    method41(v5.clone());
+    method56(v5.clone());
     method105(v5.clone());
     method15(v5.clone());
     method6(v5.clone(), v1.clone());
-    method41(v5.clone());
+    method56(v5.clone());
     method102(v5.clone());
     method15(v5.clone());
     method6(v5.clone(), v2.clone());
-    method41(v5.clone());
+    method56(v5.clone());
     method106(v5.clone());
     method15(v5.clone());
     method6(v5.clone(), v3.clone());
@@ -2510,14 +2496,14 @@ fn method103(mut v0: Rc<dyn Fn() -> Rc<str>>, mut v1: Rc<str>, mut v2: Rc<str>, 
 fn closure25(mut v0: i32, mut v1: i32, mut v2: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>>, mut v3: i32, mut v4: i32, mut v5: i32, mut v6: i32, mut v7: i32) -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
     Rc::new(move |mut v8: Rc<str>, mut v9: i32, mut v10: i32, mut v11: i32, mut v12: i32, mut v13: i32| -> Rc<str> {
         let mut v14: i32 = (v8.clone().len() as i32);
-        let mut v15: i32 = v0 + 80i32;
+        let mut v15: i32 = v0.wrapping_add(80i32);
         let mut v16: bool = v14 < v15;
         let mut v17: i32 = if v16 {
             v14
         } else {
             v15
         };
-        let mut v18: i32 = v1 + 80i32;
+        let mut v18: i32 = v1.wrapping_add(80i32);
         let mut v19: bool = v14 < v18;
         let mut v20: i32 = if v19 {
             v14
@@ -2530,7 +2516,7 @@ fn closure25(mut v0: i32, mut v1: i32, mut v2: Rc<dyn Fn(Rc<str>, i32, i32, i32,
             v22.clone()
         } else {
             let mut v23: bool = v0 == v17;
-            let mut v24: i32 = v17 - 1i32;
+            let mut v24: i32 = v17.wrapping_sub(1i32);
             let mut v25: Rc<str> = string_slice(&v8.clone(), v0 as i64, v24 as i64);
             v25.clone()
         };
@@ -2540,7 +2526,7 @@ fn closure25(mut v0: i32, mut v1: i32, mut v2: Rc<dyn Fn(Rc<str>, i32, i32, i32,
             v28.clone()
         } else {
             let mut v29: bool = v1 == v20;
-            let mut v30: i32 = v20 - 1i32;
+            let mut v30: i32 = v20.wrapping_sub(1i32);
             let mut v31: Rc<str> = string_slice(&v8.clone(), v1 as i64, v30 as i64);
             v31.clone()
         };
@@ -2606,14 +2592,14 @@ fn method107(mut v0: Rc<str>, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: i32
             };
             let mut v15: bool = v14 == false;
             if v15 {
-                let mut v16: i32 = v1 + 1i32;
+                let mut v16: i32 = v1.wrapping_add(1i32);
                 let mut v17: bool = b'\n' == v9;
                 let (mut v21, mut v22, mut v23, mut v24): (i32, i32, i32, i32) = if v17 {
-                    let mut v18: i32 = v2 + v4;
-                    let mut v19: i32 = v3 + 1i32;
+                    let mut v18: i32 = v2.wrapping_add(v4);
+                    let mut v19: i32 = v3.wrapping_add(1i32);
                     (v18, v19, 1i32, v5)
                 } else {
-                    let mut v20: i32 = v4 + 1i32;
+                    let mut v20: i32 = v4.wrapping_add(1i32);
                     (v2, v3, v20, v5)
                 };
                 US10::US10_0(v9, v16, v21, v22, v23, v24)
@@ -2625,30 +2611,30 @@ fn method107(mut v0: Rc<str>, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: i32
         match &v29 {
             US10::US10_1(v30, v31, v32, v33, v34, v35) => { // Error
                 let mut v30: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v30.clone();
-                let mut v31: i32 = v31.clone();
-                let mut v32: i32 = v32.clone();
-                let mut v33: i32 = v33.clone();
-                let mut v34: i32 = v34.clone();
-                let mut v35: i32 = v35.clone();
+                let mut v31: i32 = *v31;
+                let mut v32: i32 = *v32;
+                let mut v33: i32 = *v33;
+                let mut v34: i32 = *v34;
+                let mut v35: i32 = *v35;
                 let mut v36: bool = 0i32 >= v1;
                 let mut v41: Rc<str> = if v36 {
                     let mut v37: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                     v37.clone()
                 } else {
                     let mut v38: bool = 0i32 == v1;
-                    let mut v39: i32 = v1 - 1i32;
+                    let mut v39: i32 = v1.wrapping_sub(1i32);
                     let mut v40: Rc<str> = string_slice(&v0.clone(), 0i32 as i64, v39 as i64);
                     v40.clone()
                 };
                 return US11::US11_0(v41.clone(), v1, v2, v3, v4, v5);
             }
             US10::US10_0(v43, v44, v45, v46, v47, v48) => { // Ok
-                let mut v43: u8 = v43.clone();
-                let mut v44: i32 = v44.clone();
-                let mut v45: i32 = v45.clone();
-                let mut v46: i32 = v46.clone();
-                let mut v47: i32 = v47.clone();
-                let mut v48: i32 = v48.clone();
+                let mut v43: u8 = *v43;
+                let mut v44: i32 = *v44;
+                let mut v45: i32 = *v45;
+                let mut v46: i32 = *v46;
+                let mut v47: i32 = *v47;
+                let mut v48: i32 = *v48;
                 let mut v49: bool = v44 == v1;
                 let mut v50: bool = v49 != true;
                 if v50 {
@@ -2659,7 +2645,6 @@ fn method107(mut v0: Rc<str>, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: i32
                     return US11::US11_1(v52.clone(), v1, v2, v3, v4, v5);
                 }
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -2689,7 +2674,7 @@ fn closure29() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
             v7.clone()
         } else {
             let mut v8: bool = v1 == v5;
-            let mut v9: i32 = v5 - 1i32;
+            let mut v9: i32 = v5.wrapping_sub(1i32);
             let mut v10: Rc<str> = string_slice(&v0.clone(), v1 as i64, v9 as i64);
             v10.clone()
         };
@@ -2721,7 +2706,7 @@ fn method110(mut v0: Rc<str>, mut v1: i32, mut v2: i32) -> i32 {
                 v8
             };
             if v9 {
-                let mut v10: i32 = v2 + 1i32;
+                let mut v10: i32 = v2.wrapping_add(1i32);
                 (v0, v1, v2) = (v0.clone(), v1, v10);
                 continue;
             } else {
@@ -2732,7 +2717,7 @@ fn method110(mut v0: Rc<str>, mut v1: i32, mut v2: i32) -> i32 {
 }
 fn closure30() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
     thread_local!{ static CLOSURE: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = Rc::new(move |mut v0: Rc<str>, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: i32, mut v5: i32| -> Rc<str> {
-        let mut v6: i32 = v1 + 80i32;
+        let mut v6: i32 = v1.wrapping_add(80i32);
         let mut v7: bool = v5 < v6;
         let mut v8: i32 = if v7 {
             v5
@@ -2745,7 +2730,7 @@ fn closure30() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
             v10.clone()
         } else {
             let mut v11: bool = v1 == v8;
-            let mut v12: i32 = v8 - 1i32;
+            let mut v12: i32 = v8.wrapping_sub(1i32);
             let mut v13: Rc<str> = string_slice(&v0.clone(), v1 as i64, v12 as i64);
             v13.clone()
         };
@@ -2801,11 +2786,11 @@ fn method81(mut v0: Rc<str>) -> US9 {
     let mut v60: US10 = match &v16 {
         US10::US10_1(v23, v24, v25, v26, v27, v28) => { // Error
             let mut v23: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v23.clone();
-            let mut v24: i32 = v24.clone();
-            let mut v25: i32 = v25.clone();
-            let mut v26: i32 = v26.clone();
-            let mut v27: i32 = v27.clone();
-            let mut v28: i32 = v28.clone();
+            let mut v24: i32 = *v24;
+            let mut v25: i32 = *v25;
+            let mut v26: i32 = *v26;
+            let mut v27: i32 = *v27;
+            let mut v28: i32 = *v28;
             let mut v42: US10 = if v2 {
                 let mut v29: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure18();
                 US10::US10_1(v29.clone(), 0i32, 0i32, 1i32, 1i32, v1)
@@ -2828,54 +2813,52 @@ fn method81(mut v0: Rc<str>) -> US9 {
             match &v42 {
                 US10::US10_1(v49, v50, v51, v52, v53, v54) => { // Error
                     let mut v49: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v49.clone();
-                    let mut v50: i32 = v50.clone();
-                    let mut v51: i32 = v51.clone();
-                    let mut v52: i32 = v52.clone();
-                    let mut v53: i32 = v53.clone();
-                    let mut v54: i32 = v54.clone();
+                    let mut v50: i32 = *v50;
+                    let mut v51: i32 = *v51;
+                    let mut v52: i32 = *v52;
+                    let mut v53: i32 = *v53;
+                    let mut v54: i32 = *v54;
                     let mut v55: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                     US10::US10_1(v55.clone(), 0i32, 0i32, 1i32, 1i32, v1)
                 }
                 US10::US10_0(v43, v44, v45, v46, v47, v48) => { // Ok
-                    let mut v43: u8 = v43.clone();
-                    let mut v44: i32 = v44.clone();
-                    let mut v45: i32 = v45.clone();
-                    let mut v46: i32 = v46.clone();
-                    let mut v47: i32 = v47.clone();
-                    let mut v48: i32 = v48.clone();
+                    let mut v43: u8 = *v43;
+                    let mut v44: i32 = *v44;
+                    let mut v45: i32 = *v45;
+                    let mut v46: i32 = *v46;
+                    let mut v47: i32 = *v47;
+                    let mut v48: i32 = *v48;
                     v42.clone()
                 }
-                _ => unreachable!(),
             }
         }
         US10::US10_0(v17, v18, v19, v20, v21, v22) => { // Ok
-            let mut v17: u8 = v17.clone();
-            let mut v18: i32 = v18.clone();
-            let mut v19: i32 = v19.clone();
-            let mut v20: i32 = v20.clone();
-            let mut v21: i32 = v21.clone();
-            let mut v22: i32 = v22.clone();
+            let mut v17: u8 = *v17;
+            let mut v18: i32 = *v18;
+            let mut v19: i32 = *v19;
+            let mut v20: i32 = *v20;
+            let mut v21: i32 = *v21;
+            let mut v22: i32 = *v22;
             v16.clone()
         }
-        _ => unreachable!(),
     };
     let mut v312: US11 = match &v60 {
         US10::US10_1(v304, v305, v306, v307, v308, v309) => { // Error
             let mut v304: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v304.clone();
-            let mut v305: i32 = v305.clone();
-            let mut v306: i32 = v306.clone();
-            let mut v307: i32 = v307.clone();
-            let mut v308: i32 = v308.clone();
-            let mut v309: i32 = v309.clone();
+            let mut v305: i32 = *v305;
+            let mut v306: i32 = *v306;
+            let mut v307: i32 = *v307;
+            let mut v308: i32 = *v308;
+            let mut v309: i32 = *v309;
             US11::US11_1(v304.clone(), v305, v306, v307, v308, v309)
         }
         US10::US10_0(v61, v62, v63, v64, v65, v66) => { // Ok
-            let mut v61: u8 = v61.clone();
-            let mut v62: i32 = v62.clone();
-            let mut v63: i32 = v63.clone();
-            let mut v64: i32 = v64.clone();
-            let mut v65: i32 = v65.clone();
-            let mut v66: i32 = v66.clone();
+            let mut v61: u8 = *v61;
+            let mut v62: i32 = *v62;
+            let mut v63: i32 = *v63;
+            let mut v64: i32 = *v64;
+            let mut v65: i32 = *v65;
+            let mut v66: i32 = *v66;
             let mut v67: bool = v62 >= v66;
             let mut v88: US10 = if v67 {
                 let mut v68: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure21();
@@ -2891,14 +2874,14 @@ fn method81(mut v0: Rc<str>) -> US9 {
                 };
                 let mut v74: bool = v73 == false;
                 if v74 {
-                    let mut v75: i32 = v62 + 1i32;
+                    let mut v75: i32 = v62.wrapping_add(1i32);
                     let mut v76: bool = b'\n' == v70;
                     let (mut v80, mut v81, mut v82, mut v83): (i32, i32, i32, i32) = if v76 {
-                        let mut v77: i32 = v63 + v65;
-                        let mut v78: i32 = v64 + 1i32;
+                        let mut v77: i32 = v63.wrapping_add(v65);
+                        let mut v78: i32 = v64.wrapping_add(1i32);
                         (v77, v78, 1i32, v66)
                     } else {
-                        let mut v79: i32 = v65 + 1i32;
+                        let mut v79: i32 = v65.wrapping_add(1i32);
                         (v63, v64, v79, v66)
                     };
                     US10::US10_0(v70, v75, v80, v81, v82, v83)
@@ -2910,54 +2893,52 @@ fn method81(mut v0: Rc<str>) -> US9 {
             let mut v104: US11 = match &v88 {
                 US10::US10_1(v89, v90, v91, v92, v93, v94) => { // Error
                     let mut v89: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v89.clone();
-                    let mut v90: i32 = v90.clone();
-                    let mut v91: i32 = v91.clone();
-                    let mut v92: i32 = v92.clone();
-                    let mut v93: i32 = v93.clone();
-                    let mut v94: i32 = v94.clone();
+                    let mut v90: i32 = *v90;
+                    let mut v91: i32 = *v91;
+                    let mut v92: i32 = *v92;
+                    let mut v93: i32 = *v93;
+                    let mut v94: i32 = *v94;
                     US11::US11_1(v89.clone(), v90, v91, v92, v93, v94)
                 }
                 US10::US10_0(v96, v97, v98, v99, v100, v101) => { // Ok
-                    let mut v96: u8 = v96.clone();
-                    let mut v97: i32 = v97.clone();
-                    let mut v98: i32 = v98.clone();
-                    let mut v99: i32 = v99.clone();
-                    let mut v100: i32 = v100.clone();
-                    let mut v101: i32 = v101.clone();
+                    let mut v96: u8 = *v96;
+                    let mut v97: i32 = *v97;
+                    let mut v98: i32 = *v98;
+                    let mut v99: i32 = *v99;
+                    let mut v100: i32 = *v100;
+                    let mut v101: i32 = *v101;
                     method100(v62, v0.clone(), v97, v98, v99, v100, v101)
                 }
-                _ => unreachable!(),
             };
             let mut v121: US11 = match &v104 {
                 US11::US11_1(v112, v113, v114, v115, v116, v117) => { // Error
                     let mut v112: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v112.clone();
-                    let mut v113: i32 = v113.clone();
-                    let mut v114: i32 = v114.clone();
-                    let mut v115: i32 = v115.clone();
-                    let mut v116: i32 = v116.clone();
-                    let mut v117: i32 = v117.clone();
+                    let mut v113: i32 = *v113;
+                    let mut v114: i32 = *v114;
+                    let mut v115: i32 = *v115;
+                    let mut v116: i32 = *v116;
+                    let mut v117: i32 = *v117;
                     let mut v118: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                     US11::US11_0(v118.clone(), v62, v63, v64, v65, v66)
                 }
                 US11::US11_0(v105, v106, v107, v108, v109, v110) => { // Ok
                     let mut v105: Rc<str> = v105.clone();
-                    let mut v106: i32 = v106.clone();
-                    let mut v107: i32 = v107.clone();
-                    let mut v108: i32 = v108.clone();
-                    let mut v109: i32 = v109.clone();
-                    let mut v110: i32 = v110.clone();
+                    let mut v106: i32 = *v106;
+                    let mut v107: i32 = *v107;
+                    let mut v108: i32 = *v108;
+                    let mut v109: i32 = *v109;
+                    let mut v110: i32 = *v110;
                     US11::US11_0(v105.clone(), v106, v107, v108, v109, v110)
                 }
-                _ => unreachable!(),
             };
             match &v121 {
                 US11::US11_1(v212, v213, v214, v215, v216, v217) => { // Error
                     let mut v212: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v212.clone();
-                    let mut v213: i32 = v213.clone();
-                    let mut v214: i32 = v214.clone();
-                    let mut v215: i32 = v215.clone();
-                    let mut v216: i32 = v216.clone();
-                    let mut v217: i32 = v217.clone();
+                    let mut v213: i32 = *v213;
+                    let mut v214: i32 = *v214;
+                    let mut v215: i32 = *v215;
+                    let mut v216: i32 = *v216;
+                    let mut v217: i32 = *v217;
                     let mut v235: US10 = if v67 {
                         let mut v218: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
                         US10::US10_1(v218.clone(), v62, v63, v64, v65, v66)
@@ -2965,14 +2946,14 @@ fn method81(mut v0: Rc<str>) -> US9 {
                         let mut v220: u8 = v0.clone().as_bytes()[v62 as usize];
                         let mut v221: bool = v220 == b'"';
                         if v221 {
-                            let mut v222: i32 = v62 + 1i32;
+                            let mut v222: i32 = v62.wrapping_add(1i32);
                             let mut v223: bool = b'\n' == v220;
                             let (mut v227, mut v228, mut v229, mut v230): (i32, i32, i32, i32) = if v223 {
-                                let mut v224: i32 = v63 + v65;
-                                let mut v225: i32 = v64 + 1i32;
+                                let mut v224: i32 = v63.wrapping_add(v65);
+                                let mut v225: i32 = v64.wrapping_add(1i32);
                                 (v224, v225, 1i32, v66)
                             } else {
-                                let mut v226: i32 = v65 + 1i32;
+                                let mut v226: i32 = v65.wrapping_add(1i32);
                                 (v63, v64, v226, v66)
                             };
                             US10::US10_0(b'"', v222, v227, v228, v229, v230)
@@ -2984,11 +2965,11 @@ fn method81(mut v0: Rc<str>) -> US9 {
                     let mut v283: US10 = match &v235 {
                         US10::US10_1(v242, v243, v244, v245, v246, v247) => { // Error
                             let mut v242: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v242.clone();
-                            let mut v243: i32 = v243.clone();
-                            let mut v244: i32 = v244.clone();
-                            let mut v245: i32 = v245.clone();
-                            let mut v246: i32 = v246.clone();
-                            let mut v247: i32 = v247.clone();
+                            let mut v243: i32 = *v243;
+                            let mut v244: i32 = *v244;
+                            let mut v245: i32 = *v245;
+                            let mut v246: i32 = *v246;
+                            let mut v247: i32 = *v247;
                             let mut v265: US10 = if v67 {
                                 let mut v248: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure18();
                                 US10::US10_1(v248.clone(), v62, v63, v64, v65, v66)
@@ -2996,14 +2977,14 @@ fn method81(mut v0: Rc<str>) -> US9 {
                                 let mut v250: u8 = v0.clone().as_bytes()[v62 as usize];
                                 let mut v251: bool = v250 == b'\'';
                                 if v251 {
-                                    let mut v252: i32 = v62 + 1i32;
+                                    let mut v252: i32 = v62.wrapping_add(1i32);
                                     let mut v253: bool = b'\n' == v250;
                                     let (mut v257, mut v258, mut v259, mut v260): (i32, i32, i32, i32) = if v253 {
-                                        let mut v254: i32 = v63 + v65;
-                                        let mut v255: i32 = v64 + 1i32;
+                                        let mut v254: i32 = v63.wrapping_add(v65);
+                                        let mut v255: i32 = v64.wrapping_add(1i32);
                                         (v254, v255, 1i32, v66)
                                     } else {
-                                        let mut v256: i32 = v65 + 1i32;
+                                        let mut v256: i32 = v65.wrapping_add(1i32);
                                         (v63, v64, v256, v66)
                                     };
                                     US10::US10_0(b'\'', v252, v257, v258, v259, v260)
@@ -3015,68 +2996,65 @@ fn method81(mut v0: Rc<str>) -> US9 {
                             match &v265 {
                                 US10::US10_1(v272, v273, v274, v275, v276, v277) => { // Error
                                     let mut v272: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v272.clone();
-                                    let mut v273: i32 = v273.clone();
-                                    let mut v274: i32 = v274.clone();
-                                    let mut v275: i32 = v275.clone();
-                                    let mut v276: i32 = v276.clone();
-                                    let mut v277: i32 = v277.clone();
+                                    let mut v273: i32 = *v273;
+                                    let mut v274: i32 = *v274;
+                                    let mut v275: i32 = *v275;
+                                    let mut v276: i32 = *v276;
+                                    let mut v277: i32 = *v277;
                                     let mut v278: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                     US10::US10_1(v278.clone(), v62, v63, v64, v65, v66)
                                 }
                                 US10::US10_0(v266, v267, v268, v269, v270, v271) => { // Ok
-                                    let mut v266: u8 = v266.clone();
-                                    let mut v267: i32 = v267.clone();
-                                    let mut v268: i32 = v268.clone();
-                                    let mut v269: i32 = v269.clone();
-                                    let mut v270: i32 = v270.clone();
-                                    let mut v271: i32 = v271.clone();
+                                    let mut v266: u8 = *v266;
+                                    let mut v267: i32 = *v267;
+                                    let mut v268: i32 = *v268;
+                                    let mut v269: i32 = *v269;
+                                    let mut v270: i32 = *v270;
+                                    let mut v271: i32 = *v271;
                                     v265.clone()
                                 }
-                                _ => unreachable!(),
                             }
                         }
                         US10::US10_0(v236, v237, v238, v239, v240, v241) => { // Ok
-                            let mut v236: u8 = v236.clone();
-                            let mut v237: i32 = v237.clone();
-                            let mut v238: i32 = v238.clone();
-                            let mut v239: i32 = v239.clone();
-                            let mut v240: i32 = v240.clone();
-                            let mut v241: i32 = v241.clone();
+                            let mut v236: u8 = *v236;
+                            let mut v237: i32 = *v237;
+                            let mut v238: i32 = *v238;
+                            let mut v239: i32 = *v239;
+                            let mut v240: i32 = *v240;
+                            let mut v241: i32 = *v241;
                             v235.clone()
                         }
-                        _ => unreachable!(),
                     };
                     match &v283 {
                         US10::US10_1(v292, v293, v294, v295, v296, v297) => { // Error
                             let mut v292: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v292.clone();
-                            let mut v293: i32 = v293.clone();
-                            let mut v294: i32 = v294.clone();
-                            let mut v295: i32 = v295.clone();
-                            let mut v296: i32 = v296.clone();
-                            let mut v297: i32 = v297.clone();
+                            let mut v293: i32 = *v293;
+                            let mut v294: i32 = *v294;
+                            let mut v295: i32 = *v295;
+                            let mut v296: i32 = *v296;
+                            let mut v297: i32 = *v297;
                             let mut v298: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure24();
                             US11::US11_1(v298.clone(), v62, v63, v64, v65, v66)
                         }
                         US10::US10_0(v284, v285, v286, v287, v288, v289) => { // Ok
-                            let mut v284: u8 = v284.clone();
-                            let mut v285: i32 = v285.clone();
-                            let mut v286: i32 = v286.clone();
-                            let mut v287: i32 = v287.clone();
-                            let mut v288: i32 = v288.clone();
-                            let mut v289: i32 = v289.clone();
+                            let mut v284: u8 = *v284;
+                            let mut v285: i32 = *v285;
+                            let mut v286: i32 = *v286;
+                            let mut v287: i32 = *v287;
+                            let mut v288: i32 = *v288;
+                            let mut v289: i32 = *v289;
                             let mut v290: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                             US11::US11_0(v290.clone(), v285, v286, v287, v288, v289)
                         }
-                        _ => unreachable!(),
                     }
                 }
                 US11::US11_0(v122, v123, v124, v125, v126, v127) => { // Ok
                     let mut v122: Rc<str> = v122.clone();
-                    let mut v123: i32 = v123.clone();
-                    let mut v124: i32 = v124.clone();
-                    let mut v125: i32 = v125.clone();
-                    let mut v126: i32 = v126.clone();
-                    let mut v127: i32 = v127.clone();
+                    let mut v123: i32 = *v123;
+                    let mut v124: i32 = *v124;
+                    let mut v125: i32 = *v125;
+                    let mut v126: i32 = *v126;
+                    let mut v127: i32 = *v127;
                     let mut v128: bool = v123 >= v127;
                     let mut v146: US10 = if v128 {
                         let mut v129: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -3085,14 +3063,14 @@ fn method81(mut v0: Rc<str>) -> US9 {
                         let mut v131: u8 = v0.clone().as_bytes()[v123 as usize];
                         let mut v132: bool = v131 == b'"';
                         if v132 {
-                            let mut v133: i32 = v123 + 1i32;
+                            let mut v133: i32 = v123.wrapping_add(1i32);
                             let mut v134: bool = b'\n' == v131;
                             let (mut v138, mut v139, mut v140, mut v141): (i32, i32, i32, i32) = if v134 {
-                                let mut v135: i32 = v124 + v126;
-                                let mut v136: i32 = v125 + 1i32;
+                                let mut v135: i32 = v124.wrapping_add(v126);
+                                let mut v136: i32 = v125.wrapping_add(1i32);
                                 (v135, v136, 1i32, v127)
                             } else {
-                                let mut v137: i32 = v126 + 1i32;
+                                let mut v137: i32 = v126.wrapping_add(1i32);
                                 (v124, v125, v137, v127)
                             };
                             US10::US10_0(b'"', v133, v138, v139, v140, v141)
@@ -3104,11 +3082,11 @@ fn method81(mut v0: Rc<str>) -> US9 {
                     let mut v194: US10 = match &v146 {
                         US10::US10_1(v153, v154, v155, v156, v157, v158) => { // Error
                             let mut v153: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v153.clone();
-                            let mut v154: i32 = v154.clone();
-                            let mut v155: i32 = v155.clone();
-                            let mut v156: i32 = v156.clone();
-                            let mut v157: i32 = v157.clone();
-                            let mut v158: i32 = v158.clone();
+                            let mut v154: i32 = *v154;
+                            let mut v155: i32 = *v155;
+                            let mut v156: i32 = *v156;
+                            let mut v157: i32 = *v157;
+                            let mut v158: i32 = *v158;
                             let mut v176: US10 = if v128 {
                                 let mut v159: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure18();
                                 US10::US10_1(v159.clone(), v123, v124, v125, v126, v127)
@@ -3116,14 +3094,14 @@ fn method81(mut v0: Rc<str>) -> US9 {
                                 let mut v161: u8 = v0.clone().as_bytes()[v123 as usize];
                                 let mut v162: bool = v161 == b'\'';
                                 if v162 {
-                                    let mut v163: i32 = v123 + 1i32;
+                                    let mut v163: i32 = v123.wrapping_add(1i32);
                                     let mut v164: bool = b'\n' == v161;
                                     let (mut v168, mut v169, mut v170, mut v171): (i32, i32, i32, i32) = if v164 {
-                                        let mut v165: i32 = v124 + v126;
-                                        let mut v166: i32 = v125 + 1i32;
+                                        let mut v165: i32 = v124.wrapping_add(v126);
+                                        let mut v166: i32 = v125.wrapping_add(1i32);
                                         (v165, v166, 1i32, v127)
                                     } else {
-                                        let mut v167: i32 = v126 + 1i32;
+                                        let mut v167: i32 = v126.wrapping_add(1i32);
                                         (v124, v125, v167, v127)
                                     };
                                     US10::US10_0(b'\'', v163, v168, v169, v170, v171)
@@ -3135,97 +3113,91 @@ fn method81(mut v0: Rc<str>) -> US9 {
                             match &v176 {
                                 US10::US10_1(v183, v184, v185, v186, v187, v188) => { // Error
                                     let mut v183: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v183.clone();
-                                    let mut v184: i32 = v184.clone();
-                                    let mut v185: i32 = v185.clone();
-                                    let mut v186: i32 = v186.clone();
-                                    let mut v187: i32 = v187.clone();
-                                    let mut v188: i32 = v188.clone();
+                                    let mut v184: i32 = *v184;
+                                    let mut v185: i32 = *v185;
+                                    let mut v186: i32 = *v186;
+                                    let mut v187: i32 = *v187;
+                                    let mut v188: i32 = *v188;
                                     let mut v189: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                     US10::US10_1(v189.clone(), v123, v124, v125, v126, v127)
                                 }
                                 US10::US10_0(v177, v178, v179, v180, v181, v182) => { // Ok
-                                    let mut v177: u8 = v177.clone();
-                                    let mut v178: i32 = v178.clone();
-                                    let mut v179: i32 = v179.clone();
-                                    let mut v180: i32 = v180.clone();
-                                    let mut v181: i32 = v181.clone();
-                                    let mut v182: i32 = v182.clone();
+                                    let mut v177: u8 = *v177;
+                                    let mut v178: i32 = *v178;
+                                    let mut v179: i32 = *v179;
+                                    let mut v180: i32 = *v180;
+                                    let mut v181: i32 = *v181;
+                                    let mut v182: i32 = *v182;
                                     v176.clone()
                                 }
-                                _ => unreachable!(),
                             }
                         }
                         US10::US10_0(v147, v148, v149, v150, v151, v152) => { // Ok
-                            let mut v147: u8 = v147.clone();
-                            let mut v148: i32 = v148.clone();
-                            let mut v149: i32 = v149.clone();
-                            let mut v150: i32 = v150.clone();
-                            let mut v151: i32 = v151.clone();
-                            let mut v152: i32 = v152.clone();
+                            let mut v147: u8 = *v147;
+                            let mut v148: i32 = *v148;
+                            let mut v149: i32 = *v149;
+                            let mut v150: i32 = *v150;
+                            let mut v151: i32 = *v151;
+                            let mut v152: i32 = *v152;
                             v146.clone()
                         }
-                        _ => unreachable!(),
                     };
                     match &v194 {
                         US10::US10_1(v202, v203, v204, v205, v206, v207) => { // Error
                             let mut v202: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v202.clone();
-                            let mut v203: i32 = v203.clone();
-                            let mut v204: i32 = v204.clone();
-                            let mut v205: i32 = v205.clone();
-                            let mut v206: i32 = v206.clone();
-                            let mut v207: i32 = v207.clone();
+                            let mut v203: i32 = *v203;
+                            let mut v204: i32 = *v204;
+                            let mut v205: i32 = *v205;
+                            let mut v206: i32 = *v206;
+                            let mut v207: i32 = *v207;
                             let mut v208: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure25(v62, v123, v202.clone(), v203, v204, v205, v206, v207);
                             US11::US11_1(v208.clone(), v123, v124, v125, v126, v127)
                         }
                         US10::US10_0(v195, v196, v197, v198, v199, v200) => { // Ok
-                            let mut v195: u8 = v195.clone();
-                            let mut v196: i32 = v196.clone();
-                            let mut v197: i32 = v197.clone();
-                            let mut v198: i32 = v198.clone();
-                            let mut v199: i32 = v199.clone();
-                            let mut v200: i32 = v200.clone();
+                            let mut v195: u8 = *v195;
+                            let mut v196: i32 = *v196;
+                            let mut v197: i32 = *v197;
+                            let mut v198: i32 = *v198;
+                            let mut v199: i32 = *v199;
+                            let mut v200: i32 = *v200;
                             US11::US11_0(v122.clone(), v196, v197, v198, v199, v200)
                         }
-                        _ => unreachable!(),
                     }
                 }
-                _ => unreachable!(),
             }
         }
-        _ => unreachable!(),
     };
     let mut v331: US11 = match &v312 {
         US11::US11_1(v323, v324, v325, v326, v327, v328) => { // Error
             let mut v323: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v323.clone();
-            let mut v324: i32 = v324.clone();
-            let mut v325: i32 = v325.clone();
-            let mut v326: i32 = v326.clone();
-            let mut v327: i32 = v327.clone();
-            let mut v328: i32 = v328.clone();
+            let mut v324: i32 = *v324;
+            let mut v325: i32 = *v325;
+            let mut v326: i32 = *v326;
+            let mut v327: i32 = *v327;
+            let mut v328: i32 = *v328;
             US11::US11_1(v323.clone(), v324, v325, v326, v327, v328)
         }
         US11::US11_0(v313, v314, v315, v316, v317, v318) => { // Ok
             let mut v313: Rc<str> = v313.clone();
-            let mut v314: i32 = v314.clone();
-            let mut v315: i32 = v315.clone();
-            let mut v316: i32 = v316.clone();
-            let mut v317: i32 = v317.clone();
-            let mut v318: i32 = v318.clone();
+            let mut v314: i32 = *v314;
+            let mut v315: i32 = *v315;
+            let mut v316: i32 = *v316;
+            let mut v317: i32 = *v317;
+            let mut v318: i32 = *v318;
             let mut v319: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("\\"); } LIT.with(|lit| lit.clone()) };
             let mut v320: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("/"); } LIT.with(|lit| lit.clone()) };
             let mut v321: Rc<str> = Rc::<str>::from(v313.replace(&*v319, &*v320));
             US11::US11_0(v321.clone(), v314, v315, v316, v317, v318)
         }
-        _ => unreachable!(),
     };
     let mut v399: US11 = match &v331 {
         US11::US11_1(v338, v339, v340, v341, v342, v343) => { // Error
             let mut v338: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v338.clone();
-            let mut v339: i32 = v339.clone();
-            let mut v340: i32 = v340.clone();
-            let mut v341: i32 = v341.clone();
-            let mut v342: i32 = v342.clone();
-            let mut v343: i32 = v343.clone();
+            let mut v339: i32 = *v339;
+            let mut v340: i32 = *v340;
+            let mut v341: i32 = *v341;
+            let mut v342: i32 = *v342;
+            let mut v343: i32 = *v343;
             let mut v362: US10 = if v2 {
                 let mut v344: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure27();
                 US10::US10_1(v344.clone(), 0i32, 0i32, 1i32, 1i32, v1)
@@ -3260,68 +3232,65 @@ fn method81(mut v0: Rc<str>) -> US9 {
             let mut v378: US11 = match &v362 {
                 US10::US10_1(v363, v364, v365, v366, v367, v368) => { // Error
                     let mut v363: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v363.clone();
-                    let mut v364: i32 = v364.clone();
-                    let mut v365: i32 = v365.clone();
-                    let mut v366: i32 = v366.clone();
-                    let mut v367: i32 = v367.clone();
-                    let mut v368: i32 = v368.clone();
+                    let mut v364: i32 = *v364;
+                    let mut v365: i32 = *v365;
+                    let mut v366: i32 = *v366;
+                    let mut v367: i32 = *v367;
+                    let mut v368: i32 = *v368;
                     US11::US11_1(v363.clone(), v364, v365, v366, v367, v368)
                 }
                 US10::US10_0(v370, v371, v372, v373, v374, v375) => { // Ok
-                    let mut v370: u8 = v370.clone();
-                    let mut v371: i32 = v371.clone();
-                    let mut v372: i32 = v372.clone();
-                    let mut v373: i32 = v373.clone();
-                    let mut v374: i32 = v374.clone();
-                    let mut v375: i32 = v375.clone();
+                    let mut v370: u8 = *v370;
+                    let mut v371: i32 = *v371;
+                    let mut v372: i32 = *v372;
+                    let mut v373: i32 = *v373;
+                    let mut v374: i32 = *v374;
+                    let mut v375: i32 = *v375;
                     method107(v0.clone(), v371, v372, v373, v374, v375)
                 }
-                _ => unreachable!(),
             };
             match &v378 {
                 US11::US11_1(v389, v390, v391, v392, v393, v394) => { // Error
                     let mut v389: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v389.clone();
-                    let mut v390: i32 = v390.clone();
-                    let mut v391: i32 = v391.clone();
-                    let mut v392: i32 = v392.clone();
-                    let mut v393: i32 = v393.clone();
-                    let mut v394: i32 = v394.clone();
+                    let mut v390: i32 = *v390;
+                    let mut v391: i32 = *v391;
+                    let mut v392: i32 = *v392;
+                    let mut v393: i32 = *v393;
+                    let mut v394: i32 = *v394;
                     US11::US11_1(v389.clone(), v390, v391, v392, v393, v394)
                 }
                 US11::US11_0(v379, v380, v381, v382, v383, v384) => { // Ok
                     let mut v379: Rc<str> = v379.clone();
-                    let mut v380: i32 = v380.clone();
-                    let mut v381: i32 = v381.clone();
-                    let mut v382: i32 = v382.clone();
-                    let mut v383: i32 = v383.clone();
-                    let mut v384: i32 = v384.clone();
+                    let mut v380: i32 = *v380;
+                    let mut v381: i32 = *v381;
+                    let mut v382: i32 = *v382;
+                    let mut v383: i32 = *v383;
+                    let mut v384: i32 = *v384;
                     let mut v385: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("\\"); } LIT.with(|lit| lit.clone()) };
                     let mut v386: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("/"); } LIT.with(|lit| lit.clone()) };
                     let mut v387: Rc<str> = Rc::<str>::from(v379.replace(&*v385, &*v386));
                     US11::US11_0(v387.clone(), v380, v381, v382, v383, v384)
                 }
-                _ => unreachable!(),
             }
         }
         US11::US11_0(v332, v333, v334, v335, v336, v337) => { // Ok
             let mut v332: Rc<str> = v332.clone();
-            let mut v333: i32 = v333.clone();
-            let mut v334: i32 = v334.clone();
-            let mut v335: i32 = v335.clone();
-            let mut v336: i32 = v336.clone();
-            let mut v337: i32 = v337.clone();
+            let mut v333: i32 = *v333;
+            let mut v334: i32 = *v334;
+            let mut v335: i32 = *v335;
+            let mut v336: i32 = *v336;
+            let mut v337: i32 = *v337;
             v331.clone()
         }
-        _ => unreachable!(),
     };
     let mut v434: US11 = match &v399 {
         US11::US11_1(v406, v407, v408, v409, v410, v411) => { // Error
             let mut v406: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v406.clone();
-            let mut v407: i32 = v407.clone();
-            let mut v408: i32 = v408.clone();
-            let mut v409: i32 = v409.clone();
-            let mut v410: i32 = v410.clone();
-            let mut v411: i32 = v411.clone();
+            let mut v407: i32 = *v407;
+            let mut v408: i32 = *v408;
+            let mut v409: i32 = *v409;
+            let mut v410: i32 = *v410;
+            let mut v411: i32 = *v411;
             let mut v412: bool = v1 == 0i32;
             let mut v416: US12 = if v412 {
                 US12::US12_0(0i32, 0i32, 1i32, 1i32, v1)
@@ -3332,53 +3301,51 @@ fn method81(mut v0: Rc<str>) -> US9 {
             match &v416 {
                 US12::US12_1(v424, v425, v426, v427, v428, v429) => { // Error
                     let mut v424: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v424.clone();
-                    let mut v425: i32 = v425.clone();
-                    let mut v426: i32 = v426.clone();
-                    let mut v427: i32 = v427.clone();
-                    let mut v428: i32 = v428.clone();
-                    let mut v429: i32 = v429.clone();
+                    let mut v425: i32 = *v425;
+                    let mut v426: i32 = *v426;
+                    let mut v427: i32 = *v427;
+                    let mut v428: i32 = *v428;
+                    let mut v429: i32 = *v429;
                     US11::US11_1(v424.clone(), v425, v426, v427, v428, v429)
                 }
                 US12::US12_0(v417, v418, v419, v420, v421) => { // Ok
-                    let mut v417: i32 = v417.clone();
-                    let mut v418: i32 = v418.clone();
-                    let mut v419: i32 = v419.clone();
-                    let mut v420: i32 = v420.clone();
-                    let mut v421: i32 = v421.clone();
+                    let mut v417: i32 = *v417;
+                    let mut v418: i32 = *v418;
+                    let mut v419: i32 = *v419;
+                    let mut v420: i32 = *v420;
+                    let mut v421: i32 = *v421;
                     let mut v422: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                     US11::US11_0(v422.clone(), v417, v418, v419, v420, v421)
                 }
-                _ => unreachable!(),
             }
         }
         US11::US11_0(v400, v401, v402, v403, v404, v405) => { // Ok
             let mut v400: Rc<str> = v400.clone();
-            let mut v401: i32 = v401.clone();
-            let mut v402: i32 = v402.clone();
-            let mut v403: i32 = v403.clone();
-            let mut v404: i32 = v404.clone();
-            let mut v405: i32 = v405.clone();
+            let mut v401: i32 = *v401;
+            let mut v402: i32 = *v402;
+            let mut v403: i32 = *v403;
+            let mut v404: i32 = *v404;
+            let mut v405: i32 = *v405;
             v399.clone()
         }
-        _ => unreachable!(),
     };
     let mut v547: US13 = match &v434 {
         US11::US11_1(v435, v436, v437, v438, v439, v440) => { // Error
             let mut v435: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v435.clone();
-            let mut v436: i32 = v436.clone();
-            let mut v437: i32 = v437.clone();
-            let mut v438: i32 = v438.clone();
-            let mut v439: i32 = v439.clone();
-            let mut v440: i32 = v440.clone();
+            let mut v436: i32 = *v436;
+            let mut v437: i32 = *v437;
+            let mut v438: i32 = *v438;
+            let mut v439: i32 = *v439;
+            let mut v440: i32 = *v440;
             US13::US13_1(v435.clone(), v436, v437, v438, v439, v440)
         }
         US11::US11_0(v442, v443, v444, v445, v446, v447) => { // Ok
             let mut v442: Rc<str> = v442.clone();
-            let mut v443: i32 = v443.clone();
-            let mut v444: i32 = v444.clone();
-            let mut v445: i32 = v445.clone();
-            let mut v446: i32 = v446.clone();
-            let mut v447: i32 = v447.clone();
+            let mut v443: i32 = *v443;
+            let mut v444: i32 = *v444;
+            let mut v445: i32 = *v445;
+            let mut v446: i32 = *v446;
+            let mut v447: i32 = *v447;
             let mut v448: bool = v443 >= v447;
             let (mut v460, mut v461, mut v462, mut v463, mut v464): (i32, i32, i32, i32, i32) = if v448 {
                 (v443, v444, v445, v446, v447)
@@ -3390,12 +3357,12 @@ fn method81(mut v0: Rc<str>) -> US9 {
                 } else {
                     v449
                 };
-                let mut v452: i32 = v451 - v443;
+                let mut v452: i32 = v451.wrapping_sub(v443);
                 let mut v453: bool = v452 == 0i32;
                 if v453 {
                     (v443, v444, v445, v446, v447)
                 } else {
-                    let mut v454: i32 = v446 + v452;
+                    let mut v454: i32 = v446.wrapping_add(v452);
                     (v451, v444, v445, v454, v447)
                 }
             };
@@ -3410,19 +3377,19 @@ fn method81(mut v0: Rc<str>) -> US9 {
             let mut v508: US11 = match &v470 {
                 US12::US12_1(v500, v501, v502, v503, v504, v505) => { // Error
                     let mut v500: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v500.clone();
-                    let mut v501: i32 = v501.clone();
-                    let mut v502: i32 = v502.clone();
-                    let mut v503: i32 = v503.clone();
-                    let mut v504: i32 = v504.clone();
-                    let mut v505: i32 = v505.clone();
+                    let mut v501: i32 = *v501;
+                    let mut v502: i32 = *v502;
+                    let mut v503: i32 = *v503;
+                    let mut v504: i32 = *v504;
+                    let mut v505: i32 = *v505;
                     US11::US11_1(v500.clone(), v501, v502, v503, v504, v505)
                 }
                 US12::US12_0(v471, v472, v473, v474, v475) => { // Ok
-                    let mut v471: i32 = v471.clone();
-                    let mut v472: i32 = v472.clone();
-                    let mut v473: i32 = v473.clone();
-                    let mut v474: i32 = v474.clone();
-                    let mut v475: i32 = v475.clone();
+                    let mut v471: i32 = *v471;
+                    let mut v472: i32 = *v472;
+                    let mut v473: i32 = *v473;
+                    let mut v474: i32 = *v474;
+                    let mut v475: i32 = *v475;
                     let mut v476: bool = v471 >= v475;
                     let (mut v488, mut v489, mut v490, mut v491, mut v492): (i32, i32, i32, i32, i32) = if v476 {
                         (v471, v472, v473, v474, v475)
@@ -3434,12 +3401,12 @@ fn method81(mut v0: Rc<str>) -> US9 {
                         } else {
                             v477
                         };
-                        let mut v480: i32 = v479 - v471;
+                        let mut v480: i32 = v479.wrapping_sub(v471);
                         let mut v481: bool = v480 == 0i32;
                         if v481 {
                             (v471, v472, v473, v474, v475)
                         } else {
-                            let mut v482: i32 = v474 + v480;
+                            let mut v482: i32 = v474.wrapping_add(v480);
                             (v479, v472, v473, v482, v475)
                         }
                     };
@@ -3449,96 +3416,91 @@ fn method81(mut v0: Rc<str>) -> US9 {
                         v494.clone()
                     } else {
                         let mut v495: bool = v471 == v488;
-                        let mut v496: i32 = v488 - 1i32;
+                        let mut v496: i32 = v488.wrapping_sub(1i32);
                         let mut v497: Rc<str> = string_slice(&v0.clone(), v471 as i64, v496 as i64);
                         v497.clone()
                     };
                     US11::US11_0(v498.clone(), v488, v489, v490, v491, v492)
                 }
-                _ => unreachable!(),
             };
             let mut v527: US15 = match &v508 {
                 US11::US11_1(v518, v519, v520, v521, v522, v523) => { // Error
                     let mut v518: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v518.clone();
-                    let mut v519: i32 = v519.clone();
-                    let mut v520: i32 = v520.clone();
-                    let mut v521: i32 = v521.clone();
-                    let mut v522: i32 = v522.clone();
-                    let mut v523: i32 = v523.clone();
+                    let mut v519: i32 = *v519;
+                    let mut v520: i32 = *v520;
+                    let mut v521: i32 = *v521;
+                    let mut v522: i32 = *v522;
+                    let mut v523: i32 = *v523;
                     let mut v524: US14 = US14::US14_1;
                     US15::US15_0(v524.clone(), v443, v444, v445, v446, v447)
                 }
                 US11::US11_0(v509, v510, v511, v512, v513, v514) => { // Ok
                     let mut v509: Rc<str> = v509.clone();
-                    let mut v510: i32 = v510.clone();
-                    let mut v511: i32 = v511.clone();
-                    let mut v512: i32 = v512.clone();
-                    let mut v513: i32 = v513.clone();
-                    let mut v514: i32 = v514.clone();
+                    let mut v510: i32 = *v510;
+                    let mut v511: i32 = *v511;
+                    let mut v512: i32 = *v512;
+                    let mut v513: i32 = *v513;
+                    let mut v514: i32 = *v514;
                     let mut v515: Rc<dyn Fn() -> Rc<str>> = closure31(v509.clone());
                     let mut v516: US14 = US14::US14_0(v515.clone());
                     US15::US15_0(v516.clone(), v510, v511, v512, v513, v514)
                 }
-                _ => unreachable!(),
             };
             match &v527 {
                 US15::US15_1(v537, v538, v539, v540, v541, v542) => { // Error
                     let mut v537: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v537.clone();
-                    let mut v538: i32 = v538.clone();
-                    let mut v539: i32 = v539.clone();
-                    let mut v540: i32 = v540.clone();
-                    let mut v541: i32 = v541.clone();
-                    let mut v542: i32 = v542.clone();
+                    let mut v538: i32 = *v538;
+                    let mut v539: i32 = *v539;
+                    let mut v540: i32 = *v540;
+                    let mut v541: i32 = *v541;
+                    let mut v542: i32 = *v542;
                     US13::US13_1(v537.clone(), v538, v539, v540, v541, v542)
                 }
                 US15::US15_0(v528, v529, v530, v531, v532, v533) => { // Ok
                     let mut v528: US14 = v528.clone();
-                    let mut v529: i32 = v529.clone();
-                    let mut v530: i32 = v530.clone();
-                    let mut v531: i32 = v531.clone();
-                    let mut v532: i32 = v532.clone();
-                    let mut v533: i32 = v533.clone();
+                    let mut v529: i32 = *v529;
+                    let mut v530: i32 = *v530;
+                    let mut v531: i32 = *v531;
+                    let mut v532: i32 = *v532;
+                    let mut v533: i32 = *v533;
                     let mut v534: Rc<dyn Fn() -> Rc<str>> = closure32(v442.clone());
                     let mut v535: Rc<dyn Fn() -> US14> = closure33(v528.clone());
                     US13::US13_0(v534.clone(), v535.clone(), v529, v530, v531, v532, v533)
                 }
-                _ => unreachable!(),
             }
         }
-        _ => unreachable!(),
     };
     let mut v571: US16 = match &v547 {
         US13::US13_1(v562, v563, v564, v565, v566, v567) => { // Error
             let mut v562: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v562.clone();
-            let mut v563: i32 = v563.clone();
-            let mut v564: i32 = v564.clone();
-            let mut v565: i32 = v565.clone();
-            let mut v566: i32 = v566.clone();
-            let mut v567: i32 = v567.clone();
+            let mut v563: i32 = *v563;
+            let mut v564: i32 = *v564;
+            let mut v565: i32 = *v565;
+            let mut v566: i32 = *v566;
+            let mut v567: i32 = *v567;
             let mut v568: Rc<dyn Fn() -> Rc<str>> = closure34(v0.clone(), v562.clone(), v563, v564, v565, v566, v567);
             US16::US16_1(v568.clone())
         }
         US13::US13_0(v548, v549, v550, v551, v552, v553, v554) => { // Ok
             let mut v548: Rc<dyn Fn() -> Rc<str>> = v548.clone();
             let mut v549: Rc<dyn Fn() -> US14> = v549.clone();
-            let mut v550: i32 = v550.clone();
-            let mut v551: i32 = v551.clone();
-            let mut v552: i32 = v552.clone();
-            let mut v553: i32 = v553.clone();
-            let mut v554: i32 = v554.clone();
+            let mut v550: i32 = *v550;
+            let mut v551: i32 = *v551;
+            let mut v552: i32 = *v552;
+            let mut v553: i32 = *v553;
+            let mut v554: i32 = *v554;
             let mut v555: bool = v550 >= v554;
             let mut v560: Rc<str> = if v555 {
                 let mut v556: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                 v556.clone()
             } else {
                 let mut v557: bool = v550 == v554;
-                let mut v558: i32 = v554 - 1i32;
+                let mut v558: i32 = v554.wrapping_sub(1i32);
                 let mut v559: Rc<str> = string_slice(&v0.clone(), v550 as i64, v558 as i64);
                 v559.clone()
             };
             US16::US16_0(v548.clone(), v549.clone(), v560.clone(), v551, v552, v553, v554)
         }
-        _ => unreachable!(),
     };
     let mut v591: US17 = match &v571 {
         US16::US16_1(v588) => { // Error
@@ -3549,10 +3511,10 @@ fn method81(mut v0: Rc<str>) -> US9 {
             let mut v572: Rc<dyn Fn() -> Rc<str>> = v572.clone();
             let mut v573: Rc<dyn Fn() -> US14> = v573.clone();
             let mut v574: Rc<str> = v574.clone();
-            let mut v575: i32 = v575.clone();
-            let mut v576: i32 = v576.clone();
-            let mut v577: i32 = v577.clone();
-            let mut v578: i32 = v578.clone();
+            let mut v575: i32 = *v575;
+            let mut v576: i32 = *v576;
+            let mut v577: i32 = *v577;
+            let mut v578: i32 = *v578;
             let mut v579: Rc<str> = v572();
             let mut v580: US14 = v573();
             let mut v586: US4 = match &v580 {
@@ -3564,11 +3526,9 @@ fn method81(mut v0: Rc<str>) -> US9 {
                     let mut v582: Rc<str> = v581();
                     US4::US4_0(v582.clone())
                 }
-                _ => unreachable!(),
             };
             US17::US17_0(v579.clone(), v586.clone())
         }
-        _ => unreachable!(),
     };
     match &v591 {
         US17::US17_1(v595) => { // Error
@@ -3581,7 +3541,6 @@ fn method81(mut v0: Rc<str>) -> US9 {
             let mut v593: US4 = v593.clone();
             US9::US9_0(v592.clone(), v593.clone())
         }
-        _ => unreachable!(),
     }
 }
 fn closure35() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
@@ -3598,7 +3557,7 @@ fn closure36() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
     thread_local!{ static CLOSURE: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = Rc::new(move |mut v0: Rc<str>, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: i32, mut v5: i32| -> Rc<str> {
         let mut v6: i32 = (v0.clone().len() as i32);
         let mut v7: i32 = method90(v0.clone(), v6, v1);
-        let mut v8: i32 = v1 + 80i32;
+        let mut v8: i32 = v1.wrapping_add(80i32);
         let mut v9: bool = v7 < v8;
         let mut v10: i32 = if v9 {
             v7
@@ -3611,14 +3570,14 @@ fn closure36() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
             v12.clone()
         } else {
             let mut v13: bool = v2 == v10;
-            let mut v14: i32 = v10 - 1i32;
+            let mut v14: i32 = v10.wrapping_sub(1i32);
             let mut v15: Rc<str> = string_slice(&v0.clone(), v2 as i64, v14 as i64);
             v15.clone()
         };
         let mut v17: i32 = (v16.clone().len() as i32);
         let mut v18: bool = v17 > 0i32;
         let mut v22: bool = if v18 {
-            let mut v19: i32 = v17 - 1i32;
+            let mut v19: i32 = v17.wrapping_sub(1i32);
             let mut v20: u8 = v16.clone().as_bytes()[v19 as usize];
             let mut v21: bool = v20 == b'\n';
             v21
@@ -3632,7 +3591,7 @@ fn closure36() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
             let mut v24: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("\n"); } LIT.with(|lit| lit.clone()) };
             v24.clone()
         };
-        let mut v26: i32 = v4 - 1i32;
+        let mut v26: i32 = v4.wrapping_sub(1i32);
         let mut v27: i32 = 0i32;
         let mut v28: Rc<dyn Fn(Rc<str>) -> Rc<str>> = method91(v26, v27);
         let mut v29: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
@@ -3667,7 +3626,7 @@ fn closure38() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
     thread_local!{ static CLOSURE: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = Rc::new(move |mut v0: Rc<str>, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: i32, mut v5: i32| -> Rc<str> {
         let mut v6: i32 = (v0.clone().len() as i32);
         let mut v7: i32 = method90(v0.clone(), v6, v1);
-        let mut v8: i32 = v1 + 80i32;
+        let mut v8: i32 = v1.wrapping_add(80i32);
         let mut v9: bool = v7 < v8;
         let mut v10: i32 = if v9 {
             v7
@@ -3680,14 +3639,14 @@ fn closure38() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
             v12.clone()
         } else {
             let mut v13: bool = v2 == v10;
-            let mut v14: i32 = v10 - 1i32;
+            let mut v14: i32 = v10.wrapping_sub(1i32);
             let mut v15: Rc<str> = string_slice(&v0.clone(), v2 as i64, v14 as i64);
             v15.clone()
         };
         let mut v17: i32 = (v16.clone().len() as i32);
         let mut v18: bool = v17 > 0i32;
         let mut v22: bool = if v18 {
-            let mut v19: i32 = v17 - 1i32;
+            let mut v19: i32 = v17.wrapping_sub(1i32);
             let mut v20: u8 = v16.clone().as_bytes()[v19 as usize];
             let mut v21: bool = v20 == b'\n';
             v21
@@ -3701,7 +3660,7 @@ fn closure38() -> Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> {
             let mut v24: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("\n"); } LIT.with(|lit| lit.clone()) };
             v24.clone()
         };
-        let mut v26: i32 = v4 - 1i32;
+        let mut v26: i32 = v4.wrapping_sub(1i32);
         let mut v27: i32 = 0i32;
         let mut v28: Rc<dyn Fn(Rc<str>) -> Rc<str>> = method91(v26, v27);
         let mut v29: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
@@ -3743,14 +3702,14 @@ fn method113(mut v0: i32, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: Rc<str>
             };
             let mut v17: bool = v16 == false;
             if v17 {
-                let mut v18: i32 = v5 + 1i32;
+                let mut v18: i32 = v5.wrapping_add(1i32);
                 let mut v19: bool = b'\n' == v11;
                 let (mut v23, mut v24, mut v25, mut v26): (i32, i32, i32, i32) = if v19 {
-                    let mut v20: i32 = v6 + v8;
-                    let mut v21: i32 = v7 + 1i32;
+                    let mut v20: i32 = v6.wrapping_add(v8);
+                    let mut v21: i32 = v7.wrapping_add(1i32);
                     (v20, v21, 1i32, v9)
                 } else {
-                    let mut v22: i32 = v8 + 1i32;
+                    let mut v22: i32 = v8.wrapping_add(1i32);
                     (v6, v7, v22, v9)
                 };
                 (v0, v1, v2, v3, v4, v5, v6, v7, v8, v9) = (v0, v1, v2, v3, v4.clone(), v18, v23, v24, v25, v26);
@@ -3781,14 +3740,14 @@ fn method112(mut v0: i32, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: Rc<str>
         };
         let mut v13: bool = v12 == false;
         if v13 {
-            let mut v14: i32 = v5 + 1i32;
+            let mut v14: i32 = v5.wrapping_add(1i32);
             let mut v15: bool = b'\n' == v7;
             let (mut v19, mut v20, mut v21, mut v22): (i32, i32, i32, i32) = if v15 {
-                let mut v16: i32 = v0 + v2;
-                let mut v17: i32 = v1 + 1i32;
+                let mut v16: i32 = v0.wrapping_add(v2);
+                let mut v17: i32 = v1.wrapping_add(1i32);
                 (v16, v17, 1i32, v3)
             } else {
-                let mut v18: i32 = v2 + 1i32;
+                let mut v18: i32 = v2.wrapping_add(1i32);
                 (v0, v1, v18, v3)
             };
             method113(v0, v1, v2, v3, v4.clone(), v14, v19, v20, v21, v22)
@@ -3812,7 +3771,7 @@ fn method114(mut v0: i32, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: i32) ->
     method15(v6.clone());
     let mut v7: Rc<str> = Rc::<str>::from(format!("{}", v0));
     method6(v6.clone(), v7.clone());
-    method41(v6.clone());
+    method56(v6.clone());
     method97(v6.clone());
     method15(v6.clone());
     let mut v9: std::string::String = format!("{:#?}", (v1, v2, v3, v4));
@@ -3885,7 +3844,7 @@ fn method116(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                 v16.clone()
             } else {
                 let mut v17: bool = v4 == v9;
-                let mut v18: i32 = v9 - 1i32;
+                let mut v18: i32 = v9.wrapping_sub(1i32);
                 let mut v19: Rc<str> = string_slice(&v0.clone(), v4 as i64, v18 as i64);
                 v19.clone()
             };
@@ -3897,11 +3856,11 @@ fn method116(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
         let mut v219: US11 = match &v24 {
             US11::US11_1(v31, v32, v33, v34, v35, v36) => { // Error
                 let mut v31: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v31.clone();
-                let mut v32: i32 = v32.clone();
-                let mut v33: i32 = v33.clone();
-                let mut v34: i32 = v34.clone();
-                let mut v35: i32 = v35.clone();
-                let mut v36: i32 = v36.clone();
+                let mut v32: i32 = *v32;
+                let mut v33: i32 = *v33;
+                let mut v34: i32 = *v34;
+                let mut v35: i32 = *v35;
+                let mut v36: i32 = *v36;
                 let mut v37: bool = v4 >= v8;
                 let mut v55: US10 = if v37 {
                     let mut v38: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure35();
@@ -3910,14 +3869,14 @@ fn method116(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                     let mut v40: u8 = v0.clone().as_bytes()[v4 as usize];
                     let mut v41: bool = v40 == b'\\';
                     if v41 {
-                        let mut v42: i32 = v4 + 1i32;
+                        let mut v42: i32 = v4.wrapping_add(1i32);
                         let mut v43: bool = b'\n' == v40;
                         let (mut v47, mut v48, mut v49, mut v50): (i32, i32, i32, i32) = if v43 {
-                            let mut v44: i32 = v5 + v7;
-                            let mut v45: i32 = v6 + 1i32;
+                            let mut v44: i32 = v5.wrapping_add(v7);
+                            let mut v45: i32 = v6.wrapping_add(1i32);
                             (v44, v45, 1i32, v8)
                         } else {
-                            let mut v46: i32 = v7 + 1i32;
+                            let mut v46: i32 = v7.wrapping_add(1i32);
                             (v5, v6, v46, v8)
                         };
                         US10::US10_0(b'\\', v42, v47, v48, v49, v50)
@@ -3929,20 +3888,20 @@ fn method116(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                 let mut v90: US10 = match &v55 {
                     US10::US10_1(v82, v83, v84, v85, v86, v87) => { // Error
                         let mut v82: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v82.clone();
-                        let mut v83: i32 = v83.clone();
-                        let mut v84: i32 = v84.clone();
-                        let mut v85: i32 = v85.clone();
-                        let mut v86: i32 = v86.clone();
-                        let mut v87: i32 = v87.clone();
+                        let mut v83: i32 = *v83;
+                        let mut v84: i32 = *v84;
+                        let mut v85: i32 = *v85;
+                        let mut v86: i32 = *v86;
+                        let mut v87: i32 = *v87;
                         US10::US10_1(v82.clone(), v83, v84, v85, v86, v87)
                     }
                     US10::US10_0(v56, v57, v58, v59, v60, v61) => { // Ok
-                        let mut v56: u8 = v56.clone();
-                        let mut v57: i32 = v57.clone();
-                        let mut v58: i32 = v58.clone();
-                        let mut v59: i32 = v59.clone();
-                        let mut v60: i32 = v60.clone();
-                        let mut v61: i32 = v61.clone();
+                        let mut v56: u8 = *v56;
+                        let mut v57: i32 = *v57;
+                        let mut v58: i32 = *v58;
+                        let mut v59: i32 = *v59;
+                        let mut v60: i32 = *v60;
+                        let mut v61: i32 = *v61;
                         let mut v62: bool = v57 >= v61;
                         if v62 {
                             let mut v63: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure40();
@@ -3952,14 +3911,14 @@ fn method116(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                             let mut v66: bool = v65 == b'"';
                             let mut v67: bool = v66 == false;
                             if v67 {
-                                let mut v68: i32 = v57 + 1i32;
+                                let mut v68: i32 = v57.wrapping_add(1i32);
                                 let mut v69: bool = b'\n' == v65;
                                 let (mut v73, mut v74, mut v75, mut v76): (i32, i32, i32, i32) = if v69 {
-                                    let mut v70: i32 = v58 + v60;
-                                    let mut v71: i32 = v59 + 1i32;
+                                    let mut v70: i32 = v58.wrapping_add(v60);
+                                    let mut v71: i32 = v59.wrapping_add(1i32);
                                     (v70, v71, 1i32, v61)
                                 } else {
-                                    let mut v72: i32 = v60 + 1i32;
+                                    let mut v72: i32 = v60.wrapping_add(1i32);
                                     (v58, v59, v72, v61)
                                 };
                                 US10::US10_0(v65, v68, v73, v74, v75, v76)
@@ -3969,47 +3928,45 @@ fn method116(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                             }
                         }
                     }
-                    _ => unreachable!(),
                 };
                 let mut v112: US11 = match &v90 {
                     US10::US10_1(v104, v105, v106, v107, v108, v109) => { // Error
                         let mut v104: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v104.clone();
-                        let mut v105: i32 = v105.clone();
-                        let mut v106: i32 = v106.clone();
-                        let mut v107: i32 = v107.clone();
-                        let mut v108: i32 = v108.clone();
-                        let mut v109: i32 = v109.clone();
+                        let mut v105: i32 = *v105;
+                        let mut v106: i32 = *v106;
+                        let mut v107: i32 = *v107;
+                        let mut v108: i32 = *v108;
+                        let mut v109: i32 = *v109;
                         US11::US11_1(v104.clone(), v105, v106, v107, v108, v109)
                     }
                     US10::US10_0(v91, v92, v93, v94, v95, v96) => { // Ok
-                        let mut v91: u8 = v91.clone();
-                        let mut v92: i32 = v92.clone();
-                        let mut v93: i32 = v93.clone();
-                        let mut v94: i32 = v94.clone();
-                        let mut v95: i32 = v95.clone();
-                        let mut v96: i32 = v96.clone();
+                        let mut v91: u8 = *v91;
+                        let mut v92: i32 = *v92;
+                        let mut v93: i32 = *v93;
+                        let mut v94: i32 = *v94;
+                        let mut v95: i32 = *v95;
+                        let mut v96: i32 = *v96;
                         let mut v97: bool = v4 >= v92;
                         let mut v102: Rc<str> = if v97 {
                             let mut v98: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                             v98.clone()
                         } else {
                             let mut v99: bool = v4 == v92;
-                            let mut v100: i32 = v92 - 1i32;
+                            let mut v100: i32 = v92.wrapping_sub(1i32);
                             let mut v101: Rc<str> = string_slice(&v0.clone(), v4 as i64, v100 as i64);
                             v101.clone()
                         };
                         US11::US11_0(v102.clone(), v92, v93, v94, v95, v96)
                     }
-                    _ => unreachable!(),
                 };
                 match &v112 {
                     US11::US11_1(v119, v120, v121, v122, v123, v124) => { // Error
                         let mut v119: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v119.clone();
-                        let mut v120: i32 = v120.clone();
-                        let mut v121: i32 = v121.clone();
-                        let mut v122: i32 = v122.clone();
-                        let mut v123: i32 = v123.clone();
-                        let mut v124: i32 = v124.clone();
+                        let mut v120: i32 = *v120;
+                        let mut v121: i32 = *v121;
+                        let mut v122: i32 = *v122;
+                        let mut v123: i32 = *v123;
+                        let mut v124: i32 = *v124;
                         let mut v142: US10 = if v37 {
                             let mut v125: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                             US10::US10_1(v125.clone(), v4, v5, v6, v7, v8)
@@ -4017,14 +3974,14 @@ fn method116(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                             let mut v127: u8 = v0.clone().as_bytes()[v4 as usize];
                             let mut v128: bool = v127 == b'`';
                             if v128 {
-                                let mut v129: i32 = v4 + 1i32;
+                                let mut v129: i32 = v4.wrapping_add(1i32);
                                 let mut v130: bool = b'\n' == v127;
                                 let (mut v134, mut v135, mut v136, mut v137): (i32, i32, i32, i32) = if v130 {
-                                    let mut v131: i32 = v5 + v7;
-                                    let mut v132: i32 = v6 + 1i32;
+                                    let mut v131: i32 = v5.wrapping_add(v7);
+                                    let mut v132: i32 = v6.wrapping_add(1i32);
                                     (v131, v132, 1i32, v8)
                                 } else {
-                                    let mut v133: i32 = v7 + 1i32;
+                                    let mut v133: i32 = v7.wrapping_add(1i32);
                                     (v5, v6, v133, v8)
                                 };
                                 US10::US10_0(b'`', v129, v134, v135, v136, v137)
@@ -4036,20 +3993,20 @@ fn method116(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                         let mut v177: US10 = match &v142 {
                             US10::US10_1(v169, v170, v171, v172, v173, v174) => { // Error
                                 let mut v169: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v169.clone();
-                                let mut v170: i32 = v170.clone();
-                                let mut v171: i32 = v171.clone();
-                                let mut v172: i32 = v172.clone();
-                                let mut v173: i32 = v173.clone();
-                                let mut v174: i32 = v174.clone();
+                                let mut v170: i32 = *v170;
+                                let mut v171: i32 = *v171;
+                                let mut v172: i32 = *v172;
+                                let mut v173: i32 = *v173;
+                                let mut v174: i32 = *v174;
                                 US10::US10_1(v169.clone(), v170, v171, v172, v173, v174)
                             }
                             US10::US10_0(v143, v144, v145, v146, v147, v148) => { // Ok
-                                let mut v143: u8 = v143.clone();
-                                let mut v144: i32 = v144.clone();
-                                let mut v145: i32 = v145.clone();
-                                let mut v146: i32 = v146.clone();
-                                let mut v147: i32 = v147.clone();
-                                let mut v148: i32 = v148.clone();
+                                let mut v143: u8 = *v143;
+                                let mut v144: i32 = *v144;
+                                let mut v145: i32 = *v145;
+                                let mut v146: i32 = *v146;
+                                let mut v147: i32 = *v147;
+                                let mut v148: i32 = *v148;
                                 let mut v149: bool = v144 >= v148;
                                 if v149 {
                                     let mut v150: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure40();
@@ -4059,14 +4016,14 @@ fn method116(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                                     let mut v153: bool = v152 == b'"';
                                     let mut v154: bool = v153 == false;
                                     if v154 {
-                                        let mut v155: i32 = v144 + 1i32;
+                                        let mut v155: i32 = v144.wrapping_add(1i32);
                                         let mut v156: bool = b'\n' == v152;
                                         let (mut v160, mut v161, mut v162, mut v163): (i32, i32, i32, i32) = if v156 {
-                                            let mut v157: i32 = v145 + v147;
-                                            let mut v158: i32 = v146 + 1i32;
+                                            let mut v157: i32 = v145.wrapping_add(v147);
+                                            let mut v158: i32 = v146.wrapping_add(1i32);
                                             (v157, v158, 1i32, v148)
                                         } else {
-                                            let mut v159: i32 = v147 + 1i32;
+                                            let mut v159: i32 = v147.wrapping_add(1i32);
                                             (v145, v146, v159, v148)
                                         };
                                         US10::US10_0(v152, v155, v160, v161, v162, v163)
@@ -4076,93 +4033,88 @@ fn method116(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                                     }
                                 }
                             }
-                            _ => unreachable!(),
                         };
                         let mut v199: US11 = match &v177 {
                             US10::US10_1(v191, v192, v193, v194, v195, v196) => { // Error
                                 let mut v191: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v191.clone();
-                                let mut v192: i32 = v192.clone();
-                                let mut v193: i32 = v193.clone();
-                                let mut v194: i32 = v194.clone();
-                                let mut v195: i32 = v195.clone();
-                                let mut v196: i32 = v196.clone();
+                                let mut v192: i32 = *v192;
+                                let mut v193: i32 = *v193;
+                                let mut v194: i32 = *v194;
+                                let mut v195: i32 = *v195;
+                                let mut v196: i32 = *v196;
                                 US11::US11_1(v191.clone(), v192, v193, v194, v195, v196)
                             }
                             US10::US10_0(v178, v179, v180, v181, v182, v183) => { // Ok
-                                let mut v178: u8 = v178.clone();
-                                let mut v179: i32 = v179.clone();
-                                let mut v180: i32 = v180.clone();
-                                let mut v181: i32 = v181.clone();
-                                let mut v182: i32 = v182.clone();
-                                let mut v183: i32 = v183.clone();
+                                let mut v178: u8 = *v178;
+                                let mut v179: i32 = *v179;
+                                let mut v180: i32 = *v180;
+                                let mut v181: i32 = *v181;
+                                let mut v182: i32 = *v182;
+                                let mut v183: i32 = *v183;
                                 let mut v184: bool = v4 >= v179;
                                 let mut v189: Rc<str> = if v184 {
                                     let mut v185: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                     v185.clone()
                                 } else {
                                     let mut v186: bool = v4 == v179;
-                                    let mut v187: i32 = v179 - 1i32;
+                                    let mut v187: i32 = v179.wrapping_sub(1i32);
                                     let mut v188: Rc<str> = string_slice(&v0.clone(), v4 as i64, v187 as i64);
                                     v188.clone()
                                 };
                                 US11::US11_0(v189.clone(), v179, v180, v181, v182, v183)
                             }
-                            _ => unreachable!(),
                         };
                         match &v199 {
                             US11::US11_1(v206, v207, v208, v209, v210, v211) => { // Error
                                 let mut v206: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v206.clone();
-                                let mut v207: i32 = v207.clone();
-                                let mut v208: i32 = v208.clone();
-                                let mut v209: i32 = v209.clone();
-                                let mut v210: i32 = v210.clone();
-                                let mut v211: i32 = v211.clone();
+                                let mut v207: i32 = *v207;
+                                let mut v208: i32 = *v208;
+                                let mut v209: i32 = *v209;
+                                let mut v210: i32 = *v210;
+                                let mut v211: i32 = *v211;
                                 let mut v212: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                 US11::US11_1(v212.clone(), v4, v5, v6, v7, v8)
                             }
                             US11::US11_0(v200, v201, v202, v203, v204, v205) => { // Ok
                                 let mut v200: Rc<str> = v200.clone();
-                                let mut v201: i32 = v201.clone();
-                                let mut v202: i32 = v202.clone();
-                                let mut v203: i32 = v203.clone();
-                                let mut v204: i32 = v204.clone();
-                                let mut v205: i32 = v205.clone();
+                                let mut v201: i32 = *v201;
+                                let mut v202: i32 = *v202;
+                                let mut v203: i32 = *v203;
+                                let mut v204: i32 = *v204;
+                                let mut v205: i32 = *v205;
                                 v199.clone()
                             }
-                            _ => unreachable!(),
                         }
                     }
                     US11::US11_0(v113, v114, v115, v116, v117, v118) => { // Ok
                         let mut v113: Rc<str> = v113.clone();
-                        let mut v114: i32 = v114.clone();
-                        let mut v115: i32 = v115.clone();
-                        let mut v116: i32 = v116.clone();
-                        let mut v117: i32 = v117.clone();
-                        let mut v118: i32 = v118.clone();
+                        let mut v114: i32 = *v114;
+                        let mut v115: i32 = *v115;
+                        let mut v116: i32 = *v116;
+                        let mut v117: i32 = *v117;
+                        let mut v118: i32 = *v118;
                         v112.clone()
                     }
-                    _ => unreachable!(),
                 }
             }
             US11::US11_0(v25, v26, v27, v28, v29, v30) => { // Ok
                 let mut v25: Rc<str> = v25.clone();
-                let mut v26: i32 = v26.clone();
-                let mut v27: i32 = v27.clone();
-                let mut v28: i32 = v28.clone();
-                let mut v29: i32 = v29.clone();
-                let mut v30: i32 = v30.clone();
+                let mut v26: i32 = *v26;
+                let mut v27: i32 = *v27;
+                let mut v28: i32 = *v28;
+                let mut v29: i32 = *v29;
+                let mut v30: i32 = *v30;
                 v24.clone()
             }
-            _ => unreachable!(),
         };
         match &v219 {
             US11::US11_1(v220, v221, v222, v223, v224, v225) => { // Error
                 let mut v220: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v220.clone();
-                let mut v221: i32 = v221.clone();
-                let mut v222: i32 = v222.clone();
-                let mut v223: i32 = v223.clone();
-                let mut v224: i32 = v224.clone();
-                let mut v225: i32 = v225.clone();
+                let mut v221: i32 = *v221;
+                let mut v222: i32 = *v222;
+                let mut v223: i32 = *v223;
+                let mut v224: i32 = *v224;
+                let mut v225: i32 = *v225;
                 let mut v226: bool = v3 == 0i32;
                 let mut v228: Rc<str> = if v226 {
                     v2.clone()
@@ -4174,11 +4126,11 @@ fn method116(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
             }
             US11::US11_0(v230, v231, v232, v233, v234, v235) => { // Ok
                 let mut v230: Rc<str> = v230.clone();
-                let mut v231: i32 = v231.clone();
-                let mut v232: i32 = v232.clone();
-                let mut v233: i32 = v233.clone();
-                let mut v234: i32 = v234.clone();
-                let mut v235: i32 = v235.clone();
+                let mut v231: i32 = *v231;
+                let mut v232: i32 = *v232;
+                let mut v233: i32 = *v233;
+                let mut v234: i32 = *v234;
+                let mut v235: i32 = *v235;
                 let mut v236: bool = v231 > v4;
                 if v236 {
                     let mut v237: bool = v3 == 0i32;
@@ -4187,7 +4139,7 @@ fn method116(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                         ()
                     };
                     v1.borrow_mut().push_str(&*v230);
-                    let mut v238: i32 = v3 + 1i32;
+                    let mut v238: i32 = v3.wrapping_add(1i32);
                     (v0, v1, v2, v3, v4, v5, v6, v7, v8) = (v0.clone(), v1.clone(), v2.clone(), v238, v231, v232, v233, v234, v235);
                     continue;
                 } else {
@@ -4195,7 +4147,6 @@ fn method116(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                     return US11::US11_1(v240.clone(), v4, v5, v6, v7, v8);
                 }
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -4232,7 +4183,7 @@ fn method118(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                 v16.clone()
             } else {
                 let mut v17: bool = v4 == v9;
-                let mut v18: i32 = v9 - 1i32;
+                let mut v18: i32 = v9.wrapping_sub(1i32);
                 let mut v19: Rc<str> = string_slice(&v0.clone(), v4 as i64, v18 as i64);
                 v19.clone()
             };
@@ -4244,11 +4195,11 @@ fn method118(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
         let mut v209: US11 = match &v24 {
             US11::US11_1(v31, v32, v33, v34, v35, v36) => { // Error
                 let mut v31: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v31.clone();
-                let mut v32: i32 = v32.clone();
-                let mut v33: i32 = v33.clone();
-                let mut v34: i32 = v34.clone();
-                let mut v35: i32 = v35.clone();
-                let mut v36: i32 = v36.clone();
+                let mut v32: i32 = *v32;
+                let mut v33: i32 = *v33;
+                let mut v34: i32 = *v34;
+                let mut v35: i32 = *v35;
+                let mut v36: i32 = *v36;
                 let mut v37: bool = v4 >= v8;
                 let mut v55: US10 = if v37 {
                     let mut v38: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure35();
@@ -4257,14 +4208,14 @@ fn method118(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                     let mut v40: u8 = v0.clone().as_bytes()[v4 as usize];
                     let mut v41: bool = v40 == b'\\';
                     if v41 {
-                        let mut v42: i32 = v4 + 1i32;
+                        let mut v42: i32 = v4.wrapping_add(1i32);
                         let mut v43: bool = b'\n' == v40;
                         let (mut v47, mut v48, mut v49, mut v50): (i32, i32, i32, i32) = if v43 {
-                            let mut v44: i32 = v5 + v7;
-                            let mut v45: i32 = v6 + 1i32;
+                            let mut v44: i32 = v5.wrapping_add(v7);
+                            let mut v45: i32 = v6.wrapping_add(1i32);
                             (v44, v45, 1i32, v8)
                         } else {
-                            let mut v46: i32 = v7 + 1i32;
+                            let mut v46: i32 = v7.wrapping_add(1i32);
                             (v5, v6, v46, v8)
                         };
                         US10::US10_0(b'\\', v42, v47, v48, v49, v50)
@@ -4276,80 +4227,78 @@ fn method118(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                 let mut v85: US10 = match &v55 {
                     US10::US10_1(v77, v78, v79, v80, v81, v82) => { // Error
                         let mut v77: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v77.clone();
-                        let mut v78: i32 = v78.clone();
-                        let mut v79: i32 = v79.clone();
-                        let mut v80: i32 = v80.clone();
-                        let mut v81: i32 = v81.clone();
-                        let mut v82: i32 = v82.clone();
+                        let mut v78: i32 = *v78;
+                        let mut v79: i32 = *v79;
+                        let mut v80: i32 = *v80;
+                        let mut v81: i32 = *v81;
+                        let mut v82: i32 = *v82;
                         US10::US10_1(v77.clone(), v78, v79, v80, v81, v82)
                     }
                     US10::US10_0(v56, v57, v58, v59, v60, v61) => { // Ok
-                        let mut v56: u8 = v56.clone();
-                        let mut v57: i32 = v57.clone();
-                        let mut v58: i32 = v58.clone();
-                        let mut v59: i32 = v59.clone();
-                        let mut v60: i32 = v60.clone();
-                        let mut v61: i32 = v61.clone();
+                        let mut v56: u8 = *v56;
+                        let mut v57: i32 = *v57;
+                        let mut v58: i32 = *v58;
+                        let mut v59: i32 = *v59;
+                        let mut v60: i32 = *v60;
+                        let mut v61: i32 = *v61;
                         let mut v62: bool = v57 >= v61;
                         if v62 {
                             let mut v63: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure44();
                             US10::US10_1(v63.clone(), v57, v58, v59, v60, v61)
                         } else {
                             let mut v65: u8 = v0.clone().as_bytes()[v57 as usize];
-                            let mut v66: i32 = v57 + 1i32;
+                            let mut v66: i32 = v57.wrapping_add(1i32);
                             let mut v67: bool = b'\n' == v65;
                             let (mut v71, mut v72, mut v73, mut v74): (i32, i32, i32, i32) = if v67 {
-                                let mut v68: i32 = v58 + v60;
-                                let mut v69: i32 = v59 + 1i32;
+                                let mut v68: i32 = v58.wrapping_add(v60);
+                                let mut v69: i32 = v59.wrapping_add(1i32);
                                 (v68, v69, 1i32, v61)
                             } else {
-                                let mut v70: i32 = v60 + 1i32;
+                                let mut v70: i32 = v60.wrapping_add(1i32);
                                 (v58, v59, v70, v61)
                             };
                             US10::US10_0(v65, v66, v71, v72, v73, v74)
                         }
                     }
-                    _ => unreachable!(),
                 };
                 let mut v107: US11 = match &v85 {
                     US10::US10_1(v99, v100, v101, v102, v103, v104) => { // Error
                         let mut v99: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v99.clone();
-                        let mut v100: i32 = v100.clone();
-                        let mut v101: i32 = v101.clone();
-                        let mut v102: i32 = v102.clone();
-                        let mut v103: i32 = v103.clone();
-                        let mut v104: i32 = v104.clone();
+                        let mut v100: i32 = *v100;
+                        let mut v101: i32 = *v101;
+                        let mut v102: i32 = *v102;
+                        let mut v103: i32 = *v103;
+                        let mut v104: i32 = *v104;
                         US11::US11_1(v99.clone(), v100, v101, v102, v103, v104)
                     }
                     US10::US10_0(v86, v87, v88, v89, v90, v91) => { // Ok
-                        let mut v86: u8 = v86.clone();
-                        let mut v87: i32 = v87.clone();
-                        let mut v88: i32 = v88.clone();
-                        let mut v89: i32 = v89.clone();
-                        let mut v90: i32 = v90.clone();
-                        let mut v91: i32 = v91.clone();
+                        let mut v86: u8 = *v86;
+                        let mut v87: i32 = *v87;
+                        let mut v88: i32 = *v88;
+                        let mut v89: i32 = *v89;
+                        let mut v90: i32 = *v90;
+                        let mut v91: i32 = *v91;
                         let mut v92: bool = v4 >= v87;
                         let mut v97: Rc<str> = if v92 {
                             let mut v93: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                             v93.clone()
                         } else {
                             let mut v94: bool = v4 == v87;
-                            let mut v95: i32 = v87 - 1i32;
+                            let mut v95: i32 = v87.wrapping_sub(1i32);
                             let mut v96: Rc<str> = string_slice(&v0.clone(), v4 as i64, v95 as i64);
                             v96.clone()
                         };
                         US11::US11_0(v97.clone(), v87, v88, v89, v90, v91)
                     }
-                    _ => unreachable!(),
                 };
                 match &v107 {
                     US11::US11_1(v114, v115, v116, v117, v118, v119) => { // Error
                         let mut v114: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v114.clone();
-                        let mut v115: i32 = v115.clone();
-                        let mut v116: i32 = v116.clone();
-                        let mut v117: i32 = v117.clone();
-                        let mut v118: i32 = v118.clone();
-                        let mut v119: i32 = v119.clone();
+                        let mut v115: i32 = *v115;
+                        let mut v116: i32 = *v116;
+                        let mut v117: i32 = *v117;
+                        let mut v118: i32 = *v118;
+                        let mut v119: i32 = *v119;
                         let mut v137: US10 = if v37 {
                             let mut v120: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                             US10::US10_1(v120.clone(), v4, v5, v6, v7, v8)
@@ -4357,14 +4306,14 @@ fn method118(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                             let mut v122: u8 = v0.clone().as_bytes()[v4 as usize];
                             let mut v123: bool = v122 == b'`';
                             if v123 {
-                                let mut v124: i32 = v4 + 1i32;
+                                let mut v124: i32 = v4.wrapping_add(1i32);
                                 let mut v125: bool = b'\n' == v122;
                                 let (mut v129, mut v130, mut v131, mut v132): (i32, i32, i32, i32) = if v125 {
-                                    let mut v126: i32 = v5 + v7;
-                                    let mut v127: i32 = v6 + 1i32;
+                                    let mut v126: i32 = v5.wrapping_add(v7);
+                                    let mut v127: i32 = v6.wrapping_add(1i32);
                                     (v126, v127, 1i32, v8)
                                 } else {
-                                    let mut v128: i32 = v7 + 1i32;
+                                    let mut v128: i32 = v7.wrapping_add(1i32);
                                     (v5, v6, v128, v8)
                                 };
                                 US10::US10_0(b'`', v124, v129, v130, v131, v132)
@@ -4376,126 +4325,121 @@ fn method118(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                         let mut v167: US10 = match &v137 {
                             US10::US10_1(v159, v160, v161, v162, v163, v164) => { // Error
                                 let mut v159: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v159.clone();
-                                let mut v160: i32 = v160.clone();
-                                let mut v161: i32 = v161.clone();
-                                let mut v162: i32 = v162.clone();
-                                let mut v163: i32 = v163.clone();
-                                let mut v164: i32 = v164.clone();
+                                let mut v160: i32 = *v160;
+                                let mut v161: i32 = *v161;
+                                let mut v162: i32 = *v162;
+                                let mut v163: i32 = *v163;
+                                let mut v164: i32 = *v164;
                                 US10::US10_1(v159.clone(), v160, v161, v162, v163, v164)
                             }
                             US10::US10_0(v138, v139, v140, v141, v142, v143) => { // Ok
-                                let mut v138: u8 = v138.clone();
-                                let mut v139: i32 = v139.clone();
-                                let mut v140: i32 = v140.clone();
-                                let mut v141: i32 = v141.clone();
-                                let mut v142: i32 = v142.clone();
-                                let mut v143: i32 = v143.clone();
+                                let mut v138: u8 = *v138;
+                                let mut v139: i32 = *v139;
+                                let mut v140: i32 = *v140;
+                                let mut v141: i32 = *v141;
+                                let mut v142: i32 = *v142;
+                                let mut v143: i32 = *v143;
                                 let mut v144: bool = v139 >= v143;
                                 if v144 {
                                     let mut v145: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure44();
                                     US10::US10_1(v145.clone(), v139, v140, v141, v142, v143)
                                 } else {
                                     let mut v147: u8 = v0.clone().as_bytes()[v139 as usize];
-                                    let mut v148: i32 = v139 + 1i32;
+                                    let mut v148: i32 = v139.wrapping_add(1i32);
                                     let mut v149: bool = b'\n' == v147;
                                     let (mut v153, mut v154, mut v155, mut v156): (i32, i32, i32, i32) = if v149 {
-                                        let mut v150: i32 = v140 + v142;
-                                        let mut v151: i32 = v141 + 1i32;
+                                        let mut v150: i32 = v140.wrapping_add(v142);
+                                        let mut v151: i32 = v141.wrapping_add(1i32);
                                         (v150, v151, 1i32, v143)
                                     } else {
-                                        let mut v152: i32 = v142 + 1i32;
+                                        let mut v152: i32 = v142.wrapping_add(1i32);
                                         (v140, v141, v152, v143)
                                     };
                                     US10::US10_0(v147, v148, v153, v154, v155, v156)
                                 }
                             }
-                            _ => unreachable!(),
                         };
                         let mut v189: US11 = match &v167 {
                             US10::US10_1(v181, v182, v183, v184, v185, v186) => { // Error
                                 let mut v181: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v181.clone();
-                                let mut v182: i32 = v182.clone();
-                                let mut v183: i32 = v183.clone();
-                                let mut v184: i32 = v184.clone();
-                                let mut v185: i32 = v185.clone();
-                                let mut v186: i32 = v186.clone();
+                                let mut v182: i32 = *v182;
+                                let mut v183: i32 = *v183;
+                                let mut v184: i32 = *v184;
+                                let mut v185: i32 = *v185;
+                                let mut v186: i32 = *v186;
                                 US11::US11_1(v181.clone(), v182, v183, v184, v185, v186)
                             }
                             US10::US10_0(v168, v169, v170, v171, v172, v173) => { // Ok
-                                let mut v168: u8 = v168.clone();
-                                let mut v169: i32 = v169.clone();
-                                let mut v170: i32 = v170.clone();
-                                let mut v171: i32 = v171.clone();
-                                let mut v172: i32 = v172.clone();
-                                let mut v173: i32 = v173.clone();
+                                let mut v168: u8 = *v168;
+                                let mut v169: i32 = *v169;
+                                let mut v170: i32 = *v170;
+                                let mut v171: i32 = *v171;
+                                let mut v172: i32 = *v172;
+                                let mut v173: i32 = *v173;
                                 let mut v174: bool = v4 >= v169;
                                 let mut v179: Rc<str> = if v174 {
                                     let mut v175: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                     v175.clone()
                                 } else {
                                     let mut v176: bool = v4 == v169;
-                                    let mut v177: i32 = v169 - 1i32;
+                                    let mut v177: i32 = v169.wrapping_sub(1i32);
                                     let mut v178: Rc<str> = string_slice(&v0.clone(), v4 as i64, v177 as i64);
                                     v178.clone()
                                 };
                                 US11::US11_0(v179.clone(), v169, v170, v171, v172, v173)
                             }
-                            _ => unreachable!(),
                         };
                         match &v189 {
                             US11::US11_1(v196, v197, v198, v199, v200, v201) => { // Error
                                 let mut v196: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v196.clone();
-                                let mut v197: i32 = v197.clone();
-                                let mut v198: i32 = v198.clone();
-                                let mut v199: i32 = v199.clone();
-                                let mut v200: i32 = v200.clone();
-                                let mut v201: i32 = v201.clone();
+                                let mut v197: i32 = *v197;
+                                let mut v198: i32 = *v198;
+                                let mut v199: i32 = *v199;
+                                let mut v200: i32 = *v200;
+                                let mut v201: i32 = *v201;
                                 let mut v202: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                 US11::US11_1(v202.clone(), v4, v5, v6, v7, v8)
                             }
                             US11::US11_0(v190, v191, v192, v193, v194, v195) => { // Ok
                                 let mut v190: Rc<str> = v190.clone();
-                                let mut v191: i32 = v191.clone();
-                                let mut v192: i32 = v192.clone();
-                                let mut v193: i32 = v193.clone();
-                                let mut v194: i32 = v194.clone();
-                                let mut v195: i32 = v195.clone();
+                                let mut v191: i32 = *v191;
+                                let mut v192: i32 = *v192;
+                                let mut v193: i32 = *v193;
+                                let mut v194: i32 = *v194;
+                                let mut v195: i32 = *v195;
                                 v189.clone()
                             }
-                            _ => unreachable!(),
                         }
                     }
                     US11::US11_0(v108, v109, v110, v111, v112, v113) => { // Ok
                         let mut v108: Rc<str> = v108.clone();
-                        let mut v109: i32 = v109.clone();
-                        let mut v110: i32 = v110.clone();
-                        let mut v111: i32 = v111.clone();
-                        let mut v112: i32 = v112.clone();
-                        let mut v113: i32 = v113.clone();
+                        let mut v109: i32 = *v109;
+                        let mut v110: i32 = *v110;
+                        let mut v111: i32 = *v111;
+                        let mut v112: i32 = *v112;
+                        let mut v113: i32 = *v113;
                         v107.clone()
                     }
-                    _ => unreachable!(),
                 }
             }
             US11::US11_0(v25, v26, v27, v28, v29, v30) => { // Ok
                 let mut v25: Rc<str> = v25.clone();
-                let mut v26: i32 = v26.clone();
-                let mut v27: i32 = v27.clone();
-                let mut v28: i32 = v28.clone();
-                let mut v29: i32 = v29.clone();
-                let mut v30: i32 = v30.clone();
+                let mut v26: i32 = *v26;
+                let mut v27: i32 = *v27;
+                let mut v28: i32 = *v28;
+                let mut v29: i32 = *v29;
+                let mut v30: i32 = *v30;
                 v24.clone()
             }
-            _ => unreachable!(),
         };
         match &v209 {
             US11::US11_1(v210, v211, v212, v213, v214, v215) => { // Error
                 let mut v210: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v210.clone();
-                let mut v211: i32 = v211.clone();
-                let mut v212: i32 = v212.clone();
-                let mut v213: i32 = v213.clone();
-                let mut v214: i32 = v214.clone();
-                let mut v215: i32 = v215.clone();
+                let mut v211: i32 = *v211;
+                let mut v212: i32 = *v212;
+                let mut v213: i32 = *v213;
+                let mut v214: i32 = *v214;
+                let mut v215: i32 = *v215;
                 let mut v216: bool = v3 == 0i32;
                 let mut v218: Rc<str> = if v216 {
                     v2.clone()
@@ -4507,11 +4451,11 @@ fn method118(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
             }
             US11::US11_0(v220, v221, v222, v223, v224, v225) => { // Ok
                 let mut v220: Rc<str> = v220.clone();
-                let mut v221: i32 = v221.clone();
-                let mut v222: i32 = v222.clone();
-                let mut v223: i32 = v223.clone();
-                let mut v224: i32 = v224.clone();
-                let mut v225: i32 = v225.clone();
+                let mut v221: i32 = *v221;
+                let mut v222: i32 = *v222;
+                let mut v223: i32 = *v223;
+                let mut v224: i32 = *v224;
+                let mut v225: i32 = *v225;
                 let mut v226: bool = v221 > v4;
                 if v226 {
                     let mut v227: bool = v3 == 0i32;
@@ -4520,7 +4464,7 @@ fn method118(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                         ()
                     };
                     v1.borrow_mut().push_str(&*v220);
-                    let mut v228: i32 = v3 + 1i32;
+                    let mut v228: i32 = v3.wrapping_add(1i32);
                     (v0, v1, v2, v3, v4, v5, v6, v7, v8) = (v0.clone(), v1.clone(), v2.clone(), v228, v221, v222, v223, v224, v225);
                     continue;
                 } else {
@@ -4528,7 +4472,6 @@ fn method118(mut v0: Rc<str>, mut v1: Rc<RefCell<std::string::String>>, mut v2: 
                     return US11::US11_1(v230.clone(), v4, v5, v6, v7, v8);
                 }
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -4558,14 +4501,14 @@ fn method120(mut v0: i32, mut v1: Rc<str>, mut v2: i32, mut v3: i32, mut v4: i32
             };
             let mut v16: bool = v15 == false;
             if v16 {
-                let mut v17: i32 = v2 + 1i32;
+                let mut v17: i32 = v2.wrapping_add(1i32);
                 let mut v18: bool = b'\n' == v8;
                 let (mut v22, mut v23, mut v24, mut v25): (i32, i32, i32, i32) = if v18 {
-                    let mut v19: i32 = v3 + v5;
-                    let mut v20: i32 = v4 + 1i32;
+                    let mut v19: i32 = v3.wrapping_add(v5);
+                    let mut v20: i32 = v4.wrapping_add(1i32);
                     (v19, v20, 1i32, v6)
                 } else {
-                    let mut v21: i32 = v5 + 1i32;
+                    let mut v21: i32 = v5.wrapping_add(1i32);
                     (v3, v4, v21, v6)
                 };
                 (v0, v1, v2, v3, v4, v5, v6) = (v0, v1.clone(), v17, v22, v23, v24, v25);
@@ -4601,14 +4544,14 @@ fn method119(mut v0: i32, mut v1: Rc<str>, mut v2: i32, mut v3: i32, mut v4: i32
         };
         let mut v15: bool = v14 == false;
         if v15 {
-            let mut v16: i32 = v2 + 1i32;
+            let mut v16: i32 = v2.wrapping_add(1i32);
             let mut v17: bool = b'\n' == v7;
             let (mut v21, mut v22, mut v23, mut v24): (i32, i32, i32, i32) = if v17 {
-                let mut v18: i32 = v3 + v5;
-                let mut v19: i32 = v4 + 1i32;
+                let mut v18: i32 = v3.wrapping_add(v5);
+                let mut v19: i32 = v4.wrapping_add(1i32);
                 (v18, v19, 1i32, v0)
             } else {
-                let mut v20: i32 = v5 + 1i32;
+                let mut v20: i32 = v5.wrapping_add(1i32);
                 (v3, v4, v20, v0)
             };
             method120(v0, v1.clone(), v16, v21, v22, v23, v24)
@@ -4663,7 +4606,6 @@ fn method122(mut v0: Rc<UH0>, mut v1: Rc<UH0>) -> Rc<UH0> {
             UH0::UH0_0 => { // Nil
                 return v1.clone();
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -4684,14 +4626,14 @@ fn method121(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
             let mut v10: u8 = v0.clone().as_bytes()[v2 as usize];
             let mut v11: bool = v10 == b'\\';
             if v11 {
-                let mut v12: i32 = v2 + 1i32;
+                let mut v12: i32 = v2.wrapping_add(1i32);
                 let mut v13: bool = b'\n' == v10;
                 let (mut v17, mut v18, mut v19, mut v20): (i32, i32, i32, i32) = if v13 {
-                    let mut v14: i32 = v3 + v5;
-                    let mut v15: i32 = v4 + 1i32;
+                    let mut v14: i32 = v3.wrapping_add(v5);
+                    let mut v15: i32 = v4.wrapping_add(1i32);
                     (v14, v15, 1i32, v6)
                 } else {
-                    let mut v16: i32 = v5 + 1i32;
+                    let mut v16: i32 = v5.wrapping_add(1i32);
                     (v3, v4, v16, v6)
                 };
                 US10::US10_0(b'\\', v12, v17, v18, v19, v20)
@@ -4703,80 +4645,78 @@ fn method121(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
         let mut v55: US10 = match &v25 {
             US10::US10_1(v47, v48, v49, v50, v51, v52) => { // Error
                 let mut v47: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v47.clone();
-                let mut v48: i32 = v48.clone();
-                let mut v49: i32 = v49.clone();
-                let mut v50: i32 = v50.clone();
-                let mut v51: i32 = v51.clone();
-                let mut v52: i32 = v52.clone();
+                let mut v48: i32 = *v48;
+                let mut v49: i32 = *v49;
+                let mut v50: i32 = *v50;
+                let mut v51: i32 = *v51;
+                let mut v52: i32 = *v52;
                 US10::US10_1(v47.clone(), v48, v49, v50, v51, v52)
             }
             US10::US10_0(v26, v27, v28, v29, v30, v31) => { // Ok
-                let mut v26: u8 = v26.clone();
-                let mut v27: i32 = v27.clone();
-                let mut v28: i32 = v28.clone();
-                let mut v29: i32 = v29.clone();
-                let mut v30: i32 = v30.clone();
-                let mut v31: i32 = v31.clone();
+                let mut v26: u8 = *v26;
+                let mut v27: i32 = *v27;
+                let mut v28: i32 = *v28;
+                let mut v29: i32 = *v29;
+                let mut v30: i32 = *v30;
+                let mut v31: i32 = *v31;
                 let mut v32: bool = v27 >= v31;
                 if v32 {
                     let mut v33: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure44();
                     US10::US10_1(v33.clone(), v27, v28, v29, v30, v31)
                 } else {
                     let mut v35: u8 = v0.clone().as_bytes()[v27 as usize];
-                    let mut v36: i32 = v27 + 1i32;
+                    let mut v36: i32 = v27.wrapping_add(1i32);
                     let mut v37: bool = b'\n' == v35;
                     let (mut v41, mut v42, mut v43, mut v44): (i32, i32, i32, i32) = if v37 {
-                        let mut v38: i32 = v28 + v30;
-                        let mut v39: i32 = v29 + 1i32;
+                        let mut v38: i32 = v28.wrapping_add(v30);
+                        let mut v39: i32 = v29.wrapping_add(1i32);
                         (v38, v39, 1i32, v31)
                     } else {
-                        let mut v40: i32 = v30 + 1i32;
+                        let mut v40: i32 = v30.wrapping_add(1i32);
                         (v28, v29, v40, v31)
                     };
                     US10::US10_0(v35, v36, v41, v42, v43, v44)
                 }
             }
-            _ => unreachable!(),
         };
         let mut v77: US11 = match &v55 {
             US10::US10_1(v69, v70, v71, v72, v73, v74) => { // Error
                 let mut v69: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v69.clone();
-                let mut v70: i32 = v70.clone();
-                let mut v71: i32 = v71.clone();
-                let mut v72: i32 = v72.clone();
-                let mut v73: i32 = v73.clone();
-                let mut v74: i32 = v74.clone();
+                let mut v70: i32 = *v70;
+                let mut v71: i32 = *v71;
+                let mut v72: i32 = *v72;
+                let mut v73: i32 = *v73;
+                let mut v74: i32 = *v74;
                 US11::US11_1(v69.clone(), v70, v71, v72, v73, v74)
             }
             US10::US10_0(v56, v57, v58, v59, v60, v61) => { // Ok
-                let mut v56: u8 = v56.clone();
-                let mut v57: i32 = v57.clone();
-                let mut v58: i32 = v58.clone();
-                let mut v59: i32 = v59.clone();
-                let mut v60: i32 = v60.clone();
-                let mut v61: i32 = v61.clone();
+                let mut v56: u8 = *v56;
+                let mut v57: i32 = *v57;
+                let mut v58: i32 = *v58;
+                let mut v59: i32 = *v59;
+                let mut v60: i32 = *v60;
+                let mut v61: i32 = *v61;
                 let mut v62: bool = v2 >= v57;
                 let mut v67: Rc<str> = if v62 {
                     let mut v63: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                     v63.clone()
                 } else {
                     let mut v64: bool = v2 == v57;
-                    let mut v65: i32 = v57 - 1i32;
+                    let mut v65: i32 = v57.wrapping_sub(1i32);
                     let mut v66: Rc<str> = string_slice(&v0.clone(), v2 as i64, v65 as i64);
                     v66.clone()
                 };
                 US11::US11_0(v67.clone(), v57, v58, v59, v60, v61)
             }
-            _ => unreachable!(),
         };
         let mut v177: US11 = match &v77 {
             US11::US11_1(v84, v85, v86, v87, v88, v89) => { // Error
                 let mut v84: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v84.clone();
-                let mut v85: i32 = v85.clone();
-                let mut v86: i32 = v86.clone();
-                let mut v87: i32 = v87.clone();
-                let mut v88: i32 = v88.clone();
-                let mut v89: i32 = v89.clone();
+                let mut v85: i32 = *v85;
+                let mut v86: i32 = *v86;
+                let mut v87: i32 = *v87;
+                let mut v88: i32 = *v88;
+                let mut v89: i32 = *v89;
                 let mut v107: US10 = if v7 {
                     let mut v90: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                     US10::US10_1(v90.clone(), v2, v3, v4, v5, v6)
@@ -4784,14 +4724,14 @@ fn method121(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                     let mut v92: u8 = v0.clone().as_bytes()[v2 as usize];
                     let mut v93: bool = v92 == b'`';
                     if v93 {
-                        let mut v94: i32 = v2 + 1i32;
+                        let mut v94: i32 = v2.wrapping_add(1i32);
                         let mut v95: bool = b'\n' == v92;
                         let (mut v99, mut v100, mut v101, mut v102): (i32, i32, i32, i32) = if v95 {
-                            let mut v96: i32 = v3 + v5;
-                            let mut v97: i32 = v4 + 1i32;
+                            let mut v96: i32 = v3.wrapping_add(v5);
+                            let mut v97: i32 = v4.wrapping_add(1i32);
                             (v96, v97, 1i32, v6)
                         } else {
-                            let mut v98: i32 = v5 + 1i32;
+                            let mut v98: i32 = v5.wrapping_add(1i32);
                             (v3, v4, v98, v6)
                         };
                         US10::US10_0(b'`', v94, v99, v100, v101, v102)
@@ -4803,145 +4743,140 @@ fn method121(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                 let mut v137: US10 = match &v107 {
                     US10::US10_1(v129, v130, v131, v132, v133, v134) => { // Error
                         let mut v129: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v129.clone();
-                        let mut v130: i32 = v130.clone();
-                        let mut v131: i32 = v131.clone();
-                        let mut v132: i32 = v132.clone();
-                        let mut v133: i32 = v133.clone();
-                        let mut v134: i32 = v134.clone();
+                        let mut v130: i32 = *v130;
+                        let mut v131: i32 = *v131;
+                        let mut v132: i32 = *v132;
+                        let mut v133: i32 = *v133;
+                        let mut v134: i32 = *v134;
                         US10::US10_1(v129.clone(), v130, v131, v132, v133, v134)
                     }
                     US10::US10_0(v108, v109, v110, v111, v112, v113) => { // Ok
-                        let mut v108: u8 = v108.clone();
-                        let mut v109: i32 = v109.clone();
-                        let mut v110: i32 = v110.clone();
-                        let mut v111: i32 = v111.clone();
-                        let mut v112: i32 = v112.clone();
-                        let mut v113: i32 = v113.clone();
+                        let mut v108: u8 = *v108;
+                        let mut v109: i32 = *v109;
+                        let mut v110: i32 = *v110;
+                        let mut v111: i32 = *v111;
+                        let mut v112: i32 = *v112;
+                        let mut v113: i32 = *v113;
                         let mut v114: bool = v109 >= v113;
                         if v114 {
                             let mut v115: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure44();
                             US10::US10_1(v115.clone(), v109, v110, v111, v112, v113)
                         } else {
                             let mut v117: u8 = v0.clone().as_bytes()[v109 as usize];
-                            let mut v118: i32 = v109 + 1i32;
+                            let mut v118: i32 = v109.wrapping_add(1i32);
                             let mut v119: bool = b'\n' == v117;
                             let (mut v123, mut v124, mut v125, mut v126): (i32, i32, i32, i32) = if v119 {
-                                let mut v120: i32 = v110 + v112;
-                                let mut v121: i32 = v111 + 1i32;
+                                let mut v120: i32 = v110.wrapping_add(v112);
+                                let mut v121: i32 = v111.wrapping_add(1i32);
                                 (v120, v121, 1i32, v113)
                             } else {
-                                let mut v122: i32 = v112 + 1i32;
+                                let mut v122: i32 = v112.wrapping_add(1i32);
                                 (v110, v111, v122, v113)
                             };
                             US10::US10_0(v117, v118, v123, v124, v125, v126)
                         }
                     }
-                    _ => unreachable!(),
                 };
                 let mut v159: US11 = match &v137 {
                     US10::US10_1(v151, v152, v153, v154, v155, v156) => { // Error
                         let mut v151: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v151.clone();
-                        let mut v152: i32 = v152.clone();
-                        let mut v153: i32 = v153.clone();
-                        let mut v154: i32 = v154.clone();
-                        let mut v155: i32 = v155.clone();
-                        let mut v156: i32 = v156.clone();
+                        let mut v152: i32 = *v152;
+                        let mut v153: i32 = *v153;
+                        let mut v154: i32 = *v154;
+                        let mut v155: i32 = *v155;
+                        let mut v156: i32 = *v156;
                         US11::US11_1(v151.clone(), v152, v153, v154, v155, v156)
                     }
                     US10::US10_0(v138, v139, v140, v141, v142, v143) => { // Ok
-                        let mut v138: u8 = v138.clone();
-                        let mut v139: i32 = v139.clone();
-                        let mut v140: i32 = v140.clone();
-                        let mut v141: i32 = v141.clone();
-                        let mut v142: i32 = v142.clone();
-                        let mut v143: i32 = v143.clone();
+                        let mut v138: u8 = *v138;
+                        let mut v139: i32 = *v139;
+                        let mut v140: i32 = *v140;
+                        let mut v141: i32 = *v141;
+                        let mut v142: i32 = *v142;
+                        let mut v143: i32 = *v143;
                         let mut v144: bool = v2 >= v139;
                         let mut v149: Rc<str> = if v144 {
                             let mut v145: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                             v145.clone()
                         } else {
                             let mut v146: bool = v2 == v139;
-                            let mut v147: i32 = v139 - 1i32;
+                            let mut v147: i32 = v139.wrapping_sub(1i32);
                             let mut v148: Rc<str> = string_slice(&v0.clone(), v2 as i64, v147 as i64);
                             v148.clone()
                         };
                         US11::US11_0(v149.clone(), v139, v140, v141, v142, v143)
                     }
-                    _ => unreachable!(),
                 };
                 match &v159 {
                     US11::US11_1(v166, v167, v168, v169, v170, v171) => { // Error
                         let mut v166: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v166.clone();
-                        let mut v167: i32 = v167.clone();
-                        let mut v168: i32 = v168.clone();
-                        let mut v169: i32 = v169.clone();
-                        let mut v170: i32 = v170.clone();
-                        let mut v171: i32 = v171.clone();
+                        let mut v167: i32 = *v167;
+                        let mut v168: i32 = *v168;
+                        let mut v169: i32 = *v169;
+                        let mut v170: i32 = *v170;
+                        let mut v171: i32 = *v171;
                         let mut v172: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                         US11::US11_1(v172.clone(), v2, v3, v4, v5, v6)
                     }
                     US11::US11_0(v160, v161, v162, v163, v164, v165) => { // Ok
                         let mut v160: Rc<str> = v160.clone();
-                        let mut v161: i32 = v161.clone();
-                        let mut v162: i32 = v162.clone();
-                        let mut v163: i32 = v163.clone();
-                        let mut v164: i32 = v164.clone();
-                        let mut v165: i32 = v165.clone();
+                        let mut v161: i32 = *v161;
+                        let mut v162: i32 = *v162;
+                        let mut v163: i32 = *v163;
+                        let mut v164: i32 = *v164;
+                        let mut v165: i32 = *v165;
                         v159.clone()
                     }
-                    _ => unreachable!(),
                 }
             }
             US11::US11_0(v78, v79, v80, v81, v82, v83) => { // Ok
                 let mut v78: Rc<str> = v78.clone();
-                let mut v79: i32 = v79.clone();
-                let mut v80: i32 = v80.clone();
-                let mut v81: i32 = v81.clone();
-                let mut v82: i32 = v82.clone();
-                let mut v83: i32 = v83.clone();
+                let mut v79: i32 = *v79;
+                let mut v80: i32 = *v80;
+                let mut v81: i32 = *v81;
+                let mut v82: i32 = *v82;
+                let mut v83: i32 = *v83;
                 v77.clone()
             }
-            _ => unreachable!(),
         };
         let mut v194: US11 = match &v177 {
             US11::US11_1(v186, v187, v188, v189, v190, v191) => { // Error
                 let mut v186: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v186.clone();
-                let mut v187: i32 = v187.clone();
-                let mut v188: i32 = v188.clone();
-                let mut v189: i32 = v189.clone();
-                let mut v190: i32 = v190.clone();
-                let mut v191: i32 = v191.clone();
+                let mut v187: i32 = *v187;
+                let mut v188: i32 = *v188;
+                let mut v189: i32 = *v189;
+                let mut v190: i32 = *v190;
+                let mut v191: i32 = *v191;
                 US11::US11_1(v186.clone(), v187, v188, v189, v190, v191)
             }
             US11::US11_0(v178, v179, v180, v181, v182, v183) => { // Ok
                 let mut v178: Rc<str> = v178.clone();
-                let mut v179: i32 = v179.clone();
-                let mut v180: i32 = v180.clone();
-                let mut v181: i32 = v181.clone();
-                let mut v182: i32 = v182.clone();
-                let mut v183: i32 = v183.clone();
+                let mut v179: i32 = *v179;
+                let mut v180: i32 = *v180;
+                let mut v181: i32 = *v181;
+                let mut v182: i32 = *v182;
+                let mut v183: i32 = *v183;
                 let mut v184: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                 US11::US11_0(v184.clone(), v179, v180, v181, v182, v183)
             }
-            _ => unreachable!(),
         };
         let mut v250: US11 = match &v194 {
             US11::US11_1(v242, v243, v244, v245, v246, v247) => { // Error
                 let mut v242: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v242.clone();
-                let mut v243: i32 = v243.clone();
-                let mut v244: i32 = v244.clone();
-                let mut v245: i32 = v245.clone();
-                let mut v246: i32 = v246.clone();
-                let mut v247: i32 = v247.clone();
+                let mut v243: i32 = *v243;
+                let mut v244: i32 = *v244;
+                let mut v245: i32 = *v245;
+                let mut v246: i32 = *v246;
+                let mut v247: i32 = *v247;
                 US11::US11_1(v242.clone(), v243, v244, v245, v246, v247)
             }
             US11::US11_0(v195, v196, v197, v198, v199, v200) => { // Ok
                 let mut v195: Rc<str> = v195.clone();
-                let mut v196: i32 = v196.clone();
-                let mut v197: i32 = v197.clone();
-                let mut v198: i32 = v198.clone();
-                let mut v199: i32 = v199.clone();
-                let mut v200: i32 = v200.clone();
+                let mut v196: i32 = *v196;
+                let mut v197: i32 = *v197;
+                let mut v198: i32 = *v198;
+                let mut v199: i32 = *v199;
+                let mut v200: i32 = *v200;
                 let mut v201: bool = v196 >= v200;
                 let mut v224: US10 = if v201 {
                     let mut v202: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure45();
@@ -4962,14 +4897,14 @@ fn method121(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                     };
                     let mut v210: bool = v209 == false;
                     if v210 {
-                        let mut v211: i32 = v196 + 1i32;
+                        let mut v211: i32 = v196.wrapping_add(1i32);
                         let mut v212: bool = b'\n' == v204;
                         let (mut v216, mut v217, mut v218, mut v219): (i32, i32, i32, i32) = if v212 {
-                            let mut v213: i32 = v197 + v199;
-                            let mut v214: i32 = v198 + 1i32;
+                            let mut v213: i32 = v197.wrapping_add(v199);
+                            let mut v214: i32 = v198.wrapping_add(1i32);
                             (v213, v214, 1i32, v200)
                         } else {
-                            let mut v215: i32 = v199 + 1i32;
+                            let mut v215: i32 = v199.wrapping_add(1i32);
                             (v197, v198, v215, v200)
                         };
                         US10::US10_0(v204, v211, v216, v217, v218, v219)
@@ -4981,47 +4916,45 @@ fn method121(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                 match &v224 {
                     US10::US10_1(v233, v234, v235, v236, v237, v238) => { // Error
                         let mut v233: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v233.clone();
-                        let mut v234: i32 = v234.clone();
-                        let mut v235: i32 = v235.clone();
-                        let mut v236: i32 = v236.clone();
-                        let mut v237: i32 = v237.clone();
-                        let mut v238: i32 = v238.clone();
+                        let mut v234: i32 = *v234;
+                        let mut v235: i32 = *v235;
+                        let mut v236: i32 = *v236;
+                        let mut v237: i32 = *v237;
+                        let mut v238: i32 = *v238;
                         US11::US11_1(v233.clone(), v234, v235, v236, v237, v238)
                     }
                     US10::US10_0(v225, v226, v227, v228, v229, v230) => { // Ok
-                        let mut v225: u8 = v225.clone();
-                        let mut v226: i32 = v226.clone();
-                        let mut v227: i32 = v227.clone();
-                        let mut v228: i32 = v228.clone();
-                        let mut v229: i32 = v229.clone();
-                        let mut v230: i32 = v230.clone();
+                        let mut v225: u8 = *v225;
+                        let mut v226: i32 = *v226;
+                        let mut v227: i32 = *v227;
+                        let mut v228: i32 = *v228;
+                        let mut v229: i32 = *v229;
+                        let mut v230: i32 = *v230;
                         let mut v231: Rc<str> = Rc::<str>::from((v225 as char).encode_utf8(&mut [0u8; 4]) as &str);
                         US11::US11_0(v231.clone(), v226, v227, v228, v229, v230)
                     }
-                    _ => unreachable!(),
                 }
             }
-            _ => unreachable!(),
         };
         match &v250 {
             US11::US11_1(v251, v252, v253, v254, v255, v256) => { // Error
                 let mut v251: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v251.clone();
-                let mut v252: i32 = v252.clone();
-                let mut v253: i32 = v253.clone();
-                let mut v254: i32 = v254.clone();
-                let mut v255: i32 = v255.clone();
-                let mut v256: i32 = v256.clone();
+                let mut v252: i32 = *v252;
+                let mut v253: i32 = *v253;
+                let mut v254: i32 = *v254;
+                let mut v255: i32 = *v255;
+                let mut v256: i32 = *v256;
                 let mut v257: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
                 let mut v258: Rc<UH0> = method122(v1.clone(), v257.clone());
                 return US19::US19_0(v258.clone(), v2, v3, v4, v5, v6);
             }
             US11::US11_0(v260, v261, v262, v263, v264, v265) => { // Ok
                 let mut v260: Rc<str> = v260.clone();
-                let mut v261: i32 = v261.clone();
-                let mut v262: i32 = v262.clone();
-                let mut v263: i32 = v263.clone();
-                let mut v264: i32 = v264.clone();
-                let mut v265: i32 = v265.clone();
+                let mut v261: i32 = *v261;
+                let mut v262: i32 = *v262;
+                let mut v263: i32 = *v263;
+                let mut v264: i32 = *v264;
+                let mut v265: i32 = *v265;
                 let mut v266: bool = v261 > v2;
                 if v266 {
                     let mut v267: Rc<UH0> = Rc::new(UH0::UH0_1(v260.clone(), v1.clone()));
@@ -5032,7 +4965,6 @@ fn method121(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                     return US19::US19_1(v269.clone(), v2, v3, v4, v5, v6);
                 }
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -5092,14 +5024,14 @@ fn method126(mut v0: i32, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: Rc<str>
             };
             let mut v19: bool = v18 == false;
             if v19 {
-                let mut v20: i32 = v5 + 1i32;
+                let mut v20: i32 = v5.wrapping_add(1i32);
                 let mut v21: bool = b'\n' == v11;
                 let (mut v25, mut v26, mut v27, mut v28): (i32, i32, i32, i32) = if v21 {
-                    let mut v22: i32 = v6 + v8;
-                    let mut v23: i32 = v7 + 1i32;
+                    let mut v22: i32 = v6.wrapping_add(v8);
+                    let mut v23: i32 = v7.wrapping_add(1i32);
                     (v22, v23, 1i32, v9)
                 } else {
-                    let mut v24: i32 = v8 + 1i32;
+                    let mut v24: i32 = v8.wrapping_add(1i32);
                     (v6, v7, v24, v9)
                 };
                 (v0, v1, v2, v3, v4, v5, v6, v7, v8, v9) = (v0, v1, v2, v3, v4.clone(), v20, v25, v26, v27, v28);
@@ -5135,14 +5067,14 @@ fn method125(mut v0: i32, mut v1: i32, mut v2: i32, mut v3: i32, mut v4: Rc<str>
         };
         let mut v15: bool = v14 == false;
         if v15 {
-            let mut v16: i32 = v5 + 1i32;
+            let mut v16: i32 = v5.wrapping_add(1i32);
             let mut v17: bool = b'\n' == v7;
             let (mut v21, mut v22, mut v23, mut v24): (i32, i32, i32, i32) = if v17 {
-                let mut v18: i32 = v0 + v2;
-                let mut v19: i32 = v1 + 1i32;
+                let mut v18: i32 = v0.wrapping_add(v2);
+                let mut v19: i32 = v1.wrapping_add(1i32);
                 (v18, v19, 1i32, v3)
             } else {
-                let mut v20: i32 = v2 + 1i32;
+                let mut v20: i32 = v2.wrapping_add(1i32);
                 (v0, v1, v20, v3)
             };
             method126(v0, v1, v2, v3, v4.clone(), v16, v21, v22, v23, v24)
@@ -5158,14 +5090,13 @@ fn method127(mut v0: Rc<UH0>, mut v1: i32) -> i32 {
                 let mut v2: Rc<str> = v2.clone();
                 let mut v3: Rc<UH0> = v3.clone();
                 let mut v4: i32 = (v2.clone().len() as i32);
-                let mut v5: i32 = v1 + v4;
+                let mut v5: i32 = v1.wrapping_add(v4);
                 (v0, v1) = (v3.clone(), v5);
                 continue;
             }
             UH0::UH0_0 => { // Nil
                 return v1;
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -5176,7 +5107,7 @@ fn method128(mut v0: Rc<RefCell<Vec<u8>>>, mut v1: Rc<UH0>, mut v2: i32) -> i32 
                 let mut v3: Rc<str> = v3.clone();
                 let mut v4: Rc<UH0> = v4.clone();
                 let mut v5: i32 = (v3.clone().len() as i32);
-                let mut v6: i32 = v2 - v5;
+                let mut v6: i32 = v2.wrapping_sub(v5);
                 v0.borrow_mut()[v6 as usize..v2 as usize].copy_from_slice(v3.as_bytes());
                 (v0, v1, v2) = (v0.clone(), v4.clone(), v6);
                 continue;
@@ -5184,7 +5115,6 @@ fn method128(mut v0: Rc<RefCell<Vec<u8>>>, mut v1: Rc<UH0>, mut v2: i32) -> i32 
             UH0::UH0_0 => { // Nil
                 return v2;
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -5212,13 +5142,11 @@ fn method130(mut v0: bool, mut v1: Rc<UH0>, mut v2: Rc<UH0>) -> Rc<UH0> {
                     UH0::UH0_0 => { // Nil
                         return Rc::new(UH0::UH0_1(v3.clone(), v2.clone()));
                     }
-                    _ => unreachable!(),
                 }
             }
             UH0::UH0_0 => { // Nil
                 return v2.clone();
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -5245,7 +5173,6 @@ fn method129(mut v0: bool, mut v1: Rc<UH0>) -> Rc<str> {
                 let mut v2: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                 return v2.clone();
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -5266,14 +5193,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
             let mut v11: u8 = v0.clone().as_bytes()[v3 as usize];
             let mut v12: bool = v11 == b'\\';
             if v12 {
-                let mut v13: i32 = v3 + 1i32;
+                let mut v13: i32 = v3.wrapping_add(1i32);
                 let mut v14: bool = b'\n' == v11;
                 let (mut v18, mut v19, mut v20, mut v21): (i32, i32, i32, i32) = if v14 {
-                    let mut v15: i32 = v4 + v6;
-                    let mut v16: i32 = v5 + 1i32;
+                    let mut v15: i32 = v4.wrapping_add(v6);
+                    let mut v16: i32 = v5.wrapping_add(1i32);
                     (v15, v16, 1i32, v7)
                 } else {
-                    let mut v17: i32 = v6 + 1i32;
+                    let mut v17: i32 = v6.wrapping_add(1i32);
                     (v4, v5, v17, v7)
                 };
                 US10::US10_0(b'\\', v13, v18, v19, v20, v21)
@@ -5285,20 +5212,20 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
         let mut v60: US10 = match &v26 {
             US10::US10_1(v52, v53, v54, v55, v56, v57) => { // Error
                 let mut v52: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v52.clone();
-                let mut v53: i32 = v53.clone();
-                let mut v54: i32 = v54.clone();
-                let mut v55: i32 = v55.clone();
-                let mut v56: i32 = v56.clone();
-                let mut v57: i32 = v57.clone();
+                let mut v53: i32 = *v53;
+                let mut v54: i32 = *v54;
+                let mut v55: i32 = *v55;
+                let mut v56: i32 = *v56;
+                let mut v57: i32 = *v57;
                 US10::US10_1(v52.clone(), v53, v54, v55, v56, v57)
             }
             US10::US10_0(v27, v28, v29, v30, v31, v32) => { // Ok
-                let mut v27: u8 = v27.clone();
-                let mut v28: i32 = v28.clone();
-                let mut v29: i32 = v29.clone();
-                let mut v30: i32 = v30.clone();
-                let mut v31: i32 = v31.clone();
-                let mut v32: i32 = v32.clone();
+                let mut v27: u8 = *v27;
+                let mut v28: i32 = *v28;
+                let mut v29: i32 = *v29;
+                let mut v30: i32 = *v30;
+                let mut v31: i32 = *v31;
+                let mut v32: i32 = *v32;
                 let mut v33: bool = v28 >= v32;
                 if v33 {
                     let mut v34: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -5307,14 +5234,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                     let mut v36: u8 = v0.clone().as_bytes()[v28 as usize];
                     let mut v37: bool = v36 == b'"';
                     if v37 {
-                        let mut v38: i32 = v28 + 1i32;
+                        let mut v38: i32 = v28.wrapping_add(1i32);
                         let mut v39: bool = b'\n' == v36;
                         let (mut v43, mut v44, mut v45, mut v46): (i32, i32, i32, i32) = if v39 {
-                            let mut v40: i32 = v29 + v31;
-                            let mut v41: i32 = v30 + 1i32;
+                            let mut v40: i32 = v29.wrapping_add(v31);
+                            let mut v41: i32 = v30.wrapping_add(1i32);
                             (v40, v41, 1i32, v32)
                         } else {
-                            let mut v42: i32 = v31 + 1i32;
+                            let mut v42: i32 = v31.wrapping_add(1i32);
                             (v29, v30, v42, v32)
                         };
                         US10::US10_0(b'"', v38, v43, v44, v45, v46)
@@ -5324,37 +5251,35 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                     }
                 }
             }
-            _ => unreachable!(),
         };
         let mut v76: US10 = match &v60 {
             US10::US10_1(v68, v69, v70, v71, v72, v73) => { // Error
                 let mut v68: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v68.clone();
-                let mut v69: i32 = v69.clone();
-                let mut v70: i32 = v70.clone();
-                let mut v71: i32 = v71.clone();
-                let mut v72: i32 = v72.clone();
-                let mut v73: i32 = v73.clone();
+                let mut v69: i32 = *v69;
+                let mut v70: i32 = *v70;
+                let mut v71: i32 = *v71;
+                let mut v72: i32 = *v72;
+                let mut v73: i32 = *v73;
                 US10::US10_1(v68.clone(), v69, v70, v71, v72, v73)
             }
             US10::US10_0(v61, v62, v63, v64, v65, v66) => { // Ok
-                let mut v61: u8 = v61.clone();
-                let mut v62: i32 = v62.clone();
-                let mut v63: i32 = v63.clone();
-                let mut v64: i32 = v64.clone();
-                let mut v65: i32 = v65.clone();
-                let mut v66: i32 = v66.clone();
+                let mut v61: u8 = *v61;
+                let mut v62: i32 = *v62;
+                let mut v63: i32 = *v63;
+                let mut v64: i32 = *v64;
+                let mut v65: i32 = *v65;
+                let mut v66: i32 = *v66;
                 US10::US10_0(b'"', v62, v63, v64, v65, v66)
             }
-            _ => unreachable!(),
         };
         let mut v174: US10 = match &v76 {
             US10::US10_1(v83, v84, v85, v86, v87, v88) => { // Error
                 let mut v83: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v83.clone();
-                let mut v84: i32 = v84.clone();
-                let mut v85: i32 = v85.clone();
-                let mut v86: i32 = v86.clone();
-                let mut v87: i32 = v87.clone();
-                let mut v88: i32 = v88.clone();
+                let mut v84: i32 = *v84;
+                let mut v85: i32 = *v85;
+                let mut v86: i32 = *v86;
+                let mut v87: i32 = *v87;
+                let mut v88: i32 = *v88;
                 let mut v106: US10 = if v8 {
                     let mut v89: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                     US10::US10_1(v89.clone(), v3, v4, v5, v6, v7)
@@ -5362,14 +5287,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                     let mut v91: u8 = v0.clone().as_bytes()[v3 as usize];
                     let mut v92: bool = v91 == b'`';
                     if v92 {
-                        let mut v93: i32 = v3 + 1i32;
+                        let mut v93: i32 = v3.wrapping_add(1i32);
                         let mut v94: bool = b'\n' == v91;
                         let (mut v98, mut v99, mut v100, mut v101): (i32, i32, i32, i32) = if v94 {
-                            let mut v95: i32 = v4 + v6;
-                            let mut v96: i32 = v5 + 1i32;
+                            let mut v95: i32 = v4.wrapping_add(v6);
+                            let mut v96: i32 = v5.wrapping_add(1i32);
                             (v95, v96, 1i32, v7)
                         } else {
-                            let mut v97: i32 = v6 + 1i32;
+                            let mut v97: i32 = v6.wrapping_add(1i32);
                             (v4, v5, v97, v7)
                         };
                         US10::US10_0(b'`', v93, v98, v99, v100, v101)
@@ -5381,20 +5306,20 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                 let mut v140: US10 = match &v106 {
                     US10::US10_1(v132, v133, v134, v135, v136, v137) => { // Error
                         let mut v132: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v132.clone();
-                        let mut v133: i32 = v133.clone();
-                        let mut v134: i32 = v134.clone();
-                        let mut v135: i32 = v135.clone();
-                        let mut v136: i32 = v136.clone();
-                        let mut v137: i32 = v137.clone();
+                        let mut v133: i32 = *v133;
+                        let mut v134: i32 = *v134;
+                        let mut v135: i32 = *v135;
+                        let mut v136: i32 = *v136;
+                        let mut v137: i32 = *v137;
                         US10::US10_1(v132.clone(), v133, v134, v135, v136, v137)
                     }
                     US10::US10_0(v107, v108, v109, v110, v111, v112) => { // Ok
-                        let mut v107: u8 = v107.clone();
-                        let mut v108: i32 = v108.clone();
-                        let mut v109: i32 = v109.clone();
-                        let mut v110: i32 = v110.clone();
-                        let mut v111: i32 = v111.clone();
-                        let mut v112: i32 = v112.clone();
+                        let mut v107: u8 = *v107;
+                        let mut v108: i32 = *v108;
+                        let mut v109: i32 = *v109;
+                        let mut v110: i32 = *v110;
+                        let mut v111: i32 = *v111;
+                        let mut v112: i32 = *v112;
                         let mut v113: bool = v108 >= v112;
                         if v113 {
                             let mut v114: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -5403,14 +5328,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                             let mut v116: u8 = v0.clone().as_bytes()[v108 as usize];
                             let mut v117: bool = v116 == b'"';
                             if v117 {
-                                let mut v118: i32 = v108 + 1i32;
+                                let mut v118: i32 = v108.wrapping_add(1i32);
                                 let mut v119: bool = b'\n' == v116;
                                 let (mut v123, mut v124, mut v125, mut v126): (i32, i32, i32, i32) = if v119 {
-                                    let mut v120: i32 = v109 + v111;
-                                    let mut v121: i32 = v110 + 1i32;
+                                    let mut v120: i32 = v109.wrapping_add(v111);
+                                    let mut v121: i32 = v110.wrapping_add(1i32);
                                     (v120, v121, 1i32, v112)
                                 } else {
-                                    let mut v122: i32 = v111 + 1i32;
+                                    let mut v122: i32 = v111.wrapping_add(1i32);
                                     (v109, v110, v122, v112)
                                 };
                                 US10::US10_0(b'"', v118, v123, v124, v125, v126)
@@ -5420,80 +5345,76 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                             }
                         }
                     }
-                    _ => unreachable!(),
                 };
                 let mut v156: US10 = match &v140 {
                     US10::US10_1(v148, v149, v150, v151, v152, v153) => { // Error
                         let mut v148: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v148.clone();
-                        let mut v149: i32 = v149.clone();
-                        let mut v150: i32 = v150.clone();
-                        let mut v151: i32 = v151.clone();
-                        let mut v152: i32 = v152.clone();
-                        let mut v153: i32 = v153.clone();
+                        let mut v149: i32 = *v149;
+                        let mut v150: i32 = *v150;
+                        let mut v151: i32 = *v151;
+                        let mut v152: i32 = *v152;
+                        let mut v153: i32 = *v153;
                         US10::US10_1(v148.clone(), v149, v150, v151, v152, v153)
                     }
                     US10::US10_0(v141, v142, v143, v144, v145, v146) => { // Ok
-                        let mut v141: u8 = v141.clone();
-                        let mut v142: i32 = v142.clone();
-                        let mut v143: i32 = v143.clone();
-                        let mut v144: i32 = v144.clone();
-                        let mut v145: i32 = v145.clone();
-                        let mut v146: i32 = v146.clone();
+                        let mut v141: u8 = *v141;
+                        let mut v142: i32 = *v142;
+                        let mut v143: i32 = *v143;
+                        let mut v144: i32 = *v144;
+                        let mut v145: i32 = *v145;
+                        let mut v146: i32 = *v146;
                         US10::US10_0(b'"', v142, v143, v144, v145, v146)
                     }
-                    _ => unreachable!(),
                 };
                 match &v156 {
                     US10::US10_1(v163, v164, v165, v166, v167, v168) => { // Error
                         let mut v163: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v163.clone();
-                        let mut v164: i32 = v164.clone();
-                        let mut v165: i32 = v165.clone();
-                        let mut v166: i32 = v166.clone();
-                        let mut v167: i32 = v167.clone();
-                        let mut v168: i32 = v168.clone();
+                        let mut v164: i32 = *v164;
+                        let mut v165: i32 = *v165;
+                        let mut v166: i32 = *v166;
+                        let mut v167: i32 = *v167;
+                        let mut v168: i32 = *v168;
                         let mut v169: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                         US10::US10_1(v169.clone(), v3, v4, v5, v6, v7)
                     }
                     US10::US10_0(v157, v158, v159, v160, v161, v162) => { // Ok
-                        let mut v157: u8 = v157.clone();
-                        let mut v158: i32 = v158.clone();
-                        let mut v159: i32 = v159.clone();
-                        let mut v160: i32 = v160.clone();
-                        let mut v161: i32 = v161.clone();
-                        let mut v162: i32 = v162.clone();
+                        let mut v157: u8 = *v157;
+                        let mut v158: i32 = *v158;
+                        let mut v159: i32 = *v159;
+                        let mut v160: i32 = *v160;
+                        let mut v161: i32 = *v161;
+                        let mut v162: i32 = *v162;
                         v156.clone()
                     }
-                    _ => unreachable!(),
                 }
             }
             US10::US10_0(v77, v78, v79, v80, v81, v82) => { // Ok
-                let mut v77: u8 = v77.clone();
-                let mut v78: i32 = v78.clone();
-                let mut v79: i32 = v79.clone();
-                let mut v80: i32 = v80.clone();
-                let mut v81: i32 = v81.clone();
-                let mut v82: i32 = v82.clone();
+                let mut v77: u8 = *v77;
+                let mut v78: i32 = *v78;
+                let mut v79: i32 = *v79;
+                let mut v80: i32 = *v80;
+                let mut v81: i32 = *v81;
+                let mut v82: i32 = *v82;
                 v76.clone()
             }
-            _ => unreachable!(),
         };
         let mut v806: US11 = match &v174 {
             US10::US10_1(v798, v799, v800, v801, v802, v803) => { // Error
                 let mut v798: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v798.clone();
-                let mut v799: i32 = v799.clone();
-                let mut v800: i32 = v800.clone();
-                let mut v801: i32 = v801.clone();
-                let mut v802: i32 = v802.clone();
-                let mut v803: i32 = v803.clone();
+                let mut v799: i32 = *v799;
+                let mut v800: i32 = *v800;
+                let mut v801: i32 = *v801;
+                let mut v802: i32 = *v802;
+                let mut v803: i32 = *v803;
                 US11::US11_1(v798.clone(), v799, v800, v801, v802, v803)
             }
             US10::US10_0(v175, v176, v177, v178, v179, v180) => { // Ok
-                let mut v175: u8 = v175.clone();
-                let mut v176: i32 = v176.clone();
-                let mut v177: i32 = v177.clone();
-                let mut v178: i32 = v178.clone();
-                let mut v179: i32 = v179.clone();
-                let mut v180: i32 = v180.clone();
+                let mut v175: u8 = *v175;
+                let mut v176: i32 = *v176;
+                let mut v177: i32 = *v177;
+                let mut v178: i32 = *v178;
+                let mut v179: i32 = *v179;
+                let mut v180: i32 = *v180;
                 let (mut v181, mut v182, mut v183, mut v184, mut v185): (i32, i32, i32, i32, i32) = method112(v177, v178, v179, v180, v0.clone(), v176);
                 let mut v186: bool = v181 > v176;
                 let mut v196: US11 = if v186 {
@@ -5503,7 +5424,7 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                         v188.clone()
                     } else {
                         let mut v189: bool = v176 == v181;
-                        let mut v190: i32 = v181 - 1i32;
+                        let mut v190: i32 = v181.wrapping_sub(1i32);
                         let mut v191: Rc<str> = string_slice(&v0.clone(), v176 as i64, v190 as i64);
                         v191.clone()
                     };
@@ -5515,11 +5436,11 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                 let mut v391: US11 = match &v196 {
                     US11::US11_1(v203, v204, v205, v206, v207, v208) => { // Error
                         let mut v203: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v203.clone();
-                        let mut v204: i32 = v204.clone();
-                        let mut v205: i32 = v205.clone();
-                        let mut v206: i32 = v206.clone();
-                        let mut v207: i32 = v207.clone();
-                        let mut v208: i32 = v208.clone();
+                        let mut v204: i32 = *v204;
+                        let mut v205: i32 = *v205;
+                        let mut v206: i32 = *v206;
+                        let mut v207: i32 = *v207;
+                        let mut v208: i32 = *v208;
                         let mut v209: bool = v176 >= v180;
                         let mut v227: US10 = if v209 {
                             let mut v210: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure35();
@@ -5528,14 +5449,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                             let mut v212: u8 = v0.clone().as_bytes()[v176 as usize];
                             let mut v213: bool = v212 == b'\\';
                             if v213 {
-                                let mut v214: i32 = v176 + 1i32;
+                                let mut v214: i32 = v176.wrapping_add(1i32);
                                 let mut v215: bool = b'\n' == v212;
                                 let (mut v219, mut v220, mut v221, mut v222): (i32, i32, i32, i32) = if v215 {
-                                    let mut v216: i32 = v177 + v179;
-                                    let mut v217: i32 = v178 + 1i32;
+                                    let mut v216: i32 = v177.wrapping_add(v179);
+                                    let mut v217: i32 = v178.wrapping_add(1i32);
                                     (v216, v217, 1i32, v180)
                                 } else {
-                                    let mut v218: i32 = v179 + 1i32;
+                                    let mut v218: i32 = v179.wrapping_add(1i32);
                                     (v177, v178, v218, v180)
                                 };
                                 US10::US10_0(b'\\', v214, v219, v220, v221, v222)
@@ -5547,20 +5468,20 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                         let mut v262: US10 = match &v227 {
                             US10::US10_1(v254, v255, v256, v257, v258, v259) => { // Error
                                 let mut v254: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v254.clone();
-                                let mut v255: i32 = v255.clone();
-                                let mut v256: i32 = v256.clone();
-                                let mut v257: i32 = v257.clone();
-                                let mut v258: i32 = v258.clone();
-                                let mut v259: i32 = v259.clone();
+                                let mut v255: i32 = *v255;
+                                let mut v256: i32 = *v256;
+                                let mut v257: i32 = *v257;
+                                let mut v258: i32 = *v258;
+                                let mut v259: i32 = *v259;
                                 US10::US10_1(v254.clone(), v255, v256, v257, v258, v259)
                             }
                             US10::US10_0(v228, v229, v230, v231, v232, v233) => { // Ok
-                                let mut v228: u8 = v228.clone();
-                                let mut v229: i32 = v229.clone();
-                                let mut v230: i32 = v230.clone();
-                                let mut v231: i32 = v231.clone();
-                                let mut v232: i32 = v232.clone();
-                                let mut v233: i32 = v233.clone();
+                                let mut v228: u8 = *v228;
+                                let mut v229: i32 = *v229;
+                                let mut v230: i32 = *v230;
+                                let mut v231: i32 = *v231;
+                                let mut v232: i32 = *v232;
+                                let mut v233: i32 = *v233;
                                 let mut v234: bool = v229 >= v233;
                                 if v234 {
                                     let mut v235: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure40();
@@ -5570,14 +5491,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                     let mut v238: bool = v237 == b'"';
                                     let mut v239: bool = v238 == false;
                                     if v239 {
-                                        let mut v240: i32 = v229 + 1i32;
+                                        let mut v240: i32 = v229.wrapping_add(1i32);
                                         let mut v241: bool = b'\n' == v237;
                                         let (mut v245, mut v246, mut v247, mut v248): (i32, i32, i32, i32) = if v241 {
-                                            let mut v242: i32 = v230 + v232;
-                                            let mut v243: i32 = v231 + 1i32;
+                                            let mut v242: i32 = v230.wrapping_add(v232);
+                                            let mut v243: i32 = v231.wrapping_add(1i32);
                                             (v242, v243, 1i32, v233)
                                         } else {
-                                            let mut v244: i32 = v232 + 1i32;
+                                            let mut v244: i32 = v232.wrapping_add(1i32);
                                             (v230, v231, v244, v233)
                                         };
                                         US10::US10_0(v237, v240, v245, v246, v247, v248)
@@ -5587,47 +5508,45 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                     }
                                 }
                             }
-                            _ => unreachable!(),
                         };
                         let mut v284: US11 = match &v262 {
                             US10::US10_1(v276, v277, v278, v279, v280, v281) => { // Error
                                 let mut v276: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v276.clone();
-                                let mut v277: i32 = v277.clone();
-                                let mut v278: i32 = v278.clone();
-                                let mut v279: i32 = v279.clone();
-                                let mut v280: i32 = v280.clone();
-                                let mut v281: i32 = v281.clone();
+                                let mut v277: i32 = *v277;
+                                let mut v278: i32 = *v278;
+                                let mut v279: i32 = *v279;
+                                let mut v280: i32 = *v280;
+                                let mut v281: i32 = *v281;
                                 US11::US11_1(v276.clone(), v277, v278, v279, v280, v281)
                             }
                             US10::US10_0(v263, v264, v265, v266, v267, v268) => { // Ok
-                                let mut v263: u8 = v263.clone();
-                                let mut v264: i32 = v264.clone();
-                                let mut v265: i32 = v265.clone();
-                                let mut v266: i32 = v266.clone();
-                                let mut v267: i32 = v267.clone();
-                                let mut v268: i32 = v268.clone();
+                                let mut v263: u8 = *v263;
+                                let mut v264: i32 = *v264;
+                                let mut v265: i32 = *v265;
+                                let mut v266: i32 = *v266;
+                                let mut v267: i32 = *v267;
+                                let mut v268: i32 = *v268;
                                 let mut v269: bool = v176 >= v264;
                                 let mut v274: Rc<str> = if v269 {
                                     let mut v270: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                     v270.clone()
                                 } else {
                                     let mut v271: bool = v176 == v264;
-                                    let mut v272: i32 = v264 - 1i32;
+                                    let mut v272: i32 = v264.wrapping_sub(1i32);
                                     let mut v273: Rc<str> = string_slice(&v0.clone(), v176 as i64, v272 as i64);
                                     v273.clone()
                                 };
                                 US11::US11_0(v274.clone(), v264, v265, v266, v267, v268)
                             }
-                            _ => unreachable!(),
                         };
                         match &v284 {
                             US11::US11_1(v291, v292, v293, v294, v295, v296) => { // Error
                                 let mut v291: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v291.clone();
-                                let mut v292: i32 = v292.clone();
-                                let mut v293: i32 = v293.clone();
-                                let mut v294: i32 = v294.clone();
-                                let mut v295: i32 = v295.clone();
-                                let mut v296: i32 = v296.clone();
+                                let mut v292: i32 = *v292;
+                                let mut v293: i32 = *v293;
+                                let mut v294: i32 = *v294;
+                                let mut v295: i32 = *v295;
+                                let mut v296: i32 = *v296;
                                 let mut v314: US10 = if v209 {
                                     let mut v297: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                                     US10::US10_1(v297.clone(), v176, v177, v178, v179, v180)
@@ -5635,14 +5554,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                     let mut v299: u8 = v0.clone().as_bytes()[v176 as usize];
                                     let mut v300: bool = v299 == b'`';
                                     if v300 {
-                                        let mut v301: i32 = v176 + 1i32;
+                                        let mut v301: i32 = v176.wrapping_add(1i32);
                                         let mut v302: bool = b'\n' == v299;
                                         let (mut v306, mut v307, mut v308, mut v309): (i32, i32, i32, i32) = if v302 {
-                                            let mut v303: i32 = v177 + v179;
-                                            let mut v304: i32 = v178 + 1i32;
+                                            let mut v303: i32 = v177.wrapping_add(v179);
+                                            let mut v304: i32 = v178.wrapping_add(1i32);
                                             (v303, v304, 1i32, v180)
                                         } else {
-                                            let mut v305: i32 = v179 + 1i32;
+                                            let mut v305: i32 = v179.wrapping_add(1i32);
                                             (v177, v178, v305, v180)
                                         };
                                         US10::US10_0(b'`', v301, v306, v307, v308, v309)
@@ -5654,20 +5573,20 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                 let mut v349: US10 = match &v314 {
                                     US10::US10_1(v341, v342, v343, v344, v345, v346) => { // Error
                                         let mut v341: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v341.clone();
-                                        let mut v342: i32 = v342.clone();
-                                        let mut v343: i32 = v343.clone();
-                                        let mut v344: i32 = v344.clone();
-                                        let mut v345: i32 = v345.clone();
-                                        let mut v346: i32 = v346.clone();
+                                        let mut v342: i32 = *v342;
+                                        let mut v343: i32 = *v343;
+                                        let mut v344: i32 = *v344;
+                                        let mut v345: i32 = *v345;
+                                        let mut v346: i32 = *v346;
                                         US10::US10_1(v341.clone(), v342, v343, v344, v345, v346)
                                     }
                                     US10::US10_0(v315, v316, v317, v318, v319, v320) => { // Ok
-                                        let mut v315: u8 = v315.clone();
-                                        let mut v316: i32 = v316.clone();
-                                        let mut v317: i32 = v317.clone();
-                                        let mut v318: i32 = v318.clone();
-                                        let mut v319: i32 = v319.clone();
-                                        let mut v320: i32 = v320.clone();
+                                        let mut v315: u8 = *v315;
+                                        let mut v316: i32 = *v316;
+                                        let mut v317: i32 = *v317;
+                                        let mut v318: i32 = *v318;
+                                        let mut v319: i32 = *v319;
+                                        let mut v320: i32 = *v320;
                                         let mut v321: bool = v316 >= v320;
                                         if v321 {
                                             let mut v322: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure40();
@@ -5677,14 +5596,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                             let mut v325: bool = v324 == b'"';
                                             let mut v326: bool = v325 == false;
                                             if v326 {
-                                                let mut v327: i32 = v316 + 1i32;
+                                                let mut v327: i32 = v316.wrapping_add(1i32);
                                                 let mut v328: bool = b'\n' == v324;
                                                 let (mut v332, mut v333, mut v334, mut v335): (i32, i32, i32, i32) = if v328 {
-                                                    let mut v329: i32 = v317 + v319;
-                                                    let mut v330: i32 = v318 + 1i32;
+                                                    let mut v329: i32 = v317.wrapping_add(v319);
+                                                    let mut v330: i32 = v318.wrapping_add(1i32);
                                                     (v329, v330, 1i32, v320)
                                                 } else {
-                                                    let mut v331: i32 = v319 + 1i32;
+                                                    let mut v331: i32 = v319.wrapping_add(1i32);
                                                     (v317, v318, v331, v320)
                                                 };
                                                 US10::US10_0(v324, v327, v332, v333, v334, v335)
@@ -5694,103 +5613,98 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                             }
                                         }
                                     }
-                                    _ => unreachable!(),
                                 };
                                 let mut v371: US11 = match &v349 {
                                     US10::US10_1(v363, v364, v365, v366, v367, v368) => { // Error
                                         let mut v363: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v363.clone();
-                                        let mut v364: i32 = v364.clone();
-                                        let mut v365: i32 = v365.clone();
-                                        let mut v366: i32 = v366.clone();
-                                        let mut v367: i32 = v367.clone();
-                                        let mut v368: i32 = v368.clone();
+                                        let mut v364: i32 = *v364;
+                                        let mut v365: i32 = *v365;
+                                        let mut v366: i32 = *v366;
+                                        let mut v367: i32 = *v367;
+                                        let mut v368: i32 = *v368;
                                         US11::US11_1(v363.clone(), v364, v365, v366, v367, v368)
                                     }
                                     US10::US10_0(v350, v351, v352, v353, v354, v355) => { // Ok
-                                        let mut v350: u8 = v350.clone();
-                                        let mut v351: i32 = v351.clone();
-                                        let mut v352: i32 = v352.clone();
-                                        let mut v353: i32 = v353.clone();
-                                        let mut v354: i32 = v354.clone();
-                                        let mut v355: i32 = v355.clone();
+                                        let mut v350: u8 = *v350;
+                                        let mut v351: i32 = *v351;
+                                        let mut v352: i32 = *v352;
+                                        let mut v353: i32 = *v353;
+                                        let mut v354: i32 = *v354;
+                                        let mut v355: i32 = *v355;
                                         let mut v356: bool = v176 >= v351;
                                         let mut v361: Rc<str> = if v356 {
                                             let mut v357: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                             v357.clone()
                                         } else {
                                             let mut v358: bool = v176 == v351;
-                                            let mut v359: i32 = v351 - 1i32;
+                                            let mut v359: i32 = v351.wrapping_sub(1i32);
                                             let mut v360: Rc<str> = string_slice(&v0.clone(), v176 as i64, v359 as i64);
                                             v360.clone()
                                         };
                                         US11::US11_0(v361.clone(), v351, v352, v353, v354, v355)
                                     }
-                                    _ => unreachable!(),
                                 };
                                 match &v371 {
                                     US11::US11_1(v378, v379, v380, v381, v382, v383) => { // Error
                                         let mut v378: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v378.clone();
-                                        let mut v379: i32 = v379.clone();
-                                        let mut v380: i32 = v380.clone();
-                                        let mut v381: i32 = v381.clone();
-                                        let mut v382: i32 = v382.clone();
-                                        let mut v383: i32 = v383.clone();
+                                        let mut v379: i32 = *v379;
+                                        let mut v380: i32 = *v380;
+                                        let mut v381: i32 = *v381;
+                                        let mut v382: i32 = *v382;
+                                        let mut v383: i32 = *v383;
                                         let mut v384: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                         US11::US11_1(v384.clone(), v176, v177, v178, v179, v180)
                                     }
                                     US11::US11_0(v372, v373, v374, v375, v376, v377) => { // Ok
                                         let mut v372: Rc<str> = v372.clone();
-                                        let mut v373: i32 = v373.clone();
-                                        let mut v374: i32 = v374.clone();
-                                        let mut v375: i32 = v375.clone();
-                                        let mut v376: i32 = v376.clone();
-                                        let mut v377: i32 = v377.clone();
+                                        let mut v373: i32 = *v373;
+                                        let mut v374: i32 = *v374;
+                                        let mut v375: i32 = *v375;
+                                        let mut v376: i32 = *v376;
+                                        let mut v377: i32 = *v377;
                                         v371.clone()
                                     }
-                                    _ => unreachable!(),
                                 }
                             }
                             US11::US11_0(v285, v286, v287, v288, v289, v290) => { // Ok
                                 let mut v285: Rc<str> = v285.clone();
-                                let mut v286: i32 = v286.clone();
-                                let mut v287: i32 = v287.clone();
-                                let mut v288: i32 = v288.clone();
-                                let mut v289: i32 = v289.clone();
-                                let mut v290: i32 = v290.clone();
+                                let mut v286: i32 = *v286;
+                                let mut v287: i32 = *v287;
+                                let mut v288: i32 = *v288;
+                                let mut v289: i32 = *v289;
+                                let mut v290: i32 = *v290;
                                 v284.clone()
                             }
-                            _ => unreachable!(),
                         }
                     }
                     US11::US11_0(v197, v198, v199, v200, v201, v202) => { // Ok
                         let mut v197: Rc<str> = v197.clone();
-                        let mut v198: i32 = v198.clone();
-                        let mut v199: i32 = v199.clone();
-                        let mut v200: i32 = v200.clone();
-                        let mut v201: i32 = v201.clone();
-                        let mut v202: i32 = v202.clone();
+                        let mut v198: i32 = *v198;
+                        let mut v199: i32 = *v199;
+                        let mut v200: i32 = *v200;
+                        let mut v201: i32 = *v201;
+                        let mut v202: i32 = *v202;
                         v196.clone()
                     }
-                    _ => unreachable!(),
                 };
                 let mut v414: US11 = match &v391 {
                     US11::US11_1(v392, v393, v394, v395, v396, v397) => { // Error
                         let mut v392: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v392.clone();
-                        let mut v393: i32 = v393.clone();
-                        let mut v394: i32 = v394.clone();
-                        let mut v395: i32 = v395.clone();
-                        let mut v396: i32 = v396.clone();
-                        let mut v397: i32 = v397.clone();
+                        let mut v393: i32 = *v393;
+                        let mut v394: i32 = *v394;
+                        let mut v395: i32 = *v395;
+                        let mut v396: i32 = *v396;
+                        let mut v397: i32 = *v397;
                         let mut v398: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                         US11::US11_0(v398.clone(), v176, v177, v178, v179, v180)
                     }
                     US11::US11_0(v400, v401, v402, v403, v404, v405) => { // Ok
                         let mut v400: Rc<str> = v400.clone();
-                        let mut v401: i32 = v401.clone();
-                        let mut v402: i32 = v402.clone();
-                        let mut v403: i32 = v403.clone();
-                        let mut v404: i32 = v404.clone();
-                        let mut v405: i32 = v405.clone();
+                        let mut v401: i32 = *v401;
+                        let mut v402: i32 = *v402;
+                        let mut v403: i32 = *v403;
+                        let mut v404: i32 = *v404;
+                        let mut v405: i32 = *v405;
                         let mut v406: bool = v401 == v176;
                         if v406 {
                             let mut v407: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure42();
@@ -5801,16 +5715,15 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                             method116(v0.clone(), v409.clone(), v400.clone(), v410, v401, v402, v403, v404, v405)
                         }
                     }
-                    _ => unreachable!(),
                 };
                 match &v414 {
                     US11::US11_1(v605, v606, v607, v608, v609, v610) => { // Error
                         let mut v605: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v605.clone();
-                        let mut v606: i32 = v606.clone();
-                        let mut v607: i32 = v607.clone();
-                        let mut v608: i32 = v608.clone();
-                        let mut v609: i32 = v609.clone();
-                        let mut v610: i32 = v610.clone();
+                        let mut v606: i32 = *v606;
+                        let mut v607: i32 = *v607;
+                        let mut v608: i32 = *v608;
+                        let mut v609: i32 = *v609;
+                        let mut v610: i32 = *v610;
                         let mut v611: bool = v176 >= v180;
                         let mut v629: US10 = if v611 {
                             let mut v612: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure35();
@@ -5819,14 +5732,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                             let mut v614: u8 = v0.clone().as_bytes()[v176 as usize];
                             let mut v615: bool = v614 == b'\\';
                             if v615 {
-                                let mut v616: i32 = v176 + 1i32;
+                                let mut v616: i32 = v176.wrapping_add(1i32);
                                 let mut v617: bool = b'\n' == v614;
                                 let (mut v621, mut v622, mut v623, mut v624): (i32, i32, i32, i32) = if v617 {
-                                    let mut v618: i32 = v177 + v179;
-                                    let mut v619: i32 = v178 + 1i32;
+                                    let mut v618: i32 = v177.wrapping_add(v179);
+                                    let mut v619: i32 = v178.wrapping_add(1i32);
                                     (v618, v619, 1i32, v180)
                                 } else {
-                                    let mut v620: i32 = v179 + 1i32;
+                                    let mut v620: i32 = v179.wrapping_add(1i32);
                                     (v177, v178, v620, v180)
                                 };
                                 US10::US10_0(b'\\', v616, v621, v622, v623, v624)
@@ -5838,20 +5751,20 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                         let mut v663: US10 = match &v629 {
                             US10::US10_1(v655, v656, v657, v658, v659, v660) => { // Error
                                 let mut v655: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v655.clone();
-                                let mut v656: i32 = v656.clone();
-                                let mut v657: i32 = v657.clone();
-                                let mut v658: i32 = v658.clone();
-                                let mut v659: i32 = v659.clone();
-                                let mut v660: i32 = v660.clone();
+                                let mut v656: i32 = *v656;
+                                let mut v657: i32 = *v657;
+                                let mut v658: i32 = *v658;
+                                let mut v659: i32 = *v659;
+                                let mut v660: i32 = *v660;
                                 US10::US10_1(v655.clone(), v656, v657, v658, v659, v660)
                             }
                             US10::US10_0(v630, v631, v632, v633, v634, v635) => { // Ok
-                                let mut v630: u8 = v630.clone();
-                                let mut v631: i32 = v631.clone();
-                                let mut v632: i32 = v632.clone();
-                                let mut v633: i32 = v633.clone();
-                                let mut v634: i32 = v634.clone();
-                                let mut v635: i32 = v635.clone();
+                                let mut v630: u8 = *v630;
+                                let mut v631: i32 = *v631;
+                                let mut v632: i32 = *v632;
+                                let mut v633: i32 = *v633;
+                                let mut v634: i32 = *v634;
+                                let mut v635: i32 = *v635;
                                 let mut v636: bool = v631 >= v635;
                                 if v636 {
                                     let mut v637: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -5860,14 +5773,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                     let mut v639: u8 = v0.clone().as_bytes()[v631 as usize];
                                     let mut v640: bool = v639 == b'"';
                                     if v640 {
-                                        let mut v641: i32 = v631 + 1i32;
+                                        let mut v641: i32 = v631.wrapping_add(1i32);
                                         let mut v642: bool = b'\n' == v639;
                                         let (mut v646, mut v647, mut v648, mut v649): (i32, i32, i32, i32) = if v642 {
-                                            let mut v643: i32 = v632 + v634;
-                                            let mut v644: i32 = v633 + 1i32;
+                                            let mut v643: i32 = v632.wrapping_add(v634);
+                                            let mut v644: i32 = v633.wrapping_add(1i32);
                                             (v643, v644, 1i32, v635)
                                         } else {
-                                            let mut v645: i32 = v634 + 1i32;
+                                            let mut v645: i32 = v634.wrapping_add(1i32);
                                             (v632, v633, v645, v635)
                                         };
                                         US10::US10_0(b'"', v641, v646, v647, v648, v649)
@@ -5877,37 +5790,35 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                     }
                                 }
                             }
-                            _ => unreachable!(),
                         };
                         let mut v679: US10 = match &v663 {
                             US10::US10_1(v671, v672, v673, v674, v675, v676) => { // Error
                                 let mut v671: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v671.clone();
-                                let mut v672: i32 = v672.clone();
-                                let mut v673: i32 = v673.clone();
-                                let mut v674: i32 = v674.clone();
-                                let mut v675: i32 = v675.clone();
-                                let mut v676: i32 = v676.clone();
+                                let mut v672: i32 = *v672;
+                                let mut v673: i32 = *v673;
+                                let mut v674: i32 = *v674;
+                                let mut v675: i32 = *v675;
+                                let mut v676: i32 = *v676;
                                 US10::US10_1(v671.clone(), v672, v673, v674, v675, v676)
                             }
                             US10::US10_0(v664, v665, v666, v667, v668, v669) => { // Ok
-                                let mut v664: u8 = v664.clone();
-                                let mut v665: i32 = v665.clone();
-                                let mut v666: i32 = v666.clone();
-                                let mut v667: i32 = v667.clone();
-                                let mut v668: i32 = v668.clone();
-                                let mut v669: i32 = v669.clone();
+                                let mut v664: u8 = *v664;
+                                let mut v665: i32 = *v665;
+                                let mut v666: i32 = *v666;
+                                let mut v667: i32 = *v667;
+                                let mut v668: i32 = *v668;
+                                let mut v669: i32 = *v669;
                                 US10::US10_0(b'"', v665, v666, v667, v668, v669)
                             }
-                            _ => unreachable!(),
                         };
                         let mut v777: US10 = match &v679 {
                             US10::US10_1(v686, v687, v688, v689, v690, v691) => { // Error
                                 let mut v686: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v686.clone();
-                                let mut v687: i32 = v687.clone();
-                                let mut v688: i32 = v688.clone();
-                                let mut v689: i32 = v689.clone();
-                                let mut v690: i32 = v690.clone();
-                                let mut v691: i32 = v691.clone();
+                                let mut v687: i32 = *v687;
+                                let mut v688: i32 = *v688;
+                                let mut v689: i32 = *v689;
+                                let mut v690: i32 = *v690;
+                                let mut v691: i32 = *v691;
                                 let mut v709: US10 = if v611 {
                                     let mut v692: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                                     US10::US10_1(v692.clone(), v176, v177, v178, v179, v180)
@@ -5915,14 +5826,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                     let mut v694: u8 = v0.clone().as_bytes()[v176 as usize];
                                     let mut v695: bool = v694 == b'`';
                                     if v695 {
-                                        let mut v696: i32 = v176 + 1i32;
+                                        let mut v696: i32 = v176.wrapping_add(1i32);
                                         let mut v697: bool = b'\n' == v694;
                                         let (mut v701, mut v702, mut v703, mut v704): (i32, i32, i32, i32) = if v697 {
-                                            let mut v698: i32 = v177 + v179;
-                                            let mut v699: i32 = v178 + 1i32;
+                                            let mut v698: i32 = v177.wrapping_add(v179);
+                                            let mut v699: i32 = v178.wrapping_add(1i32);
                                             (v698, v699, 1i32, v180)
                                         } else {
-                                            let mut v700: i32 = v179 + 1i32;
+                                            let mut v700: i32 = v179.wrapping_add(1i32);
                                             (v177, v178, v700, v180)
                                         };
                                         US10::US10_0(b'`', v696, v701, v702, v703, v704)
@@ -5934,20 +5845,20 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                 let mut v743: US10 = match &v709 {
                                     US10::US10_1(v735, v736, v737, v738, v739, v740) => { // Error
                                         let mut v735: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v735.clone();
-                                        let mut v736: i32 = v736.clone();
-                                        let mut v737: i32 = v737.clone();
-                                        let mut v738: i32 = v738.clone();
-                                        let mut v739: i32 = v739.clone();
-                                        let mut v740: i32 = v740.clone();
+                                        let mut v736: i32 = *v736;
+                                        let mut v737: i32 = *v737;
+                                        let mut v738: i32 = *v738;
+                                        let mut v739: i32 = *v739;
+                                        let mut v740: i32 = *v740;
                                         US10::US10_1(v735.clone(), v736, v737, v738, v739, v740)
                                     }
                                     US10::US10_0(v710, v711, v712, v713, v714, v715) => { // Ok
-                                        let mut v710: u8 = v710.clone();
-                                        let mut v711: i32 = v711.clone();
-                                        let mut v712: i32 = v712.clone();
-                                        let mut v713: i32 = v713.clone();
-                                        let mut v714: i32 = v714.clone();
-                                        let mut v715: i32 = v715.clone();
+                                        let mut v710: u8 = *v710;
+                                        let mut v711: i32 = *v711;
+                                        let mut v712: i32 = *v712;
+                                        let mut v713: i32 = *v713;
+                                        let mut v714: i32 = *v714;
+                                        let mut v715: i32 = *v715;
                                         let mut v716: bool = v711 >= v715;
                                         if v716 {
                                             let mut v717: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -5956,14 +5867,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                             let mut v719: u8 = v0.clone().as_bytes()[v711 as usize];
                                             let mut v720: bool = v719 == b'"';
                                             if v720 {
-                                                let mut v721: i32 = v711 + 1i32;
+                                                let mut v721: i32 = v711.wrapping_add(1i32);
                                                 let mut v722: bool = b'\n' == v719;
                                                 let (mut v726, mut v727, mut v728, mut v729): (i32, i32, i32, i32) = if v722 {
-                                                    let mut v723: i32 = v712 + v714;
-                                                    let mut v724: i32 = v713 + 1i32;
+                                                    let mut v723: i32 = v712.wrapping_add(v714);
+                                                    let mut v724: i32 = v713.wrapping_add(1i32);
                                                     (v723, v724, 1i32, v715)
                                                 } else {
-                                                    let mut v725: i32 = v714 + 1i32;
+                                                    let mut v725: i32 = v714.wrapping_add(1i32);
                                                     (v712, v713, v725, v715)
                                                 };
                                                 US10::US10_0(b'"', v721, v726, v727, v728, v729)
@@ -5973,94 +5884,89 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                             }
                                         }
                                     }
-                                    _ => unreachable!(),
                                 };
                                 let mut v759: US10 = match &v743 {
                                     US10::US10_1(v751, v752, v753, v754, v755, v756) => { // Error
                                         let mut v751: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v751.clone();
-                                        let mut v752: i32 = v752.clone();
-                                        let mut v753: i32 = v753.clone();
-                                        let mut v754: i32 = v754.clone();
-                                        let mut v755: i32 = v755.clone();
-                                        let mut v756: i32 = v756.clone();
+                                        let mut v752: i32 = *v752;
+                                        let mut v753: i32 = *v753;
+                                        let mut v754: i32 = *v754;
+                                        let mut v755: i32 = *v755;
+                                        let mut v756: i32 = *v756;
                                         US10::US10_1(v751.clone(), v752, v753, v754, v755, v756)
                                     }
                                     US10::US10_0(v744, v745, v746, v747, v748, v749) => { // Ok
-                                        let mut v744: u8 = v744.clone();
-                                        let mut v745: i32 = v745.clone();
-                                        let mut v746: i32 = v746.clone();
-                                        let mut v747: i32 = v747.clone();
-                                        let mut v748: i32 = v748.clone();
-                                        let mut v749: i32 = v749.clone();
+                                        let mut v744: u8 = *v744;
+                                        let mut v745: i32 = *v745;
+                                        let mut v746: i32 = *v746;
+                                        let mut v747: i32 = *v747;
+                                        let mut v748: i32 = *v748;
+                                        let mut v749: i32 = *v749;
                                         US10::US10_0(b'"', v745, v746, v747, v748, v749)
                                     }
-                                    _ => unreachable!(),
                                 };
                                 match &v759 {
                                     US10::US10_1(v766, v767, v768, v769, v770, v771) => { // Error
                                         let mut v766: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v766.clone();
-                                        let mut v767: i32 = v767.clone();
-                                        let mut v768: i32 = v768.clone();
-                                        let mut v769: i32 = v769.clone();
-                                        let mut v770: i32 = v770.clone();
-                                        let mut v771: i32 = v771.clone();
+                                        let mut v767: i32 = *v767;
+                                        let mut v768: i32 = *v768;
+                                        let mut v769: i32 = *v769;
+                                        let mut v770: i32 = *v770;
+                                        let mut v771: i32 = *v771;
                                         let mut v772: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                         US10::US10_1(v772.clone(), v176, v177, v178, v179, v180)
                                     }
                                     US10::US10_0(v760, v761, v762, v763, v764, v765) => { // Ok
-                                        let mut v760: u8 = v760.clone();
-                                        let mut v761: i32 = v761.clone();
-                                        let mut v762: i32 = v762.clone();
-                                        let mut v763: i32 = v763.clone();
-                                        let mut v764: i32 = v764.clone();
-                                        let mut v765: i32 = v765.clone();
+                                        let mut v760: u8 = *v760;
+                                        let mut v761: i32 = *v761;
+                                        let mut v762: i32 = *v762;
+                                        let mut v763: i32 = *v763;
+                                        let mut v764: i32 = *v764;
+                                        let mut v765: i32 = *v765;
                                         v759.clone()
                                     }
-                                    _ => unreachable!(),
                                 }
                             }
                             US10::US10_0(v680, v681, v682, v683, v684, v685) => { // Ok
-                                let mut v680: u8 = v680.clone();
-                                let mut v681: i32 = v681.clone();
-                                let mut v682: i32 = v682.clone();
-                                let mut v683: i32 = v683.clone();
-                                let mut v684: i32 = v684.clone();
-                                let mut v685: i32 = v685.clone();
+                                let mut v680: u8 = *v680;
+                                let mut v681: i32 = *v681;
+                                let mut v682: i32 = *v682;
+                                let mut v683: i32 = *v683;
+                                let mut v684: i32 = *v684;
+                                let mut v685: i32 = *v685;
                                 v679.clone()
                             }
-                            _ => unreachable!(),
                         };
                         match &v777 {
                             US10::US10_1(v786, v787, v788, v789, v790, v791) => { // Error
                                 let mut v786: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v786.clone();
-                                let mut v787: i32 = v787.clone();
-                                let mut v788: i32 = v788.clone();
-                                let mut v789: i32 = v789.clone();
-                                let mut v790: i32 = v790.clone();
-                                let mut v791: i32 = v791.clone();
+                                let mut v787: i32 = *v787;
+                                let mut v788: i32 = *v788;
+                                let mut v789: i32 = *v789;
+                                let mut v790: i32 = *v790;
+                                let mut v791: i32 = *v791;
                                 let mut v792: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure24();
                                 US11::US11_1(v792.clone(), v176, v177, v178, v179, v180)
                             }
                             US10::US10_0(v778, v779, v780, v781, v782, v783) => { // Ok
-                                let mut v778: u8 = v778.clone();
-                                let mut v779: i32 = v779.clone();
-                                let mut v780: i32 = v780.clone();
-                                let mut v781: i32 = v781.clone();
-                                let mut v782: i32 = v782.clone();
-                                let mut v783: i32 = v783.clone();
+                                let mut v778: u8 = *v778;
+                                let mut v779: i32 = *v779;
+                                let mut v780: i32 = *v780;
+                                let mut v781: i32 = *v781;
+                                let mut v782: i32 = *v782;
+                                let mut v783: i32 = *v783;
                                 let mut v784: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                 US11::US11_0(v784.clone(), v779, v780, v781, v782, v783)
                             }
-                            _ => unreachable!(),
                         }
                     }
                     US11::US11_0(v415, v416, v417, v418, v419, v420) => { // Ok
                         let mut v415: Rc<str> = v415.clone();
-                        let mut v416: i32 = v416.clone();
-                        let mut v417: i32 = v417.clone();
-                        let mut v418: i32 = v418.clone();
-                        let mut v419: i32 = v419.clone();
-                        let mut v420: i32 = v420.clone();
+                        let mut v416: i32 = *v416;
+                        let mut v417: i32 = *v417;
+                        let mut v418: i32 = *v418;
+                        let mut v419: i32 = *v419;
+                        let mut v420: i32 = *v420;
                         let mut v421: bool = v416 >= v420;
                         let mut v439: US10 = if v421 {
                             let mut v422: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure35();
@@ -6069,14 +5975,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                             let mut v424: u8 = v0.clone().as_bytes()[v416 as usize];
                             let mut v425: bool = v424 == b'\\';
                             if v425 {
-                                let mut v426: i32 = v416 + 1i32;
+                                let mut v426: i32 = v416.wrapping_add(1i32);
                                 let mut v427: bool = b'\n' == v424;
                                 let (mut v431, mut v432, mut v433, mut v434): (i32, i32, i32, i32) = if v427 {
-                                    let mut v428: i32 = v417 + v419;
-                                    let mut v429: i32 = v418 + 1i32;
+                                    let mut v428: i32 = v417.wrapping_add(v419);
+                                    let mut v429: i32 = v418.wrapping_add(1i32);
                                     (v428, v429, 1i32, v420)
                                 } else {
-                                    let mut v430: i32 = v419 + 1i32;
+                                    let mut v430: i32 = v419.wrapping_add(1i32);
                                     (v417, v418, v430, v420)
                                 };
                                 US10::US10_0(b'\\', v426, v431, v432, v433, v434)
@@ -6088,20 +5994,20 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                         let mut v473: US10 = match &v439 {
                             US10::US10_1(v465, v466, v467, v468, v469, v470) => { // Error
                                 let mut v465: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v465.clone();
-                                let mut v466: i32 = v466.clone();
-                                let mut v467: i32 = v467.clone();
-                                let mut v468: i32 = v468.clone();
-                                let mut v469: i32 = v469.clone();
-                                let mut v470: i32 = v470.clone();
+                                let mut v466: i32 = *v466;
+                                let mut v467: i32 = *v467;
+                                let mut v468: i32 = *v468;
+                                let mut v469: i32 = *v469;
+                                let mut v470: i32 = *v470;
                                 US10::US10_1(v465.clone(), v466, v467, v468, v469, v470)
                             }
                             US10::US10_0(v440, v441, v442, v443, v444, v445) => { // Ok
-                                let mut v440: u8 = v440.clone();
-                                let mut v441: i32 = v441.clone();
-                                let mut v442: i32 = v442.clone();
-                                let mut v443: i32 = v443.clone();
-                                let mut v444: i32 = v444.clone();
-                                let mut v445: i32 = v445.clone();
+                                let mut v440: u8 = *v440;
+                                let mut v441: i32 = *v441;
+                                let mut v442: i32 = *v442;
+                                let mut v443: i32 = *v443;
+                                let mut v444: i32 = *v444;
+                                let mut v445: i32 = *v445;
                                 let mut v446: bool = v441 >= v445;
                                 if v446 {
                                     let mut v447: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -6110,14 +6016,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                     let mut v449: u8 = v0.clone().as_bytes()[v441 as usize];
                                     let mut v450: bool = v449 == b'"';
                                     if v450 {
-                                        let mut v451: i32 = v441 + 1i32;
+                                        let mut v451: i32 = v441.wrapping_add(1i32);
                                         let mut v452: bool = b'\n' == v449;
                                         let (mut v456, mut v457, mut v458, mut v459): (i32, i32, i32, i32) = if v452 {
-                                            let mut v453: i32 = v442 + v444;
-                                            let mut v454: i32 = v443 + 1i32;
+                                            let mut v453: i32 = v442.wrapping_add(v444);
+                                            let mut v454: i32 = v443.wrapping_add(1i32);
                                             (v453, v454, 1i32, v445)
                                         } else {
-                                            let mut v455: i32 = v444 + 1i32;
+                                            let mut v455: i32 = v444.wrapping_add(1i32);
                                             (v442, v443, v455, v445)
                                         };
                                         US10::US10_0(b'"', v451, v456, v457, v458, v459)
@@ -6127,37 +6033,35 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                     }
                                 }
                             }
-                            _ => unreachable!(),
                         };
                         let mut v489: US10 = match &v473 {
                             US10::US10_1(v481, v482, v483, v484, v485, v486) => { // Error
                                 let mut v481: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v481.clone();
-                                let mut v482: i32 = v482.clone();
-                                let mut v483: i32 = v483.clone();
-                                let mut v484: i32 = v484.clone();
-                                let mut v485: i32 = v485.clone();
-                                let mut v486: i32 = v486.clone();
+                                let mut v482: i32 = *v482;
+                                let mut v483: i32 = *v483;
+                                let mut v484: i32 = *v484;
+                                let mut v485: i32 = *v485;
+                                let mut v486: i32 = *v486;
                                 US10::US10_1(v481.clone(), v482, v483, v484, v485, v486)
                             }
                             US10::US10_0(v474, v475, v476, v477, v478, v479) => { // Ok
-                                let mut v474: u8 = v474.clone();
-                                let mut v475: i32 = v475.clone();
-                                let mut v476: i32 = v476.clone();
-                                let mut v477: i32 = v477.clone();
-                                let mut v478: i32 = v478.clone();
-                                let mut v479: i32 = v479.clone();
+                                let mut v474: u8 = *v474;
+                                let mut v475: i32 = *v475;
+                                let mut v476: i32 = *v476;
+                                let mut v477: i32 = *v477;
+                                let mut v478: i32 = *v478;
+                                let mut v479: i32 = *v479;
                                 US10::US10_0(b'"', v475, v476, v477, v478, v479)
                             }
-                            _ => unreachable!(),
                         };
                         let mut v587: US10 = match &v489 {
                             US10::US10_1(v496, v497, v498, v499, v500, v501) => { // Error
                                 let mut v496: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v496.clone();
-                                let mut v497: i32 = v497.clone();
-                                let mut v498: i32 = v498.clone();
-                                let mut v499: i32 = v499.clone();
-                                let mut v500: i32 = v500.clone();
-                                let mut v501: i32 = v501.clone();
+                                let mut v497: i32 = *v497;
+                                let mut v498: i32 = *v498;
+                                let mut v499: i32 = *v499;
+                                let mut v500: i32 = *v500;
+                                let mut v501: i32 = *v501;
                                 let mut v519: US10 = if v421 {
                                     let mut v502: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                                     US10::US10_1(v502.clone(), v416, v417, v418, v419, v420)
@@ -6165,14 +6069,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                     let mut v504: u8 = v0.clone().as_bytes()[v416 as usize];
                                     let mut v505: bool = v504 == b'`';
                                     if v505 {
-                                        let mut v506: i32 = v416 + 1i32;
+                                        let mut v506: i32 = v416.wrapping_add(1i32);
                                         let mut v507: bool = b'\n' == v504;
                                         let (mut v511, mut v512, mut v513, mut v514): (i32, i32, i32, i32) = if v507 {
-                                            let mut v508: i32 = v417 + v419;
-                                            let mut v509: i32 = v418 + 1i32;
+                                            let mut v508: i32 = v417.wrapping_add(v419);
+                                            let mut v509: i32 = v418.wrapping_add(1i32);
                                             (v508, v509, 1i32, v420)
                                         } else {
-                                            let mut v510: i32 = v419 + 1i32;
+                                            let mut v510: i32 = v419.wrapping_add(1i32);
                                             (v417, v418, v510, v420)
                                         };
                                         US10::US10_0(b'`', v506, v511, v512, v513, v514)
@@ -6184,20 +6088,20 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                 let mut v553: US10 = match &v519 {
                                     US10::US10_1(v545, v546, v547, v548, v549, v550) => { // Error
                                         let mut v545: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v545.clone();
-                                        let mut v546: i32 = v546.clone();
-                                        let mut v547: i32 = v547.clone();
-                                        let mut v548: i32 = v548.clone();
-                                        let mut v549: i32 = v549.clone();
-                                        let mut v550: i32 = v550.clone();
+                                        let mut v546: i32 = *v546;
+                                        let mut v547: i32 = *v547;
+                                        let mut v548: i32 = *v548;
+                                        let mut v549: i32 = *v549;
+                                        let mut v550: i32 = *v550;
                                         US10::US10_1(v545.clone(), v546, v547, v548, v549, v550)
                                     }
                                     US10::US10_0(v520, v521, v522, v523, v524, v525) => { // Ok
-                                        let mut v520: u8 = v520.clone();
-                                        let mut v521: i32 = v521.clone();
-                                        let mut v522: i32 = v522.clone();
-                                        let mut v523: i32 = v523.clone();
-                                        let mut v524: i32 = v524.clone();
-                                        let mut v525: i32 = v525.clone();
+                                        let mut v520: u8 = *v520;
+                                        let mut v521: i32 = *v521;
+                                        let mut v522: i32 = *v522;
+                                        let mut v523: i32 = *v523;
+                                        let mut v524: i32 = *v524;
+                                        let mut v525: i32 = *v525;
                                         let mut v526: bool = v521 >= v525;
                                         if v526 {
                                             let mut v527: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -6206,14 +6110,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                             let mut v529: u8 = v0.clone().as_bytes()[v521 as usize];
                                             let mut v530: bool = v529 == b'"';
                                             if v530 {
-                                                let mut v531: i32 = v521 + 1i32;
+                                                let mut v531: i32 = v521.wrapping_add(1i32);
                                                 let mut v532: bool = b'\n' == v529;
                                                 let (mut v536, mut v537, mut v538, mut v539): (i32, i32, i32, i32) = if v532 {
-                                                    let mut v533: i32 = v522 + v524;
-                                                    let mut v534: i32 = v523 + 1i32;
+                                                    let mut v533: i32 = v522.wrapping_add(v524);
+                                                    let mut v534: i32 = v523.wrapping_add(1i32);
                                                     (v533, v534, 1i32, v525)
                                                 } else {
-                                                    let mut v535: i32 = v524 + 1i32;
+                                                    let mut v535: i32 = v524.wrapping_add(1i32);
                                                     (v522, v523, v535, v525)
                                                 };
                                                 US10::US10_0(b'"', v531, v536, v537, v538, v539)
@@ -6223,99 +6127,92 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                             }
                                         }
                                     }
-                                    _ => unreachable!(),
                                 };
                                 let mut v569: US10 = match &v553 {
                                     US10::US10_1(v561, v562, v563, v564, v565, v566) => { // Error
                                         let mut v561: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v561.clone();
-                                        let mut v562: i32 = v562.clone();
-                                        let mut v563: i32 = v563.clone();
-                                        let mut v564: i32 = v564.clone();
-                                        let mut v565: i32 = v565.clone();
-                                        let mut v566: i32 = v566.clone();
+                                        let mut v562: i32 = *v562;
+                                        let mut v563: i32 = *v563;
+                                        let mut v564: i32 = *v564;
+                                        let mut v565: i32 = *v565;
+                                        let mut v566: i32 = *v566;
                                         US10::US10_1(v561.clone(), v562, v563, v564, v565, v566)
                                     }
                                     US10::US10_0(v554, v555, v556, v557, v558, v559) => { // Ok
-                                        let mut v554: u8 = v554.clone();
-                                        let mut v555: i32 = v555.clone();
-                                        let mut v556: i32 = v556.clone();
-                                        let mut v557: i32 = v557.clone();
-                                        let mut v558: i32 = v558.clone();
-                                        let mut v559: i32 = v559.clone();
+                                        let mut v554: u8 = *v554;
+                                        let mut v555: i32 = *v555;
+                                        let mut v556: i32 = *v556;
+                                        let mut v557: i32 = *v557;
+                                        let mut v558: i32 = *v558;
+                                        let mut v559: i32 = *v559;
                                         US10::US10_0(b'"', v555, v556, v557, v558, v559)
                                     }
-                                    _ => unreachable!(),
                                 };
                                 match &v569 {
                                     US10::US10_1(v576, v577, v578, v579, v580, v581) => { // Error
                                         let mut v576: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v576.clone();
-                                        let mut v577: i32 = v577.clone();
-                                        let mut v578: i32 = v578.clone();
-                                        let mut v579: i32 = v579.clone();
-                                        let mut v580: i32 = v580.clone();
-                                        let mut v581: i32 = v581.clone();
+                                        let mut v577: i32 = *v577;
+                                        let mut v578: i32 = *v578;
+                                        let mut v579: i32 = *v579;
+                                        let mut v580: i32 = *v580;
+                                        let mut v581: i32 = *v581;
                                         let mut v582: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                         US10::US10_1(v582.clone(), v416, v417, v418, v419, v420)
                                     }
                                     US10::US10_0(v570, v571, v572, v573, v574, v575) => { // Ok
-                                        let mut v570: u8 = v570.clone();
-                                        let mut v571: i32 = v571.clone();
-                                        let mut v572: i32 = v572.clone();
-                                        let mut v573: i32 = v573.clone();
-                                        let mut v574: i32 = v574.clone();
-                                        let mut v575: i32 = v575.clone();
+                                        let mut v570: u8 = *v570;
+                                        let mut v571: i32 = *v571;
+                                        let mut v572: i32 = *v572;
+                                        let mut v573: i32 = *v573;
+                                        let mut v574: i32 = *v574;
+                                        let mut v575: i32 = *v575;
                                         v569.clone()
                                     }
-                                    _ => unreachable!(),
                                 }
                             }
                             US10::US10_0(v490, v491, v492, v493, v494, v495) => { // Ok
-                                let mut v490: u8 = v490.clone();
-                                let mut v491: i32 = v491.clone();
-                                let mut v492: i32 = v492.clone();
-                                let mut v493: i32 = v493.clone();
-                                let mut v494: i32 = v494.clone();
-                                let mut v495: i32 = v495.clone();
+                                let mut v490: u8 = *v490;
+                                let mut v491: i32 = *v491;
+                                let mut v492: i32 = *v492;
+                                let mut v493: i32 = *v493;
+                                let mut v494: i32 = *v494;
+                                let mut v495: i32 = *v495;
                                 v489.clone()
                             }
-                            _ => unreachable!(),
                         };
                         match &v587 {
                             US10::US10_1(v595, v596, v597, v598, v599, v600) => { // Error
                                 let mut v595: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v595.clone();
-                                let mut v596: i32 = v596.clone();
-                                let mut v597: i32 = v597.clone();
-                                let mut v598: i32 = v598.clone();
-                                let mut v599: i32 = v599.clone();
-                                let mut v600: i32 = v600.clone();
+                                let mut v596: i32 = *v596;
+                                let mut v597: i32 = *v597;
+                                let mut v598: i32 = *v598;
+                                let mut v599: i32 = *v599;
+                                let mut v600: i32 = *v600;
                                 let mut v601: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure25(v176, v416, v595.clone(), v596, v597, v598, v599, v600);
                                 US11::US11_1(v601.clone(), v416, v417, v418, v419, v420)
                             }
                             US10::US10_0(v588, v589, v590, v591, v592, v593) => { // Ok
-                                let mut v588: u8 = v588.clone();
-                                let mut v589: i32 = v589.clone();
-                                let mut v590: i32 = v590.clone();
-                                let mut v591: i32 = v591.clone();
-                                let mut v592: i32 = v592.clone();
-                                let mut v593: i32 = v593.clone();
+                                let mut v588: u8 = *v588;
+                                let mut v589: i32 = *v589;
+                                let mut v590: i32 = *v590;
+                                let mut v591: i32 = *v591;
+                                let mut v592: i32 = *v592;
+                                let mut v593: i32 = *v593;
                                 US11::US11_0(v415.clone(), v589, v590, v591, v592, v593)
                             }
-                            _ => unreachable!(),
                         }
                     }
-                    _ => unreachable!(),
                 }
             }
-            _ => unreachable!(),
         };
         let mut v1164: US11 = match &v806 {
             US11::US11_1(v813, v814, v815, v816, v817, v818) => { // Error
                 let mut v813: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v813.clone();
-                let mut v814: i32 = v814.clone();
-                let mut v815: i32 = v815.clone();
-                let mut v816: i32 = v816.clone();
-                let mut v817: i32 = v817.clone();
-                let mut v818: i32 = v818.clone();
+                let mut v814: i32 = *v814;
+                let mut v815: i32 = *v815;
+                let mut v816: i32 = *v816;
+                let mut v817: i32 = *v817;
+                let mut v818: i32 = *v818;
                 let mut v836: US10 = if v8 {
                     let mut v819: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
                     US10::US10_1(v819.clone(), v3, v4, v5, v6, v7)
@@ -6323,14 +6220,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                     let mut v821: u8 = v0.clone().as_bytes()[v3 as usize];
                     let mut v822: bool = v821 == b'"';
                     if v822 {
-                        let mut v823: i32 = v3 + 1i32;
+                        let mut v823: i32 = v3.wrapping_add(1i32);
                         let mut v824: bool = b'\n' == v821;
                         let (mut v828, mut v829, mut v830, mut v831): (i32, i32, i32, i32) = if v824 {
-                            let mut v825: i32 = v4 + v6;
-                            let mut v826: i32 = v5 + 1i32;
+                            let mut v825: i32 = v4.wrapping_add(v6);
+                            let mut v826: i32 = v5.wrapping_add(1i32);
                             (v825, v826, 1i32, v7)
                         } else {
-                            let mut v827: i32 = v6 + 1i32;
+                            let mut v827: i32 = v6.wrapping_add(1i32);
                             (v4, v5, v827, v7)
                         };
                         US10::US10_0(b'"', v823, v828, v829, v830, v831)
@@ -6342,20 +6239,20 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                 match &v836 {
                     US10::US10_1(v1154, v1155, v1156, v1157, v1158, v1159) => { // Error
                         let mut v1154: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1154.clone();
-                        let mut v1155: i32 = v1155.clone();
-                        let mut v1156: i32 = v1156.clone();
-                        let mut v1157: i32 = v1157.clone();
-                        let mut v1158: i32 = v1158.clone();
-                        let mut v1159: i32 = v1159.clone();
+                        let mut v1155: i32 = *v1155;
+                        let mut v1156: i32 = *v1156;
+                        let mut v1157: i32 = *v1157;
+                        let mut v1158: i32 = *v1158;
+                        let mut v1159: i32 = *v1159;
                         US11::US11_1(v1154.clone(), v1155, v1156, v1157, v1158, v1159)
                     }
                     US10::US10_0(v837, v838, v839, v840, v841, v842) => { // Ok
-                        let mut v837: u8 = v837.clone();
-                        let mut v838: i32 = v838.clone();
-                        let mut v839: i32 = v839.clone();
-                        let mut v840: i32 = v840.clone();
-                        let mut v841: i32 = v841.clone();
-                        let mut v842: i32 = v842.clone();
+                        let mut v837: u8 = *v837;
+                        let mut v838: i32 = *v838;
+                        let mut v839: i32 = *v839;
+                        let mut v840: i32 = *v840;
+                        let mut v841: i32 = *v841;
+                        let mut v842: i32 = *v842;
                         let (mut v843, mut v844, mut v845, mut v846, mut v847): (i32, i32, i32, i32, i32) = method112(v839, v840, v841, v842, v0.clone(), v838);
                         let mut v848: bool = v843 > v838;
                         let mut v858: US11 = if v848 {
@@ -6365,7 +6262,7 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                 v850.clone()
                             } else {
                                 let mut v851: bool = v838 == v843;
-                                let mut v852: i32 = v843 - 1i32;
+                                let mut v852: i32 = v843.wrapping_sub(1i32);
                                 let mut v853: Rc<str> = string_slice(&v0.clone(), v838 as i64, v852 as i64);
                                 v853.clone()
                             };
@@ -6377,11 +6274,11 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                         let mut v1043: US11 = match &v858 {
                             US11::US11_1(v865, v866, v867, v868, v869, v870) => { // Error
                                 let mut v865: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v865.clone();
-                                let mut v866: i32 = v866.clone();
-                                let mut v867: i32 = v867.clone();
-                                let mut v868: i32 = v868.clone();
-                                let mut v869: i32 = v869.clone();
-                                let mut v870: i32 = v870.clone();
+                                let mut v866: i32 = *v866;
+                                let mut v867: i32 = *v867;
+                                let mut v868: i32 = *v868;
+                                let mut v869: i32 = *v869;
+                                let mut v870: i32 = *v870;
                                 let mut v871: bool = v838 >= v842;
                                 let mut v889: US10 = if v871 {
                                     let mut v872: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure35();
@@ -6390,14 +6287,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                     let mut v874: u8 = v0.clone().as_bytes()[v838 as usize];
                                     let mut v875: bool = v874 == b'\\';
                                     if v875 {
-                                        let mut v876: i32 = v838 + 1i32;
+                                        let mut v876: i32 = v838.wrapping_add(1i32);
                                         let mut v877: bool = b'\n' == v874;
                                         let (mut v881, mut v882, mut v883, mut v884): (i32, i32, i32, i32) = if v877 {
-                                            let mut v878: i32 = v839 + v841;
-                                            let mut v879: i32 = v840 + 1i32;
+                                            let mut v878: i32 = v839.wrapping_add(v841);
+                                            let mut v879: i32 = v840.wrapping_add(1i32);
                                             (v878, v879, 1i32, v842)
                                         } else {
-                                            let mut v880: i32 = v841 + 1i32;
+                                            let mut v880: i32 = v841.wrapping_add(1i32);
                                             (v839, v840, v880, v842)
                                         };
                                         US10::US10_0(b'\\', v876, v881, v882, v883, v884)
@@ -6409,80 +6306,78 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                 let mut v919: US10 = match &v889 {
                                     US10::US10_1(v911, v912, v913, v914, v915, v916) => { // Error
                                         let mut v911: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v911.clone();
-                                        let mut v912: i32 = v912.clone();
-                                        let mut v913: i32 = v913.clone();
-                                        let mut v914: i32 = v914.clone();
-                                        let mut v915: i32 = v915.clone();
-                                        let mut v916: i32 = v916.clone();
+                                        let mut v912: i32 = *v912;
+                                        let mut v913: i32 = *v913;
+                                        let mut v914: i32 = *v914;
+                                        let mut v915: i32 = *v915;
+                                        let mut v916: i32 = *v916;
                                         US10::US10_1(v911.clone(), v912, v913, v914, v915, v916)
                                     }
                                     US10::US10_0(v890, v891, v892, v893, v894, v895) => { // Ok
-                                        let mut v890: u8 = v890.clone();
-                                        let mut v891: i32 = v891.clone();
-                                        let mut v892: i32 = v892.clone();
-                                        let mut v893: i32 = v893.clone();
-                                        let mut v894: i32 = v894.clone();
-                                        let mut v895: i32 = v895.clone();
+                                        let mut v890: u8 = *v890;
+                                        let mut v891: i32 = *v891;
+                                        let mut v892: i32 = *v892;
+                                        let mut v893: i32 = *v893;
+                                        let mut v894: i32 = *v894;
+                                        let mut v895: i32 = *v895;
                                         let mut v896: bool = v891 >= v895;
                                         if v896 {
                                             let mut v897: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure44();
                                             US10::US10_1(v897.clone(), v891, v892, v893, v894, v895)
                                         } else {
                                             let mut v899: u8 = v0.clone().as_bytes()[v891 as usize];
-                                            let mut v900: i32 = v891 + 1i32;
+                                            let mut v900: i32 = v891.wrapping_add(1i32);
                                             let mut v901: bool = b'\n' == v899;
                                             let (mut v905, mut v906, mut v907, mut v908): (i32, i32, i32, i32) = if v901 {
-                                                let mut v902: i32 = v892 + v894;
-                                                let mut v903: i32 = v893 + 1i32;
+                                                let mut v902: i32 = v892.wrapping_add(v894);
+                                                let mut v903: i32 = v893.wrapping_add(1i32);
                                                 (v902, v903, 1i32, v895)
                                             } else {
-                                                let mut v904: i32 = v894 + 1i32;
+                                                let mut v904: i32 = v894.wrapping_add(1i32);
                                                 (v892, v893, v904, v895)
                                             };
                                             US10::US10_0(v899, v900, v905, v906, v907, v908)
                                         }
                                     }
-                                    _ => unreachable!(),
                                 };
                                 let mut v941: US11 = match &v919 {
                                     US10::US10_1(v933, v934, v935, v936, v937, v938) => { // Error
                                         let mut v933: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v933.clone();
-                                        let mut v934: i32 = v934.clone();
-                                        let mut v935: i32 = v935.clone();
-                                        let mut v936: i32 = v936.clone();
-                                        let mut v937: i32 = v937.clone();
-                                        let mut v938: i32 = v938.clone();
+                                        let mut v934: i32 = *v934;
+                                        let mut v935: i32 = *v935;
+                                        let mut v936: i32 = *v936;
+                                        let mut v937: i32 = *v937;
+                                        let mut v938: i32 = *v938;
                                         US11::US11_1(v933.clone(), v934, v935, v936, v937, v938)
                                     }
                                     US10::US10_0(v920, v921, v922, v923, v924, v925) => { // Ok
-                                        let mut v920: u8 = v920.clone();
-                                        let mut v921: i32 = v921.clone();
-                                        let mut v922: i32 = v922.clone();
-                                        let mut v923: i32 = v923.clone();
-                                        let mut v924: i32 = v924.clone();
-                                        let mut v925: i32 = v925.clone();
+                                        let mut v920: u8 = *v920;
+                                        let mut v921: i32 = *v921;
+                                        let mut v922: i32 = *v922;
+                                        let mut v923: i32 = *v923;
+                                        let mut v924: i32 = *v924;
+                                        let mut v925: i32 = *v925;
                                         let mut v926: bool = v838 >= v921;
                                         let mut v931: Rc<str> = if v926 {
                                             let mut v927: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                             v927.clone()
                                         } else {
                                             let mut v928: bool = v838 == v921;
-                                            let mut v929: i32 = v921 - 1i32;
+                                            let mut v929: i32 = v921.wrapping_sub(1i32);
                                             let mut v930: Rc<str> = string_slice(&v0.clone(), v838 as i64, v929 as i64);
                                             v930.clone()
                                         };
                                         US11::US11_0(v931.clone(), v921, v922, v923, v924, v925)
                                     }
-                                    _ => unreachable!(),
                                 };
                                 match &v941 {
                                     US11::US11_1(v948, v949, v950, v951, v952, v953) => { // Error
                                         let mut v948: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v948.clone();
-                                        let mut v949: i32 = v949.clone();
-                                        let mut v950: i32 = v950.clone();
-                                        let mut v951: i32 = v951.clone();
-                                        let mut v952: i32 = v952.clone();
-                                        let mut v953: i32 = v953.clone();
+                                        let mut v949: i32 = *v949;
+                                        let mut v950: i32 = *v950;
+                                        let mut v951: i32 = *v951;
+                                        let mut v952: i32 = *v952;
+                                        let mut v953: i32 = *v953;
                                         let mut v971: US10 = if v871 {
                                             let mut v954: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                                             US10::US10_1(v954.clone(), v838, v839, v840, v841, v842)
@@ -6490,14 +6385,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                             let mut v956: u8 = v0.clone().as_bytes()[v838 as usize];
                                             let mut v957: bool = v956 == b'`';
                                             if v957 {
-                                                let mut v958: i32 = v838 + 1i32;
+                                                let mut v958: i32 = v838.wrapping_add(1i32);
                                                 let mut v959: bool = b'\n' == v956;
                                                 let (mut v963, mut v964, mut v965, mut v966): (i32, i32, i32, i32) = if v959 {
-                                                    let mut v960: i32 = v839 + v841;
-                                                    let mut v961: i32 = v840 + 1i32;
+                                                    let mut v960: i32 = v839.wrapping_add(v841);
+                                                    let mut v961: i32 = v840.wrapping_add(1i32);
                                                     (v960, v961, 1i32, v842)
                                                 } else {
-                                                    let mut v962: i32 = v841 + 1i32;
+                                                    let mut v962: i32 = v841.wrapping_add(1i32);
                                                     (v839, v840, v962, v842)
                                                 };
                                                 US10::US10_0(b'`', v958, v963, v964, v965, v966)
@@ -6509,136 +6404,131 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                         let mut v1001: US10 = match &v971 {
                                             US10::US10_1(v993, v994, v995, v996, v997, v998) => { // Error
                                                 let mut v993: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v993.clone();
-                                                let mut v994: i32 = v994.clone();
-                                                let mut v995: i32 = v995.clone();
-                                                let mut v996: i32 = v996.clone();
-                                                let mut v997: i32 = v997.clone();
-                                                let mut v998: i32 = v998.clone();
+                                                let mut v994: i32 = *v994;
+                                                let mut v995: i32 = *v995;
+                                                let mut v996: i32 = *v996;
+                                                let mut v997: i32 = *v997;
+                                                let mut v998: i32 = *v998;
                                                 US10::US10_1(v993.clone(), v994, v995, v996, v997, v998)
                                             }
                                             US10::US10_0(v972, v973, v974, v975, v976, v977) => { // Ok
-                                                let mut v972: u8 = v972.clone();
-                                                let mut v973: i32 = v973.clone();
-                                                let mut v974: i32 = v974.clone();
-                                                let mut v975: i32 = v975.clone();
-                                                let mut v976: i32 = v976.clone();
-                                                let mut v977: i32 = v977.clone();
+                                                let mut v972: u8 = *v972;
+                                                let mut v973: i32 = *v973;
+                                                let mut v974: i32 = *v974;
+                                                let mut v975: i32 = *v975;
+                                                let mut v976: i32 = *v976;
+                                                let mut v977: i32 = *v977;
                                                 let mut v978: bool = v973 >= v977;
                                                 if v978 {
                                                     let mut v979: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure44();
                                                     US10::US10_1(v979.clone(), v973, v974, v975, v976, v977)
                                                 } else {
                                                     let mut v981: u8 = v0.clone().as_bytes()[v973 as usize];
-                                                    let mut v982: i32 = v973 + 1i32;
+                                                    let mut v982: i32 = v973.wrapping_add(1i32);
                                                     let mut v983: bool = b'\n' == v981;
                                                     let (mut v987, mut v988, mut v989, mut v990): (i32, i32, i32, i32) = if v983 {
-                                                        let mut v984: i32 = v974 + v976;
-                                                        let mut v985: i32 = v975 + 1i32;
+                                                        let mut v984: i32 = v974.wrapping_add(v976);
+                                                        let mut v985: i32 = v975.wrapping_add(1i32);
                                                         (v984, v985, 1i32, v977)
                                                     } else {
-                                                        let mut v986: i32 = v976 + 1i32;
+                                                        let mut v986: i32 = v976.wrapping_add(1i32);
                                                         (v974, v975, v986, v977)
                                                     };
                                                     US10::US10_0(v981, v982, v987, v988, v989, v990)
                                                 }
                                             }
-                                            _ => unreachable!(),
                                         };
                                         let mut v1023: US11 = match &v1001 {
                                             US10::US10_1(v1015, v1016, v1017, v1018, v1019, v1020) => { // Error
                                                 let mut v1015: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1015.clone();
-                                                let mut v1016: i32 = v1016.clone();
-                                                let mut v1017: i32 = v1017.clone();
-                                                let mut v1018: i32 = v1018.clone();
-                                                let mut v1019: i32 = v1019.clone();
-                                                let mut v1020: i32 = v1020.clone();
+                                                let mut v1016: i32 = *v1016;
+                                                let mut v1017: i32 = *v1017;
+                                                let mut v1018: i32 = *v1018;
+                                                let mut v1019: i32 = *v1019;
+                                                let mut v1020: i32 = *v1020;
                                                 US11::US11_1(v1015.clone(), v1016, v1017, v1018, v1019, v1020)
                                             }
                                             US10::US10_0(v1002, v1003, v1004, v1005, v1006, v1007) => { // Ok
-                                                let mut v1002: u8 = v1002.clone();
-                                                let mut v1003: i32 = v1003.clone();
-                                                let mut v1004: i32 = v1004.clone();
-                                                let mut v1005: i32 = v1005.clone();
-                                                let mut v1006: i32 = v1006.clone();
-                                                let mut v1007: i32 = v1007.clone();
+                                                let mut v1002: u8 = *v1002;
+                                                let mut v1003: i32 = *v1003;
+                                                let mut v1004: i32 = *v1004;
+                                                let mut v1005: i32 = *v1005;
+                                                let mut v1006: i32 = *v1006;
+                                                let mut v1007: i32 = *v1007;
                                                 let mut v1008: bool = v838 >= v1003;
                                                 let mut v1013: Rc<str> = if v1008 {
                                                     let mut v1009: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                                     v1009.clone()
                                                 } else {
                                                     let mut v1010: bool = v838 == v1003;
-                                                    let mut v1011: i32 = v1003 - 1i32;
+                                                    let mut v1011: i32 = v1003.wrapping_sub(1i32);
                                                     let mut v1012: Rc<str> = string_slice(&v0.clone(), v838 as i64, v1011 as i64);
                                                     v1012.clone()
                                                 };
                                                 US11::US11_0(v1013.clone(), v1003, v1004, v1005, v1006, v1007)
                                             }
-                                            _ => unreachable!(),
                                         };
                                         match &v1023 {
                                             US11::US11_1(v1030, v1031, v1032, v1033, v1034, v1035) => { // Error
                                                 let mut v1030: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1030.clone();
-                                                let mut v1031: i32 = v1031.clone();
-                                                let mut v1032: i32 = v1032.clone();
-                                                let mut v1033: i32 = v1033.clone();
-                                                let mut v1034: i32 = v1034.clone();
-                                                let mut v1035: i32 = v1035.clone();
+                                                let mut v1031: i32 = *v1031;
+                                                let mut v1032: i32 = *v1032;
+                                                let mut v1033: i32 = *v1033;
+                                                let mut v1034: i32 = *v1034;
+                                                let mut v1035: i32 = *v1035;
                                                 let mut v1036: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                                 US11::US11_1(v1036.clone(), v838, v839, v840, v841, v842)
                                             }
                                             US11::US11_0(v1024, v1025, v1026, v1027, v1028, v1029) => { // Ok
                                                 let mut v1024: Rc<str> = v1024.clone();
-                                                let mut v1025: i32 = v1025.clone();
-                                                let mut v1026: i32 = v1026.clone();
-                                                let mut v1027: i32 = v1027.clone();
-                                                let mut v1028: i32 = v1028.clone();
-                                                let mut v1029: i32 = v1029.clone();
+                                                let mut v1025: i32 = *v1025;
+                                                let mut v1026: i32 = *v1026;
+                                                let mut v1027: i32 = *v1027;
+                                                let mut v1028: i32 = *v1028;
+                                                let mut v1029: i32 = *v1029;
                                                 v1023.clone()
                                             }
-                                            _ => unreachable!(),
                                         }
                                     }
                                     US11::US11_0(v942, v943, v944, v945, v946, v947) => { // Ok
                                         let mut v942: Rc<str> = v942.clone();
-                                        let mut v943: i32 = v943.clone();
-                                        let mut v944: i32 = v944.clone();
-                                        let mut v945: i32 = v945.clone();
-                                        let mut v946: i32 = v946.clone();
-                                        let mut v947: i32 = v947.clone();
+                                        let mut v943: i32 = *v943;
+                                        let mut v944: i32 = *v944;
+                                        let mut v945: i32 = *v945;
+                                        let mut v946: i32 = *v946;
+                                        let mut v947: i32 = *v947;
                                         v941.clone()
                                     }
-                                    _ => unreachable!(),
                                 }
                             }
                             US11::US11_0(v859, v860, v861, v862, v863, v864) => { // Ok
                                 let mut v859: Rc<str> = v859.clone();
-                                let mut v860: i32 = v860.clone();
-                                let mut v861: i32 = v861.clone();
-                                let mut v862: i32 = v862.clone();
-                                let mut v863: i32 = v863.clone();
-                                let mut v864: i32 = v864.clone();
+                                let mut v860: i32 = *v860;
+                                let mut v861: i32 = *v861;
+                                let mut v862: i32 = *v862;
+                                let mut v863: i32 = *v863;
+                                let mut v864: i32 = *v864;
                                 v858.clone()
                             }
-                            _ => unreachable!(),
                         };
                         let mut v1066: US11 = match &v1043 {
                             US11::US11_1(v1044, v1045, v1046, v1047, v1048, v1049) => { // Error
                                 let mut v1044: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1044.clone();
-                                let mut v1045: i32 = v1045.clone();
-                                let mut v1046: i32 = v1046.clone();
-                                let mut v1047: i32 = v1047.clone();
-                                let mut v1048: i32 = v1048.clone();
-                                let mut v1049: i32 = v1049.clone();
+                                let mut v1045: i32 = *v1045;
+                                let mut v1046: i32 = *v1046;
+                                let mut v1047: i32 = *v1047;
+                                let mut v1048: i32 = *v1048;
+                                let mut v1049: i32 = *v1049;
                                 let mut v1050: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                 US11::US11_0(v1050.clone(), v838, v839, v840, v841, v842)
                             }
                             US11::US11_0(v1052, v1053, v1054, v1055, v1056, v1057) => { // Ok
                                 let mut v1052: Rc<str> = v1052.clone();
-                                let mut v1053: i32 = v1053.clone();
-                                let mut v1054: i32 = v1054.clone();
-                                let mut v1055: i32 = v1055.clone();
-                                let mut v1056: i32 = v1056.clone();
-                                let mut v1057: i32 = v1057.clone();
+                                let mut v1053: i32 = *v1053;
+                                let mut v1054: i32 = *v1054;
+                                let mut v1055: i32 = *v1055;
+                                let mut v1056: i32 = *v1056;
+                                let mut v1057: i32 = *v1057;
                                 let mut v1058: bool = v1053 == v838;
                                 if v1058 {
                                     let mut v1059: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure42();
@@ -6649,16 +6539,15 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                     method118(v0.clone(), v1061.clone(), v1052.clone(), v1062, v1053, v1054, v1055, v1056, v1057)
                                 }
                             }
-                            _ => unreachable!(),
                         };
                         match &v1066 {
                             US11::US11_1(v1109, v1110, v1111, v1112, v1113, v1114) => { // Error
                                 let mut v1109: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1109.clone();
-                                let mut v1110: i32 = v1110.clone();
-                                let mut v1111: i32 = v1111.clone();
-                                let mut v1112: i32 = v1112.clone();
-                                let mut v1113: i32 = v1113.clone();
-                                let mut v1114: i32 = v1114.clone();
+                                let mut v1110: i32 = *v1110;
+                                let mut v1111: i32 = *v1111;
+                                let mut v1112: i32 = *v1112;
+                                let mut v1113: i32 = *v1113;
+                                let mut v1114: i32 = *v1114;
                                 let mut v1115: bool = v838 >= v842;
                                 let mut v1133: US10 = if v1115 {
                                     let mut v1116: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -6667,14 +6556,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                     let mut v1118: u8 = v0.clone().as_bytes()[v838 as usize];
                                     let mut v1119: bool = v1118 == b'"';
                                     if v1119 {
-                                        let mut v1120: i32 = v838 + 1i32;
+                                        let mut v1120: i32 = v838.wrapping_add(1i32);
                                         let mut v1121: bool = b'\n' == v1118;
                                         let (mut v1125, mut v1126, mut v1127, mut v1128): (i32, i32, i32, i32) = if v1121 {
-                                            let mut v1122: i32 = v839 + v841;
-                                            let mut v1123: i32 = v840 + 1i32;
+                                            let mut v1122: i32 = v839.wrapping_add(v841);
+                                            let mut v1123: i32 = v840.wrapping_add(1i32);
                                             (v1122, v1123, 1i32, v842)
                                         } else {
-                                            let mut v1124: i32 = v841 + 1i32;
+                                            let mut v1124: i32 = v841.wrapping_add(1i32);
                                             (v839, v840, v1124, v842)
                                         };
                                         US10::US10_0(b'"', v1120, v1125, v1126, v1127, v1128)
@@ -6686,34 +6575,33 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                 match &v1133 {
                                     US10::US10_1(v1142, v1143, v1144, v1145, v1146, v1147) => { // Error
                                         let mut v1142: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1142.clone();
-                                        let mut v1143: i32 = v1143.clone();
-                                        let mut v1144: i32 = v1144.clone();
-                                        let mut v1145: i32 = v1145.clone();
-                                        let mut v1146: i32 = v1146.clone();
-                                        let mut v1147: i32 = v1147.clone();
+                                        let mut v1143: i32 = *v1143;
+                                        let mut v1144: i32 = *v1144;
+                                        let mut v1145: i32 = *v1145;
+                                        let mut v1146: i32 = *v1146;
+                                        let mut v1147: i32 = *v1147;
                                         let mut v1148: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure24();
                                         US11::US11_1(v1148.clone(), v838, v839, v840, v841, v842)
                                     }
                                     US10::US10_0(v1134, v1135, v1136, v1137, v1138, v1139) => { // Ok
-                                        let mut v1134: u8 = v1134.clone();
-                                        let mut v1135: i32 = v1135.clone();
-                                        let mut v1136: i32 = v1136.clone();
-                                        let mut v1137: i32 = v1137.clone();
-                                        let mut v1138: i32 = v1138.clone();
-                                        let mut v1139: i32 = v1139.clone();
+                                        let mut v1134: u8 = *v1134;
+                                        let mut v1135: i32 = *v1135;
+                                        let mut v1136: i32 = *v1136;
+                                        let mut v1137: i32 = *v1137;
+                                        let mut v1138: i32 = *v1138;
+                                        let mut v1139: i32 = *v1139;
                                         let mut v1140: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                         US11::US11_0(v1140.clone(), v1135, v1136, v1137, v1138, v1139)
                                     }
-                                    _ => unreachable!(),
                                 }
                             }
                             US11::US11_0(v1067, v1068, v1069, v1070, v1071, v1072) => { // Ok
                                 let mut v1067: Rc<str> = v1067.clone();
-                                let mut v1068: i32 = v1068.clone();
-                                let mut v1069: i32 = v1069.clone();
-                                let mut v1070: i32 = v1070.clone();
-                                let mut v1071: i32 = v1071.clone();
-                                let mut v1072: i32 = v1072.clone();
+                                let mut v1068: i32 = *v1068;
+                                let mut v1069: i32 = *v1069;
+                                let mut v1070: i32 = *v1070;
+                                let mut v1071: i32 = *v1071;
+                                let mut v1072: i32 = *v1072;
                                 let mut v1073: bool = v1068 >= v1072;
                                 let mut v1091: US10 = if v1073 {
                                     let mut v1074: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -6722,14 +6610,14 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                     let mut v1076: u8 = v0.clone().as_bytes()[v1068 as usize];
                                     let mut v1077: bool = v1076 == b'"';
                                     if v1077 {
-                                        let mut v1078: i32 = v1068 + 1i32;
+                                        let mut v1078: i32 = v1068.wrapping_add(1i32);
                                         let mut v1079: bool = b'\n' == v1076;
                                         let (mut v1083, mut v1084, mut v1085, mut v1086): (i32, i32, i32, i32) = if v1079 {
-                                            let mut v1080: i32 = v1069 + v1071;
-                                            let mut v1081: i32 = v1070 + 1i32;
+                                            let mut v1080: i32 = v1069.wrapping_add(v1071);
+                                            let mut v1081: i32 = v1070.wrapping_add(1i32);
                                             (v1080, v1081, 1i32, v1072)
                                         } else {
-                                            let mut v1082: i32 = v1071 + 1i32;
+                                            let mut v1082: i32 = v1071.wrapping_add(1i32);
                                             (v1069, v1070, v1082, v1072)
                                         };
                                         US10::US10_0(b'"', v1078, v1083, v1084, v1085, v1086)
@@ -6741,51 +6629,47 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                                 match &v1091 {
                                     US10::US10_1(v1099, v1100, v1101, v1102, v1103, v1104) => { // Error
                                         let mut v1099: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1099.clone();
-                                        let mut v1100: i32 = v1100.clone();
-                                        let mut v1101: i32 = v1101.clone();
-                                        let mut v1102: i32 = v1102.clone();
-                                        let mut v1103: i32 = v1103.clone();
-                                        let mut v1104: i32 = v1104.clone();
+                                        let mut v1100: i32 = *v1100;
+                                        let mut v1101: i32 = *v1101;
+                                        let mut v1102: i32 = *v1102;
+                                        let mut v1103: i32 = *v1103;
+                                        let mut v1104: i32 = *v1104;
                                         let mut v1105: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure25(v838, v1068, v1099.clone(), v1100, v1101, v1102, v1103, v1104);
                                         US11::US11_1(v1105.clone(), v1068, v1069, v1070, v1071, v1072)
                                     }
                                     US10::US10_0(v1092, v1093, v1094, v1095, v1096, v1097) => { // Ok
-                                        let mut v1092: u8 = v1092.clone();
-                                        let mut v1093: i32 = v1093.clone();
-                                        let mut v1094: i32 = v1094.clone();
-                                        let mut v1095: i32 = v1095.clone();
-                                        let mut v1096: i32 = v1096.clone();
-                                        let mut v1097: i32 = v1097.clone();
+                                        let mut v1092: u8 = *v1092;
+                                        let mut v1093: i32 = *v1093;
+                                        let mut v1094: i32 = *v1094;
+                                        let mut v1095: i32 = *v1095;
+                                        let mut v1096: i32 = *v1096;
+                                        let mut v1097: i32 = *v1097;
                                         US11::US11_0(v1067.clone(), v1093, v1094, v1095, v1096, v1097)
                                     }
-                                    _ => unreachable!(),
                                 }
                             }
-                            _ => unreachable!(),
                         }
                     }
-                    _ => unreachable!(),
                 }
             }
             US11::US11_0(v807, v808, v809, v810, v811, v812) => { // Ok
                 let mut v807: Rc<str> = v807.clone();
-                let mut v808: i32 = v808.clone();
-                let mut v809: i32 = v809.clone();
-                let mut v810: i32 = v810.clone();
-                let mut v811: i32 = v811.clone();
-                let mut v812: i32 = v812.clone();
+                let mut v808: i32 = *v808;
+                let mut v809: i32 = *v809;
+                let mut v810: i32 = *v810;
+                let mut v811: i32 = *v811;
+                let mut v812: i32 = *v812;
                 v806.clone()
             }
-            _ => unreachable!(),
         };
         let mut v1194: US11 = match &v1164 {
             US11::US11_1(v1171, v1172, v1173, v1174, v1175, v1176) => { // Error
                 let mut v1171: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1171.clone();
-                let mut v1172: i32 = v1172.clone();
-                let mut v1173: i32 = v1173.clone();
-                let mut v1174: i32 = v1174.clone();
-                let mut v1175: i32 = v1175.clone();
-                let mut v1176: i32 = v1176.clone();
+                let mut v1172: i32 = *v1172;
+                let mut v1173: i32 = *v1173;
+                let mut v1174: i32 = *v1174;
+                let mut v1175: i32 = *v1175;
+                let mut v1176: i32 = *v1176;
                 let (mut v1177, mut v1178, mut v1179, mut v1180, mut v1181): (i32, i32, i32, i32, i32) = method125(v4, v5, v6, v7, v0.clone(), v3);
                 let mut v1182: bool = v1177 > v3;
                 if v1182 {
@@ -6795,7 +6679,7 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                         v1184.clone()
                     } else {
                         let mut v1185: bool = v3 == v1177;
-                        let mut v1186: i32 = v1177 - 1i32;
+                        let mut v1186: i32 = v1177.wrapping_sub(1i32);
                         let mut v1187: Rc<str> = string_slice(&v0.clone(), v3 as i64, v1186 as i64);
                         v1187.clone()
                     };
@@ -6807,68 +6691,65 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
             }
             US11::US11_0(v1165, v1166, v1167, v1168, v1169, v1170) => { // Ok
                 let mut v1165: Rc<str> = v1165.clone();
-                let mut v1166: i32 = v1166.clone();
-                let mut v1167: i32 = v1167.clone();
-                let mut v1168: i32 = v1168.clone();
-                let mut v1169: i32 = v1169.clone();
-                let mut v1170: i32 = v1170.clone();
+                let mut v1166: i32 = *v1166;
+                let mut v1167: i32 = *v1167;
+                let mut v1168: i32 = *v1168;
+                let mut v1169: i32 = *v1169;
+                let mut v1170: i32 = *v1170;
                 v1164.clone()
             }
-            _ => unreachable!(),
         };
         let mut v1229: US11 = match &v1194 {
             US11::US11_1(v1201, v1202, v1203, v1204, v1205, v1206) => { // Error
                 let mut v1201: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1201.clone();
-                let mut v1202: i32 = v1202.clone();
-                let mut v1203: i32 = v1203.clone();
-                let mut v1204: i32 = v1204.clone();
-                let mut v1205: i32 = v1205.clone();
-                let mut v1206: i32 = v1206.clone();
+                let mut v1202: i32 = *v1202;
+                let mut v1203: i32 = *v1203;
+                let mut v1204: i32 = *v1204;
+                let mut v1205: i32 = *v1205;
+                let mut v1206: i32 = *v1206;
                 let mut v1207: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
                 let mut v1208: US19 = method121(v0.clone(), v1207.clone(), v3, v4, v5, v6, v7);
                 match &v1208 {
                     US19::US19_1(v1219, v1220, v1221, v1222, v1223, v1224) => { // Error
                         let mut v1219: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1219.clone();
-                        let mut v1220: i32 = v1220.clone();
-                        let mut v1221: i32 = v1221.clone();
-                        let mut v1222: i32 = v1222.clone();
-                        let mut v1223: i32 = v1223.clone();
-                        let mut v1224: i32 = v1224.clone();
+                        let mut v1220: i32 = *v1220;
+                        let mut v1221: i32 = *v1221;
+                        let mut v1222: i32 = *v1222;
+                        let mut v1223: i32 = *v1223;
+                        let mut v1224: i32 = *v1224;
                         US11::US11_1(v1219.clone(), v1220, v1221, v1222, v1223, v1224)
                     }
                     US19::US19_0(v1209, v1210, v1211, v1212, v1213, v1214) => { // Ok
                         let mut v1209: Rc<UH0> = v1209.clone();
-                        let mut v1210: i32 = v1210.clone();
-                        let mut v1211: i32 = v1211.clone();
-                        let mut v1212: i32 = v1212.clone();
-                        let mut v1213: i32 = v1213.clone();
-                        let mut v1214: i32 = v1214.clone();
+                        let mut v1210: i32 = *v1210;
+                        let mut v1211: i32 = *v1211;
+                        let mut v1212: i32 = *v1212;
+                        let mut v1213: i32 = *v1213;
+                        let mut v1214: i32 = *v1214;
                         let mut v1215: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                         let (mut v1216, mut v1217): (Rc<str>, Rc<str>) = method123(v1209.clone(), v1215.clone());
                         US11::US11_0(v1216.clone(), v1210, v1211, v1212, v1213, v1214)
                     }
-                    _ => unreachable!(),
                 }
             }
             US11::US11_0(v1195, v1196, v1197, v1198, v1199, v1200) => { // Ok
                 let mut v1195: Rc<str> = v1195.clone();
-                let mut v1196: i32 = v1196.clone();
-                let mut v1197: i32 = v1197.clone();
-                let mut v1198: i32 = v1198.clone();
-                let mut v1199: i32 = v1199.clone();
-                let mut v1200: i32 = v1200.clone();
+                let mut v1196: i32 = *v1196;
+                let mut v1197: i32 = *v1197;
+                let mut v1198: i32 = *v1198;
+                let mut v1199: i32 = *v1199;
+                let mut v1200: i32 = *v1200;
                 v1194.clone()
             }
-            _ => unreachable!(),
         };
         let mut v1240: US11 = match &v1229 {
             US11::US11_0(v1230, v1231, v1232, v1233, v1234, v1235) => { // Ok
                 let mut v1230: Rc<str> = v1230.clone();
-                let mut v1231: i32 = v1231.clone();
-                let mut v1232: i32 = v1232.clone();
-                let mut v1233: i32 = v1233.clone();
-                let mut v1234: i32 = v1234.clone();
-                let mut v1235: i32 = v1235.clone();
+                let mut v1231: i32 = *v1231;
+                let mut v1232: i32 = *v1232;
+                let mut v1233: i32 = *v1233;
+                let mut v1234: i32 = *v1234;
+                let mut v1235: i32 = *v1235;
                 let mut v1236: bool = v1231 == v3;
                 if v1236 {
                     let mut v1237: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure48();
@@ -6884,11 +6765,11 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
         match &v1240 {
             US11::US11_1(v1241, v1242, v1243, v1244, v1245, v1246) => { // Error
                 let mut v1241: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1241.clone();
-                let mut v1242: i32 = v1242.clone();
-                let mut v1243: i32 = v1243.clone();
-                let mut v1244: i32 = v1244.clone();
-                let mut v1245: i32 = v1245.clone();
-                let mut v1246: i32 = v1246.clone();
+                let mut v1242: i32 = *v1242;
+                let mut v1243: i32 = *v1243;
+                let mut v1244: i32 = *v1244;
+                let mut v1245: i32 = *v1245;
+                let mut v1246: i32 = *v1246;
                 let mut v1266: Rc<str> = match &*v2 {
                     UH0::UH0_0 => { // Nil
                         v1.clone()
@@ -6935,11 +6816,11 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
             }
             US11::US11_0(v1268, v1269, v1270, v1271, v1272, v1273) => { // Ok
                 let mut v1268: Rc<str> = v1268.clone();
-                let mut v1269: i32 = v1269.clone();
-                let mut v1270: i32 = v1270.clone();
-                let mut v1271: i32 = v1271.clone();
-                let mut v1272: i32 = v1272.clone();
-                let mut v1273: i32 = v1273.clone();
+                let mut v1269: i32 = *v1269;
+                let mut v1270: i32 = *v1270;
+                let mut v1271: i32 = *v1271;
+                let mut v1272: i32 = *v1272;
+                let mut v1273: i32 = *v1273;
                 let mut v1274: bool = v1269 > v3;
                 if v1274 {
                     let mut v1275: Rc<UH0> = Rc::new(UH0::UH0_1(v1268.clone(), v2.clone()));
@@ -6950,7 +6831,6 @@ fn method124(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<UH0>, mut v3: i32, mut
                     return US11::US11_1(v1277.clone(), v3, v4, v5, v6, v7);
                 }
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -6975,12 +6855,12 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
             } else {
                 v9
             };
-            let mut v12: i32 = v11 - v2;
+            let mut v12: i32 = v11.wrapping_sub(v2);
             let mut v13: bool = v12 == 0i32;
             if v13 {
                 (v2, v3, v4, v5, v6)
             } else {
-                let mut v14: i32 = v5 + v12;
+                let mut v14: i32 = v5.wrapping_add(v12);
                 (v11, v3, v4, v14, v6)
             }
         };
@@ -6995,21 +6875,21 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
         match &v30 {
             US12::US12_1(v31, v32, v33, v34, v35, v36) => { // Error
                 let mut v31: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v31.clone();
-                let mut v32: i32 = v32.clone();
-                let mut v33: i32 = v33.clone();
-                let mut v34: i32 = v34.clone();
-                let mut v35: i32 = v35.clone();
-                let mut v36: i32 = v36.clone();
+                let mut v32: i32 = *v32;
+                let mut v33: i32 = *v33;
+                let mut v34: i32 = *v34;
+                let mut v35: i32 = *v35;
+                let mut v36: i32 = *v36;
                 let mut v37: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
                 let mut v38: Rc<UH0> = method122(v1.clone(), v37.clone());
                 return US19::US19_0(v38.clone(), v2, v3, v4, v5, v6);
             }
             US12::US12_0(v40, v41, v42, v43, v44) => { // Ok
-                let mut v40: i32 = v40.clone();
-                let mut v41: i32 = v41.clone();
-                let mut v42: i32 = v42.clone();
-                let mut v43: i32 = v43.clone();
-                let mut v44: i32 = v44.clone();
+                let mut v40: i32 = *v40;
+                let mut v41: i32 = *v41;
+                let mut v42: i32 = *v42;
+                let mut v43: i32 = *v43;
+                let mut v44: i32 = *v44;
                 let mut v45: bool = v40 == v2;
                 if v45 {
                     let mut v46: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure50();
@@ -7023,14 +6903,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                         let mut v51: u8 = v0.clone().as_bytes()[v40 as usize];
                         let mut v52: bool = v51 == b'\\';
                         if v52 {
-                            let mut v53: i32 = v40 + 1i32;
+                            let mut v53: i32 = v40.wrapping_add(1i32);
                             let mut v54: bool = b'\n' == v51;
                             let (mut v58, mut v59, mut v60, mut v61): (i32, i32, i32, i32) = if v54 {
-                                let mut v55: i32 = v41 + v43;
-                                let mut v56: i32 = v42 + 1i32;
+                                let mut v55: i32 = v41.wrapping_add(v43);
+                                let mut v56: i32 = v42.wrapping_add(1i32);
                                 (v55, v56, 1i32, v44)
                             } else {
-                                let mut v57: i32 = v43 + 1i32;
+                                let mut v57: i32 = v43.wrapping_add(1i32);
                                 (v41, v42, v57, v44)
                             };
                             US10::US10_0(b'\\', v53, v58, v59, v60, v61)
@@ -7042,20 +6922,20 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                     let mut v100: US10 = match &v66 {
                         US10::US10_1(v92, v93, v94, v95, v96, v97) => { // Error
                             let mut v92: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v92.clone();
-                            let mut v93: i32 = v93.clone();
-                            let mut v94: i32 = v94.clone();
-                            let mut v95: i32 = v95.clone();
-                            let mut v96: i32 = v96.clone();
-                            let mut v97: i32 = v97.clone();
+                            let mut v93: i32 = *v93;
+                            let mut v94: i32 = *v94;
+                            let mut v95: i32 = *v95;
+                            let mut v96: i32 = *v96;
+                            let mut v97: i32 = *v97;
                             US10::US10_1(v92.clone(), v93, v94, v95, v96, v97)
                         }
                         US10::US10_0(v67, v68, v69, v70, v71, v72) => { // Ok
-                            let mut v67: u8 = v67.clone();
-                            let mut v68: i32 = v68.clone();
-                            let mut v69: i32 = v69.clone();
-                            let mut v70: i32 = v70.clone();
-                            let mut v71: i32 = v71.clone();
-                            let mut v72: i32 = v72.clone();
+                            let mut v67: u8 = *v67;
+                            let mut v68: i32 = *v68;
+                            let mut v69: i32 = *v69;
+                            let mut v70: i32 = *v70;
+                            let mut v71: i32 = *v71;
+                            let mut v72: i32 = *v72;
                             let mut v73: bool = v68 >= v72;
                             if v73 {
                                 let mut v74: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -7064,14 +6944,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                 let mut v76: u8 = v0.clone().as_bytes()[v68 as usize];
                                 let mut v77: bool = v76 == b'"';
                                 if v77 {
-                                    let mut v78: i32 = v68 + 1i32;
+                                    let mut v78: i32 = v68.wrapping_add(1i32);
                                     let mut v79: bool = b'\n' == v76;
                                     let (mut v83, mut v84, mut v85, mut v86): (i32, i32, i32, i32) = if v79 {
-                                        let mut v80: i32 = v69 + v71;
-                                        let mut v81: i32 = v70 + 1i32;
+                                        let mut v80: i32 = v69.wrapping_add(v71);
+                                        let mut v81: i32 = v70.wrapping_add(1i32);
                                         (v80, v81, 1i32, v72)
                                     } else {
-                                        let mut v82: i32 = v71 + 1i32;
+                                        let mut v82: i32 = v71.wrapping_add(1i32);
                                         (v69, v70, v82, v72)
                                     };
                                     US10::US10_0(b'"', v78, v83, v84, v85, v86)
@@ -7081,37 +6961,35 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                 }
                             }
                         }
-                        _ => unreachable!(),
                     };
                     let mut v116: US10 = match &v100 {
                         US10::US10_1(v108, v109, v110, v111, v112, v113) => { // Error
                             let mut v108: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v108.clone();
-                            let mut v109: i32 = v109.clone();
-                            let mut v110: i32 = v110.clone();
-                            let mut v111: i32 = v111.clone();
-                            let mut v112: i32 = v112.clone();
-                            let mut v113: i32 = v113.clone();
+                            let mut v109: i32 = *v109;
+                            let mut v110: i32 = *v110;
+                            let mut v111: i32 = *v111;
+                            let mut v112: i32 = *v112;
+                            let mut v113: i32 = *v113;
                             US10::US10_1(v108.clone(), v109, v110, v111, v112, v113)
                         }
                         US10::US10_0(v101, v102, v103, v104, v105, v106) => { // Ok
-                            let mut v101: u8 = v101.clone();
-                            let mut v102: i32 = v102.clone();
-                            let mut v103: i32 = v103.clone();
-                            let mut v104: i32 = v104.clone();
-                            let mut v105: i32 = v105.clone();
-                            let mut v106: i32 = v106.clone();
+                            let mut v101: u8 = *v101;
+                            let mut v102: i32 = *v102;
+                            let mut v103: i32 = *v103;
+                            let mut v104: i32 = *v104;
+                            let mut v105: i32 = *v105;
+                            let mut v106: i32 = *v106;
                             US10::US10_0(b'"', v102, v103, v104, v105, v106)
                         }
-                        _ => unreachable!(),
                     };
                     let mut v214: US10 = match &v116 {
                         US10::US10_1(v123, v124, v125, v126, v127, v128) => { // Error
                             let mut v123: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v123.clone();
-                            let mut v124: i32 = v124.clone();
-                            let mut v125: i32 = v125.clone();
-                            let mut v126: i32 = v126.clone();
-                            let mut v127: i32 = v127.clone();
-                            let mut v128: i32 = v128.clone();
+                            let mut v124: i32 = *v124;
+                            let mut v125: i32 = *v125;
+                            let mut v126: i32 = *v126;
+                            let mut v127: i32 = *v127;
+                            let mut v128: i32 = *v128;
                             let mut v146: US10 = if v48 {
                                 let mut v129: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                                 US10::US10_1(v129.clone(), v40, v41, v42, v43, v44)
@@ -7119,14 +6997,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                 let mut v131: u8 = v0.clone().as_bytes()[v40 as usize];
                                 let mut v132: bool = v131 == b'`';
                                 if v132 {
-                                    let mut v133: i32 = v40 + 1i32;
+                                    let mut v133: i32 = v40.wrapping_add(1i32);
                                     let mut v134: bool = b'\n' == v131;
                                     let (mut v138, mut v139, mut v140, mut v141): (i32, i32, i32, i32) = if v134 {
-                                        let mut v135: i32 = v41 + v43;
-                                        let mut v136: i32 = v42 + 1i32;
+                                        let mut v135: i32 = v41.wrapping_add(v43);
+                                        let mut v136: i32 = v42.wrapping_add(1i32);
                                         (v135, v136, 1i32, v44)
                                     } else {
-                                        let mut v137: i32 = v43 + 1i32;
+                                        let mut v137: i32 = v43.wrapping_add(1i32);
                                         (v41, v42, v137, v44)
                                     };
                                     US10::US10_0(b'`', v133, v138, v139, v140, v141)
@@ -7138,20 +7016,20 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                             let mut v180: US10 = match &v146 {
                                 US10::US10_1(v172, v173, v174, v175, v176, v177) => { // Error
                                     let mut v172: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v172.clone();
-                                    let mut v173: i32 = v173.clone();
-                                    let mut v174: i32 = v174.clone();
-                                    let mut v175: i32 = v175.clone();
-                                    let mut v176: i32 = v176.clone();
-                                    let mut v177: i32 = v177.clone();
+                                    let mut v173: i32 = *v173;
+                                    let mut v174: i32 = *v174;
+                                    let mut v175: i32 = *v175;
+                                    let mut v176: i32 = *v176;
+                                    let mut v177: i32 = *v177;
                                     US10::US10_1(v172.clone(), v173, v174, v175, v176, v177)
                                 }
                                 US10::US10_0(v147, v148, v149, v150, v151, v152) => { // Ok
-                                    let mut v147: u8 = v147.clone();
-                                    let mut v148: i32 = v148.clone();
-                                    let mut v149: i32 = v149.clone();
-                                    let mut v150: i32 = v150.clone();
-                                    let mut v151: i32 = v151.clone();
-                                    let mut v152: i32 = v152.clone();
+                                    let mut v147: u8 = *v147;
+                                    let mut v148: i32 = *v148;
+                                    let mut v149: i32 = *v149;
+                                    let mut v150: i32 = *v150;
+                                    let mut v151: i32 = *v151;
+                                    let mut v152: i32 = *v152;
                                     let mut v153: bool = v148 >= v152;
                                     if v153 {
                                         let mut v154: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -7160,14 +7038,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                         let mut v156: u8 = v0.clone().as_bytes()[v148 as usize];
                                         let mut v157: bool = v156 == b'"';
                                         if v157 {
-                                            let mut v158: i32 = v148 + 1i32;
+                                            let mut v158: i32 = v148.wrapping_add(1i32);
                                             let mut v159: bool = b'\n' == v156;
                                             let (mut v163, mut v164, mut v165, mut v166): (i32, i32, i32, i32) = if v159 {
-                                                let mut v160: i32 = v149 + v151;
-                                                let mut v161: i32 = v150 + 1i32;
+                                                let mut v160: i32 = v149.wrapping_add(v151);
+                                                let mut v161: i32 = v150.wrapping_add(1i32);
                                                 (v160, v161, 1i32, v152)
                                             } else {
-                                                let mut v162: i32 = v151 + 1i32;
+                                                let mut v162: i32 = v151.wrapping_add(1i32);
                                                 (v149, v150, v162, v152)
                                             };
                                             US10::US10_0(b'"', v158, v163, v164, v165, v166)
@@ -7177,80 +7055,76 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                         }
                                     }
                                 }
-                                _ => unreachable!(),
                             };
                             let mut v196: US10 = match &v180 {
                                 US10::US10_1(v188, v189, v190, v191, v192, v193) => { // Error
                                     let mut v188: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v188.clone();
-                                    let mut v189: i32 = v189.clone();
-                                    let mut v190: i32 = v190.clone();
-                                    let mut v191: i32 = v191.clone();
-                                    let mut v192: i32 = v192.clone();
-                                    let mut v193: i32 = v193.clone();
+                                    let mut v189: i32 = *v189;
+                                    let mut v190: i32 = *v190;
+                                    let mut v191: i32 = *v191;
+                                    let mut v192: i32 = *v192;
+                                    let mut v193: i32 = *v193;
                                     US10::US10_1(v188.clone(), v189, v190, v191, v192, v193)
                                 }
                                 US10::US10_0(v181, v182, v183, v184, v185, v186) => { // Ok
-                                    let mut v181: u8 = v181.clone();
-                                    let mut v182: i32 = v182.clone();
-                                    let mut v183: i32 = v183.clone();
-                                    let mut v184: i32 = v184.clone();
-                                    let mut v185: i32 = v185.clone();
-                                    let mut v186: i32 = v186.clone();
+                                    let mut v181: u8 = *v181;
+                                    let mut v182: i32 = *v182;
+                                    let mut v183: i32 = *v183;
+                                    let mut v184: i32 = *v184;
+                                    let mut v185: i32 = *v185;
+                                    let mut v186: i32 = *v186;
                                     US10::US10_0(b'"', v182, v183, v184, v185, v186)
                                 }
-                                _ => unreachable!(),
                             };
                             match &v196 {
                                 US10::US10_1(v203, v204, v205, v206, v207, v208) => { // Error
                                     let mut v203: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v203.clone();
-                                    let mut v204: i32 = v204.clone();
-                                    let mut v205: i32 = v205.clone();
-                                    let mut v206: i32 = v206.clone();
-                                    let mut v207: i32 = v207.clone();
-                                    let mut v208: i32 = v208.clone();
+                                    let mut v204: i32 = *v204;
+                                    let mut v205: i32 = *v205;
+                                    let mut v206: i32 = *v206;
+                                    let mut v207: i32 = *v207;
+                                    let mut v208: i32 = *v208;
                                     let mut v209: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                     US10::US10_1(v209.clone(), v40, v41, v42, v43, v44)
                                 }
                                 US10::US10_0(v197, v198, v199, v200, v201, v202) => { // Ok
-                                    let mut v197: u8 = v197.clone();
-                                    let mut v198: i32 = v198.clone();
-                                    let mut v199: i32 = v199.clone();
-                                    let mut v200: i32 = v200.clone();
-                                    let mut v201: i32 = v201.clone();
-                                    let mut v202: i32 = v202.clone();
+                                    let mut v197: u8 = *v197;
+                                    let mut v198: i32 = *v198;
+                                    let mut v199: i32 = *v199;
+                                    let mut v200: i32 = *v200;
+                                    let mut v201: i32 = *v201;
+                                    let mut v202: i32 = *v202;
                                     v196.clone()
                                 }
-                                _ => unreachable!(),
                             }
                         }
                         US10::US10_0(v117, v118, v119, v120, v121, v122) => { // Ok
-                            let mut v117: u8 = v117.clone();
-                            let mut v118: i32 = v118.clone();
-                            let mut v119: i32 = v119.clone();
-                            let mut v120: i32 = v120.clone();
-                            let mut v121: i32 = v121.clone();
-                            let mut v122: i32 = v122.clone();
+                            let mut v117: u8 = *v117;
+                            let mut v118: i32 = *v118;
+                            let mut v119: i32 = *v119;
+                            let mut v120: i32 = *v120;
+                            let mut v121: i32 = *v121;
+                            let mut v122: i32 = *v122;
                             v116.clone()
                         }
-                        _ => unreachable!(),
                     };
                     let mut v846: US11 = match &v214 {
                         US10::US10_1(v838, v839, v840, v841, v842, v843) => { // Error
                             let mut v838: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v838.clone();
-                            let mut v839: i32 = v839.clone();
-                            let mut v840: i32 = v840.clone();
-                            let mut v841: i32 = v841.clone();
-                            let mut v842: i32 = v842.clone();
-                            let mut v843: i32 = v843.clone();
+                            let mut v839: i32 = *v839;
+                            let mut v840: i32 = *v840;
+                            let mut v841: i32 = *v841;
+                            let mut v842: i32 = *v842;
+                            let mut v843: i32 = *v843;
                             US11::US11_1(v838.clone(), v839, v840, v841, v842, v843)
                         }
                         US10::US10_0(v215, v216, v217, v218, v219, v220) => { // Ok
-                            let mut v215: u8 = v215.clone();
-                            let mut v216: i32 = v216.clone();
-                            let mut v217: i32 = v217.clone();
-                            let mut v218: i32 = v218.clone();
-                            let mut v219: i32 = v219.clone();
-                            let mut v220: i32 = v220.clone();
+                            let mut v215: u8 = *v215;
+                            let mut v216: i32 = *v216;
+                            let mut v217: i32 = *v217;
+                            let mut v218: i32 = *v218;
+                            let mut v219: i32 = *v219;
+                            let mut v220: i32 = *v220;
                             let (mut v221, mut v222, mut v223, mut v224, mut v225): (i32, i32, i32, i32, i32) = method112(v217, v218, v219, v220, v0.clone(), v216);
                             let mut v226: bool = v221 > v216;
                             let mut v236: US11 = if v226 {
@@ -7260,7 +7134,7 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                     v228.clone()
                                 } else {
                                     let mut v229: bool = v216 == v221;
-                                    let mut v230: i32 = v221 - 1i32;
+                                    let mut v230: i32 = v221.wrapping_sub(1i32);
                                     let mut v231: Rc<str> = string_slice(&v0.clone(), v216 as i64, v230 as i64);
                                     v231.clone()
                                 };
@@ -7272,11 +7146,11 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                             let mut v431: US11 = match &v236 {
                                 US11::US11_1(v243, v244, v245, v246, v247, v248) => { // Error
                                     let mut v243: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v243.clone();
-                                    let mut v244: i32 = v244.clone();
-                                    let mut v245: i32 = v245.clone();
-                                    let mut v246: i32 = v246.clone();
-                                    let mut v247: i32 = v247.clone();
-                                    let mut v248: i32 = v248.clone();
+                                    let mut v244: i32 = *v244;
+                                    let mut v245: i32 = *v245;
+                                    let mut v246: i32 = *v246;
+                                    let mut v247: i32 = *v247;
+                                    let mut v248: i32 = *v248;
                                     let mut v249: bool = v216 >= v220;
                                     let mut v267: US10 = if v249 {
                                         let mut v250: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure35();
@@ -7285,14 +7159,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                         let mut v252: u8 = v0.clone().as_bytes()[v216 as usize];
                                         let mut v253: bool = v252 == b'\\';
                                         if v253 {
-                                            let mut v254: i32 = v216 + 1i32;
+                                            let mut v254: i32 = v216.wrapping_add(1i32);
                                             let mut v255: bool = b'\n' == v252;
                                             let (mut v259, mut v260, mut v261, mut v262): (i32, i32, i32, i32) = if v255 {
-                                                let mut v256: i32 = v217 + v219;
-                                                let mut v257: i32 = v218 + 1i32;
+                                                let mut v256: i32 = v217.wrapping_add(v219);
+                                                let mut v257: i32 = v218.wrapping_add(1i32);
                                                 (v256, v257, 1i32, v220)
                                             } else {
-                                                let mut v258: i32 = v219 + 1i32;
+                                                let mut v258: i32 = v219.wrapping_add(1i32);
                                                 (v217, v218, v258, v220)
                                             };
                                             US10::US10_0(b'\\', v254, v259, v260, v261, v262)
@@ -7304,20 +7178,20 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                     let mut v302: US10 = match &v267 {
                                         US10::US10_1(v294, v295, v296, v297, v298, v299) => { // Error
                                             let mut v294: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v294.clone();
-                                            let mut v295: i32 = v295.clone();
-                                            let mut v296: i32 = v296.clone();
-                                            let mut v297: i32 = v297.clone();
-                                            let mut v298: i32 = v298.clone();
-                                            let mut v299: i32 = v299.clone();
+                                            let mut v295: i32 = *v295;
+                                            let mut v296: i32 = *v296;
+                                            let mut v297: i32 = *v297;
+                                            let mut v298: i32 = *v298;
+                                            let mut v299: i32 = *v299;
                                             US10::US10_1(v294.clone(), v295, v296, v297, v298, v299)
                                         }
                                         US10::US10_0(v268, v269, v270, v271, v272, v273) => { // Ok
-                                            let mut v268: u8 = v268.clone();
-                                            let mut v269: i32 = v269.clone();
-                                            let mut v270: i32 = v270.clone();
-                                            let mut v271: i32 = v271.clone();
-                                            let mut v272: i32 = v272.clone();
-                                            let mut v273: i32 = v273.clone();
+                                            let mut v268: u8 = *v268;
+                                            let mut v269: i32 = *v269;
+                                            let mut v270: i32 = *v270;
+                                            let mut v271: i32 = *v271;
+                                            let mut v272: i32 = *v272;
+                                            let mut v273: i32 = *v273;
                                             let mut v274: bool = v269 >= v273;
                                             if v274 {
                                                 let mut v275: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure40();
@@ -7327,14 +7201,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                 let mut v278: bool = v277 == b'"';
                                                 let mut v279: bool = v278 == false;
                                                 if v279 {
-                                                    let mut v280: i32 = v269 + 1i32;
+                                                    let mut v280: i32 = v269.wrapping_add(1i32);
                                                     let mut v281: bool = b'\n' == v277;
                                                     let (mut v285, mut v286, mut v287, mut v288): (i32, i32, i32, i32) = if v281 {
-                                                        let mut v282: i32 = v270 + v272;
-                                                        let mut v283: i32 = v271 + 1i32;
+                                                        let mut v282: i32 = v270.wrapping_add(v272);
+                                                        let mut v283: i32 = v271.wrapping_add(1i32);
                                                         (v282, v283, 1i32, v273)
                                                     } else {
-                                                        let mut v284: i32 = v272 + 1i32;
+                                                        let mut v284: i32 = v272.wrapping_add(1i32);
                                                         (v270, v271, v284, v273)
                                                     };
                                                     US10::US10_0(v277, v280, v285, v286, v287, v288)
@@ -7344,47 +7218,45 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                 }
                                             }
                                         }
-                                        _ => unreachable!(),
                                     };
                                     let mut v324: US11 = match &v302 {
                                         US10::US10_1(v316, v317, v318, v319, v320, v321) => { // Error
                                             let mut v316: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v316.clone();
-                                            let mut v317: i32 = v317.clone();
-                                            let mut v318: i32 = v318.clone();
-                                            let mut v319: i32 = v319.clone();
-                                            let mut v320: i32 = v320.clone();
-                                            let mut v321: i32 = v321.clone();
+                                            let mut v317: i32 = *v317;
+                                            let mut v318: i32 = *v318;
+                                            let mut v319: i32 = *v319;
+                                            let mut v320: i32 = *v320;
+                                            let mut v321: i32 = *v321;
                                             US11::US11_1(v316.clone(), v317, v318, v319, v320, v321)
                                         }
                                         US10::US10_0(v303, v304, v305, v306, v307, v308) => { // Ok
-                                            let mut v303: u8 = v303.clone();
-                                            let mut v304: i32 = v304.clone();
-                                            let mut v305: i32 = v305.clone();
-                                            let mut v306: i32 = v306.clone();
-                                            let mut v307: i32 = v307.clone();
-                                            let mut v308: i32 = v308.clone();
+                                            let mut v303: u8 = *v303;
+                                            let mut v304: i32 = *v304;
+                                            let mut v305: i32 = *v305;
+                                            let mut v306: i32 = *v306;
+                                            let mut v307: i32 = *v307;
+                                            let mut v308: i32 = *v308;
                                             let mut v309: bool = v216 >= v304;
                                             let mut v314: Rc<str> = if v309 {
                                                 let mut v310: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                                 v310.clone()
                                             } else {
                                                 let mut v311: bool = v216 == v304;
-                                                let mut v312: i32 = v304 - 1i32;
+                                                let mut v312: i32 = v304.wrapping_sub(1i32);
                                                 let mut v313: Rc<str> = string_slice(&v0.clone(), v216 as i64, v312 as i64);
                                                 v313.clone()
                                             };
                                             US11::US11_0(v314.clone(), v304, v305, v306, v307, v308)
                                         }
-                                        _ => unreachable!(),
                                     };
                                     match &v324 {
                                         US11::US11_1(v331, v332, v333, v334, v335, v336) => { // Error
                                             let mut v331: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v331.clone();
-                                            let mut v332: i32 = v332.clone();
-                                            let mut v333: i32 = v333.clone();
-                                            let mut v334: i32 = v334.clone();
-                                            let mut v335: i32 = v335.clone();
-                                            let mut v336: i32 = v336.clone();
+                                            let mut v332: i32 = *v332;
+                                            let mut v333: i32 = *v333;
+                                            let mut v334: i32 = *v334;
+                                            let mut v335: i32 = *v335;
+                                            let mut v336: i32 = *v336;
                                             let mut v354: US10 = if v249 {
                                                 let mut v337: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                                                 US10::US10_1(v337.clone(), v216, v217, v218, v219, v220)
@@ -7392,14 +7264,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                 let mut v339: u8 = v0.clone().as_bytes()[v216 as usize];
                                                 let mut v340: bool = v339 == b'`';
                                                 if v340 {
-                                                    let mut v341: i32 = v216 + 1i32;
+                                                    let mut v341: i32 = v216.wrapping_add(1i32);
                                                     let mut v342: bool = b'\n' == v339;
                                                     let (mut v346, mut v347, mut v348, mut v349): (i32, i32, i32, i32) = if v342 {
-                                                        let mut v343: i32 = v217 + v219;
-                                                        let mut v344: i32 = v218 + 1i32;
+                                                        let mut v343: i32 = v217.wrapping_add(v219);
+                                                        let mut v344: i32 = v218.wrapping_add(1i32);
                                                         (v343, v344, 1i32, v220)
                                                     } else {
-                                                        let mut v345: i32 = v219 + 1i32;
+                                                        let mut v345: i32 = v219.wrapping_add(1i32);
                                                         (v217, v218, v345, v220)
                                                     };
                                                     US10::US10_0(b'`', v341, v346, v347, v348, v349)
@@ -7411,20 +7283,20 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                             let mut v389: US10 = match &v354 {
                                                 US10::US10_1(v381, v382, v383, v384, v385, v386) => { // Error
                                                     let mut v381: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v381.clone();
-                                                    let mut v382: i32 = v382.clone();
-                                                    let mut v383: i32 = v383.clone();
-                                                    let mut v384: i32 = v384.clone();
-                                                    let mut v385: i32 = v385.clone();
-                                                    let mut v386: i32 = v386.clone();
+                                                    let mut v382: i32 = *v382;
+                                                    let mut v383: i32 = *v383;
+                                                    let mut v384: i32 = *v384;
+                                                    let mut v385: i32 = *v385;
+                                                    let mut v386: i32 = *v386;
                                                     US10::US10_1(v381.clone(), v382, v383, v384, v385, v386)
                                                 }
                                                 US10::US10_0(v355, v356, v357, v358, v359, v360) => { // Ok
-                                                    let mut v355: u8 = v355.clone();
-                                                    let mut v356: i32 = v356.clone();
-                                                    let mut v357: i32 = v357.clone();
-                                                    let mut v358: i32 = v358.clone();
-                                                    let mut v359: i32 = v359.clone();
-                                                    let mut v360: i32 = v360.clone();
+                                                    let mut v355: u8 = *v355;
+                                                    let mut v356: i32 = *v356;
+                                                    let mut v357: i32 = *v357;
+                                                    let mut v358: i32 = *v358;
+                                                    let mut v359: i32 = *v359;
+                                                    let mut v360: i32 = *v360;
                                                     let mut v361: bool = v356 >= v360;
                                                     if v361 {
                                                         let mut v362: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure40();
@@ -7434,14 +7306,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                         let mut v365: bool = v364 == b'"';
                                                         let mut v366: bool = v365 == false;
                                                         if v366 {
-                                                            let mut v367: i32 = v356 + 1i32;
+                                                            let mut v367: i32 = v356.wrapping_add(1i32);
                                                             let mut v368: bool = b'\n' == v364;
                                                             let (mut v372, mut v373, mut v374, mut v375): (i32, i32, i32, i32) = if v368 {
-                                                                let mut v369: i32 = v357 + v359;
-                                                                let mut v370: i32 = v358 + 1i32;
+                                                                let mut v369: i32 = v357.wrapping_add(v359);
+                                                                let mut v370: i32 = v358.wrapping_add(1i32);
                                                                 (v369, v370, 1i32, v360)
                                                             } else {
-                                                                let mut v371: i32 = v359 + 1i32;
+                                                                let mut v371: i32 = v359.wrapping_add(1i32);
                                                                 (v357, v358, v371, v360)
                                                             };
                                                             US10::US10_0(v364, v367, v372, v373, v374, v375)
@@ -7451,103 +7323,98 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                         }
                                                     }
                                                 }
-                                                _ => unreachable!(),
                                             };
                                             let mut v411: US11 = match &v389 {
                                                 US10::US10_1(v403, v404, v405, v406, v407, v408) => { // Error
                                                     let mut v403: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v403.clone();
-                                                    let mut v404: i32 = v404.clone();
-                                                    let mut v405: i32 = v405.clone();
-                                                    let mut v406: i32 = v406.clone();
-                                                    let mut v407: i32 = v407.clone();
-                                                    let mut v408: i32 = v408.clone();
+                                                    let mut v404: i32 = *v404;
+                                                    let mut v405: i32 = *v405;
+                                                    let mut v406: i32 = *v406;
+                                                    let mut v407: i32 = *v407;
+                                                    let mut v408: i32 = *v408;
                                                     US11::US11_1(v403.clone(), v404, v405, v406, v407, v408)
                                                 }
                                                 US10::US10_0(v390, v391, v392, v393, v394, v395) => { // Ok
-                                                    let mut v390: u8 = v390.clone();
-                                                    let mut v391: i32 = v391.clone();
-                                                    let mut v392: i32 = v392.clone();
-                                                    let mut v393: i32 = v393.clone();
-                                                    let mut v394: i32 = v394.clone();
-                                                    let mut v395: i32 = v395.clone();
+                                                    let mut v390: u8 = *v390;
+                                                    let mut v391: i32 = *v391;
+                                                    let mut v392: i32 = *v392;
+                                                    let mut v393: i32 = *v393;
+                                                    let mut v394: i32 = *v394;
+                                                    let mut v395: i32 = *v395;
                                                     let mut v396: bool = v216 >= v391;
                                                     let mut v401: Rc<str> = if v396 {
                                                         let mut v397: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                                         v397.clone()
                                                     } else {
                                                         let mut v398: bool = v216 == v391;
-                                                        let mut v399: i32 = v391 - 1i32;
+                                                        let mut v399: i32 = v391.wrapping_sub(1i32);
                                                         let mut v400: Rc<str> = string_slice(&v0.clone(), v216 as i64, v399 as i64);
                                                         v400.clone()
                                                     };
                                                     US11::US11_0(v401.clone(), v391, v392, v393, v394, v395)
                                                 }
-                                                _ => unreachable!(),
                                             };
                                             match &v411 {
                                                 US11::US11_1(v418, v419, v420, v421, v422, v423) => { // Error
                                                     let mut v418: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v418.clone();
-                                                    let mut v419: i32 = v419.clone();
-                                                    let mut v420: i32 = v420.clone();
-                                                    let mut v421: i32 = v421.clone();
-                                                    let mut v422: i32 = v422.clone();
-                                                    let mut v423: i32 = v423.clone();
+                                                    let mut v419: i32 = *v419;
+                                                    let mut v420: i32 = *v420;
+                                                    let mut v421: i32 = *v421;
+                                                    let mut v422: i32 = *v422;
+                                                    let mut v423: i32 = *v423;
                                                     let mut v424: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                                     US11::US11_1(v424.clone(), v216, v217, v218, v219, v220)
                                                 }
                                                 US11::US11_0(v412, v413, v414, v415, v416, v417) => { // Ok
                                                     let mut v412: Rc<str> = v412.clone();
-                                                    let mut v413: i32 = v413.clone();
-                                                    let mut v414: i32 = v414.clone();
-                                                    let mut v415: i32 = v415.clone();
-                                                    let mut v416: i32 = v416.clone();
-                                                    let mut v417: i32 = v417.clone();
+                                                    let mut v413: i32 = *v413;
+                                                    let mut v414: i32 = *v414;
+                                                    let mut v415: i32 = *v415;
+                                                    let mut v416: i32 = *v416;
+                                                    let mut v417: i32 = *v417;
                                                     v411.clone()
                                                 }
-                                                _ => unreachable!(),
                                             }
                                         }
                                         US11::US11_0(v325, v326, v327, v328, v329, v330) => { // Ok
                                             let mut v325: Rc<str> = v325.clone();
-                                            let mut v326: i32 = v326.clone();
-                                            let mut v327: i32 = v327.clone();
-                                            let mut v328: i32 = v328.clone();
-                                            let mut v329: i32 = v329.clone();
-                                            let mut v330: i32 = v330.clone();
+                                            let mut v326: i32 = *v326;
+                                            let mut v327: i32 = *v327;
+                                            let mut v328: i32 = *v328;
+                                            let mut v329: i32 = *v329;
+                                            let mut v330: i32 = *v330;
                                             v324.clone()
                                         }
-                                        _ => unreachable!(),
                                     }
                                 }
                                 US11::US11_0(v237, v238, v239, v240, v241, v242) => { // Ok
                                     let mut v237: Rc<str> = v237.clone();
-                                    let mut v238: i32 = v238.clone();
-                                    let mut v239: i32 = v239.clone();
-                                    let mut v240: i32 = v240.clone();
-                                    let mut v241: i32 = v241.clone();
-                                    let mut v242: i32 = v242.clone();
+                                    let mut v238: i32 = *v238;
+                                    let mut v239: i32 = *v239;
+                                    let mut v240: i32 = *v240;
+                                    let mut v241: i32 = *v241;
+                                    let mut v242: i32 = *v242;
                                     v236.clone()
                                 }
-                                _ => unreachable!(),
                             };
                             let mut v454: US11 = match &v431 {
                                 US11::US11_1(v432, v433, v434, v435, v436, v437) => { // Error
                                     let mut v432: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v432.clone();
-                                    let mut v433: i32 = v433.clone();
-                                    let mut v434: i32 = v434.clone();
-                                    let mut v435: i32 = v435.clone();
-                                    let mut v436: i32 = v436.clone();
-                                    let mut v437: i32 = v437.clone();
+                                    let mut v433: i32 = *v433;
+                                    let mut v434: i32 = *v434;
+                                    let mut v435: i32 = *v435;
+                                    let mut v436: i32 = *v436;
+                                    let mut v437: i32 = *v437;
                                     let mut v438: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                     US11::US11_0(v438.clone(), v216, v217, v218, v219, v220)
                                 }
                                 US11::US11_0(v440, v441, v442, v443, v444, v445) => { // Ok
                                     let mut v440: Rc<str> = v440.clone();
-                                    let mut v441: i32 = v441.clone();
-                                    let mut v442: i32 = v442.clone();
-                                    let mut v443: i32 = v443.clone();
-                                    let mut v444: i32 = v444.clone();
-                                    let mut v445: i32 = v445.clone();
+                                    let mut v441: i32 = *v441;
+                                    let mut v442: i32 = *v442;
+                                    let mut v443: i32 = *v443;
+                                    let mut v444: i32 = *v444;
+                                    let mut v445: i32 = *v445;
                                     let mut v446: bool = v441 == v216;
                                     if v446 {
                                         let mut v447: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure42();
@@ -7558,16 +7425,15 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                         method116(v0.clone(), v449.clone(), v440.clone(), v450, v441, v442, v443, v444, v445)
                                     }
                                 }
-                                _ => unreachable!(),
                             };
                             match &v454 {
                                 US11::US11_1(v645, v646, v647, v648, v649, v650) => { // Error
                                     let mut v645: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v645.clone();
-                                    let mut v646: i32 = v646.clone();
-                                    let mut v647: i32 = v647.clone();
-                                    let mut v648: i32 = v648.clone();
-                                    let mut v649: i32 = v649.clone();
-                                    let mut v650: i32 = v650.clone();
+                                    let mut v646: i32 = *v646;
+                                    let mut v647: i32 = *v647;
+                                    let mut v648: i32 = *v648;
+                                    let mut v649: i32 = *v649;
+                                    let mut v650: i32 = *v650;
                                     let mut v651: bool = v216 >= v220;
                                     let mut v669: US10 = if v651 {
                                         let mut v652: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure35();
@@ -7576,14 +7442,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                         let mut v654: u8 = v0.clone().as_bytes()[v216 as usize];
                                         let mut v655: bool = v654 == b'\\';
                                         if v655 {
-                                            let mut v656: i32 = v216 + 1i32;
+                                            let mut v656: i32 = v216.wrapping_add(1i32);
                                             let mut v657: bool = b'\n' == v654;
                                             let (mut v661, mut v662, mut v663, mut v664): (i32, i32, i32, i32) = if v657 {
-                                                let mut v658: i32 = v217 + v219;
-                                                let mut v659: i32 = v218 + 1i32;
+                                                let mut v658: i32 = v217.wrapping_add(v219);
+                                                let mut v659: i32 = v218.wrapping_add(1i32);
                                                 (v658, v659, 1i32, v220)
                                             } else {
-                                                let mut v660: i32 = v219 + 1i32;
+                                                let mut v660: i32 = v219.wrapping_add(1i32);
                                                 (v217, v218, v660, v220)
                                             };
                                             US10::US10_0(b'\\', v656, v661, v662, v663, v664)
@@ -7595,20 +7461,20 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                     let mut v703: US10 = match &v669 {
                                         US10::US10_1(v695, v696, v697, v698, v699, v700) => { // Error
                                             let mut v695: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v695.clone();
-                                            let mut v696: i32 = v696.clone();
-                                            let mut v697: i32 = v697.clone();
-                                            let mut v698: i32 = v698.clone();
-                                            let mut v699: i32 = v699.clone();
-                                            let mut v700: i32 = v700.clone();
+                                            let mut v696: i32 = *v696;
+                                            let mut v697: i32 = *v697;
+                                            let mut v698: i32 = *v698;
+                                            let mut v699: i32 = *v699;
+                                            let mut v700: i32 = *v700;
                                             US10::US10_1(v695.clone(), v696, v697, v698, v699, v700)
                                         }
                                         US10::US10_0(v670, v671, v672, v673, v674, v675) => { // Ok
-                                            let mut v670: u8 = v670.clone();
-                                            let mut v671: i32 = v671.clone();
-                                            let mut v672: i32 = v672.clone();
-                                            let mut v673: i32 = v673.clone();
-                                            let mut v674: i32 = v674.clone();
-                                            let mut v675: i32 = v675.clone();
+                                            let mut v670: u8 = *v670;
+                                            let mut v671: i32 = *v671;
+                                            let mut v672: i32 = *v672;
+                                            let mut v673: i32 = *v673;
+                                            let mut v674: i32 = *v674;
+                                            let mut v675: i32 = *v675;
                                             let mut v676: bool = v671 >= v675;
                                             if v676 {
                                                 let mut v677: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -7617,14 +7483,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                 let mut v679: u8 = v0.clone().as_bytes()[v671 as usize];
                                                 let mut v680: bool = v679 == b'"';
                                                 if v680 {
-                                                    let mut v681: i32 = v671 + 1i32;
+                                                    let mut v681: i32 = v671.wrapping_add(1i32);
                                                     let mut v682: bool = b'\n' == v679;
                                                     let (mut v686, mut v687, mut v688, mut v689): (i32, i32, i32, i32) = if v682 {
-                                                        let mut v683: i32 = v672 + v674;
-                                                        let mut v684: i32 = v673 + 1i32;
+                                                        let mut v683: i32 = v672.wrapping_add(v674);
+                                                        let mut v684: i32 = v673.wrapping_add(1i32);
                                                         (v683, v684, 1i32, v675)
                                                     } else {
-                                                        let mut v685: i32 = v674 + 1i32;
+                                                        let mut v685: i32 = v674.wrapping_add(1i32);
                                                         (v672, v673, v685, v675)
                                                     };
                                                     US10::US10_0(b'"', v681, v686, v687, v688, v689)
@@ -7634,37 +7500,35 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                 }
                                             }
                                         }
-                                        _ => unreachable!(),
                                     };
                                     let mut v719: US10 = match &v703 {
                                         US10::US10_1(v711, v712, v713, v714, v715, v716) => { // Error
                                             let mut v711: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v711.clone();
-                                            let mut v712: i32 = v712.clone();
-                                            let mut v713: i32 = v713.clone();
-                                            let mut v714: i32 = v714.clone();
-                                            let mut v715: i32 = v715.clone();
-                                            let mut v716: i32 = v716.clone();
+                                            let mut v712: i32 = *v712;
+                                            let mut v713: i32 = *v713;
+                                            let mut v714: i32 = *v714;
+                                            let mut v715: i32 = *v715;
+                                            let mut v716: i32 = *v716;
                                             US10::US10_1(v711.clone(), v712, v713, v714, v715, v716)
                                         }
                                         US10::US10_0(v704, v705, v706, v707, v708, v709) => { // Ok
-                                            let mut v704: u8 = v704.clone();
-                                            let mut v705: i32 = v705.clone();
-                                            let mut v706: i32 = v706.clone();
-                                            let mut v707: i32 = v707.clone();
-                                            let mut v708: i32 = v708.clone();
-                                            let mut v709: i32 = v709.clone();
+                                            let mut v704: u8 = *v704;
+                                            let mut v705: i32 = *v705;
+                                            let mut v706: i32 = *v706;
+                                            let mut v707: i32 = *v707;
+                                            let mut v708: i32 = *v708;
+                                            let mut v709: i32 = *v709;
                                             US10::US10_0(b'"', v705, v706, v707, v708, v709)
                                         }
-                                        _ => unreachable!(),
                                     };
                                     let mut v817: US10 = match &v719 {
                                         US10::US10_1(v726, v727, v728, v729, v730, v731) => { // Error
                                             let mut v726: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v726.clone();
-                                            let mut v727: i32 = v727.clone();
-                                            let mut v728: i32 = v728.clone();
-                                            let mut v729: i32 = v729.clone();
-                                            let mut v730: i32 = v730.clone();
-                                            let mut v731: i32 = v731.clone();
+                                            let mut v727: i32 = *v727;
+                                            let mut v728: i32 = *v728;
+                                            let mut v729: i32 = *v729;
+                                            let mut v730: i32 = *v730;
+                                            let mut v731: i32 = *v731;
                                             let mut v749: US10 = if v651 {
                                                 let mut v732: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                                                 US10::US10_1(v732.clone(), v216, v217, v218, v219, v220)
@@ -7672,14 +7536,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                 let mut v734: u8 = v0.clone().as_bytes()[v216 as usize];
                                                 let mut v735: bool = v734 == b'`';
                                                 if v735 {
-                                                    let mut v736: i32 = v216 + 1i32;
+                                                    let mut v736: i32 = v216.wrapping_add(1i32);
                                                     let mut v737: bool = b'\n' == v734;
                                                     let (mut v741, mut v742, mut v743, mut v744): (i32, i32, i32, i32) = if v737 {
-                                                        let mut v738: i32 = v217 + v219;
-                                                        let mut v739: i32 = v218 + 1i32;
+                                                        let mut v738: i32 = v217.wrapping_add(v219);
+                                                        let mut v739: i32 = v218.wrapping_add(1i32);
                                                         (v738, v739, 1i32, v220)
                                                     } else {
-                                                        let mut v740: i32 = v219 + 1i32;
+                                                        let mut v740: i32 = v219.wrapping_add(1i32);
                                                         (v217, v218, v740, v220)
                                                     };
                                                     US10::US10_0(b'`', v736, v741, v742, v743, v744)
@@ -7691,20 +7555,20 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                             let mut v783: US10 = match &v749 {
                                                 US10::US10_1(v775, v776, v777, v778, v779, v780) => { // Error
                                                     let mut v775: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v775.clone();
-                                                    let mut v776: i32 = v776.clone();
-                                                    let mut v777: i32 = v777.clone();
-                                                    let mut v778: i32 = v778.clone();
-                                                    let mut v779: i32 = v779.clone();
-                                                    let mut v780: i32 = v780.clone();
+                                                    let mut v776: i32 = *v776;
+                                                    let mut v777: i32 = *v777;
+                                                    let mut v778: i32 = *v778;
+                                                    let mut v779: i32 = *v779;
+                                                    let mut v780: i32 = *v780;
                                                     US10::US10_1(v775.clone(), v776, v777, v778, v779, v780)
                                                 }
                                                 US10::US10_0(v750, v751, v752, v753, v754, v755) => { // Ok
-                                                    let mut v750: u8 = v750.clone();
-                                                    let mut v751: i32 = v751.clone();
-                                                    let mut v752: i32 = v752.clone();
-                                                    let mut v753: i32 = v753.clone();
-                                                    let mut v754: i32 = v754.clone();
-                                                    let mut v755: i32 = v755.clone();
+                                                    let mut v750: u8 = *v750;
+                                                    let mut v751: i32 = *v751;
+                                                    let mut v752: i32 = *v752;
+                                                    let mut v753: i32 = *v753;
+                                                    let mut v754: i32 = *v754;
+                                                    let mut v755: i32 = *v755;
                                                     let mut v756: bool = v751 >= v755;
                                                     if v756 {
                                                         let mut v757: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -7713,14 +7577,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                         let mut v759: u8 = v0.clone().as_bytes()[v751 as usize];
                                                         let mut v760: bool = v759 == b'"';
                                                         if v760 {
-                                                            let mut v761: i32 = v751 + 1i32;
+                                                            let mut v761: i32 = v751.wrapping_add(1i32);
                                                             let mut v762: bool = b'\n' == v759;
                                                             let (mut v766, mut v767, mut v768, mut v769): (i32, i32, i32, i32) = if v762 {
-                                                                let mut v763: i32 = v752 + v754;
-                                                                let mut v764: i32 = v753 + 1i32;
+                                                                let mut v763: i32 = v752.wrapping_add(v754);
+                                                                let mut v764: i32 = v753.wrapping_add(1i32);
                                                                 (v763, v764, 1i32, v755)
                                                             } else {
-                                                                let mut v765: i32 = v754 + 1i32;
+                                                                let mut v765: i32 = v754.wrapping_add(1i32);
                                                                 (v752, v753, v765, v755)
                                                             };
                                                             US10::US10_0(b'"', v761, v766, v767, v768, v769)
@@ -7730,94 +7594,89 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                         }
                                                     }
                                                 }
-                                                _ => unreachable!(),
                                             };
                                             let mut v799: US10 = match &v783 {
                                                 US10::US10_1(v791, v792, v793, v794, v795, v796) => { // Error
                                                     let mut v791: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v791.clone();
-                                                    let mut v792: i32 = v792.clone();
-                                                    let mut v793: i32 = v793.clone();
-                                                    let mut v794: i32 = v794.clone();
-                                                    let mut v795: i32 = v795.clone();
-                                                    let mut v796: i32 = v796.clone();
+                                                    let mut v792: i32 = *v792;
+                                                    let mut v793: i32 = *v793;
+                                                    let mut v794: i32 = *v794;
+                                                    let mut v795: i32 = *v795;
+                                                    let mut v796: i32 = *v796;
                                                     US10::US10_1(v791.clone(), v792, v793, v794, v795, v796)
                                                 }
                                                 US10::US10_0(v784, v785, v786, v787, v788, v789) => { // Ok
-                                                    let mut v784: u8 = v784.clone();
-                                                    let mut v785: i32 = v785.clone();
-                                                    let mut v786: i32 = v786.clone();
-                                                    let mut v787: i32 = v787.clone();
-                                                    let mut v788: i32 = v788.clone();
-                                                    let mut v789: i32 = v789.clone();
+                                                    let mut v784: u8 = *v784;
+                                                    let mut v785: i32 = *v785;
+                                                    let mut v786: i32 = *v786;
+                                                    let mut v787: i32 = *v787;
+                                                    let mut v788: i32 = *v788;
+                                                    let mut v789: i32 = *v789;
                                                     US10::US10_0(b'"', v785, v786, v787, v788, v789)
                                                 }
-                                                _ => unreachable!(),
                                             };
                                             match &v799 {
                                                 US10::US10_1(v806, v807, v808, v809, v810, v811) => { // Error
                                                     let mut v806: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v806.clone();
-                                                    let mut v807: i32 = v807.clone();
-                                                    let mut v808: i32 = v808.clone();
-                                                    let mut v809: i32 = v809.clone();
-                                                    let mut v810: i32 = v810.clone();
-                                                    let mut v811: i32 = v811.clone();
+                                                    let mut v807: i32 = *v807;
+                                                    let mut v808: i32 = *v808;
+                                                    let mut v809: i32 = *v809;
+                                                    let mut v810: i32 = *v810;
+                                                    let mut v811: i32 = *v811;
                                                     let mut v812: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                                     US10::US10_1(v812.clone(), v216, v217, v218, v219, v220)
                                                 }
                                                 US10::US10_0(v800, v801, v802, v803, v804, v805) => { // Ok
-                                                    let mut v800: u8 = v800.clone();
-                                                    let mut v801: i32 = v801.clone();
-                                                    let mut v802: i32 = v802.clone();
-                                                    let mut v803: i32 = v803.clone();
-                                                    let mut v804: i32 = v804.clone();
-                                                    let mut v805: i32 = v805.clone();
+                                                    let mut v800: u8 = *v800;
+                                                    let mut v801: i32 = *v801;
+                                                    let mut v802: i32 = *v802;
+                                                    let mut v803: i32 = *v803;
+                                                    let mut v804: i32 = *v804;
+                                                    let mut v805: i32 = *v805;
                                                     v799.clone()
                                                 }
-                                                _ => unreachable!(),
                                             }
                                         }
                                         US10::US10_0(v720, v721, v722, v723, v724, v725) => { // Ok
-                                            let mut v720: u8 = v720.clone();
-                                            let mut v721: i32 = v721.clone();
-                                            let mut v722: i32 = v722.clone();
-                                            let mut v723: i32 = v723.clone();
-                                            let mut v724: i32 = v724.clone();
-                                            let mut v725: i32 = v725.clone();
+                                            let mut v720: u8 = *v720;
+                                            let mut v721: i32 = *v721;
+                                            let mut v722: i32 = *v722;
+                                            let mut v723: i32 = *v723;
+                                            let mut v724: i32 = *v724;
+                                            let mut v725: i32 = *v725;
                                             v719.clone()
                                         }
-                                        _ => unreachable!(),
                                     };
                                     match &v817 {
                                         US10::US10_1(v826, v827, v828, v829, v830, v831) => { // Error
                                             let mut v826: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v826.clone();
-                                            let mut v827: i32 = v827.clone();
-                                            let mut v828: i32 = v828.clone();
-                                            let mut v829: i32 = v829.clone();
-                                            let mut v830: i32 = v830.clone();
-                                            let mut v831: i32 = v831.clone();
+                                            let mut v827: i32 = *v827;
+                                            let mut v828: i32 = *v828;
+                                            let mut v829: i32 = *v829;
+                                            let mut v830: i32 = *v830;
+                                            let mut v831: i32 = *v831;
                                             let mut v832: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure24();
                                             US11::US11_1(v832.clone(), v216, v217, v218, v219, v220)
                                         }
                                         US10::US10_0(v818, v819, v820, v821, v822, v823) => { // Ok
-                                            let mut v818: u8 = v818.clone();
-                                            let mut v819: i32 = v819.clone();
-                                            let mut v820: i32 = v820.clone();
-                                            let mut v821: i32 = v821.clone();
-                                            let mut v822: i32 = v822.clone();
-                                            let mut v823: i32 = v823.clone();
+                                            let mut v818: u8 = *v818;
+                                            let mut v819: i32 = *v819;
+                                            let mut v820: i32 = *v820;
+                                            let mut v821: i32 = *v821;
+                                            let mut v822: i32 = *v822;
+                                            let mut v823: i32 = *v823;
                                             let mut v824: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                             US11::US11_0(v824.clone(), v819, v820, v821, v822, v823)
                                         }
-                                        _ => unreachable!(),
                                     }
                                 }
                                 US11::US11_0(v455, v456, v457, v458, v459, v460) => { // Ok
                                     let mut v455: Rc<str> = v455.clone();
-                                    let mut v456: i32 = v456.clone();
-                                    let mut v457: i32 = v457.clone();
-                                    let mut v458: i32 = v458.clone();
-                                    let mut v459: i32 = v459.clone();
-                                    let mut v460: i32 = v460.clone();
+                                    let mut v456: i32 = *v456;
+                                    let mut v457: i32 = *v457;
+                                    let mut v458: i32 = *v458;
+                                    let mut v459: i32 = *v459;
+                                    let mut v460: i32 = *v460;
                                     let mut v461: bool = v456 >= v460;
                                     let mut v479: US10 = if v461 {
                                         let mut v462: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure35();
@@ -7826,14 +7685,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                         let mut v464: u8 = v0.clone().as_bytes()[v456 as usize];
                                         let mut v465: bool = v464 == b'\\';
                                         if v465 {
-                                            let mut v466: i32 = v456 + 1i32;
+                                            let mut v466: i32 = v456.wrapping_add(1i32);
                                             let mut v467: bool = b'\n' == v464;
                                             let (mut v471, mut v472, mut v473, mut v474): (i32, i32, i32, i32) = if v467 {
-                                                let mut v468: i32 = v457 + v459;
-                                                let mut v469: i32 = v458 + 1i32;
+                                                let mut v468: i32 = v457.wrapping_add(v459);
+                                                let mut v469: i32 = v458.wrapping_add(1i32);
                                                 (v468, v469, 1i32, v460)
                                             } else {
-                                                let mut v470: i32 = v459 + 1i32;
+                                                let mut v470: i32 = v459.wrapping_add(1i32);
                                                 (v457, v458, v470, v460)
                                             };
                                             US10::US10_0(b'\\', v466, v471, v472, v473, v474)
@@ -7845,20 +7704,20 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                     let mut v513: US10 = match &v479 {
                                         US10::US10_1(v505, v506, v507, v508, v509, v510) => { // Error
                                             let mut v505: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v505.clone();
-                                            let mut v506: i32 = v506.clone();
-                                            let mut v507: i32 = v507.clone();
-                                            let mut v508: i32 = v508.clone();
-                                            let mut v509: i32 = v509.clone();
-                                            let mut v510: i32 = v510.clone();
+                                            let mut v506: i32 = *v506;
+                                            let mut v507: i32 = *v507;
+                                            let mut v508: i32 = *v508;
+                                            let mut v509: i32 = *v509;
+                                            let mut v510: i32 = *v510;
                                             US10::US10_1(v505.clone(), v506, v507, v508, v509, v510)
                                         }
                                         US10::US10_0(v480, v481, v482, v483, v484, v485) => { // Ok
-                                            let mut v480: u8 = v480.clone();
-                                            let mut v481: i32 = v481.clone();
-                                            let mut v482: i32 = v482.clone();
-                                            let mut v483: i32 = v483.clone();
-                                            let mut v484: i32 = v484.clone();
-                                            let mut v485: i32 = v485.clone();
+                                            let mut v480: u8 = *v480;
+                                            let mut v481: i32 = *v481;
+                                            let mut v482: i32 = *v482;
+                                            let mut v483: i32 = *v483;
+                                            let mut v484: i32 = *v484;
+                                            let mut v485: i32 = *v485;
                                             let mut v486: bool = v481 >= v485;
                                             if v486 {
                                                 let mut v487: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -7867,14 +7726,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                 let mut v489: u8 = v0.clone().as_bytes()[v481 as usize];
                                                 let mut v490: bool = v489 == b'"';
                                                 if v490 {
-                                                    let mut v491: i32 = v481 + 1i32;
+                                                    let mut v491: i32 = v481.wrapping_add(1i32);
                                                     let mut v492: bool = b'\n' == v489;
                                                     let (mut v496, mut v497, mut v498, mut v499): (i32, i32, i32, i32) = if v492 {
-                                                        let mut v493: i32 = v482 + v484;
-                                                        let mut v494: i32 = v483 + 1i32;
+                                                        let mut v493: i32 = v482.wrapping_add(v484);
+                                                        let mut v494: i32 = v483.wrapping_add(1i32);
                                                         (v493, v494, 1i32, v485)
                                                     } else {
-                                                        let mut v495: i32 = v484 + 1i32;
+                                                        let mut v495: i32 = v484.wrapping_add(1i32);
                                                         (v482, v483, v495, v485)
                                                     };
                                                     US10::US10_0(b'"', v491, v496, v497, v498, v499)
@@ -7884,37 +7743,35 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                 }
                                             }
                                         }
-                                        _ => unreachable!(),
                                     };
                                     let mut v529: US10 = match &v513 {
                                         US10::US10_1(v521, v522, v523, v524, v525, v526) => { // Error
                                             let mut v521: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v521.clone();
-                                            let mut v522: i32 = v522.clone();
-                                            let mut v523: i32 = v523.clone();
-                                            let mut v524: i32 = v524.clone();
-                                            let mut v525: i32 = v525.clone();
-                                            let mut v526: i32 = v526.clone();
+                                            let mut v522: i32 = *v522;
+                                            let mut v523: i32 = *v523;
+                                            let mut v524: i32 = *v524;
+                                            let mut v525: i32 = *v525;
+                                            let mut v526: i32 = *v526;
                                             US10::US10_1(v521.clone(), v522, v523, v524, v525, v526)
                                         }
                                         US10::US10_0(v514, v515, v516, v517, v518, v519) => { // Ok
-                                            let mut v514: u8 = v514.clone();
-                                            let mut v515: i32 = v515.clone();
-                                            let mut v516: i32 = v516.clone();
-                                            let mut v517: i32 = v517.clone();
-                                            let mut v518: i32 = v518.clone();
-                                            let mut v519: i32 = v519.clone();
+                                            let mut v514: u8 = *v514;
+                                            let mut v515: i32 = *v515;
+                                            let mut v516: i32 = *v516;
+                                            let mut v517: i32 = *v517;
+                                            let mut v518: i32 = *v518;
+                                            let mut v519: i32 = *v519;
                                             US10::US10_0(b'"', v515, v516, v517, v518, v519)
                                         }
-                                        _ => unreachable!(),
                                     };
                                     let mut v627: US10 = match &v529 {
                                         US10::US10_1(v536, v537, v538, v539, v540, v541) => { // Error
                                             let mut v536: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v536.clone();
-                                            let mut v537: i32 = v537.clone();
-                                            let mut v538: i32 = v538.clone();
-                                            let mut v539: i32 = v539.clone();
-                                            let mut v540: i32 = v540.clone();
-                                            let mut v541: i32 = v541.clone();
+                                            let mut v537: i32 = *v537;
+                                            let mut v538: i32 = *v538;
+                                            let mut v539: i32 = *v539;
+                                            let mut v540: i32 = *v540;
+                                            let mut v541: i32 = *v541;
                                             let mut v559: US10 = if v461 {
                                                 let mut v542: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                                                 US10::US10_1(v542.clone(), v456, v457, v458, v459, v460)
@@ -7922,14 +7779,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                 let mut v544: u8 = v0.clone().as_bytes()[v456 as usize];
                                                 let mut v545: bool = v544 == b'`';
                                                 if v545 {
-                                                    let mut v546: i32 = v456 + 1i32;
+                                                    let mut v546: i32 = v456.wrapping_add(1i32);
                                                     let mut v547: bool = b'\n' == v544;
                                                     let (mut v551, mut v552, mut v553, mut v554): (i32, i32, i32, i32) = if v547 {
-                                                        let mut v548: i32 = v457 + v459;
-                                                        let mut v549: i32 = v458 + 1i32;
+                                                        let mut v548: i32 = v457.wrapping_add(v459);
+                                                        let mut v549: i32 = v458.wrapping_add(1i32);
                                                         (v548, v549, 1i32, v460)
                                                     } else {
-                                                        let mut v550: i32 = v459 + 1i32;
+                                                        let mut v550: i32 = v459.wrapping_add(1i32);
                                                         (v457, v458, v550, v460)
                                                     };
                                                     US10::US10_0(b'`', v546, v551, v552, v553, v554)
@@ -7941,20 +7798,20 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                             let mut v593: US10 = match &v559 {
                                                 US10::US10_1(v585, v586, v587, v588, v589, v590) => { // Error
                                                     let mut v585: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v585.clone();
-                                                    let mut v586: i32 = v586.clone();
-                                                    let mut v587: i32 = v587.clone();
-                                                    let mut v588: i32 = v588.clone();
-                                                    let mut v589: i32 = v589.clone();
-                                                    let mut v590: i32 = v590.clone();
+                                                    let mut v586: i32 = *v586;
+                                                    let mut v587: i32 = *v587;
+                                                    let mut v588: i32 = *v588;
+                                                    let mut v589: i32 = *v589;
+                                                    let mut v590: i32 = *v590;
                                                     US10::US10_1(v585.clone(), v586, v587, v588, v589, v590)
                                                 }
                                                 US10::US10_0(v560, v561, v562, v563, v564, v565) => { // Ok
-                                                    let mut v560: u8 = v560.clone();
-                                                    let mut v561: i32 = v561.clone();
-                                                    let mut v562: i32 = v562.clone();
-                                                    let mut v563: i32 = v563.clone();
-                                                    let mut v564: i32 = v564.clone();
-                                                    let mut v565: i32 = v565.clone();
+                                                    let mut v560: u8 = *v560;
+                                                    let mut v561: i32 = *v561;
+                                                    let mut v562: i32 = *v562;
+                                                    let mut v563: i32 = *v563;
+                                                    let mut v564: i32 = *v564;
+                                                    let mut v565: i32 = *v565;
                                                     let mut v566: bool = v561 >= v565;
                                                     if v566 {
                                                         let mut v567: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -7963,14 +7820,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                         let mut v569: u8 = v0.clone().as_bytes()[v561 as usize];
                                                         let mut v570: bool = v569 == b'"';
                                                         if v570 {
-                                                            let mut v571: i32 = v561 + 1i32;
+                                                            let mut v571: i32 = v561.wrapping_add(1i32);
                                                             let mut v572: bool = b'\n' == v569;
                                                             let (mut v576, mut v577, mut v578, mut v579): (i32, i32, i32, i32) = if v572 {
-                                                                let mut v573: i32 = v562 + v564;
-                                                                let mut v574: i32 = v563 + 1i32;
+                                                                let mut v573: i32 = v562.wrapping_add(v564);
+                                                                let mut v574: i32 = v563.wrapping_add(1i32);
                                                                 (v573, v574, 1i32, v565)
                                                             } else {
-                                                                let mut v575: i32 = v564 + 1i32;
+                                                                let mut v575: i32 = v564.wrapping_add(1i32);
                                                                 (v562, v563, v575, v565)
                                                             };
                                                             US10::US10_0(b'"', v571, v576, v577, v578, v579)
@@ -7980,99 +7837,92 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                         }
                                                     }
                                                 }
-                                                _ => unreachable!(),
                                             };
                                             let mut v609: US10 = match &v593 {
                                                 US10::US10_1(v601, v602, v603, v604, v605, v606) => { // Error
                                                     let mut v601: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v601.clone();
-                                                    let mut v602: i32 = v602.clone();
-                                                    let mut v603: i32 = v603.clone();
-                                                    let mut v604: i32 = v604.clone();
-                                                    let mut v605: i32 = v605.clone();
-                                                    let mut v606: i32 = v606.clone();
+                                                    let mut v602: i32 = *v602;
+                                                    let mut v603: i32 = *v603;
+                                                    let mut v604: i32 = *v604;
+                                                    let mut v605: i32 = *v605;
+                                                    let mut v606: i32 = *v606;
                                                     US10::US10_1(v601.clone(), v602, v603, v604, v605, v606)
                                                 }
                                                 US10::US10_0(v594, v595, v596, v597, v598, v599) => { // Ok
-                                                    let mut v594: u8 = v594.clone();
-                                                    let mut v595: i32 = v595.clone();
-                                                    let mut v596: i32 = v596.clone();
-                                                    let mut v597: i32 = v597.clone();
-                                                    let mut v598: i32 = v598.clone();
-                                                    let mut v599: i32 = v599.clone();
+                                                    let mut v594: u8 = *v594;
+                                                    let mut v595: i32 = *v595;
+                                                    let mut v596: i32 = *v596;
+                                                    let mut v597: i32 = *v597;
+                                                    let mut v598: i32 = *v598;
+                                                    let mut v599: i32 = *v599;
                                                     US10::US10_0(b'"', v595, v596, v597, v598, v599)
                                                 }
-                                                _ => unreachable!(),
                                             };
                                             match &v609 {
                                                 US10::US10_1(v616, v617, v618, v619, v620, v621) => { // Error
                                                     let mut v616: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v616.clone();
-                                                    let mut v617: i32 = v617.clone();
-                                                    let mut v618: i32 = v618.clone();
-                                                    let mut v619: i32 = v619.clone();
-                                                    let mut v620: i32 = v620.clone();
-                                                    let mut v621: i32 = v621.clone();
+                                                    let mut v617: i32 = *v617;
+                                                    let mut v618: i32 = *v618;
+                                                    let mut v619: i32 = *v619;
+                                                    let mut v620: i32 = *v620;
+                                                    let mut v621: i32 = *v621;
                                                     let mut v622: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                                     US10::US10_1(v622.clone(), v456, v457, v458, v459, v460)
                                                 }
                                                 US10::US10_0(v610, v611, v612, v613, v614, v615) => { // Ok
-                                                    let mut v610: u8 = v610.clone();
-                                                    let mut v611: i32 = v611.clone();
-                                                    let mut v612: i32 = v612.clone();
-                                                    let mut v613: i32 = v613.clone();
-                                                    let mut v614: i32 = v614.clone();
-                                                    let mut v615: i32 = v615.clone();
+                                                    let mut v610: u8 = *v610;
+                                                    let mut v611: i32 = *v611;
+                                                    let mut v612: i32 = *v612;
+                                                    let mut v613: i32 = *v613;
+                                                    let mut v614: i32 = *v614;
+                                                    let mut v615: i32 = *v615;
                                                     v609.clone()
                                                 }
-                                                _ => unreachable!(),
                                             }
                                         }
                                         US10::US10_0(v530, v531, v532, v533, v534, v535) => { // Ok
-                                            let mut v530: u8 = v530.clone();
-                                            let mut v531: i32 = v531.clone();
-                                            let mut v532: i32 = v532.clone();
-                                            let mut v533: i32 = v533.clone();
-                                            let mut v534: i32 = v534.clone();
-                                            let mut v535: i32 = v535.clone();
+                                            let mut v530: u8 = *v530;
+                                            let mut v531: i32 = *v531;
+                                            let mut v532: i32 = *v532;
+                                            let mut v533: i32 = *v533;
+                                            let mut v534: i32 = *v534;
+                                            let mut v535: i32 = *v535;
                                             v529.clone()
                                         }
-                                        _ => unreachable!(),
                                     };
                                     match &v627 {
                                         US10::US10_1(v635, v636, v637, v638, v639, v640) => { // Error
                                             let mut v635: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v635.clone();
-                                            let mut v636: i32 = v636.clone();
-                                            let mut v637: i32 = v637.clone();
-                                            let mut v638: i32 = v638.clone();
-                                            let mut v639: i32 = v639.clone();
-                                            let mut v640: i32 = v640.clone();
+                                            let mut v636: i32 = *v636;
+                                            let mut v637: i32 = *v637;
+                                            let mut v638: i32 = *v638;
+                                            let mut v639: i32 = *v639;
+                                            let mut v640: i32 = *v640;
                                             let mut v641: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure25(v216, v456, v635.clone(), v636, v637, v638, v639, v640);
                                             US11::US11_1(v641.clone(), v456, v457, v458, v459, v460)
                                         }
                                         US10::US10_0(v628, v629, v630, v631, v632, v633) => { // Ok
-                                            let mut v628: u8 = v628.clone();
-                                            let mut v629: i32 = v629.clone();
-                                            let mut v630: i32 = v630.clone();
-                                            let mut v631: i32 = v631.clone();
-                                            let mut v632: i32 = v632.clone();
-                                            let mut v633: i32 = v633.clone();
+                                            let mut v628: u8 = *v628;
+                                            let mut v629: i32 = *v629;
+                                            let mut v630: i32 = *v630;
+                                            let mut v631: i32 = *v631;
+                                            let mut v632: i32 = *v632;
+                                            let mut v633: i32 = *v633;
                                             US11::US11_0(v455.clone(), v629, v630, v631, v632, v633)
                                         }
-                                        _ => unreachable!(),
                                     }
                                 }
-                                _ => unreachable!(),
                             }
                         }
-                        _ => unreachable!(),
                     };
                     let mut v1204: US11 = match &v846 {
                         US11::US11_1(v853, v854, v855, v856, v857, v858) => { // Error
                             let mut v853: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v853.clone();
-                            let mut v854: i32 = v854.clone();
-                            let mut v855: i32 = v855.clone();
-                            let mut v856: i32 = v856.clone();
-                            let mut v857: i32 = v857.clone();
-                            let mut v858: i32 = v858.clone();
+                            let mut v854: i32 = *v854;
+                            let mut v855: i32 = *v855;
+                            let mut v856: i32 = *v856;
+                            let mut v857: i32 = *v857;
+                            let mut v858: i32 = *v858;
                             let mut v876: US10 = if v48 {
                                 let mut v859: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
                                 US10::US10_1(v859.clone(), v40, v41, v42, v43, v44)
@@ -8080,14 +7930,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                 let mut v861: u8 = v0.clone().as_bytes()[v40 as usize];
                                 let mut v862: bool = v861 == b'"';
                                 if v862 {
-                                    let mut v863: i32 = v40 + 1i32;
+                                    let mut v863: i32 = v40.wrapping_add(1i32);
                                     let mut v864: bool = b'\n' == v861;
                                     let (mut v868, mut v869, mut v870, mut v871): (i32, i32, i32, i32) = if v864 {
-                                        let mut v865: i32 = v41 + v43;
-                                        let mut v866: i32 = v42 + 1i32;
+                                        let mut v865: i32 = v41.wrapping_add(v43);
+                                        let mut v866: i32 = v42.wrapping_add(1i32);
                                         (v865, v866, 1i32, v44)
                                     } else {
-                                        let mut v867: i32 = v43 + 1i32;
+                                        let mut v867: i32 = v43.wrapping_add(1i32);
                                         (v41, v42, v867, v44)
                                     };
                                     US10::US10_0(b'"', v863, v868, v869, v870, v871)
@@ -8099,20 +7949,20 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                             match &v876 {
                                 US10::US10_1(v1194, v1195, v1196, v1197, v1198, v1199) => { // Error
                                     let mut v1194: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1194.clone();
-                                    let mut v1195: i32 = v1195.clone();
-                                    let mut v1196: i32 = v1196.clone();
-                                    let mut v1197: i32 = v1197.clone();
-                                    let mut v1198: i32 = v1198.clone();
-                                    let mut v1199: i32 = v1199.clone();
+                                    let mut v1195: i32 = *v1195;
+                                    let mut v1196: i32 = *v1196;
+                                    let mut v1197: i32 = *v1197;
+                                    let mut v1198: i32 = *v1198;
+                                    let mut v1199: i32 = *v1199;
                                     US11::US11_1(v1194.clone(), v1195, v1196, v1197, v1198, v1199)
                                 }
                                 US10::US10_0(v877, v878, v879, v880, v881, v882) => { // Ok
-                                    let mut v877: u8 = v877.clone();
-                                    let mut v878: i32 = v878.clone();
-                                    let mut v879: i32 = v879.clone();
-                                    let mut v880: i32 = v880.clone();
-                                    let mut v881: i32 = v881.clone();
-                                    let mut v882: i32 = v882.clone();
+                                    let mut v877: u8 = *v877;
+                                    let mut v878: i32 = *v878;
+                                    let mut v879: i32 = *v879;
+                                    let mut v880: i32 = *v880;
+                                    let mut v881: i32 = *v881;
+                                    let mut v882: i32 = *v882;
                                     let (mut v883, mut v884, mut v885, mut v886, mut v887): (i32, i32, i32, i32, i32) = method112(v879, v880, v881, v882, v0.clone(), v878);
                                     let mut v888: bool = v883 > v878;
                                     let mut v898: US11 = if v888 {
@@ -8122,7 +7972,7 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                             v890.clone()
                                         } else {
                                             let mut v891: bool = v878 == v883;
-                                            let mut v892: i32 = v883 - 1i32;
+                                            let mut v892: i32 = v883.wrapping_sub(1i32);
                                             let mut v893: Rc<str> = string_slice(&v0.clone(), v878 as i64, v892 as i64);
                                             v893.clone()
                                         };
@@ -8134,11 +7984,11 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                     let mut v1083: US11 = match &v898 {
                                         US11::US11_1(v905, v906, v907, v908, v909, v910) => { // Error
                                             let mut v905: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v905.clone();
-                                            let mut v906: i32 = v906.clone();
-                                            let mut v907: i32 = v907.clone();
-                                            let mut v908: i32 = v908.clone();
-                                            let mut v909: i32 = v909.clone();
-                                            let mut v910: i32 = v910.clone();
+                                            let mut v906: i32 = *v906;
+                                            let mut v907: i32 = *v907;
+                                            let mut v908: i32 = *v908;
+                                            let mut v909: i32 = *v909;
+                                            let mut v910: i32 = *v910;
                                             let mut v911: bool = v878 >= v882;
                                             let mut v929: US10 = if v911 {
                                                 let mut v912: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure35();
@@ -8147,14 +7997,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                 let mut v914: u8 = v0.clone().as_bytes()[v878 as usize];
                                                 let mut v915: bool = v914 == b'\\';
                                                 if v915 {
-                                                    let mut v916: i32 = v878 + 1i32;
+                                                    let mut v916: i32 = v878.wrapping_add(1i32);
                                                     let mut v917: bool = b'\n' == v914;
                                                     let (mut v921, mut v922, mut v923, mut v924): (i32, i32, i32, i32) = if v917 {
-                                                        let mut v918: i32 = v879 + v881;
-                                                        let mut v919: i32 = v880 + 1i32;
+                                                        let mut v918: i32 = v879.wrapping_add(v881);
+                                                        let mut v919: i32 = v880.wrapping_add(1i32);
                                                         (v918, v919, 1i32, v882)
                                                     } else {
-                                                        let mut v920: i32 = v881 + 1i32;
+                                                        let mut v920: i32 = v881.wrapping_add(1i32);
                                                         (v879, v880, v920, v882)
                                                     };
                                                     US10::US10_0(b'\\', v916, v921, v922, v923, v924)
@@ -8166,80 +8016,78 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                             let mut v959: US10 = match &v929 {
                                                 US10::US10_1(v951, v952, v953, v954, v955, v956) => { // Error
                                                     let mut v951: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v951.clone();
-                                                    let mut v952: i32 = v952.clone();
-                                                    let mut v953: i32 = v953.clone();
-                                                    let mut v954: i32 = v954.clone();
-                                                    let mut v955: i32 = v955.clone();
-                                                    let mut v956: i32 = v956.clone();
+                                                    let mut v952: i32 = *v952;
+                                                    let mut v953: i32 = *v953;
+                                                    let mut v954: i32 = *v954;
+                                                    let mut v955: i32 = *v955;
+                                                    let mut v956: i32 = *v956;
                                                     US10::US10_1(v951.clone(), v952, v953, v954, v955, v956)
                                                 }
                                                 US10::US10_0(v930, v931, v932, v933, v934, v935) => { // Ok
-                                                    let mut v930: u8 = v930.clone();
-                                                    let mut v931: i32 = v931.clone();
-                                                    let mut v932: i32 = v932.clone();
-                                                    let mut v933: i32 = v933.clone();
-                                                    let mut v934: i32 = v934.clone();
-                                                    let mut v935: i32 = v935.clone();
+                                                    let mut v930: u8 = *v930;
+                                                    let mut v931: i32 = *v931;
+                                                    let mut v932: i32 = *v932;
+                                                    let mut v933: i32 = *v933;
+                                                    let mut v934: i32 = *v934;
+                                                    let mut v935: i32 = *v935;
                                                     let mut v936: bool = v931 >= v935;
                                                     if v936 {
                                                         let mut v937: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure44();
                                                         US10::US10_1(v937.clone(), v931, v932, v933, v934, v935)
                                                     } else {
                                                         let mut v939: u8 = v0.clone().as_bytes()[v931 as usize];
-                                                        let mut v940: i32 = v931 + 1i32;
+                                                        let mut v940: i32 = v931.wrapping_add(1i32);
                                                         let mut v941: bool = b'\n' == v939;
                                                         let (mut v945, mut v946, mut v947, mut v948): (i32, i32, i32, i32) = if v941 {
-                                                            let mut v942: i32 = v932 + v934;
-                                                            let mut v943: i32 = v933 + 1i32;
+                                                            let mut v942: i32 = v932.wrapping_add(v934);
+                                                            let mut v943: i32 = v933.wrapping_add(1i32);
                                                             (v942, v943, 1i32, v935)
                                                         } else {
-                                                            let mut v944: i32 = v934 + 1i32;
+                                                            let mut v944: i32 = v934.wrapping_add(1i32);
                                                             (v932, v933, v944, v935)
                                                         };
                                                         US10::US10_0(v939, v940, v945, v946, v947, v948)
                                                     }
                                                 }
-                                                _ => unreachable!(),
                                             };
                                             let mut v981: US11 = match &v959 {
                                                 US10::US10_1(v973, v974, v975, v976, v977, v978) => { // Error
                                                     let mut v973: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v973.clone();
-                                                    let mut v974: i32 = v974.clone();
-                                                    let mut v975: i32 = v975.clone();
-                                                    let mut v976: i32 = v976.clone();
-                                                    let mut v977: i32 = v977.clone();
-                                                    let mut v978: i32 = v978.clone();
+                                                    let mut v974: i32 = *v974;
+                                                    let mut v975: i32 = *v975;
+                                                    let mut v976: i32 = *v976;
+                                                    let mut v977: i32 = *v977;
+                                                    let mut v978: i32 = *v978;
                                                     US11::US11_1(v973.clone(), v974, v975, v976, v977, v978)
                                                 }
                                                 US10::US10_0(v960, v961, v962, v963, v964, v965) => { // Ok
-                                                    let mut v960: u8 = v960.clone();
-                                                    let mut v961: i32 = v961.clone();
-                                                    let mut v962: i32 = v962.clone();
-                                                    let mut v963: i32 = v963.clone();
-                                                    let mut v964: i32 = v964.clone();
-                                                    let mut v965: i32 = v965.clone();
+                                                    let mut v960: u8 = *v960;
+                                                    let mut v961: i32 = *v961;
+                                                    let mut v962: i32 = *v962;
+                                                    let mut v963: i32 = *v963;
+                                                    let mut v964: i32 = *v964;
+                                                    let mut v965: i32 = *v965;
                                                     let mut v966: bool = v878 >= v961;
                                                     let mut v971: Rc<str> = if v966 {
                                                         let mut v967: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                                         v967.clone()
                                                     } else {
                                                         let mut v968: bool = v878 == v961;
-                                                        let mut v969: i32 = v961 - 1i32;
+                                                        let mut v969: i32 = v961.wrapping_sub(1i32);
                                                         let mut v970: Rc<str> = string_slice(&v0.clone(), v878 as i64, v969 as i64);
                                                         v970.clone()
                                                     };
                                                     US11::US11_0(v971.clone(), v961, v962, v963, v964, v965)
                                                 }
-                                                _ => unreachable!(),
                                             };
                                             match &v981 {
                                                 US11::US11_1(v988, v989, v990, v991, v992, v993) => { // Error
                                                     let mut v988: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v988.clone();
-                                                    let mut v989: i32 = v989.clone();
-                                                    let mut v990: i32 = v990.clone();
-                                                    let mut v991: i32 = v991.clone();
-                                                    let mut v992: i32 = v992.clone();
-                                                    let mut v993: i32 = v993.clone();
+                                                    let mut v989: i32 = *v989;
+                                                    let mut v990: i32 = *v990;
+                                                    let mut v991: i32 = *v991;
+                                                    let mut v992: i32 = *v992;
+                                                    let mut v993: i32 = *v993;
                                                     let mut v1011: US10 = if v911 {
                                                         let mut v994: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                                                         US10::US10_1(v994.clone(), v878, v879, v880, v881, v882)
@@ -8247,14 +8095,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                         let mut v996: u8 = v0.clone().as_bytes()[v878 as usize];
                                                         let mut v997: bool = v996 == b'`';
                                                         if v997 {
-                                                            let mut v998: i32 = v878 + 1i32;
+                                                            let mut v998: i32 = v878.wrapping_add(1i32);
                                                             let mut v999: bool = b'\n' == v996;
                                                             let (mut v1003, mut v1004, mut v1005, mut v1006): (i32, i32, i32, i32) = if v999 {
-                                                                let mut v1000: i32 = v879 + v881;
-                                                                let mut v1001: i32 = v880 + 1i32;
+                                                                let mut v1000: i32 = v879.wrapping_add(v881);
+                                                                let mut v1001: i32 = v880.wrapping_add(1i32);
                                                                 (v1000, v1001, 1i32, v882)
                                                             } else {
-                                                                let mut v1002: i32 = v881 + 1i32;
+                                                                let mut v1002: i32 = v881.wrapping_add(1i32);
                                                                 (v879, v880, v1002, v882)
                                                             };
                                                             US10::US10_0(b'`', v998, v1003, v1004, v1005, v1006)
@@ -8266,136 +8114,131 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                     let mut v1041: US10 = match &v1011 {
                                                         US10::US10_1(v1033, v1034, v1035, v1036, v1037, v1038) => { // Error
                                                             let mut v1033: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1033.clone();
-                                                            let mut v1034: i32 = v1034.clone();
-                                                            let mut v1035: i32 = v1035.clone();
-                                                            let mut v1036: i32 = v1036.clone();
-                                                            let mut v1037: i32 = v1037.clone();
-                                                            let mut v1038: i32 = v1038.clone();
+                                                            let mut v1034: i32 = *v1034;
+                                                            let mut v1035: i32 = *v1035;
+                                                            let mut v1036: i32 = *v1036;
+                                                            let mut v1037: i32 = *v1037;
+                                                            let mut v1038: i32 = *v1038;
                                                             US10::US10_1(v1033.clone(), v1034, v1035, v1036, v1037, v1038)
                                                         }
                                                         US10::US10_0(v1012, v1013, v1014, v1015, v1016, v1017) => { // Ok
-                                                            let mut v1012: u8 = v1012.clone();
-                                                            let mut v1013: i32 = v1013.clone();
-                                                            let mut v1014: i32 = v1014.clone();
-                                                            let mut v1015: i32 = v1015.clone();
-                                                            let mut v1016: i32 = v1016.clone();
-                                                            let mut v1017: i32 = v1017.clone();
+                                                            let mut v1012: u8 = *v1012;
+                                                            let mut v1013: i32 = *v1013;
+                                                            let mut v1014: i32 = *v1014;
+                                                            let mut v1015: i32 = *v1015;
+                                                            let mut v1016: i32 = *v1016;
+                                                            let mut v1017: i32 = *v1017;
                                                             let mut v1018: bool = v1013 >= v1017;
                                                             if v1018 {
                                                                 let mut v1019: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure44();
                                                                 US10::US10_1(v1019.clone(), v1013, v1014, v1015, v1016, v1017)
                                                             } else {
                                                                 let mut v1021: u8 = v0.clone().as_bytes()[v1013 as usize];
-                                                                let mut v1022: i32 = v1013 + 1i32;
+                                                                let mut v1022: i32 = v1013.wrapping_add(1i32);
                                                                 let mut v1023: bool = b'\n' == v1021;
                                                                 let (mut v1027, mut v1028, mut v1029, mut v1030): (i32, i32, i32, i32) = if v1023 {
-                                                                    let mut v1024: i32 = v1014 + v1016;
-                                                                    let mut v1025: i32 = v1015 + 1i32;
+                                                                    let mut v1024: i32 = v1014.wrapping_add(v1016);
+                                                                    let mut v1025: i32 = v1015.wrapping_add(1i32);
                                                                     (v1024, v1025, 1i32, v1017)
                                                                 } else {
-                                                                    let mut v1026: i32 = v1016 + 1i32;
+                                                                    let mut v1026: i32 = v1016.wrapping_add(1i32);
                                                                     (v1014, v1015, v1026, v1017)
                                                                 };
                                                                 US10::US10_0(v1021, v1022, v1027, v1028, v1029, v1030)
                                                             }
                                                         }
-                                                        _ => unreachable!(),
                                                     };
                                                     let mut v1063: US11 = match &v1041 {
                                                         US10::US10_1(v1055, v1056, v1057, v1058, v1059, v1060) => { // Error
                                                             let mut v1055: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1055.clone();
-                                                            let mut v1056: i32 = v1056.clone();
-                                                            let mut v1057: i32 = v1057.clone();
-                                                            let mut v1058: i32 = v1058.clone();
-                                                            let mut v1059: i32 = v1059.clone();
-                                                            let mut v1060: i32 = v1060.clone();
+                                                            let mut v1056: i32 = *v1056;
+                                                            let mut v1057: i32 = *v1057;
+                                                            let mut v1058: i32 = *v1058;
+                                                            let mut v1059: i32 = *v1059;
+                                                            let mut v1060: i32 = *v1060;
                                                             US11::US11_1(v1055.clone(), v1056, v1057, v1058, v1059, v1060)
                                                         }
                                                         US10::US10_0(v1042, v1043, v1044, v1045, v1046, v1047) => { // Ok
-                                                            let mut v1042: u8 = v1042.clone();
-                                                            let mut v1043: i32 = v1043.clone();
-                                                            let mut v1044: i32 = v1044.clone();
-                                                            let mut v1045: i32 = v1045.clone();
-                                                            let mut v1046: i32 = v1046.clone();
-                                                            let mut v1047: i32 = v1047.clone();
+                                                            let mut v1042: u8 = *v1042;
+                                                            let mut v1043: i32 = *v1043;
+                                                            let mut v1044: i32 = *v1044;
+                                                            let mut v1045: i32 = *v1045;
+                                                            let mut v1046: i32 = *v1046;
+                                                            let mut v1047: i32 = *v1047;
                                                             let mut v1048: bool = v878 >= v1043;
                                                             let mut v1053: Rc<str> = if v1048 {
                                                                 let mut v1049: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                                                 v1049.clone()
                                                             } else {
                                                                 let mut v1050: bool = v878 == v1043;
-                                                                let mut v1051: i32 = v1043 - 1i32;
+                                                                let mut v1051: i32 = v1043.wrapping_sub(1i32);
                                                                 let mut v1052: Rc<str> = string_slice(&v0.clone(), v878 as i64, v1051 as i64);
                                                                 v1052.clone()
                                                             };
                                                             US11::US11_0(v1053.clone(), v1043, v1044, v1045, v1046, v1047)
                                                         }
-                                                        _ => unreachable!(),
                                                     };
                                                     match &v1063 {
                                                         US11::US11_1(v1070, v1071, v1072, v1073, v1074, v1075) => { // Error
                                                             let mut v1070: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1070.clone();
-                                                            let mut v1071: i32 = v1071.clone();
-                                                            let mut v1072: i32 = v1072.clone();
-                                                            let mut v1073: i32 = v1073.clone();
-                                                            let mut v1074: i32 = v1074.clone();
-                                                            let mut v1075: i32 = v1075.clone();
+                                                            let mut v1071: i32 = *v1071;
+                                                            let mut v1072: i32 = *v1072;
+                                                            let mut v1073: i32 = *v1073;
+                                                            let mut v1074: i32 = *v1074;
+                                                            let mut v1075: i32 = *v1075;
                                                             let mut v1076: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                                             US11::US11_1(v1076.clone(), v878, v879, v880, v881, v882)
                                                         }
                                                         US11::US11_0(v1064, v1065, v1066, v1067, v1068, v1069) => { // Ok
                                                             let mut v1064: Rc<str> = v1064.clone();
-                                                            let mut v1065: i32 = v1065.clone();
-                                                            let mut v1066: i32 = v1066.clone();
-                                                            let mut v1067: i32 = v1067.clone();
-                                                            let mut v1068: i32 = v1068.clone();
-                                                            let mut v1069: i32 = v1069.clone();
+                                                            let mut v1065: i32 = *v1065;
+                                                            let mut v1066: i32 = *v1066;
+                                                            let mut v1067: i32 = *v1067;
+                                                            let mut v1068: i32 = *v1068;
+                                                            let mut v1069: i32 = *v1069;
                                                             v1063.clone()
                                                         }
-                                                        _ => unreachable!(),
                                                     }
                                                 }
                                                 US11::US11_0(v982, v983, v984, v985, v986, v987) => { // Ok
                                                     let mut v982: Rc<str> = v982.clone();
-                                                    let mut v983: i32 = v983.clone();
-                                                    let mut v984: i32 = v984.clone();
-                                                    let mut v985: i32 = v985.clone();
-                                                    let mut v986: i32 = v986.clone();
-                                                    let mut v987: i32 = v987.clone();
+                                                    let mut v983: i32 = *v983;
+                                                    let mut v984: i32 = *v984;
+                                                    let mut v985: i32 = *v985;
+                                                    let mut v986: i32 = *v986;
+                                                    let mut v987: i32 = *v987;
                                                     v981.clone()
                                                 }
-                                                _ => unreachable!(),
                                             }
                                         }
                                         US11::US11_0(v899, v900, v901, v902, v903, v904) => { // Ok
                                             let mut v899: Rc<str> = v899.clone();
-                                            let mut v900: i32 = v900.clone();
-                                            let mut v901: i32 = v901.clone();
-                                            let mut v902: i32 = v902.clone();
-                                            let mut v903: i32 = v903.clone();
-                                            let mut v904: i32 = v904.clone();
+                                            let mut v900: i32 = *v900;
+                                            let mut v901: i32 = *v901;
+                                            let mut v902: i32 = *v902;
+                                            let mut v903: i32 = *v903;
+                                            let mut v904: i32 = *v904;
                                             v898.clone()
                                         }
-                                        _ => unreachable!(),
                                     };
                                     let mut v1106: US11 = match &v1083 {
                                         US11::US11_1(v1084, v1085, v1086, v1087, v1088, v1089) => { // Error
                                             let mut v1084: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1084.clone();
-                                            let mut v1085: i32 = v1085.clone();
-                                            let mut v1086: i32 = v1086.clone();
-                                            let mut v1087: i32 = v1087.clone();
-                                            let mut v1088: i32 = v1088.clone();
-                                            let mut v1089: i32 = v1089.clone();
+                                            let mut v1085: i32 = *v1085;
+                                            let mut v1086: i32 = *v1086;
+                                            let mut v1087: i32 = *v1087;
+                                            let mut v1088: i32 = *v1088;
+                                            let mut v1089: i32 = *v1089;
                                             let mut v1090: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                             US11::US11_0(v1090.clone(), v878, v879, v880, v881, v882)
                                         }
                                         US11::US11_0(v1092, v1093, v1094, v1095, v1096, v1097) => { // Ok
                                             let mut v1092: Rc<str> = v1092.clone();
-                                            let mut v1093: i32 = v1093.clone();
-                                            let mut v1094: i32 = v1094.clone();
-                                            let mut v1095: i32 = v1095.clone();
-                                            let mut v1096: i32 = v1096.clone();
-                                            let mut v1097: i32 = v1097.clone();
+                                            let mut v1093: i32 = *v1093;
+                                            let mut v1094: i32 = *v1094;
+                                            let mut v1095: i32 = *v1095;
+                                            let mut v1096: i32 = *v1096;
+                                            let mut v1097: i32 = *v1097;
                                             let mut v1098: bool = v1093 == v878;
                                             if v1098 {
                                                 let mut v1099: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure42();
@@ -8406,16 +8249,15 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                 method118(v0.clone(), v1101.clone(), v1092.clone(), v1102, v1093, v1094, v1095, v1096, v1097)
                                             }
                                         }
-                                        _ => unreachable!(),
                                     };
                                     match &v1106 {
                                         US11::US11_1(v1149, v1150, v1151, v1152, v1153, v1154) => { // Error
                                             let mut v1149: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1149.clone();
-                                            let mut v1150: i32 = v1150.clone();
-                                            let mut v1151: i32 = v1151.clone();
-                                            let mut v1152: i32 = v1152.clone();
-                                            let mut v1153: i32 = v1153.clone();
-                                            let mut v1154: i32 = v1154.clone();
+                                            let mut v1150: i32 = *v1150;
+                                            let mut v1151: i32 = *v1151;
+                                            let mut v1152: i32 = *v1152;
+                                            let mut v1153: i32 = *v1153;
+                                            let mut v1154: i32 = *v1154;
                                             let mut v1155: bool = v878 >= v882;
                                             let mut v1173: US10 = if v1155 {
                                                 let mut v1156: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -8424,14 +8266,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                 let mut v1158: u8 = v0.clone().as_bytes()[v878 as usize];
                                                 let mut v1159: bool = v1158 == b'"';
                                                 if v1159 {
-                                                    let mut v1160: i32 = v878 + 1i32;
+                                                    let mut v1160: i32 = v878.wrapping_add(1i32);
                                                     let mut v1161: bool = b'\n' == v1158;
                                                     let (mut v1165, mut v1166, mut v1167, mut v1168): (i32, i32, i32, i32) = if v1161 {
-                                                        let mut v1162: i32 = v879 + v881;
-                                                        let mut v1163: i32 = v880 + 1i32;
+                                                        let mut v1162: i32 = v879.wrapping_add(v881);
+                                                        let mut v1163: i32 = v880.wrapping_add(1i32);
                                                         (v1162, v1163, 1i32, v882)
                                                     } else {
-                                                        let mut v1164: i32 = v881 + 1i32;
+                                                        let mut v1164: i32 = v881.wrapping_add(1i32);
                                                         (v879, v880, v1164, v882)
                                                     };
                                                     US10::US10_0(b'"', v1160, v1165, v1166, v1167, v1168)
@@ -8443,34 +8285,33 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                             match &v1173 {
                                                 US10::US10_1(v1182, v1183, v1184, v1185, v1186, v1187) => { // Error
                                                     let mut v1182: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1182.clone();
-                                                    let mut v1183: i32 = v1183.clone();
-                                                    let mut v1184: i32 = v1184.clone();
-                                                    let mut v1185: i32 = v1185.clone();
-                                                    let mut v1186: i32 = v1186.clone();
-                                                    let mut v1187: i32 = v1187.clone();
+                                                    let mut v1183: i32 = *v1183;
+                                                    let mut v1184: i32 = *v1184;
+                                                    let mut v1185: i32 = *v1185;
+                                                    let mut v1186: i32 = *v1186;
+                                                    let mut v1187: i32 = *v1187;
                                                     let mut v1188: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure24();
                                                     US11::US11_1(v1188.clone(), v878, v879, v880, v881, v882)
                                                 }
                                                 US10::US10_0(v1174, v1175, v1176, v1177, v1178, v1179) => { // Ok
-                                                    let mut v1174: u8 = v1174.clone();
-                                                    let mut v1175: i32 = v1175.clone();
-                                                    let mut v1176: i32 = v1176.clone();
-                                                    let mut v1177: i32 = v1177.clone();
-                                                    let mut v1178: i32 = v1178.clone();
-                                                    let mut v1179: i32 = v1179.clone();
+                                                    let mut v1174: u8 = *v1174;
+                                                    let mut v1175: i32 = *v1175;
+                                                    let mut v1176: i32 = *v1176;
+                                                    let mut v1177: i32 = *v1177;
+                                                    let mut v1178: i32 = *v1178;
+                                                    let mut v1179: i32 = *v1179;
                                                     let mut v1180: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                                     US11::US11_0(v1180.clone(), v1175, v1176, v1177, v1178, v1179)
                                                 }
-                                                _ => unreachable!(),
                                             }
                                         }
                                         US11::US11_0(v1107, v1108, v1109, v1110, v1111, v1112) => { // Ok
                                             let mut v1107: Rc<str> = v1107.clone();
-                                            let mut v1108: i32 = v1108.clone();
-                                            let mut v1109: i32 = v1109.clone();
-                                            let mut v1110: i32 = v1110.clone();
-                                            let mut v1111: i32 = v1111.clone();
-                                            let mut v1112: i32 = v1112.clone();
+                                            let mut v1108: i32 = *v1108;
+                                            let mut v1109: i32 = *v1109;
+                                            let mut v1110: i32 = *v1110;
+                                            let mut v1111: i32 = *v1111;
+                                            let mut v1112: i32 = *v1112;
                                             let mut v1113: bool = v1108 >= v1112;
                                             let mut v1131: US10 = if v1113 {
                                                 let mut v1114: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -8479,14 +8320,14 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                                 let mut v1116: u8 = v0.clone().as_bytes()[v1108 as usize];
                                                 let mut v1117: bool = v1116 == b'"';
                                                 if v1117 {
-                                                    let mut v1118: i32 = v1108 + 1i32;
+                                                    let mut v1118: i32 = v1108.wrapping_add(1i32);
                                                     let mut v1119: bool = b'\n' == v1116;
                                                     let (mut v1123, mut v1124, mut v1125, mut v1126): (i32, i32, i32, i32) = if v1119 {
-                                                        let mut v1120: i32 = v1109 + v1111;
-                                                        let mut v1121: i32 = v1110 + 1i32;
+                                                        let mut v1120: i32 = v1109.wrapping_add(v1111);
+                                                        let mut v1121: i32 = v1110.wrapping_add(1i32);
                                                         (v1120, v1121, 1i32, v1112)
                                                     } else {
-                                                        let mut v1122: i32 = v1111 + 1i32;
+                                                        let mut v1122: i32 = v1111.wrapping_add(1i32);
                                                         (v1109, v1110, v1122, v1112)
                                                     };
                                                     US10::US10_0(b'"', v1118, v1123, v1124, v1125, v1126)
@@ -8498,51 +8339,47 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                             match &v1131 {
                                                 US10::US10_1(v1139, v1140, v1141, v1142, v1143, v1144) => { // Error
                                                     let mut v1139: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1139.clone();
-                                                    let mut v1140: i32 = v1140.clone();
-                                                    let mut v1141: i32 = v1141.clone();
-                                                    let mut v1142: i32 = v1142.clone();
-                                                    let mut v1143: i32 = v1143.clone();
-                                                    let mut v1144: i32 = v1144.clone();
+                                                    let mut v1140: i32 = *v1140;
+                                                    let mut v1141: i32 = *v1141;
+                                                    let mut v1142: i32 = *v1142;
+                                                    let mut v1143: i32 = *v1143;
+                                                    let mut v1144: i32 = *v1144;
                                                     let mut v1145: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure25(v878, v1108, v1139.clone(), v1140, v1141, v1142, v1143, v1144);
                                                     US11::US11_1(v1145.clone(), v1108, v1109, v1110, v1111, v1112)
                                                 }
                                                 US10::US10_0(v1132, v1133, v1134, v1135, v1136, v1137) => { // Ok
-                                                    let mut v1132: u8 = v1132.clone();
-                                                    let mut v1133: i32 = v1133.clone();
-                                                    let mut v1134: i32 = v1134.clone();
-                                                    let mut v1135: i32 = v1135.clone();
-                                                    let mut v1136: i32 = v1136.clone();
-                                                    let mut v1137: i32 = v1137.clone();
+                                                    let mut v1132: u8 = *v1132;
+                                                    let mut v1133: i32 = *v1133;
+                                                    let mut v1134: i32 = *v1134;
+                                                    let mut v1135: i32 = *v1135;
+                                                    let mut v1136: i32 = *v1136;
+                                                    let mut v1137: i32 = *v1137;
                                                     US11::US11_0(v1107.clone(), v1133, v1134, v1135, v1136, v1137)
                                                 }
-                                                _ => unreachable!(),
                                             }
                                         }
-                                        _ => unreachable!(),
                                     }
                                 }
-                                _ => unreachable!(),
                             }
                         }
                         US11::US11_0(v847, v848, v849, v850, v851, v852) => { // Ok
                             let mut v847: Rc<str> = v847.clone();
-                            let mut v848: i32 = v848.clone();
-                            let mut v849: i32 = v849.clone();
-                            let mut v850: i32 = v850.clone();
-                            let mut v851: i32 = v851.clone();
-                            let mut v852: i32 = v852.clone();
+                            let mut v848: i32 = *v848;
+                            let mut v849: i32 = *v849;
+                            let mut v850: i32 = *v850;
+                            let mut v851: i32 = *v851;
+                            let mut v852: i32 = *v852;
                             v846.clone()
                         }
-                        _ => unreachable!(),
                     };
                     let mut v1234: US11 = match &v1204 {
                         US11::US11_1(v1211, v1212, v1213, v1214, v1215, v1216) => { // Error
                             let mut v1211: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1211.clone();
-                            let mut v1212: i32 = v1212.clone();
-                            let mut v1213: i32 = v1213.clone();
-                            let mut v1214: i32 = v1214.clone();
-                            let mut v1215: i32 = v1215.clone();
-                            let mut v1216: i32 = v1216.clone();
+                            let mut v1212: i32 = *v1212;
+                            let mut v1213: i32 = *v1213;
+                            let mut v1214: i32 = *v1214;
+                            let mut v1215: i32 = *v1215;
+                            let mut v1216: i32 = *v1216;
                             let (mut v1217, mut v1218, mut v1219, mut v1220, mut v1221): (i32, i32, i32, i32, i32) = method125(v41, v42, v43, v44, v0.clone(), v40);
                             let mut v1222: bool = v1217 > v40;
                             if v1222 {
@@ -8552,7 +8389,7 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                                     v1224.clone()
                                 } else {
                                     let mut v1225: bool = v40 == v1217;
-                                    let mut v1226: i32 = v1217 - 1i32;
+                                    let mut v1226: i32 = v1217.wrapping_sub(1i32);
                                     let mut v1227: Rc<str> = string_slice(&v0.clone(), v40 as i64, v1226 as i64);
                                     v1227.clone()
                                 };
@@ -8564,68 +8401,65 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                         }
                         US11::US11_0(v1205, v1206, v1207, v1208, v1209, v1210) => { // Ok
                             let mut v1205: Rc<str> = v1205.clone();
-                            let mut v1206: i32 = v1206.clone();
-                            let mut v1207: i32 = v1207.clone();
-                            let mut v1208: i32 = v1208.clone();
-                            let mut v1209: i32 = v1209.clone();
-                            let mut v1210: i32 = v1210.clone();
+                            let mut v1206: i32 = *v1206;
+                            let mut v1207: i32 = *v1207;
+                            let mut v1208: i32 = *v1208;
+                            let mut v1209: i32 = *v1209;
+                            let mut v1210: i32 = *v1210;
                             v1204.clone()
                         }
-                        _ => unreachable!(),
                     };
                     let mut v1269: US11 = match &v1234 {
                         US11::US11_1(v1241, v1242, v1243, v1244, v1245, v1246) => { // Error
                             let mut v1241: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1241.clone();
-                            let mut v1242: i32 = v1242.clone();
-                            let mut v1243: i32 = v1243.clone();
-                            let mut v1244: i32 = v1244.clone();
-                            let mut v1245: i32 = v1245.clone();
-                            let mut v1246: i32 = v1246.clone();
+                            let mut v1242: i32 = *v1242;
+                            let mut v1243: i32 = *v1243;
+                            let mut v1244: i32 = *v1244;
+                            let mut v1245: i32 = *v1245;
+                            let mut v1246: i32 = *v1246;
                             let mut v1247: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
                             let mut v1248: US19 = method121(v0.clone(), v1247.clone(), v40, v41, v42, v43, v44);
                             match &v1248 {
                                 US19::US19_1(v1259, v1260, v1261, v1262, v1263, v1264) => { // Error
                                     let mut v1259: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1259.clone();
-                                    let mut v1260: i32 = v1260.clone();
-                                    let mut v1261: i32 = v1261.clone();
-                                    let mut v1262: i32 = v1262.clone();
-                                    let mut v1263: i32 = v1263.clone();
-                                    let mut v1264: i32 = v1264.clone();
+                                    let mut v1260: i32 = *v1260;
+                                    let mut v1261: i32 = *v1261;
+                                    let mut v1262: i32 = *v1262;
+                                    let mut v1263: i32 = *v1263;
+                                    let mut v1264: i32 = *v1264;
                                     US11::US11_1(v1259.clone(), v1260, v1261, v1262, v1263, v1264)
                                 }
                                 US19::US19_0(v1249, v1250, v1251, v1252, v1253, v1254) => { // Ok
                                     let mut v1249: Rc<UH0> = v1249.clone();
-                                    let mut v1250: i32 = v1250.clone();
-                                    let mut v1251: i32 = v1251.clone();
-                                    let mut v1252: i32 = v1252.clone();
-                                    let mut v1253: i32 = v1253.clone();
-                                    let mut v1254: i32 = v1254.clone();
+                                    let mut v1250: i32 = *v1250;
+                                    let mut v1251: i32 = *v1251;
+                                    let mut v1252: i32 = *v1252;
+                                    let mut v1253: i32 = *v1253;
+                                    let mut v1254: i32 = *v1254;
                                     let mut v1255: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                     let (mut v1256, mut v1257): (Rc<str>, Rc<str>) = method123(v1249.clone(), v1255.clone());
                                     US11::US11_0(v1256.clone(), v1250, v1251, v1252, v1253, v1254)
                                 }
-                                _ => unreachable!(),
                             }
                         }
                         US11::US11_0(v1235, v1236, v1237, v1238, v1239, v1240) => { // Ok
                             let mut v1235: Rc<str> = v1235.clone();
-                            let mut v1236: i32 = v1236.clone();
-                            let mut v1237: i32 = v1237.clone();
-                            let mut v1238: i32 = v1238.clone();
-                            let mut v1239: i32 = v1239.clone();
-                            let mut v1240: i32 = v1240.clone();
+                            let mut v1236: i32 = *v1236;
+                            let mut v1237: i32 = *v1237;
+                            let mut v1238: i32 = *v1238;
+                            let mut v1239: i32 = *v1239;
+                            let mut v1240: i32 = *v1240;
                             v1234.clone()
                         }
-                        _ => unreachable!(),
                     };
                     let mut v1280: US11 = match &v1269 {
                         US11::US11_0(v1270, v1271, v1272, v1273, v1274, v1275) => { // Ok
                             let mut v1270: Rc<str> = v1270.clone();
-                            let mut v1271: i32 = v1271.clone();
-                            let mut v1272: i32 = v1272.clone();
-                            let mut v1273: i32 = v1273.clone();
-                            let mut v1274: i32 = v1274.clone();
-                            let mut v1275: i32 = v1275.clone();
+                            let mut v1271: i32 = *v1271;
+                            let mut v1272: i32 = *v1272;
+                            let mut v1273: i32 = *v1273;
+                            let mut v1274: i32 = *v1274;
+                            let mut v1275: i32 = *v1275;
                             let mut v1276: bool = v1271 == v40;
                             if v1276 {
                                 let mut v1277: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure48();
@@ -8641,53 +8475,50 @@ fn method131(mut v0: Rc<str>, mut v1: Rc<UH0>, mut v2: i32, mut v3: i32, mut v4:
                     let mut v1297: US11 = match &v1280 {
                         US11::US11_1(v1281, v1282, v1283, v1284, v1285, v1286) => { // Error
                             let mut v1281: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1281.clone();
-                            let mut v1282: i32 = v1282.clone();
-                            let mut v1283: i32 = v1283.clone();
-                            let mut v1284: i32 = v1284.clone();
-                            let mut v1285: i32 = v1285.clone();
-                            let mut v1286: i32 = v1286.clone();
+                            let mut v1282: i32 = *v1282;
+                            let mut v1283: i32 = *v1283;
+                            let mut v1284: i32 = *v1284;
+                            let mut v1285: i32 = *v1285;
+                            let mut v1286: i32 = *v1286;
                             US11::US11_1(v1281.clone(), v1282, v1283, v1284, v1285, v1286)
                         }
                         US11::US11_0(v1288, v1289, v1290, v1291, v1292, v1293) => { // Ok
                             let mut v1288: Rc<str> = v1288.clone();
-                            let mut v1289: i32 = v1289.clone();
-                            let mut v1290: i32 = v1290.clone();
-                            let mut v1291: i32 = v1291.clone();
-                            let mut v1292: i32 = v1292.clone();
-                            let mut v1293: i32 = v1293.clone();
+                            let mut v1289: i32 = *v1289;
+                            let mut v1290: i32 = *v1290;
+                            let mut v1291: i32 = *v1291;
+                            let mut v1292: i32 = *v1292;
+                            let mut v1293: i32 = *v1293;
                             let mut v1294: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
                             method124(v0.clone(), v1288.clone(), v1294.clone(), v1289, v1290, v1291, v1292, v1293)
                         }
-                        _ => unreachable!(),
                     };
                     match &v1297 {
                         US11::US11_1(v1306, v1307, v1308, v1309, v1310, v1311) => { // Error
                             let mut v1306: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1306.clone();
-                            let mut v1307: i32 = v1307.clone();
-                            let mut v1308: i32 = v1308.clone();
-                            let mut v1309: i32 = v1309.clone();
-                            let mut v1310: i32 = v1310.clone();
-                            let mut v1311: i32 = v1311.clone();
+                            let mut v1307: i32 = *v1307;
+                            let mut v1308: i32 = *v1308;
+                            let mut v1309: i32 = *v1309;
+                            let mut v1310: i32 = *v1310;
+                            let mut v1311: i32 = *v1311;
                             let mut v1312: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
                             let mut v1313: Rc<UH0> = method122(v1.clone(), v1312.clone());
                             return US19::US19_0(v1313.clone(), v2, v3, v4, v5, v6);
                         }
                         US11::US11_0(v1298, v1299, v1300, v1301, v1302, v1303) => { // Ok
                             let mut v1298: Rc<str> = v1298.clone();
-                            let mut v1299: i32 = v1299.clone();
-                            let mut v1300: i32 = v1300.clone();
-                            let mut v1301: i32 = v1301.clone();
-                            let mut v1302: i32 = v1302.clone();
-                            let mut v1303: i32 = v1303.clone();
+                            let mut v1299: i32 = *v1299;
+                            let mut v1300: i32 = *v1300;
+                            let mut v1301: i32 = *v1301;
+                            let mut v1302: i32 = *v1302;
+                            let mut v1303: i32 = *v1303;
                             let mut v1304: Rc<UH0> = Rc::new(UH0::UH0_1(v1298.clone(), v1.clone()));
                             (v0, v1, v2, v3, v4, v5, v6) = (v0.clone(), v1304.clone(), v1299, v1300, v1301, v1302, v1303);
                             continue;
                         }
-                        _ => unreachable!(),
                     }
                 }
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -8697,14 +8528,13 @@ fn method132(mut v0: Rc<UH0>, mut v1: i32) -> i32 {
             UH0::UH0_1(v2, v3) => { // Cons
                 let mut v2: Rc<str> = v2.clone();
                 let mut v3: Rc<UH0> = v3.clone();
-                let mut v4: i32 = v1 + 1i32;
+                let mut v4: i32 = v1.wrapping_add(1i32);
                 (v0, v1) = (v3.clone(), v4);
                 continue;
             }
             UH0::UH0_0 => { // Nil
                 return v1;
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -8715,14 +8545,13 @@ fn method133(mut v0: Rc<RefCell<Vec<Rc<str>>>>, mut v1: Rc<UH0>, mut v2: i32) ->
                 let mut v3: Rc<str> = v3.clone();
                 let mut v4: Rc<UH0> = v4.clone();
                 v0.borrow_mut().push(v3);
-                let mut v5: i32 = v2 + 1i32;
+                let mut v5: i32 = v2.wrapping_add(1i32);
                 (v0, v1, v2) = (v0.clone(), v4.clone(), v5);
                 continue;
             }
             UH0::UH0_0 => { // Nil
                 return v2;
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -8751,20 +8580,20 @@ fn method111(mut v0: Rc<str>) -> US18 {
     let mut v50: US10 = match &v16 {
         US10::US10_1(v42, v43, v44, v45, v46, v47) => { // Error
             let mut v42: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v42.clone();
-            let mut v43: i32 = v43.clone();
-            let mut v44: i32 = v44.clone();
-            let mut v45: i32 = v45.clone();
-            let mut v46: i32 = v46.clone();
-            let mut v47: i32 = v47.clone();
+            let mut v43: i32 = *v43;
+            let mut v44: i32 = *v44;
+            let mut v45: i32 = *v45;
+            let mut v46: i32 = *v46;
+            let mut v47: i32 = *v47;
             US10::US10_1(v42.clone(), v43, v44, v45, v46, v47)
         }
         US10::US10_0(v17, v18, v19, v20, v21, v22) => { // Ok
-            let mut v17: u8 = v17.clone();
-            let mut v18: i32 = v18.clone();
-            let mut v19: i32 = v19.clone();
-            let mut v20: i32 = v20.clone();
-            let mut v21: i32 = v21.clone();
-            let mut v22: i32 = v22.clone();
+            let mut v17: u8 = *v17;
+            let mut v18: i32 = *v18;
+            let mut v19: i32 = *v19;
+            let mut v20: i32 = *v20;
+            let mut v21: i32 = *v21;
+            let mut v22: i32 = *v22;
             let mut v23: bool = v18 >= v22;
             if v23 {
                 let mut v24: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -8773,14 +8602,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                 let mut v26: u8 = v0.clone().as_bytes()[v18 as usize];
                 let mut v27: bool = v26 == b'"';
                 if v27 {
-                    let mut v28: i32 = v18 + 1i32;
+                    let mut v28: i32 = v18.wrapping_add(1i32);
                     let mut v29: bool = b'\n' == v26;
                     let (mut v33, mut v34, mut v35, mut v36): (i32, i32, i32, i32) = if v29 {
-                        let mut v30: i32 = v19 + v21;
-                        let mut v31: i32 = v20 + 1i32;
+                        let mut v30: i32 = v19.wrapping_add(v21);
+                        let mut v31: i32 = v20.wrapping_add(1i32);
                         (v30, v31, 1i32, v22)
                     } else {
-                        let mut v32: i32 = v21 + 1i32;
+                        let mut v32: i32 = v21.wrapping_add(1i32);
                         (v19, v20, v32, v22)
                     };
                     US10::US10_0(b'"', v28, v33, v34, v35, v36)
@@ -8790,37 +8619,35 @@ fn method111(mut v0: Rc<str>) -> US18 {
                 }
             }
         }
-        _ => unreachable!(),
     };
     let mut v66: US10 = match &v50 {
         US10::US10_1(v58, v59, v60, v61, v62, v63) => { // Error
             let mut v58: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v58.clone();
-            let mut v59: i32 = v59.clone();
-            let mut v60: i32 = v60.clone();
-            let mut v61: i32 = v61.clone();
-            let mut v62: i32 = v62.clone();
-            let mut v63: i32 = v63.clone();
+            let mut v59: i32 = *v59;
+            let mut v60: i32 = *v60;
+            let mut v61: i32 = *v61;
+            let mut v62: i32 = *v62;
+            let mut v63: i32 = *v63;
             US10::US10_1(v58.clone(), v59, v60, v61, v62, v63)
         }
         US10::US10_0(v51, v52, v53, v54, v55, v56) => { // Ok
-            let mut v51: u8 = v51.clone();
-            let mut v52: i32 = v52.clone();
-            let mut v53: i32 = v53.clone();
-            let mut v54: i32 = v54.clone();
-            let mut v55: i32 = v55.clone();
-            let mut v56: i32 = v56.clone();
+            let mut v51: u8 = *v51;
+            let mut v52: i32 = *v52;
+            let mut v53: i32 = *v53;
+            let mut v54: i32 = *v54;
+            let mut v55: i32 = *v55;
+            let mut v56: i32 = *v56;
             US10::US10_0(b'"', v52, v53, v54, v55, v56)
         }
-        _ => unreachable!(),
     };
     let mut v160: US10 = match &v66 {
         US10::US10_1(v73, v74, v75, v76, v77, v78) => { // Error
             let mut v73: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v73.clone();
-            let mut v74: i32 = v74.clone();
-            let mut v75: i32 = v75.clone();
-            let mut v76: i32 = v76.clone();
-            let mut v77: i32 = v77.clone();
-            let mut v78: i32 = v78.clone();
+            let mut v74: i32 = *v74;
+            let mut v75: i32 = *v75;
+            let mut v76: i32 = *v76;
+            let mut v77: i32 = *v77;
+            let mut v78: i32 = *v78;
             let mut v92: US10 = if v2 {
                 let mut v79: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                 US10::US10_1(v79.clone(), 0i32, 0i32, 1i32, 1i32, v1)
@@ -8843,20 +8670,20 @@ fn method111(mut v0: Rc<str>) -> US18 {
             let mut v126: US10 = match &v92 {
                 US10::US10_1(v118, v119, v120, v121, v122, v123) => { // Error
                     let mut v118: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v118.clone();
-                    let mut v119: i32 = v119.clone();
-                    let mut v120: i32 = v120.clone();
-                    let mut v121: i32 = v121.clone();
-                    let mut v122: i32 = v122.clone();
-                    let mut v123: i32 = v123.clone();
+                    let mut v119: i32 = *v119;
+                    let mut v120: i32 = *v120;
+                    let mut v121: i32 = *v121;
+                    let mut v122: i32 = *v122;
+                    let mut v123: i32 = *v123;
                     US10::US10_1(v118.clone(), v119, v120, v121, v122, v123)
                 }
                 US10::US10_0(v93, v94, v95, v96, v97, v98) => { // Ok
-                    let mut v93: u8 = v93.clone();
-                    let mut v94: i32 = v94.clone();
-                    let mut v95: i32 = v95.clone();
-                    let mut v96: i32 = v96.clone();
-                    let mut v97: i32 = v97.clone();
-                    let mut v98: i32 = v98.clone();
+                    let mut v93: u8 = *v93;
+                    let mut v94: i32 = *v94;
+                    let mut v95: i32 = *v95;
+                    let mut v96: i32 = *v96;
+                    let mut v97: i32 = *v97;
+                    let mut v98: i32 = *v98;
                     let mut v99: bool = v94 >= v98;
                     if v99 {
                         let mut v100: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -8865,14 +8692,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                         let mut v102: u8 = v0.clone().as_bytes()[v94 as usize];
                         let mut v103: bool = v102 == b'"';
                         if v103 {
-                            let mut v104: i32 = v94 + 1i32;
+                            let mut v104: i32 = v94.wrapping_add(1i32);
                             let mut v105: bool = b'\n' == v102;
                             let (mut v109, mut v110, mut v111, mut v112): (i32, i32, i32, i32) = if v105 {
-                                let mut v106: i32 = v95 + v97;
-                                let mut v107: i32 = v96 + 1i32;
+                                let mut v106: i32 = v95.wrapping_add(v97);
+                                let mut v107: i32 = v96.wrapping_add(1i32);
                                 (v106, v107, 1i32, v98)
                             } else {
-                                let mut v108: i32 = v97 + 1i32;
+                                let mut v108: i32 = v97.wrapping_add(1i32);
                                 (v95, v96, v108, v98)
                             };
                             US10::US10_0(b'"', v104, v109, v110, v111, v112)
@@ -8882,80 +8709,76 @@ fn method111(mut v0: Rc<str>) -> US18 {
                         }
                     }
                 }
-                _ => unreachable!(),
             };
             let mut v142: US10 = match &v126 {
                 US10::US10_1(v134, v135, v136, v137, v138, v139) => { // Error
                     let mut v134: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v134.clone();
-                    let mut v135: i32 = v135.clone();
-                    let mut v136: i32 = v136.clone();
-                    let mut v137: i32 = v137.clone();
-                    let mut v138: i32 = v138.clone();
-                    let mut v139: i32 = v139.clone();
+                    let mut v135: i32 = *v135;
+                    let mut v136: i32 = *v136;
+                    let mut v137: i32 = *v137;
+                    let mut v138: i32 = *v138;
+                    let mut v139: i32 = *v139;
                     US10::US10_1(v134.clone(), v135, v136, v137, v138, v139)
                 }
                 US10::US10_0(v127, v128, v129, v130, v131, v132) => { // Ok
-                    let mut v127: u8 = v127.clone();
-                    let mut v128: i32 = v128.clone();
-                    let mut v129: i32 = v129.clone();
-                    let mut v130: i32 = v130.clone();
-                    let mut v131: i32 = v131.clone();
-                    let mut v132: i32 = v132.clone();
+                    let mut v127: u8 = *v127;
+                    let mut v128: i32 = *v128;
+                    let mut v129: i32 = *v129;
+                    let mut v130: i32 = *v130;
+                    let mut v131: i32 = *v131;
+                    let mut v132: i32 = *v132;
                     US10::US10_0(b'"', v128, v129, v130, v131, v132)
                 }
-                _ => unreachable!(),
             };
             match &v142 {
                 US10::US10_1(v149, v150, v151, v152, v153, v154) => { // Error
                     let mut v149: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v149.clone();
-                    let mut v150: i32 = v150.clone();
-                    let mut v151: i32 = v151.clone();
-                    let mut v152: i32 = v152.clone();
-                    let mut v153: i32 = v153.clone();
-                    let mut v154: i32 = v154.clone();
+                    let mut v150: i32 = *v150;
+                    let mut v151: i32 = *v151;
+                    let mut v152: i32 = *v152;
+                    let mut v153: i32 = *v153;
+                    let mut v154: i32 = *v154;
                     let mut v155: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                     US10::US10_1(v155.clone(), 0i32, 0i32, 1i32, 1i32, v1)
                 }
                 US10::US10_0(v143, v144, v145, v146, v147, v148) => { // Ok
-                    let mut v143: u8 = v143.clone();
-                    let mut v144: i32 = v144.clone();
-                    let mut v145: i32 = v145.clone();
-                    let mut v146: i32 = v146.clone();
-                    let mut v147: i32 = v147.clone();
-                    let mut v148: i32 = v148.clone();
+                    let mut v143: u8 = *v143;
+                    let mut v144: i32 = *v144;
+                    let mut v145: i32 = *v145;
+                    let mut v146: i32 = *v146;
+                    let mut v147: i32 = *v147;
+                    let mut v148: i32 = *v148;
                     v142.clone()
                 }
-                _ => unreachable!(),
             }
         }
         US10::US10_0(v67, v68, v69, v70, v71, v72) => { // Ok
-            let mut v67: u8 = v67.clone();
-            let mut v68: i32 = v68.clone();
-            let mut v69: i32 = v69.clone();
-            let mut v70: i32 = v70.clone();
-            let mut v71: i32 = v71.clone();
-            let mut v72: i32 = v72.clone();
+            let mut v67: u8 = *v67;
+            let mut v68: i32 = *v68;
+            let mut v69: i32 = *v69;
+            let mut v70: i32 = *v70;
+            let mut v71: i32 = *v71;
+            let mut v72: i32 = *v72;
             v66.clone()
         }
-        _ => unreachable!(),
     };
     let mut v792: US11 = match &v160 {
         US10::US10_1(v784, v785, v786, v787, v788, v789) => { // Error
             let mut v784: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v784.clone();
-            let mut v785: i32 = v785.clone();
-            let mut v786: i32 = v786.clone();
-            let mut v787: i32 = v787.clone();
-            let mut v788: i32 = v788.clone();
-            let mut v789: i32 = v789.clone();
+            let mut v785: i32 = *v785;
+            let mut v786: i32 = *v786;
+            let mut v787: i32 = *v787;
+            let mut v788: i32 = *v788;
+            let mut v789: i32 = *v789;
             US11::US11_1(v784.clone(), v785, v786, v787, v788, v789)
         }
         US10::US10_0(v161, v162, v163, v164, v165, v166) => { // Ok
-            let mut v161: u8 = v161.clone();
-            let mut v162: i32 = v162.clone();
-            let mut v163: i32 = v163.clone();
-            let mut v164: i32 = v164.clone();
-            let mut v165: i32 = v165.clone();
-            let mut v166: i32 = v166.clone();
+            let mut v161: u8 = *v161;
+            let mut v162: i32 = *v162;
+            let mut v163: i32 = *v163;
+            let mut v164: i32 = *v164;
+            let mut v165: i32 = *v165;
+            let mut v166: i32 = *v166;
             let (mut v167, mut v168, mut v169, mut v170, mut v171): (i32, i32, i32, i32, i32) = method112(v163, v164, v165, v166, v0.clone(), v162);
             let mut v172: bool = v167 > v162;
             let mut v182: US11 = if v172 {
@@ -8965,7 +8788,7 @@ fn method111(mut v0: Rc<str>) -> US18 {
                     v174.clone()
                 } else {
                     let mut v175: bool = v162 == v167;
-                    let mut v176: i32 = v167 - 1i32;
+                    let mut v176: i32 = v167.wrapping_sub(1i32);
                     let mut v177: Rc<str> = string_slice(&v0.clone(), v162 as i64, v176 as i64);
                     v177.clone()
                 };
@@ -8977,11 +8800,11 @@ fn method111(mut v0: Rc<str>) -> US18 {
             let mut v377: US11 = match &v182 {
                 US11::US11_1(v189, v190, v191, v192, v193, v194) => { // Error
                     let mut v189: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v189.clone();
-                    let mut v190: i32 = v190.clone();
-                    let mut v191: i32 = v191.clone();
-                    let mut v192: i32 = v192.clone();
-                    let mut v193: i32 = v193.clone();
-                    let mut v194: i32 = v194.clone();
+                    let mut v190: i32 = *v190;
+                    let mut v191: i32 = *v191;
+                    let mut v192: i32 = *v192;
+                    let mut v193: i32 = *v193;
+                    let mut v194: i32 = *v194;
                     let mut v195: bool = v162 >= v166;
                     let mut v213: US10 = if v195 {
                         let mut v196: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure35();
@@ -8990,14 +8813,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                         let mut v198: u8 = v0.clone().as_bytes()[v162 as usize];
                         let mut v199: bool = v198 == b'\\';
                         if v199 {
-                            let mut v200: i32 = v162 + 1i32;
+                            let mut v200: i32 = v162.wrapping_add(1i32);
                             let mut v201: bool = b'\n' == v198;
                             let (mut v205, mut v206, mut v207, mut v208): (i32, i32, i32, i32) = if v201 {
-                                let mut v202: i32 = v163 + v165;
-                                let mut v203: i32 = v164 + 1i32;
+                                let mut v202: i32 = v163.wrapping_add(v165);
+                                let mut v203: i32 = v164.wrapping_add(1i32);
                                 (v202, v203, 1i32, v166)
                             } else {
-                                let mut v204: i32 = v165 + 1i32;
+                                let mut v204: i32 = v165.wrapping_add(1i32);
                                 (v163, v164, v204, v166)
                             };
                             US10::US10_0(b'\\', v200, v205, v206, v207, v208)
@@ -9009,20 +8832,20 @@ fn method111(mut v0: Rc<str>) -> US18 {
                     let mut v248: US10 = match &v213 {
                         US10::US10_1(v240, v241, v242, v243, v244, v245) => { // Error
                             let mut v240: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v240.clone();
-                            let mut v241: i32 = v241.clone();
-                            let mut v242: i32 = v242.clone();
-                            let mut v243: i32 = v243.clone();
-                            let mut v244: i32 = v244.clone();
-                            let mut v245: i32 = v245.clone();
+                            let mut v241: i32 = *v241;
+                            let mut v242: i32 = *v242;
+                            let mut v243: i32 = *v243;
+                            let mut v244: i32 = *v244;
+                            let mut v245: i32 = *v245;
                             US10::US10_1(v240.clone(), v241, v242, v243, v244, v245)
                         }
                         US10::US10_0(v214, v215, v216, v217, v218, v219) => { // Ok
-                            let mut v214: u8 = v214.clone();
-                            let mut v215: i32 = v215.clone();
-                            let mut v216: i32 = v216.clone();
-                            let mut v217: i32 = v217.clone();
-                            let mut v218: i32 = v218.clone();
-                            let mut v219: i32 = v219.clone();
+                            let mut v214: u8 = *v214;
+                            let mut v215: i32 = *v215;
+                            let mut v216: i32 = *v216;
+                            let mut v217: i32 = *v217;
+                            let mut v218: i32 = *v218;
+                            let mut v219: i32 = *v219;
                             let mut v220: bool = v215 >= v219;
                             if v220 {
                                 let mut v221: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure40();
@@ -9032,14 +8855,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                 let mut v224: bool = v223 == b'"';
                                 let mut v225: bool = v224 == false;
                                 if v225 {
-                                    let mut v226: i32 = v215 + 1i32;
+                                    let mut v226: i32 = v215.wrapping_add(1i32);
                                     let mut v227: bool = b'\n' == v223;
                                     let (mut v231, mut v232, mut v233, mut v234): (i32, i32, i32, i32) = if v227 {
-                                        let mut v228: i32 = v216 + v218;
-                                        let mut v229: i32 = v217 + 1i32;
+                                        let mut v228: i32 = v216.wrapping_add(v218);
+                                        let mut v229: i32 = v217.wrapping_add(1i32);
                                         (v228, v229, 1i32, v219)
                                     } else {
-                                        let mut v230: i32 = v218 + 1i32;
+                                        let mut v230: i32 = v218.wrapping_add(1i32);
                                         (v216, v217, v230, v219)
                                     };
                                     US10::US10_0(v223, v226, v231, v232, v233, v234)
@@ -9049,47 +8872,45 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                 }
                             }
                         }
-                        _ => unreachable!(),
                     };
                     let mut v270: US11 = match &v248 {
                         US10::US10_1(v262, v263, v264, v265, v266, v267) => { // Error
                             let mut v262: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v262.clone();
-                            let mut v263: i32 = v263.clone();
-                            let mut v264: i32 = v264.clone();
-                            let mut v265: i32 = v265.clone();
-                            let mut v266: i32 = v266.clone();
-                            let mut v267: i32 = v267.clone();
+                            let mut v263: i32 = *v263;
+                            let mut v264: i32 = *v264;
+                            let mut v265: i32 = *v265;
+                            let mut v266: i32 = *v266;
+                            let mut v267: i32 = *v267;
                             US11::US11_1(v262.clone(), v263, v264, v265, v266, v267)
                         }
                         US10::US10_0(v249, v250, v251, v252, v253, v254) => { // Ok
-                            let mut v249: u8 = v249.clone();
-                            let mut v250: i32 = v250.clone();
-                            let mut v251: i32 = v251.clone();
-                            let mut v252: i32 = v252.clone();
-                            let mut v253: i32 = v253.clone();
-                            let mut v254: i32 = v254.clone();
+                            let mut v249: u8 = *v249;
+                            let mut v250: i32 = *v250;
+                            let mut v251: i32 = *v251;
+                            let mut v252: i32 = *v252;
+                            let mut v253: i32 = *v253;
+                            let mut v254: i32 = *v254;
                             let mut v255: bool = v162 >= v250;
                             let mut v260: Rc<str> = if v255 {
                                 let mut v256: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                 v256.clone()
                             } else {
                                 let mut v257: bool = v162 == v250;
-                                let mut v258: i32 = v250 - 1i32;
+                                let mut v258: i32 = v250.wrapping_sub(1i32);
                                 let mut v259: Rc<str> = string_slice(&v0.clone(), v162 as i64, v258 as i64);
                                 v259.clone()
                             };
                             US11::US11_0(v260.clone(), v250, v251, v252, v253, v254)
                         }
-                        _ => unreachable!(),
                     };
                     match &v270 {
                         US11::US11_1(v277, v278, v279, v280, v281, v282) => { // Error
                             let mut v277: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v277.clone();
-                            let mut v278: i32 = v278.clone();
-                            let mut v279: i32 = v279.clone();
-                            let mut v280: i32 = v280.clone();
-                            let mut v281: i32 = v281.clone();
-                            let mut v282: i32 = v282.clone();
+                            let mut v278: i32 = *v278;
+                            let mut v279: i32 = *v279;
+                            let mut v280: i32 = *v280;
+                            let mut v281: i32 = *v281;
+                            let mut v282: i32 = *v282;
                             let mut v300: US10 = if v195 {
                                 let mut v283: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                                 US10::US10_1(v283.clone(), v162, v163, v164, v165, v166)
@@ -9097,14 +8918,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                 let mut v285: u8 = v0.clone().as_bytes()[v162 as usize];
                                 let mut v286: bool = v285 == b'`';
                                 if v286 {
-                                    let mut v287: i32 = v162 + 1i32;
+                                    let mut v287: i32 = v162.wrapping_add(1i32);
                                     let mut v288: bool = b'\n' == v285;
                                     let (mut v292, mut v293, mut v294, mut v295): (i32, i32, i32, i32) = if v288 {
-                                        let mut v289: i32 = v163 + v165;
-                                        let mut v290: i32 = v164 + 1i32;
+                                        let mut v289: i32 = v163.wrapping_add(v165);
+                                        let mut v290: i32 = v164.wrapping_add(1i32);
                                         (v289, v290, 1i32, v166)
                                     } else {
-                                        let mut v291: i32 = v165 + 1i32;
+                                        let mut v291: i32 = v165.wrapping_add(1i32);
                                         (v163, v164, v291, v166)
                                     };
                                     US10::US10_0(b'`', v287, v292, v293, v294, v295)
@@ -9116,20 +8937,20 @@ fn method111(mut v0: Rc<str>) -> US18 {
                             let mut v335: US10 = match &v300 {
                                 US10::US10_1(v327, v328, v329, v330, v331, v332) => { // Error
                                     let mut v327: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v327.clone();
-                                    let mut v328: i32 = v328.clone();
-                                    let mut v329: i32 = v329.clone();
-                                    let mut v330: i32 = v330.clone();
-                                    let mut v331: i32 = v331.clone();
-                                    let mut v332: i32 = v332.clone();
+                                    let mut v328: i32 = *v328;
+                                    let mut v329: i32 = *v329;
+                                    let mut v330: i32 = *v330;
+                                    let mut v331: i32 = *v331;
+                                    let mut v332: i32 = *v332;
                                     US10::US10_1(v327.clone(), v328, v329, v330, v331, v332)
                                 }
                                 US10::US10_0(v301, v302, v303, v304, v305, v306) => { // Ok
-                                    let mut v301: u8 = v301.clone();
-                                    let mut v302: i32 = v302.clone();
-                                    let mut v303: i32 = v303.clone();
-                                    let mut v304: i32 = v304.clone();
-                                    let mut v305: i32 = v305.clone();
-                                    let mut v306: i32 = v306.clone();
+                                    let mut v301: u8 = *v301;
+                                    let mut v302: i32 = *v302;
+                                    let mut v303: i32 = *v303;
+                                    let mut v304: i32 = *v304;
+                                    let mut v305: i32 = *v305;
+                                    let mut v306: i32 = *v306;
                                     let mut v307: bool = v302 >= v306;
                                     if v307 {
                                         let mut v308: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure40();
@@ -9139,14 +8960,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                         let mut v311: bool = v310 == b'"';
                                         let mut v312: bool = v311 == false;
                                         if v312 {
-                                            let mut v313: i32 = v302 + 1i32;
+                                            let mut v313: i32 = v302.wrapping_add(1i32);
                                             let mut v314: bool = b'\n' == v310;
                                             let (mut v318, mut v319, mut v320, mut v321): (i32, i32, i32, i32) = if v314 {
-                                                let mut v315: i32 = v303 + v305;
-                                                let mut v316: i32 = v304 + 1i32;
+                                                let mut v315: i32 = v303.wrapping_add(v305);
+                                                let mut v316: i32 = v304.wrapping_add(1i32);
                                                 (v315, v316, 1i32, v306)
                                             } else {
-                                                let mut v317: i32 = v305 + 1i32;
+                                                let mut v317: i32 = v305.wrapping_add(1i32);
                                                 (v303, v304, v317, v306)
                                             };
                                             US10::US10_0(v310, v313, v318, v319, v320, v321)
@@ -9156,103 +8977,98 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                         }
                                     }
                                 }
-                                _ => unreachable!(),
                             };
                             let mut v357: US11 = match &v335 {
                                 US10::US10_1(v349, v350, v351, v352, v353, v354) => { // Error
                                     let mut v349: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v349.clone();
-                                    let mut v350: i32 = v350.clone();
-                                    let mut v351: i32 = v351.clone();
-                                    let mut v352: i32 = v352.clone();
-                                    let mut v353: i32 = v353.clone();
-                                    let mut v354: i32 = v354.clone();
+                                    let mut v350: i32 = *v350;
+                                    let mut v351: i32 = *v351;
+                                    let mut v352: i32 = *v352;
+                                    let mut v353: i32 = *v353;
+                                    let mut v354: i32 = *v354;
                                     US11::US11_1(v349.clone(), v350, v351, v352, v353, v354)
                                 }
                                 US10::US10_0(v336, v337, v338, v339, v340, v341) => { // Ok
-                                    let mut v336: u8 = v336.clone();
-                                    let mut v337: i32 = v337.clone();
-                                    let mut v338: i32 = v338.clone();
-                                    let mut v339: i32 = v339.clone();
-                                    let mut v340: i32 = v340.clone();
-                                    let mut v341: i32 = v341.clone();
+                                    let mut v336: u8 = *v336;
+                                    let mut v337: i32 = *v337;
+                                    let mut v338: i32 = *v338;
+                                    let mut v339: i32 = *v339;
+                                    let mut v340: i32 = *v340;
+                                    let mut v341: i32 = *v341;
                                     let mut v342: bool = v162 >= v337;
                                     let mut v347: Rc<str> = if v342 {
                                         let mut v343: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                         v343.clone()
                                     } else {
                                         let mut v344: bool = v162 == v337;
-                                        let mut v345: i32 = v337 - 1i32;
+                                        let mut v345: i32 = v337.wrapping_sub(1i32);
                                         let mut v346: Rc<str> = string_slice(&v0.clone(), v162 as i64, v345 as i64);
                                         v346.clone()
                                     };
                                     US11::US11_0(v347.clone(), v337, v338, v339, v340, v341)
                                 }
-                                _ => unreachable!(),
                             };
                             match &v357 {
                                 US11::US11_1(v364, v365, v366, v367, v368, v369) => { // Error
                                     let mut v364: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v364.clone();
-                                    let mut v365: i32 = v365.clone();
-                                    let mut v366: i32 = v366.clone();
-                                    let mut v367: i32 = v367.clone();
-                                    let mut v368: i32 = v368.clone();
-                                    let mut v369: i32 = v369.clone();
+                                    let mut v365: i32 = *v365;
+                                    let mut v366: i32 = *v366;
+                                    let mut v367: i32 = *v367;
+                                    let mut v368: i32 = *v368;
+                                    let mut v369: i32 = *v369;
                                     let mut v370: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                     US11::US11_1(v370.clone(), v162, v163, v164, v165, v166)
                                 }
                                 US11::US11_0(v358, v359, v360, v361, v362, v363) => { // Ok
                                     let mut v358: Rc<str> = v358.clone();
-                                    let mut v359: i32 = v359.clone();
-                                    let mut v360: i32 = v360.clone();
-                                    let mut v361: i32 = v361.clone();
-                                    let mut v362: i32 = v362.clone();
-                                    let mut v363: i32 = v363.clone();
+                                    let mut v359: i32 = *v359;
+                                    let mut v360: i32 = *v360;
+                                    let mut v361: i32 = *v361;
+                                    let mut v362: i32 = *v362;
+                                    let mut v363: i32 = *v363;
                                     v357.clone()
                                 }
-                                _ => unreachable!(),
                             }
                         }
                         US11::US11_0(v271, v272, v273, v274, v275, v276) => { // Ok
                             let mut v271: Rc<str> = v271.clone();
-                            let mut v272: i32 = v272.clone();
-                            let mut v273: i32 = v273.clone();
-                            let mut v274: i32 = v274.clone();
-                            let mut v275: i32 = v275.clone();
-                            let mut v276: i32 = v276.clone();
+                            let mut v272: i32 = *v272;
+                            let mut v273: i32 = *v273;
+                            let mut v274: i32 = *v274;
+                            let mut v275: i32 = *v275;
+                            let mut v276: i32 = *v276;
                             v270.clone()
                         }
-                        _ => unreachable!(),
                     }
                 }
                 US11::US11_0(v183, v184, v185, v186, v187, v188) => { // Ok
                     let mut v183: Rc<str> = v183.clone();
-                    let mut v184: i32 = v184.clone();
-                    let mut v185: i32 = v185.clone();
-                    let mut v186: i32 = v186.clone();
-                    let mut v187: i32 = v187.clone();
-                    let mut v188: i32 = v188.clone();
+                    let mut v184: i32 = *v184;
+                    let mut v185: i32 = *v185;
+                    let mut v186: i32 = *v186;
+                    let mut v187: i32 = *v187;
+                    let mut v188: i32 = *v188;
                     v182.clone()
                 }
-                _ => unreachable!(),
             };
             let mut v400: US11 = match &v377 {
                 US11::US11_1(v378, v379, v380, v381, v382, v383) => { // Error
                     let mut v378: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v378.clone();
-                    let mut v379: i32 = v379.clone();
-                    let mut v380: i32 = v380.clone();
-                    let mut v381: i32 = v381.clone();
-                    let mut v382: i32 = v382.clone();
-                    let mut v383: i32 = v383.clone();
+                    let mut v379: i32 = *v379;
+                    let mut v380: i32 = *v380;
+                    let mut v381: i32 = *v381;
+                    let mut v382: i32 = *v382;
+                    let mut v383: i32 = *v383;
                     let mut v384: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                     US11::US11_0(v384.clone(), v162, v163, v164, v165, v166)
                 }
                 US11::US11_0(v386, v387, v388, v389, v390, v391) => { // Ok
                     let mut v386: Rc<str> = v386.clone();
-                    let mut v387: i32 = v387.clone();
-                    let mut v388: i32 = v388.clone();
-                    let mut v389: i32 = v389.clone();
-                    let mut v390: i32 = v390.clone();
-                    let mut v391: i32 = v391.clone();
+                    let mut v387: i32 = *v387;
+                    let mut v388: i32 = *v388;
+                    let mut v389: i32 = *v389;
+                    let mut v390: i32 = *v390;
+                    let mut v391: i32 = *v391;
                     let mut v392: bool = v387 == v162;
                     if v392 {
                         let mut v393: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure42();
@@ -9263,16 +9079,15 @@ fn method111(mut v0: Rc<str>) -> US18 {
                         method116(v0.clone(), v395.clone(), v386.clone(), v396, v387, v388, v389, v390, v391)
                     }
                 }
-                _ => unreachable!(),
             };
             match &v400 {
                 US11::US11_1(v591, v592, v593, v594, v595, v596) => { // Error
                     let mut v591: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v591.clone();
-                    let mut v592: i32 = v592.clone();
-                    let mut v593: i32 = v593.clone();
-                    let mut v594: i32 = v594.clone();
-                    let mut v595: i32 = v595.clone();
-                    let mut v596: i32 = v596.clone();
+                    let mut v592: i32 = *v592;
+                    let mut v593: i32 = *v593;
+                    let mut v594: i32 = *v594;
+                    let mut v595: i32 = *v595;
+                    let mut v596: i32 = *v596;
                     let mut v597: bool = v162 >= v166;
                     let mut v615: US10 = if v597 {
                         let mut v598: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure35();
@@ -9281,14 +9096,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                         let mut v600: u8 = v0.clone().as_bytes()[v162 as usize];
                         let mut v601: bool = v600 == b'\\';
                         if v601 {
-                            let mut v602: i32 = v162 + 1i32;
+                            let mut v602: i32 = v162.wrapping_add(1i32);
                             let mut v603: bool = b'\n' == v600;
                             let (mut v607, mut v608, mut v609, mut v610): (i32, i32, i32, i32) = if v603 {
-                                let mut v604: i32 = v163 + v165;
-                                let mut v605: i32 = v164 + 1i32;
+                                let mut v604: i32 = v163.wrapping_add(v165);
+                                let mut v605: i32 = v164.wrapping_add(1i32);
                                 (v604, v605, 1i32, v166)
                             } else {
-                                let mut v606: i32 = v165 + 1i32;
+                                let mut v606: i32 = v165.wrapping_add(1i32);
                                 (v163, v164, v606, v166)
                             };
                             US10::US10_0(b'\\', v602, v607, v608, v609, v610)
@@ -9300,20 +9115,20 @@ fn method111(mut v0: Rc<str>) -> US18 {
                     let mut v649: US10 = match &v615 {
                         US10::US10_1(v641, v642, v643, v644, v645, v646) => { // Error
                             let mut v641: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v641.clone();
-                            let mut v642: i32 = v642.clone();
-                            let mut v643: i32 = v643.clone();
-                            let mut v644: i32 = v644.clone();
-                            let mut v645: i32 = v645.clone();
-                            let mut v646: i32 = v646.clone();
+                            let mut v642: i32 = *v642;
+                            let mut v643: i32 = *v643;
+                            let mut v644: i32 = *v644;
+                            let mut v645: i32 = *v645;
+                            let mut v646: i32 = *v646;
                             US10::US10_1(v641.clone(), v642, v643, v644, v645, v646)
                         }
                         US10::US10_0(v616, v617, v618, v619, v620, v621) => { // Ok
-                            let mut v616: u8 = v616.clone();
-                            let mut v617: i32 = v617.clone();
-                            let mut v618: i32 = v618.clone();
-                            let mut v619: i32 = v619.clone();
-                            let mut v620: i32 = v620.clone();
-                            let mut v621: i32 = v621.clone();
+                            let mut v616: u8 = *v616;
+                            let mut v617: i32 = *v617;
+                            let mut v618: i32 = *v618;
+                            let mut v619: i32 = *v619;
+                            let mut v620: i32 = *v620;
+                            let mut v621: i32 = *v621;
                             let mut v622: bool = v617 >= v621;
                             if v622 {
                                 let mut v623: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -9322,14 +9137,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                 let mut v625: u8 = v0.clone().as_bytes()[v617 as usize];
                                 let mut v626: bool = v625 == b'"';
                                 if v626 {
-                                    let mut v627: i32 = v617 + 1i32;
+                                    let mut v627: i32 = v617.wrapping_add(1i32);
                                     let mut v628: bool = b'\n' == v625;
                                     let (mut v632, mut v633, mut v634, mut v635): (i32, i32, i32, i32) = if v628 {
-                                        let mut v629: i32 = v618 + v620;
-                                        let mut v630: i32 = v619 + 1i32;
+                                        let mut v629: i32 = v618.wrapping_add(v620);
+                                        let mut v630: i32 = v619.wrapping_add(1i32);
                                         (v629, v630, 1i32, v621)
                                     } else {
-                                        let mut v631: i32 = v620 + 1i32;
+                                        let mut v631: i32 = v620.wrapping_add(1i32);
                                         (v618, v619, v631, v621)
                                     };
                                     US10::US10_0(b'"', v627, v632, v633, v634, v635)
@@ -9339,37 +9154,35 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                 }
                             }
                         }
-                        _ => unreachable!(),
                     };
                     let mut v665: US10 = match &v649 {
                         US10::US10_1(v657, v658, v659, v660, v661, v662) => { // Error
                             let mut v657: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v657.clone();
-                            let mut v658: i32 = v658.clone();
-                            let mut v659: i32 = v659.clone();
-                            let mut v660: i32 = v660.clone();
-                            let mut v661: i32 = v661.clone();
-                            let mut v662: i32 = v662.clone();
+                            let mut v658: i32 = *v658;
+                            let mut v659: i32 = *v659;
+                            let mut v660: i32 = *v660;
+                            let mut v661: i32 = *v661;
+                            let mut v662: i32 = *v662;
                             US10::US10_1(v657.clone(), v658, v659, v660, v661, v662)
                         }
                         US10::US10_0(v650, v651, v652, v653, v654, v655) => { // Ok
-                            let mut v650: u8 = v650.clone();
-                            let mut v651: i32 = v651.clone();
-                            let mut v652: i32 = v652.clone();
-                            let mut v653: i32 = v653.clone();
-                            let mut v654: i32 = v654.clone();
-                            let mut v655: i32 = v655.clone();
+                            let mut v650: u8 = *v650;
+                            let mut v651: i32 = *v651;
+                            let mut v652: i32 = *v652;
+                            let mut v653: i32 = *v653;
+                            let mut v654: i32 = *v654;
+                            let mut v655: i32 = *v655;
                             US10::US10_0(b'"', v651, v652, v653, v654, v655)
                         }
-                        _ => unreachable!(),
                     };
                     let mut v763: US10 = match &v665 {
                         US10::US10_1(v672, v673, v674, v675, v676, v677) => { // Error
                             let mut v672: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v672.clone();
-                            let mut v673: i32 = v673.clone();
-                            let mut v674: i32 = v674.clone();
-                            let mut v675: i32 = v675.clone();
-                            let mut v676: i32 = v676.clone();
-                            let mut v677: i32 = v677.clone();
+                            let mut v673: i32 = *v673;
+                            let mut v674: i32 = *v674;
+                            let mut v675: i32 = *v675;
+                            let mut v676: i32 = *v676;
+                            let mut v677: i32 = *v677;
                             let mut v695: US10 = if v597 {
                                 let mut v678: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                                 US10::US10_1(v678.clone(), v162, v163, v164, v165, v166)
@@ -9377,14 +9190,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                 let mut v680: u8 = v0.clone().as_bytes()[v162 as usize];
                                 let mut v681: bool = v680 == b'`';
                                 if v681 {
-                                    let mut v682: i32 = v162 + 1i32;
+                                    let mut v682: i32 = v162.wrapping_add(1i32);
                                     let mut v683: bool = b'\n' == v680;
                                     let (mut v687, mut v688, mut v689, mut v690): (i32, i32, i32, i32) = if v683 {
-                                        let mut v684: i32 = v163 + v165;
-                                        let mut v685: i32 = v164 + 1i32;
+                                        let mut v684: i32 = v163.wrapping_add(v165);
+                                        let mut v685: i32 = v164.wrapping_add(1i32);
                                         (v684, v685, 1i32, v166)
                                     } else {
-                                        let mut v686: i32 = v165 + 1i32;
+                                        let mut v686: i32 = v165.wrapping_add(1i32);
                                         (v163, v164, v686, v166)
                                     };
                                     US10::US10_0(b'`', v682, v687, v688, v689, v690)
@@ -9396,20 +9209,20 @@ fn method111(mut v0: Rc<str>) -> US18 {
                             let mut v729: US10 = match &v695 {
                                 US10::US10_1(v721, v722, v723, v724, v725, v726) => { // Error
                                     let mut v721: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v721.clone();
-                                    let mut v722: i32 = v722.clone();
-                                    let mut v723: i32 = v723.clone();
-                                    let mut v724: i32 = v724.clone();
-                                    let mut v725: i32 = v725.clone();
-                                    let mut v726: i32 = v726.clone();
+                                    let mut v722: i32 = *v722;
+                                    let mut v723: i32 = *v723;
+                                    let mut v724: i32 = *v724;
+                                    let mut v725: i32 = *v725;
+                                    let mut v726: i32 = *v726;
                                     US10::US10_1(v721.clone(), v722, v723, v724, v725, v726)
                                 }
                                 US10::US10_0(v696, v697, v698, v699, v700, v701) => { // Ok
-                                    let mut v696: u8 = v696.clone();
-                                    let mut v697: i32 = v697.clone();
-                                    let mut v698: i32 = v698.clone();
-                                    let mut v699: i32 = v699.clone();
-                                    let mut v700: i32 = v700.clone();
-                                    let mut v701: i32 = v701.clone();
+                                    let mut v696: u8 = *v696;
+                                    let mut v697: i32 = *v697;
+                                    let mut v698: i32 = *v698;
+                                    let mut v699: i32 = *v699;
+                                    let mut v700: i32 = *v700;
+                                    let mut v701: i32 = *v701;
                                     let mut v702: bool = v697 >= v701;
                                     if v702 {
                                         let mut v703: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -9418,14 +9231,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                         let mut v705: u8 = v0.clone().as_bytes()[v697 as usize];
                                         let mut v706: bool = v705 == b'"';
                                         if v706 {
-                                            let mut v707: i32 = v697 + 1i32;
+                                            let mut v707: i32 = v697.wrapping_add(1i32);
                                             let mut v708: bool = b'\n' == v705;
                                             let (mut v712, mut v713, mut v714, mut v715): (i32, i32, i32, i32) = if v708 {
-                                                let mut v709: i32 = v698 + v700;
-                                                let mut v710: i32 = v699 + 1i32;
+                                                let mut v709: i32 = v698.wrapping_add(v700);
+                                                let mut v710: i32 = v699.wrapping_add(1i32);
                                                 (v709, v710, 1i32, v701)
                                             } else {
-                                                let mut v711: i32 = v700 + 1i32;
+                                                let mut v711: i32 = v700.wrapping_add(1i32);
                                                 (v698, v699, v711, v701)
                                             };
                                             US10::US10_0(b'"', v707, v712, v713, v714, v715)
@@ -9435,94 +9248,89 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                         }
                                     }
                                 }
-                                _ => unreachable!(),
                             };
                             let mut v745: US10 = match &v729 {
                                 US10::US10_1(v737, v738, v739, v740, v741, v742) => { // Error
                                     let mut v737: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v737.clone();
-                                    let mut v738: i32 = v738.clone();
-                                    let mut v739: i32 = v739.clone();
-                                    let mut v740: i32 = v740.clone();
-                                    let mut v741: i32 = v741.clone();
-                                    let mut v742: i32 = v742.clone();
+                                    let mut v738: i32 = *v738;
+                                    let mut v739: i32 = *v739;
+                                    let mut v740: i32 = *v740;
+                                    let mut v741: i32 = *v741;
+                                    let mut v742: i32 = *v742;
                                     US10::US10_1(v737.clone(), v738, v739, v740, v741, v742)
                                 }
                                 US10::US10_0(v730, v731, v732, v733, v734, v735) => { // Ok
-                                    let mut v730: u8 = v730.clone();
-                                    let mut v731: i32 = v731.clone();
-                                    let mut v732: i32 = v732.clone();
-                                    let mut v733: i32 = v733.clone();
-                                    let mut v734: i32 = v734.clone();
-                                    let mut v735: i32 = v735.clone();
+                                    let mut v730: u8 = *v730;
+                                    let mut v731: i32 = *v731;
+                                    let mut v732: i32 = *v732;
+                                    let mut v733: i32 = *v733;
+                                    let mut v734: i32 = *v734;
+                                    let mut v735: i32 = *v735;
                                     US10::US10_0(b'"', v731, v732, v733, v734, v735)
                                 }
-                                _ => unreachable!(),
                             };
                             match &v745 {
                                 US10::US10_1(v752, v753, v754, v755, v756, v757) => { // Error
                                     let mut v752: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v752.clone();
-                                    let mut v753: i32 = v753.clone();
-                                    let mut v754: i32 = v754.clone();
-                                    let mut v755: i32 = v755.clone();
-                                    let mut v756: i32 = v756.clone();
-                                    let mut v757: i32 = v757.clone();
+                                    let mut v753: i32 = *v753;
+                                    let mut v754: i32 = *v754;
+                                    let mut v755: i32 = *v755;
+                                    let mut v756: i32 = *v756;
+                                    let mut v757: i32 = *v757;
                                     let mut v758: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                     US10::US10_1(v758.clone(), v162, v163, v164, v165, v166)
                                 }
                                 US10::US10_0(v746, v747, v748, v749, v750, v751) => { // Ok
-                                    let mut v746: u8 = v746.clone();
-                                    let mut v747: i32 = v747.clone();
-                                    let mut v748: i32 = v748.clone();
-                                    let mut v749: i32 = v749.clone();
-                                    let mut v750: i32 = v750.clone();
-                                    let mut v751: i32 = v751.clone();
+                                    let mut v746: u8 = *v746;
+                                    let mut v747: i32 = *v747;
+                                    let mut v748: i32 = *v748;
+                                    let mut v749: i32 = *v749;
+                                    let mut v750: i32 = *v750;
+                                    let mut v751: i32 = *v751;
                                     v745.clone()
                                 }
-                                _ => unreachable!(),
                             }
                         }
                         US10::US10_0(v666, v667, v668, v669, v670, v671) => { // Ok
-                            let mut v666: u8 = v666.clone();
-                            let mut v667: i32 = v667.clone();
-                            let mut v668: i32 = v668.clone();
-                            let mut v669: i32 = v669.clone();
-                            let mut v670: i32 = v670.clone();
-                            let mut v671: i32 = v671.clone();
+                            let mut v666: u8 = *v666;
+                            let mut v667: i32 = *v667;
+                            let mut v668: i32 = *v668;
+                            let mut v669: i32 = *v669;
+                            let mut v670: i32 = *v670;
+                            let mut v671: i32 = *v671;
                             v665.clone()
                         }
-                        _ => unreachable!(),
                     };
                     match &v763 {
                         US10::US10_1(v772, v773, v774, v775, v776, v777) => { // Error
                             let mut v772: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v772.clone();
-                            let mut v773: i32 = v773.clone();
-                            let mut v774: i32 = v774.clone();
-                            let mut v775: i32 = v775.clone();
-                            let mut v776: i32 = v776.clone();
-                            let mut v777: i32 = v777.clone();
+                            let mut v773: i32 = *v773;
+                            let mut v774: i32 = *v774;
+                            let mut v775: i32 = *v775;
+                            let mut v776: i32 = *v776;
+                            let mut v777: i32 = *v777;
                             let mut v778: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure24();
                             US11::US11_1(v778.clone(), v162, v163, v164, v165, v166)
                         }
                         US10::US10_0(v764, v765, v766, v767, v768, v769) => { // Ok
-                            let mut v764: u8 = v764.clone();
-                            let mut v765: i32 = v765.clone();
-                            let mut v766: i32 = v766.clone();
-                            let mut v767: i32 = v767.clone();
-                            let mut v768: i32 = v768.clone();
-                            let mut v769: i32 = v769.clone();
+                            let mut v764: u8 = *v764;
+                            let mut v765: i32 = *v765;
+                            let mut v766: i32 = *v766;
+                            let mut v767: i32 = *v767;
+                            let mut v768: i32 = *v768;
+                            let mut v769: i32 = *v769;
                             let mut v770: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                             US11::US11_0(v770.clone(), v765, v766, v767, v768, v769)
                         }
-                        _ => unreachable!(),
                     }
                 }
                 US11::US11_0(v401, v402, v403, v404, v405, v406) => { // Ok
                     let mut v401: Rc<str> = v401.clone();
-                    let mut v402: i32 = v402.clone();
-                    let mut v403: i32 = v403.clone();
-                    let mut v404: i32 = v404.clone();
-                    let mut v405: i32 = v405.clone();
-                    let mut v406: i32 = v406.clone();
+                    let mut v402: i32 = *v402;
+                    let mut v403: i32 = *v403;
+                    let mut v404: i32 = *v404;
+                    let mut v405: i32 = *v405;
+                    let mut v406: i32 = *v406;
                     let mut v407: bool = v402 >= v406;
                     let mut v425: US10 = if v407 {
                         let mut v408: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure35();
@@ -9531,14 +9339,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                         let mut v410: u8 = v0.clone().as_bytes()[v402 as usize];
                         let mut v411: bool = v410 == b'\\';
                         if v411 {
-                            let mut v412: i32 = v402 + 1i32;
+                            let mut v412: i32 = v402.wrapping_add(1i32);
                             let mut v413: bool = b'\n' == v410;
                             let (mut v417, mut v418, mut v419, mut v420): (i32, i32, i32, i32) = if v413 {
-                                let mut v414: i32 = v403 + v405;
-                                let mut v415: i32 = v404 + 1i32;
+                                let mut v414: i32 = v403.wrapping_add(v405);
+                                let mut v415: i32 = v404.wrapping_add(1i32);
                                 (v414, v415, 1i32, v406)
                             } else {
-                                let mut v416: i32 = v405 + 1i32;
+                                let mut v416: i32 = v405.wrapping_add(1i32);
                                 (v403, v404, v416, v406)
                             };
                             US10::US10_0(b'\\', v412, v417, v418, v419, v420)
@@ -9550,20 +9358,20 @@ fn method111(mut v0: Rc<str>) -> US18 {
                     let mut v459: US10 = match &v425 {
                         US10::US10_1(v451, v452, v453, v454, v455, v456) => { // Error
                             let mut v451: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v451.clone();
-                            let mut v452: i32 = v452.clone();
-                            let mut v453: i32 = v453.clone();
-                            let mut v454: i32 = v454.clone();
-                            let mut v455: i32 = v455.clone();
-                            let mut v456: i32 = v456.clone();
+                            let mut v452: i32 = *v452;
+                            let mut v453: i32 = *v453;
+                            let mut v454: i32 = *v454;
+                            let mut v455: i32 = *v455;
+                            let mut v456: i32 = *v456;
                             US10::US10_1(v451.clone(), v452, v453, v454, v455, v456)
                         }
                         US10::US10_0(v426, v427, v428, v429, v430, v431) => { // Ok
-                            let mut v426: u8 = v426.clone();
-                            let mut v427: i32 = v427.clone();
-                            let mut v428: i32 = v428.clone();
-                            let mut v429: i32 = v429.clone();
-                            let mut v430: i32 = v430.clone();
-                            let mut v431: i32 = v431.clone();
+                            let mut v426: u8 = *v426;
+                            let mut v427: i32 = *v427;
+                            let mut v428: i32 = *v428;
+                            let mut v429: i32 = *v429;
+                            let mut v430: i32 = *v430;
+                            let mut v431: i32 = *v431;
                             let mut v432: bool = v427 >= v431;
                             if v432 {
                                 let mut v433: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -9572,14 +9380,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                 let mut v435: u8 = v0.clone().as_bytes()[v427 as usize];
                                 let mut v436: bool = v435 == b'"';
                                 if v436 {
-                                    let mut v437: i32 = v427 + 1i32;
+                                    let mut v437: i32 = v427.wrapping_add(1i32);
                                     let mut v438: bool = b'\n' == v435;
                                     let (mut v442, mut v443, mut v444, mut v445): (i32, i32, i32, i32) = if v438 {
-                                        let mut v439: i32 = v428 + v430;
-                                        let mut v440: i32 = v429 + 1i32;
+                                        let mut v439: i32 = v428.wrapping_add(v430);
+                                        let mut v440: i32 = v429.wrapping_add(1i32);
                                         (v439, v440, 1i32, v431)
                                     } else {
-                                        let mut v441: i32 = v430 + 1i32;
+                                        let mut v441: i32 = v430.wrapping_add(1i32);
                                         (v428, v429, v441, v431)
                                     };
                                     US10::US10_0(b'"', v437, v442, v443, v444, v445)
@@ -9589,37 +9397,35 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                 }
                             }
                         }
-                        _ => unreachable!(),
                     };
                     let mut v475: US10 = match &v459 {
                         US10::US10_1(v467, v468, v469, v470, v471, v472) => { // Error
                             let mut v467: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v467.clone();
-                            let mut v468: i32 = v468.clone();
-                            let mut v469: i32 = v469.clone();
-                            let mut v470: i32 = v470.clone();
-                            let mut v471: i32 = v471.clone();
-                            let mut v472: i32 = v472.clone();
+                            let mut v468: i32 = *v468;
+                            let mut v469: i32 = *v469;
+                            let mut v470: i32 = *v470;
+                            let mut v471: i32 = *v471;
+                            let mut v472: i32 = *v472;
                             US10::US10_1(v467.clone(), v468, v469, v470, v471, v472)
                         }
                         US10::US10_0(v460, v461, v462, v463, v464, v465) => { // Ok
-                            let mut v460: u8 = v460.clone();
-                            let mut v461: i32 = v461.clone();
-                            let mut v462: i32 = v462.clone();
-                            let mut v463: i32 = v463.clone();
-                            let mut v464: i32 = v464.clone();
-                            let mut v465: i32 = v465.clone();
+                            let mut v460: u8 = *v460;
+                            let mut v461: i32 = *v461;
+                            let mut v462: i32 = *v462;
+                            let mut v463: i32 = *v463;
+                            let mut v464: i32 = *v464;
+                            let mut v465: i32 = *v465;
                             US10::US10_0(b'"', v461, v462, v463, v464, v465)
                         }
-                        _ => unreachable!(),
                     };
                     let mut v573: US10 = match &v475 {
                         US10::US10_1(v482, v483, v484, v485, v486, v487) => { // Error
                             let mut v482: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v482.clone();
-                            let mut v483: i32 = v483.clone();
-                            let mut v484: i32 = v484.clone();
-                            let mut v485: i32 = v485.clone();
-                            let mut v486: i32 = v486.clone();
-                            let mut v487: i32 = v487.clone();
+                            let mut v483: i32 = *v483;
+                            let mut v484: i32 = *v484;
+                            let mut v485: i32 = *v485;
+                            let mut v486: i32 = *v486;
+                            let mut v487: i32 = *v487;
                             let mut v505: US10 = if v407 {
                                 let mut v488: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                                 US10::US10_1(v488.clone(), v402, v403, v404, v405, v406)
@@ -9627,14 +9433,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                 let mut v490: u8 = v0.clone().as_bytes()[v402 as usize];
                                 let mut v491: bool = v490 == b'`';
                                 if v491 {
-                                    let mut v492: i32 = v402 + 1i32;
+                                    let mut v492: i32 = v402.wrapping_add(1i32);
                                     let mut v493: bool = b'\n' == v490;
                                     let (mut v497, mut v498, mut v499, mut v500): (i32, i32, i32, i32) = if v493 {
-                                        let mut v494: i32 = v403 + v405;
-                                        let mut v495: i32 = v404 + 1i32;
+                                        let mut v494: i32 = v403.wrapping_add(v405);
+                                        let mut v495: i32 = v404.wrapping_add(1i32);
                                         (v494, v495, 1i32, v406)
                                     } else {
-                                        let mut v496: i32 = v405 + 1i32;
+                                        let mut v496: i32 = v405.wrapping_add(1i32);
                                         (v403, v404, v496, v406)
                                     };
                                     US10::US10_0(b'`', v492, v497, v498, v499, v500)
@@ -9646,20 +9452,20 @@ fn method111(mut v0: Rc<str>) -> US18 {
                             let mut v539: US10 = match &v505 {
                                 US10::US10_1(v531, v532, v533, v534, v535, v536) => { // Error
                                     let mut v531: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v531.clone();
-                                    let mut v532: i32 = v532.clone();
-                                    let mut v533: i32 = v533.clone();
-                                    let mut v534: i32 = v534.clone();
-                                    let mut v535: i32 = v535.clone();
-                                    let mut v536: i32 = v536.clone();
+                                    let mut v532: i32 = *v532;
+                                    let mut v533: i32 = *v533;
+                                    let mut v534: i32 = *v534;
+                                    let mut v535: i32 = *v535;
+                                    let mut v536: i32 = *v536;
                                     US10::US10_1(v531.clone(), v532, v533, v534, v535, v536)
                                 }
                                 US10::US10_0(v506, v507, v508, v509, v510, v511) => { // Ok
-                                    let mut v506: u8 = v506.clone();
-                                    let mut v507: i32 = v507.clone();
-                                    let mut v508: i32 = v508.clone();
-                                    let mut v509: i32 = v509.clone();
-                                    let mut v510: i32 = v510.clone();
-                                    let mut v511: i32 = v511.clone();
+                                    let mut v506: u8 = *v506;
+                                    let mut v507: i32 = *v507;
+                                    let mut v508: i32 = *v508;
+                                    let mut v509: i32 = *v509;
+                                    let mut v510: i32 = *v510;
+                                    let mut v511: i32 = *v511;
                                     let mut v512: bool = v507 >= v511;
                                     if v512 {
                                         let mut v513: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -9668,14 +9474,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                         let mut v515: u8 = v0.clone().as_bytes()[v507 as usize];
                                         let mut v516: bool = v515 == b'"';
                                         if v516 {
-                                            let mut v517: i32 = v507 + 1i32;
+                                            let mut v517: i32 = v507.wrapping_add(1i32);
                                             let mut v518: bool = b'\n' == v515;
                                             let (mut v522, mut v523, mut v524, mut v525): (i32, i32, i32, i32) = if v518 {
-                                                let mut v519: i32 = v508 + v510;
-                                                let mut v520: i32 = v509 + 1i32;
+                                                let mut v519: i32 = v508.wrapping_add(v510);
+                                                let mut v520: i32 = v509.wrapping_add(1i32);
                                                 (v519, v520, 1i32, v511)
                                             } else {
-                                                let mut v521: i32 = v510 + 1i32;
+                                                let mut v521: i32 = v510.wrapping_add(1i32);
                                                 (v508, v509, v521, v511)
                                             };
                                             US10::US10_0(b'"', v517, v522, v523, v524, v525)
@@ -9685,99 +9491,92 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                         }
                                     }
                                 }
-                                _ => unreachable!(),
                             };
                             let mut v555: US10 = match &v539 {
                                 US10::US10_1(v547, v548, v549, v550, v551, v552) => { // Error
                                     let mut v547: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v547.clone();
-                                    let mut v548: i32 = v548.clone();
-                                    let mut v549: i32 = v549.clone();
-                                    let mut v550: i32 = v550.clone();
-                                    let mut v551: i32 = v551.clone();
-                                    let mut v552: i32 = v552.clone();
+                                    let mut v548: i32 = *v548;
+                                    let mut v549: i32 = *v549;
+                                    let mut v550: i32 = *v550;
+                                    let mut v551: i32 = *v551;
+                                    let mut v552: i32 = *v552;
                                     US10::US10_1(v547.clone(), v548, v549, v550, v551, v552)
                                 }
                                 US10::US10_0(v540, v541, v542, v543, v544, v545) => { // Ok
-                                    let mut v540: u8 = v540.clone();
-                                    let mut v541: i32 = v541.clone();
-                                    let mut v542: i32 = v542.clone();
-                                    let mut v543: i32 = v543.clone();
-                                    let mut v544: i32 = v544.clone();
-                                    let mut v545: i32 = v545.clone();
+                                    let mut v540: u8 = *v540;
+                                    let mut v541: i32 = *v541;
+                                    let mut v542: i32 = *v542;
+                                    let mut v543: i32 = *v543;
+                                    let mut v544: i32 = *v544;
+                                    let mut v545: i32 = *v545;
                                     US10::US10_0(b'"', v541, v542, v543, v544, v545)
                                 }
-                                _ => unreachable!(),
                             };
                             match &v555 {
                                 US10::US10_1(v562, v563, v564, v565, v566, v567) => { // Error
                                     let mut v562: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v562.clone();
-                                    let mut v563: i32 = v563.clone();
-                                    let mut v564: i32 = v564.clone();
-                                    let mut v565: i32 = v565.clone();
-                                    let mut v566: i32 = v566.clone();
-                                    let mut v567: i32 = v567.clone();
+                                    let mut v563: i32 = *v563;
+                                    let mut v564: i32 = *v564;
+                                    let mut v565: i32 = *v565;
+                                    let mut v566: i32 = *v566;
+                                    let mut v567: i32 = *v567;
                                     let mut v568: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                     US10::US10_1(v568.clone(), v402, v403, v404, v405, v406)
                                 }
                                 US10::US10_0(v556, v557, v558, v559, v560, v561) => { // Ok
-                                    let mut v556: u8 = v556.clone();
-                                    let mut v557: i32 = v557.clone();
-                                    let mut v558: i32 = v558.clone();
-                                    let mut v559: i32 = v559.clone();
-                                    let mut v560: i32 = v560.clone();
-                                    let mut v561: i32 = v561.clone();
+                                    let mut v556: u8 = *v556;
+                                    let mut v557: i32 = *v557;
+                                    let mut v558: i32 = *v558;
+                                    let mut v559: i32 = *v559;
+                                    let mut v560: i32 = *v560;
+                                    let mut v561: i32 = *v561;
                                     v555.clone()
                                 }
-                                _ => unreachable!(),
                             }
                         }
                         US10::US10_0(v476, v477, v478, v479, v480, v481) => { // Ok
-                            let mut v476: u8 = v476.clone();
-                            let mut v477: i32 = v477.clone();
-                            let mut v478: i32 = v478.clone();
-                            let mut v479: i32 = v479.clone();
-                            let mut v480: i32 = v480.clone();
-                            let mut v481: i32 = v481.clone();
+                            let mut v476: u8 = *v476;
+                            let mut v477: i32 = *v477;
+                            let mut v478: i32 = *v478;
+                            let mut v479: i32 = *v479;
+                            let mut v480: i32 = *v480;
+                            let mut v481: i32 = *v481;
                             v475.clone()
                         }
-                        _ => unreachable!(),
                     };
                     match &v573 {
                         US10::US10_1(v581, v582, v583, v584, v585, v586) => { // Error
                             let mut v581: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v581.clone();
-                            let mut v582: i32 = v582.clone();
-                            let mut v583: i32 = v583.clone();
-                            let mut v584: i32 = v584.clone();
-                            let mut v585: i32 = v585.clone();
-                            let mut v586: i32 = v586.clone();
+                            let mut v582: i32 = *v582;
+                            let mut v583: i32 = *v583;
+                            let mut v584: i32 = *v584;
+                            let mut v585: i32 = *v585;
+                            let mut v586: i32 = *v586;
                             let mut v587: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure25(v162, v402, v581.clone(), v582, v583, v584, v585, v586);
                             US11::US11_1(v587.clone(), v402, v403, v404, v405, v406)
                         }
                         US10::US10_0(v574, v575, v576, v577, v578, v579) => { // Ok
-                            let mut v574: u8 = v574.clone();
-                            let mut v575: i32 = v575.clone();
-                            let mut v576: i32 = v576.clone();
-                            let mut v577: i32 = v577.clone();
-                            let mut v578: i32 = v578.clone();
-                            let mut v579: i32 = v579.clone();
+                            let mut v574: u8 = *v574;
+                            let mut v575: i32 = *v575;
+                            let mut v576: i32 = *v576;
+                            let mut v577: i32 = *v577;
+                            let mut v578: i32 = *v578;
+                            let mut v579: i32 = *v579;
                             US11::US11_0(v401.clone(), v575, v576, v577, v578, v579)
                         }
-                        _ => unreachable!(),
                     }
                 }
-                _ => unreachable!(),
             }
         }
-        _ => unreachable!(),
     };
     let mut v1146: US11 = match &v792 {
         US11::US11_1(v799, v800, v801, v802, v803, v804) => { // Error
             let mut v799: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v799.clone();
-            let mut v800: i32 = v800.clone();
-            let mut v801: i32 = v801.clone();
-            let mut v802: i32 = v802.clone();
-            let mut v803: i32 = v803.clone();
-            let mut v804: i32 = v804.clone();
+            let mut v800: i32 = *v800;
+            let mut v801: i32 = *v801;
+            let mut v802: i32 = *v802;
+            let mut v803: i32 = *v803;
+            let mut v804: i32 = *v804;
             let mut v818: US10 = if v2 {
                 let mut v805: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
                 US10::US10_1(v805.clone(), 0i32, 0i32, 1i32, 1i32, v1)
@@ -9800,20 +9599,20 @@ fn method111(mut v0: Rc<str>) -> US18 {
             match &v818 {
                 US10::US10_1(v1136, v1137, v1138, v1139, v1140, v1141) => { // Error
                     let mut v1136: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1136.clone();
-                    let mut v1137: i32 = v1137.clone();
-                    let mut v1138: i32 = v1138.clone();
-                    let mut v1139: i32 = v1139.clone();
-                    let mut v1140: i32 = v1140.clone();
-                    let mut v1141: i32 = v1141.clone();
+                    let mut v1137: i32 = *v1137;
+                    let mut v1138: i32 = *v1138;
+                    let mut v1139: i32 = *v1139;
+                    let mut v1140: i32 = *v1140;
+                    let mut v1141: i32 = *v1141;
                     US11::US11_1(v1136.clone(), v1137, v1138, v1139, v1140, v1141)
                 }
                 US10::US10_0(v819, v820, v821, v822, v823, v824) => { // Ok
-                    let mut v819: u8 = v819.clone();
-                    let mut v820: i32 = v820.clone();
-                    let mut v821: i32 = v821.clone();
-                    let mut v822: i32 = v822.clone();
-                    let mut v823: i32 = v823.clone();
-                    let mut v824: i32 = v824.clone();
+                    let mut v819: u8 = *v819;
+                    let mut v820: i32 = *v820;
+                    let mut v821: i32 = *v821;
+                    let mut v822: i32 = *v822;
+                    let mut v823: i32 = *v823;
+                    let mut v824: i32 = *v824;
                     let (mut v825, mut v826, mut v827, mut v828, mut v829): (i32, i32, i32, i32, i32) = method112(v821, v822, v823, v824, v0.clone(), v820);
                     let mut v830: bool = v825 > v820;
                     let mut v840: US11 = if v830 {
@@ -9823,7 +9622,7 @@ fn method111(mut v0: Rc<str>) -> US18 {
                             v832.clone()
                         } else {
                             let mut v833: bool = v820 == v825;
-                            let mut v834: i32 = v825 - 1i32;
+                            let mut v834: i32 = v825.wrapping_sub(1i32);
                             let mut v835: Rc<str> = string_slice(&v0.clone(), v820 as i64, v834 as i64);
                             v835.clone()
                         };
@@ -9835,11 +9634,11 @@ fn method111(mut v0: Rc<str>) -> US18 {
                     let mut v1025: US11 = match &v840 {
                         US11::US11_1(v847, v848, v849, v850, v851, v852) => { // Error
                             let mut v847: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v847.clone();
-                            let mut v848: i32 = v848.clone();
-                            let mut v849: i32 = v849.clone();
-                            let mut v850: i32 = v850.clone();
-                            let mut v851: i32 = v851.clone();
-                            let mut v852: i32 = v852.clone();
+                            let mut v848: i32 = *v848;
+                            let mut v849: i32 = *v849;
+                            let mut v850: i32 = *v850;
+                            let mut v851: i32 = *v851;
+                            let mut v852: i32 = *v852;
                             let mut v853: bool = v820 >= v824;
                             let mut v871: US10 = if v853 {
                                 let mut v854: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure35();
@@ -9848,14 +9647,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                 let mut v856: u8 = v0.clone().as_bytes()[v820 as usize];
                                 let mut v857: bool = v856 == b'\\';
                                 if v857 {
-                                    let mut v858: i32 = v820 + 1i32;
+                                    let mut v858: i32 = v820.wrapping_add(1i32);
                                     let mut v859: bool = b'\n' == v856;
                                     let (mut v863, mut v864, mut v865, mut v866): (i32, i32, i32, i32) = if v859 {
-                                        let mut v860: i32 = v821 + v823;
-                                        let mut v861: i32 = v822 + 1i32;
+                                        let mut v860: i32 = v821.wrapping_add(v823);
+                                        let mut v861: i32 = v822.wrapping_add(1i32);
                                         (v860, v861, 1i32, v824)
                                     } else {
-                                        let mut v862: i32 = v823 + 1i32;
+                                        let mut v862: i32 = v823.wrapping_add(1i32);
                                         (v821, v822, v862, v824)
                                     };
                                     US10::US10_0(b'\\', v858, v863, v864, v865, v866)
@@ -9867,80 +9666,78 @@ fn method111(mut v0: Rc<str>) -> US18 {
                             let mut v901: US10 = match &v871 {
                                 US10::US10_1(v893, v894, v895, v896, v897, v898) => { // Error
                                     let mut v893: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v893.clone();
-                                    let mut v894: i32 = v894.clone();
-                                    let mut v895: i32 = v895.clone();
-                                    let mut v896: i32 = v896.clone();
-                                    let mut v897: i32 = v897.clone();
-                                    let mut v898: i32 = v898.clone();
+                                    let mut v894: i32 = *v894;
+                                    let mut v895: i32 = *v895;
+                                    let mut v896: i32 = *v896;
+                                    let mut v897: i32 = *v897;
+                                    let mut v898: i32 = *v898;
                                     US10::US10_1(v893.clone(), v894, v895, v896, v897, v898)
                                 }
                                 US10::US10_0(v872, v873, v874, v875, v876, v877) => { // Ok
-                                    let mut v872: u8 = v872.clone();
-                                    let mut v873: i32 = v873.clone();
-                                    let mut v874: i32 = v874.clone();
-                                    let mut v875: i32 = v875.clone();
-                                    let mut v876: i32 = v876.clone();
-                                    let mut v877: i32 = v877.clone();
+                                    let mut v872: u8 = *v872;
+                                    let mut v873: i32 = *v873;
+                                    let mut v874: i32 = *v874;
+                                    let mut v875: i32 = *v875;
+                                    let mut v876: i32 = *v876;
+                                    let mut v877: i32 = *v877;
                                     let mut v878: bool = v873 >= v877;
                                     if v878 {
                                         let mut v879: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure44();
                                         US10::US10_1(v879.clone(), v873, v874, v875, v876, v877)
                                     } else {
                                         let mut v881: u8 = v0.clone().as_bytes()[v873 as usize];
-                                        let mut v882: i32 = v873 + 1i32;
+                                        let mut v882: i32 = v873.wrapping_add(1i32);
                                         let mut v883: bool = b'\n' == v881;
                                         let (mut v887, mut v888, mut v889, mut v890): (i32, i32, i32, i32) = if v883 {
-                                            let mut v884: i32 = v874 + v876;
-                                            let mut v885: i32 = v875 + 1i32;
+                                            let mut v884: i32 = v874.wrapping_add(v876);
+                                            let mut v885: i32 = v875.wrapping_add(1i32);
                                             (v884, v885, 1i32, v877)
                                         } else {
-                                            let mut v886: i32 = v876 + 1i32;
+                                            let mut v886: i32 = v876.wrapping_add(1i32);
                                             (v874, v875, v886, v877)
                                         };
                                         US10::US10_0(v881, v882, v887, v888, v889, v890)
                                     }
                                 }
-                                _ => unreachable!(),
                             };
                             let mut v923: US11 = match &v901 {
                                 US10::US10_1(v915, v916, v917, v918, v919, v920) => { // Error
                                     let mut v915: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v915.clone();
-                                    let mut v916: i32 = v916.clone();
-                                    let mut v917: i32 = v917.clone();
-                                    let mut v918: i32 = v918.clone();
-                                    let mut v919: i32 = v919.clone();
-                                    let mut v920: i32 = v920.clone();
+                                    let mut v916: i32 = *v916;
+                                    let mut v917: i32 = *v917;
+                                    let mut v918: i32 = *v918;
+                                    let mut v919: i32 = *v919;
+                                    let mut v920: i32 = *v920;
                                     US11::US11_1(v915.clone(), v916, v917, v918, v919, v920)
                                 }
                                 US10::US10_0(v902, v903, v904, v905, v906, v907) => { // Ok
-                                    let mut v902: u8 = v902.clone();
-                                    let mut v903: i32 = v903.clone();
-                                    let mut v904: i32 = v904.clone();
-                                    let mut v905: i32 = v905.clone();
-                                    let mut v906: i32 = v906.clone();
-                                    let mut v907: i32 = v907.clone();
+                                    let mut v902: u8 = *v902;
+                                    let mut v903: i32 = *v903;
+                                    let mut v904: i32 = *v904;
+                                    let mut v905: i32 = *v905;
+                                    let mut v906: i32 = *v906;
+                                    let mut v907: i32 = *v907;
                                     let mut v908: bool = v820 >= v903;
                                     let mut v913: Rc<str> = if v908 {
                                         let mut v909: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                         v909.clone()
                                     } else {
                                         let mut v910: bool = v820 == v903;
-                                        let mut v911: i32 = v903 - 1i32;
+                                        let mut v911: i32 = v903.wrapping_sub(1i32);
                                         let mut v912: Rc<str> = string_slice(&v0.clone(), v820 as i64, v911 as i64);
                                         v912.clone()
                                     };
                                     US11::US11_0(v913.clone(), v903, v904, v905, v906, v907)
                                 }
-                                _ => unreachable!(),
                             };
                             match &v923 {
                                 US11::US11_1(v930, v931, v932, v933, v934, v935) => { // Error
                                     let mut v930: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v930.clone();
-                                    let mut v931: i32 = v931.clone();
-                                    let mut v932: i32 = v932.clone();
-                                    let mut v933: i32 = v933.clone();
-                                    let mut v934: i32 = v934.clone();
-                                    let mut v935: i32 = v935.clone();
+                                    let mut v931: i32 = *v931;
+                                    let mut v932: i32 = *v932;
+                                    let mut v933: i32 = *v933;
+                                    let mut v934: i32 = *v934;
+                                    let mut v935: i32 = *v935;
                                     let mut v953: US10 = if v853 {
                                         let mut v936: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure37();
                                         US10::US10_1(v936.clone(), v820, v821, v822, v823, v824)
@@ -9948,14 +9745,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                         let mut v938: u8 = v0.clone().as_bytes()[v820 as usize];
                                         let mut v939: bool = v938 == b'`';
                                         if v939 {
-                                            let mut v940: i32 = v820 + 1i32;
+                                            let mut v940: i32 = v820.wrapping_add(1i32);
                                             let mut v941: bool = b'\n' == v938;
                                             let (mut v945, mut v946, mut v947, mut v948): (i32, i32, i32, i32) = if v941 {
-                                                let mut v942: i32 = v821 + v823;
-                                                let mut v943: i32 = v822 + 1i32;
+                                                let mut v942: i32 = v821.wrapping_add(v823);
+                                                let mut v943: i32 = v822.wrapping_add(1i32);
                                                 (v942, v943, 1i32, v824)
                                             } else {
-                                                let mut v944: i32 = v823 + 1i32;
+                                                let mut v944: i32 = v823.wrapping_add(1i32);
                                                 (v821, v822, v944, v824)
                                             };
                                             US10::US10_0(b'`', v940, v945, v946, v947, v948)
@@ -9967,136 +9764,131 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                     let mut v983: US10 = match &v953 {
                                         US10::US10_1(v975, v976, v977, v978, v979, v980) => { // Error
                                             let mut v975: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v975.clone();
-                                            let mut v976: i32 = v976.clone();
-                                            let mut v977: i32 = v977.clone();
-                                            let mut v978: i32 = v978.clone();
-                                            let mut v979: i32 = v979.clone();
-                                            let mut v980: i32 = v980.clone();
+                                            let mut v976: i32 = *v976;
+                                            let mut v977: i32 = *v977;
+                                            let mut v978: i32 = *v978;
+                                            let mut v979: i32 = *v979;
+                                            let mut v980: i32 = *v980;
                                             US10::US10_1(v975.clone(), v976, v977, v978, v979, v980)
                                         }
                                         US10::US10_0(v954, v955, v956, v957, v958, v959) => { // Ok
-                                            let mut v954: u8 = v954.clone();
-                                            let mut v955: i32 = v955.clone();
-                                            let mut v956: i32 = v956.clone();
-                                            let mut v957: i32 = v957.clone();
-                                            let mut v958: i32 = v958.clone();
-                                            let mut v959: i32 = v959.clone();
+                                            let mut v954: u8 = *v954;
+                                            let mut v955: i32 = *v955;
+                                            let mut v956: i32 = *v956;
+                                            let mut v957: i32 = *v957;
+                                            let mut v958: i32 = *v958;
+                                            let mut v959: i32 = *v959;
                                             let mut v960: bool = v955 >= v959;
                                             if v960 {
                                                 let mut v961: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure44();
                                                 US10::US10_1(v961.clone(), v955, v956, v957, v958, v959)
                                             } else {
                                                 let mut v963: u8 = v0.clone().as_bytes()[v955 as usize];
-                                                let mut v964: i32 = v955 + 1i32;
+                                                let mut v964: i32 = v955.wrapping_add(1i32);
                                                 let mut v965: bool = b'\n' == v963;
                                                 let (mut v969, mut v970, mut v971, mut v972): (i32, i32, i32, i32) = if v965 {
-                                                    let mut v966: i32 = v956 + v958;
-                                                    let mut v967: i32 = v957 + 1i32;
+                                                    let mut v966: i32 = v956.wrapping_add(v958);
+                                                    let mut v967: i32 = v957.wrapping_add(1i32);
                                                     (v966, v967, 1i32, v959)
                                                 } else {
-                                                    let mut v968: i32 = v958 + 1i32;
+                                                    let mut v968: i32 = v958.wrapping_add(1i32);
                                                     (v956, v957, v968, v959)
                                                 };
                                                 US10::US10_0(v963, v964, v969, v970, v971, v972)
                                             }
                                         }
-                                        _ => unreachable!(),
                                     };
                                     let mut v1005: US11 = match &v983 {
                                         US10::US10_1(v997, v998, v999, v1000, v1001, v1002) => { // Error
                                             let mut v997: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v997.clone();
-                                            let mut v998: i32 = v998.clone();
-                                            let mut v999: i32 = v999.clone();
-                                            let mut v1000: i32 = v1000.clone();
-                                            let mut v1001: i32 = v1001.clone();
-                                            let mut v1002: i32 = v1002.clone();
+                                            let mut v998: i32 = *v998;
+                                            let mut v999: i32 = *v999;
+                                            let mut v1000: i32 = *v1000;
+                                            let mut v1001: i32 = *v1001;
+                                            let mut v1002: i32 = *v1002;
                                             US11::US11_1(v997.clone(), v998, v999, v1000, v1001, v1002)
                                         }
                                         US10::US10_0(v984, v985, v986, v987, v988, v989) => { // Ok
-                                            let mut v984: u8 = v984.clone();
-                                            let mut v985: i32 = v985.clone();
-                                            let mut v986: i32 = v986.clone();
-                                            let mut v987: i32 = v987.clone();
-                                            let mut v988: i32 = v988.clone();
-                                            let mut v989: i32 = v989.clone();
+                                            let mut v984: u8 = *v984;
+                                            let mut v985: i32 = *v985;
+                                            let mut v986: i32 = *v986;
+                                            let mut v987: i32 = *v987;
+                                            let mut v988: i32 = *v988;
+                                            let mut v989: i32 = *v989;
                                             let mut v990: bool = v820 >= v985;
                                             let mut v995: Rc<str> = if v990 {
                                                 let mut v991: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                                 v991.clone()
                                             } else {
                                                 let mut v992: bool = v820 == v985;
-                                                let mut v993: i32 = v985 - 1i32;
+                                                let mut v993: i32 = v985.wrapping_sub(1i32);
                                                 let mut v994: Rc<str> = string_slice(&v0.clone(), v820 as i64, v993 as i64);
                                                 v994.clone()
                                             };
                                             US11::US11_0(v995.clone(), v985, v986, v987, v988, v989)
                                         }
-                                        _ => unreachable!(),
                                     };
                                     match &v1005 {
                                         US11::US11_1(v1012, v1013, v1014, v1015, v1016, v1017) => { // Error
                                             let mut v1012: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1012.clone();
-                                            let mut v1013: i32 = v1013.clone();
-                                            let mut v1014: i32 = v1014.clone();
-                                            let mut v1015: i32 = v1015.clone();
-                                            let mut v1016: i32 = v1016.clone();
-                                            let mut v1017: i32 = v1017.clone();
+                                            let mut v1013: i32 = *v1013;
+                                            let mut v1014: i32 = *v1014;
+                                            let mut v1015: i32 = *v1015;
+                                            let mut v1016: i32 = *v1016;
+                                            let mut v1017: i32 = *v1017;
                                             let mut v1018: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure20();
                                             US11::US11_1(v1018.clone(), v820, v821, v822, v823, v824)
                                         }
                                         US11::US11_0(v1006, v1007, v1008, v1009, v1010, v1011) => { // Ok
                                             let mut v1006: Rc<str> = v1006.clone();
-                                            let mut v1007: i32 = v1007.clone();
-                                            let mut v1008: i32 = v1008.clone();
-                                            let mut v1009: i32 = v1009.clone();
-                                            let mut v1010: i32 = v1010.clone();
-                                            let mut v1011: i32 = v1011.clone();
+                                            let mut v1007: i32 = *v1007;
+                                            let mut v1008: i32 = *v1008;
+                                            let mut v1009: i32 = *v1009;
+                                            let mut v1010: i32 = *v1010;
+                                            let mut v1011: i32 = *v1011;
                                             v1005.clone()
                                         }
-                                        _ => unreachable!(),
                                     }
                                 }
                                 US11::US11_0(v924, v925, v926, v927, v928, v929) => { // Ok
                                     let mut v924: Rc<str> = v924.clone();
-                                    let mut v925: i32 = v925.clone();
-                                    let mut v926: i32 = v926.clone();
-                                    let mut v927: i32 = v927.clone();
-                                    let mut v928: i32 = v928.clone();
-                                    let mut v929: i32 = v929.clone();
+                                    let mut v925: i32 = *v925;
+                                    let mut v926: i32 = *v926;
+                                    let mut v927: i32 = *v927;
+                                    let mut v928: i32 = *v928;
+                                    let mut v929: i32 = *v929;
                                     v923.clone()
                                 }
-                                _ => unreachable!(),
                             }
                         }
                         US11::US11_0(v841, v842, v843, v844, v845, v846) => { // Ok
                             let mut v841: Rc<str> = v841.clone();
-                            let mut v842: i32 = v842.clone();
-                            let mut v843: i32 = v843.clone();
-                            let mut v844: i32 = v844.clone();
-                            let mut v845: i32 = v845.clone();
-                            let mut v846: i32 = v846.clone();
+                            let mut v842: i32 = *v842;
+                            let mut v843: i32 = *v843;
+                            let mut v844: i32 = *v844;
+                            let mut v845: i32 = *v845;
+                            let mut v846: i32 = *v846;
                             v840.clone()
                         }
-                        _ => unreachable!(),
                     };
                     let mut v1048: US11 = match &v1025 {
                         US11::US11_1(v1026, v1027, v1028, v1029, v1030, v1031) => { // Error
                             let mut v1026: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1026.clone();
-                            let mut v1027: i32 = v1027.clone();
-                            let mut v1028: i32 = v1028.clone();
-                            let mut v1029: i32 = v1029.clone();
-                            let mut v1030: i32 = v1030.clone();
-                            let mut v1031: i32 = v1031.clone();
+                            let mut v1027: i32 = *v1027;
+                            let mut v1028: i32 = *v1028;
+                            let mut v1029: i32 = *v1029;
+                            let mut v1030: i32 = *v1030;
+                            let mut v1031: i32 = *v1031;
                             let mut v1032: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                             US11::US11_0(v1032.clone(), v820, v821, v822, v823, v824)
                         }
                         US11::US11_0(v1034, v1035, v1036, v1037, v1038, v1039) => { // Ok
                             let mut v1034: Rc<str> = v1034.clone();
-                            let mut v1035: i32 = v1035.clone();
-                            let mut v1036: i32 = v1036.clone();
-                            let mut v1037: i32 = v1037.clone();
-                            let mut v1038: i32 = v1038.clone();
-                            let mut v1039: i32 = v1039.clone();
+                            let mut v1035: i32 = *v1035;
+                            let mut v1036: i32 = *v1036;
+                            let mut v1037: i32 = *v1037;
+                            let mut v1038: i32 = *v1038;
+                            let mut v1039: i32 = *v1039;
                             let mut v1040: bool = v1035 == v820;
                             if v1040 {
                                 let mut v1041: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure42();
@@ -10107,16 +9899,15 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                 method118(v0.clone(), v1043.clone(), v1034.clone(), v1044, v1035, v1036, v1037, v1038, v1039)
                             }
                         }
-                        _ => unreachable!(),
                     };
                     match &v1048 {
                         US11::US11_1(v1091, v1092, v1093, v1094, v1095, v1096) => { // Error
                             let mut v1091: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1091.clone();
-                            let mut v1092: i32 = v1092.clone();
-                            let mut v1093: i32 = v1093.clone();
-                            let mut v1094: i32 = v1094.clone();
-                            let mut v1095: i32 = v1095.clone();
-                            let mut v1096: i32 = v1096.clone();
+                            let mut v1092: i32 = *v1092;
+                            let mut v1093: i32 = *v1093;
+                            let mut v1094: i32 = *v1094;
+                            let mut v1095: i32 = *v1095;
+                            let mut v1096: i32 = *v1096;
                             let mut v1097: bool = v820 >= v824;
                             let mut v1115: US10 = if v1097 {
                                 let mut v1098: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -10125,14 +9916,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                 let mut v1100: u8 = v0.clone().as_bytes()[v820 as usize];
                                 let mut v1101: bool = v1100 == b'"';
                                 if v1101 {
-                                    let mut v1102: i32 = v820 + 1i32;
+                                    let mut v1102: i32 = v820.wrapping_add(1i32);
                                     let mut v1103: bool = b'\n' == v1100;
                                     let (mut v1107, mut v1108, mut v1109, mut v1110): (i32, i32, i32, i32) = if v1103 {
-                                        let mut v1104: i32 = v821 + v823;
-                                        let mut v1105: i32 = v822 + 1i32;
+                                        let mut v1104: i32 = v821.wrapping_add(v823);
+                                        let mut v1105: i32 = v822.wrapping_add(1i32);
                                         (v1104, v1105, 1i32, v824)
                                     } else {
-                                        let mut v1106: i32 = v823 + 1i32;
+                                        let mut v1106: i32 = v823.wrapping_add(1i32);
                                         (v821, v822, v1106, v824)
                                     };
                                     US10::US10_0(b'"', v1102, v1107, v1108, v1109, v1110)
@@ -10144,34 +9935,33 @@ fn method111(mut v0: Rc<str>) -> US18 {
                             match &v1115 {
                                 US10::US10_1(v1124, v1125, v1126, v1127, v1128, v1129) => { // Error
                                     let mut v1124: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1124.clone();
-                                    let mut v1125: i32 = v1125.clone();
-                                    let mut v1126: i32 = v1126.clone();
-                                    let mut v1127: i32 = v1127.clone();
-                                    let mut v1128: i32 = v1128.clone();
-                                    let mut v1129: i32 = v1129.clone();
+                                    let mut v1125: i32 = *v1125;
+                                    let mut v1126: i32 = *v1126;
+                                    let mut v1127: i32 = *v1127;
+                                    let mut v1128: i32 = *v1128;
+                                    let mut v1129: i32 = *v1129;
                                     let mut v1130: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure24();
                                     US11::US11_1(v1130.clone(), v820, v821, v822, v823, v824)
                                 }
                                 US10::US10_0(v1116, v1117, v1118, v1119, v1120, v1121) => { // Ok
-                                    let mut v1116: u8 = v1116.clone();
-                                    let mut v1117: i32 = v1117.clone();
-                                    let mut v1118: i32 = v1118.clone();
-                                    let mut v1119: i32 = v1119.clone();
-                                    let mut v1120: i32 = v1120.clone();
-                                    let mut v1121: i32 = v1121.clone();
+                                    let mut v1116: u8 = *v1116;
+                                    let mut v1117: i32 = *v1117;
+                                    let mut v1118: i32 = *v1118;
+                                    let mut v1119: i32 = *v1119;
+                                    let mut v1120: i32 = *v1120;
+                                    let mut v1121: i32 = *v1121;
                                     let mut v1122: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                                     US11::US11_0(v1122.clone(), v1117, v1118, v1119, v1120, v1121)
                                 }
-                                _ => unreachable!(),
                             }
                         }
                         US11::US11_0(v1049, v1050, v1051, v1052, v1053, v1054) => { // Ok
                             let mut v1049: Rc<str> = v1049.clone();
-                            let mut v1050: i32 = v1050.clone();
-                            let mut v1051: i32 = v1051.clone();
-                            let mut v1052: i32 = v1052.clone();
-                            let mut v1053: i32 = v1053.clone();
-                            let mut v1054: i32 = v1054.clone();
+                            let mut v1050: i32 = *v1050;
+                            let mut v1051: i32 = *v1051;
+                            let mut v1052: i32 = *v1052;
+                            let mut v1053: i32 = *v1053;
+                            let mut v1054: i32 = *v1054;
                             let mut v1055: bool = v1050 >= v1054;
                             let mut v1073: US10 = if v1055 {
                                 let mut v1056: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure15();
@@ -10180,14 +9970,14 @@ fn method111(mut v0: Rc<str>) -> US18 {
                                 let mut v1058: u8 = v0.clone().as_bytes()[v1050 as usize];
                                 let mut v1059: bool = v1058 == b'"';
                                 if v1059 {
-                                    let mut v1060: i32 = v1050 + 1i32;
+                                    let mut v1060: i32 = v1050.wrapping_add(1i32);
                                     let mut v1061: bool = b'\n' == v1058;
                                     let (mut v1065, mut v1066, mut v1067, mut v1068): (i32, i32, i32, i32) = if v1061 {
-                                        let mut v1062: i32 = v1051 + v1053;
-                                        let mut v1063: i32 = v1052 + 1i32;
+                                        let mut v1062: i32 = v1051.wrapping_add(v1053);
+                                        let mut v1063: i32 = v1052.wrapping_add(1i32);
                                         (v1062, v1063, 1i32, v1054)
                                     } else {
-                                        let mut v1064: i32 = v1053 + 1i32;
+                                        let mut v1064: i32 = v1053.wrapping_add(1i32);
                                         (v1051, v1052, v1064, v1054)
                                     };
                                     US10::US10_0(b'"', v1060, v1065, v1066, v1067, v1068)
@@ -10199,51 +9989,47 @@ fn method111(mut v0: Rc<str>) -> US18 {
                             match &v1073 {
                                 US10::US10_1(v1081, v1082, v1083, v1084, v1085, v1086) => { // Error
                                     let mut v1081: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1081.clone();
-                                    let mut v1082: i32 = v1082.clone();
-                                    let mut v1083: i32 = v1083.clone();
-                                    let mut v1084: i32 = v1084.clone();
-                                    let mut v1085: i32 = v1085.clone();
-                                    let mut v1086: i32 = v1086.clone();
+                                    let mut v1082: i32 = *v1082;
+                                    let mut v1083: i32 = *v1083;
+                                    let mut v1084: i32 = *v1084;
+                                    let mut v1085: i32 = *v1085;
+                                    let mut v1086: i32 = *v1086;
                                     let mut v1087: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure25(v820, v1050, v1081.clone(), v1082, v1083, v1084, v1085, v1086);
                                     US11::US11_1(v1087.clone(), v1050, v1051, v1052, v1053, v1054)
                                 }
                                 US10::US10_0(v1074, v1075, v1076, v1077, v1078, v1079) => { // Ok
-                                    let mut v1074: u8 = v1074.clone();
-                                    let mut v1075: i32 = v1075.clone();
-                                    let mut v1076: i32 = v1076.clone();
-                                    let mut v1077: i32 = v1077.clone();
-                                    let mut v1078: i32 = v1078.clone();
-                                    let mut v1079: i32 = v1079.clone();
+                                    let mut v1074: u8 = *v1074;
+                                    let mut v1075: i32 = *v1075;
+                                    let mut v1076: i32 = *v1076;
+                                    let mut v1077: i32 = *v1077;
+                                    let mut v1078: i32 = *v1078;
+                                    let mut v1079: i32 = *v1079;
                                     US11::US11_0(v1049.clone(), v1075, v1076, v1077, v1078, v1079)
                                 }
-                                _ => unreachable!(),
                             }
                         }
-                        _ => unreachable!(),
                     }
                 }
-                _ => unreachable!(),
             }
         }
         US11::US11_0(v793, v794, v795, v796, v797, v798) => { // Ok
             let mut v793: Rc<str> = v793.clone();
-            let mut v794: i32 = v794.clone();
-            let mut v795: i32 = v795.clone();
-            let mut v796: i32 = v796.clone();
-            let mut v797: i32 = v797.clone();
-            let mut v798: i32 = v798.clone();
+            let mut v794: i32 = *v794;
+            let mut v795: i32 = *v795;
+            let mut v796: i32 = *v796;
+            let mut v797: i32 = *v797;
+            let mut v798: i32 = *v798;
             v792.clone()
         }
-        _ => unreachable!(),
     };
     let mut v1180: US11 = match &v1146 {
         US11::US11_1(v1153, v1154, v1155, v1156, v1157, v1158) => { // Error
             let mut v1153: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1153.clone();
-            let mut v1154: i32 = v1154.clone();
-            let mut v1155: i32 = v1155.clone();
-            let mut v1156: i32 = v1156.clone();
-            let mut v1157: i32 = v1157.clone();
-            let mut v1158: i32 = v1158.clone();
+            let mut v1154: i32 = *v1154;
+            let mut v1155: i32 = *v1155;
+            let mut v1156: i32 = *v1156;
+            let mut v1157: i32 = *v1157;
+            let mut v1158: i32 = *v1158;
             let mut v1159: i32 = 0i32;
             let mut v1160: i32 = 0i32;
             let mut v1161: i32 = 1i32;
@@ -10257,7 +10043,7 @@ fn method111(mut v0: Rc<str>) -> US18 {
                     v1170.clone()
                 } else {
                     let mut v1171: bool = 0i32 == v1163;
-                    let mut v1172: i32 = v1163 - 1i32;
+                    let mut v1172: i32 = v1163.wrapping_sub(1i32);
                     let mut v1173: Rc<str> = string_slice(&v0.clone(), 0i32 as i64, v1172 as i64);
                     v1173.clone()
                 };
@@ -10269,23 +10055,22 @@ fn method111(mut v0: Rc<str>) -> US18 {
         }
         US11::US11_0(v1147, v1148, v1149, v1150, v1151, v1152) => { // Ok
             let mut v1147: Rc<str> = v1147.clone();
-            let mut v1148: i32 = v1148.clone();
-            let mut v1149: i32 = v1149.clone();
-            let mut v1150: i32 = v1150.clone();
-            let mut v1151: i32 = v1151.clone();
-            let mut v1152: i32 = v1152.clone();
+            let mut v1148: i32 = *v1148;
+            let mut v1149: i32 = *v1149;
+            let mut v1150: i32 = *v1150;
+            let mut v1151: i32 = *v1151;
+            let mut v1152: i32 = *v1152;
             v1146.clone()
         }
-        _ => unreachable!(),
     };
     let mut v1219: US11 = match &v1180 {
         US11::US11_1(v1187, v1188, v1189, v1190, v1191, v1192) => { // Error
             let mut v1187: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1187.clone();
-            let mut v1188: i32 = v1188.clone();
-            let mut v1189: i32 = v1189.clone();
-            let mut v1190: i32 = v1190.clone();
-            let mut v1191: i32 = v1191.clone();
-            let mut v1192: i32 = v1192.clone();
+            let mut v1188: i32 = *v1188;
+            let mut v1189: i32 = *v1189;
+            let mut v1190: i32 = *v1190;
+            let mut v1191: i32 = *v1191;
+            let mut v1192: i32 = *v1192;
             let mut v1193: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
             let mut v1194: i32 = 0i32;
             let mut v1195: i32 = 0i32;
@@ -10295,46 +10080,44 @@ fn method111(mut v0: Rc<str>) -> US18 {
             match &v1198 {
                 US19::US19_1(v1209, v1210, v1211, v1212, v1213, v1214) => { // Error
                     let mut v1209: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1209.clone();
-                    let mut v1210: i32 = v1210.clone();
-                    let mut v1211: i32 = v1211.clone();
-                    let mut v1212: i32 = v1212.clone();
-                    let mut v1213: i32 = v1213.clone();
-                    let mut v1214: i32 = v1214.clone();
+                    let mut v1210: i32 = *v1210;
+                    let mut v1211: i32 = *v1211;
+                    let mut v1212: i32 = *v1212;
+                    let mut v1213: i32 = *v1213;
+                    let mut v1214: i32 = *v1214;
                     US11::US11_1(v1209.clone(), v1210, v1211, v1212, v1213, v1214)
                 }
                 US19::US19_0(v1199, v1200, v1201, v1202, v1203, v1204) => { // Ok
                     let mut v1199: Rc<UH0> = v1199.clone();
-                    let mut v1200: i32 = v1200.clone();
-                    let mut v1201: i32 = v1201.clone();
-                    let mut v1202: i32 = v1202.clone();
-                    let mut v1203: i32 = v1203.clone();
-                    let mut v1204: i32 = v1204.clone();
+                    let mut v1200: i32 = *v1200;
+                    let mut v1201: i32 = *v1201;
+                    let mut v1202: i32 = *v1202;
+                    let mut v1203: i32 = *v1203;
+                    let mut v1204: i32 = *v1204;
                     let mut v1205: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                     let (mut v1206, mut v1207): (Rc<str>, Rc<str>) = method123(v1199.clone(), v1205.clone());
                     US11::US11_0(v1206.clone(), v1200, v1201, v1202, v1203, v1204)
                 }
-                _ => unreachable!(),
             }
         }
         US11::US11_0(v1181, v1182, v1183, v1184, v1185, v1186) => { // Ok
             let mut v1181: Rc<str> = v1181.clone();
-            let mut v1182: i32 = v1182.clone();
-            let mut v1183: i32 = v1183.clone();
-            let mut v1184: i32 = v1184.clone();
-            let mut v1185: i32 = v1185.clone();
-            let mut v1186: i32 = v1186.clone();
+            let mut v1182: i32 = *v1182;
+            let mut v1183: i32 = *v1183;
+            let mut v1184: i32 = *v1184;
+            let mut v1185: i32 = *v1185;
+            let mut v1186: i32 = *v1186;
             v1180.clone()
         }
-        _ => unreachable!(),
     };
     let mut v1230: US11 = match &v1219 {
         US11::US11_0(v1220, v1221, v1222, v1223, v1224, v1225) => { // Ok
             let mut v1220: Rc<str> = v1220.clone();
-            let mut v1221: i32 = v1221.clone();
-            let mut v1222: i32 = v1222.clone();
-            let mut v1223: i32 = v1223.clone();
-            let mut v1224: i32 = v1224.clone();
-            let mut v1225: i32 = v1225.clone();
+            let mut v1221: i32 = *v1221;
+            let mut v1222: i32 = *v1222;
+            let mut v1223: i32 = *v1223;
+            let mut v1224: i32 = *v1224;
+            let mut v1225: i32 = *v1225;
             let mut v1226: bool = v1221 == 0i32;
             if v1226 {
                 let mut v1227: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = closure48();
@@ -10350,80 +10133,77 @@ fn method111(mut v0: Rc<str>) -> US18 {
     let mut v1247: US11 = match &v1230 {
         US11::US11_1(v1231, v1232, v1233, v1234, v1235, v1236) => { // Error
             let mut v1231: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1231.clone();
-            let mut v1232: i32 = v1232.clone();
-            let mut v1233: i32 = v1233.clone();
-            let mut v1234: i32 = v1234.clone();
-            let mut v1235: i32 = v1235.clone();
-            let mut v1236: i32 = v1236.clone();
+            let mut v1232: i32 = *v1232;
+            let mut v1233: i32 = *v1233;
+            let mut v1234: i32 = *v1234;
+            let mut v1235: i32 = *v1235;
+            let mut v1236: i32 = *v1236;
             US11::US11_1(v1231.clone(), v1232, v1233, v1234, v1235, v1236)
         }
         US11::US11_0(v1238, v1239, v1240, v1241, v1242, v1243) => { // Ok
             let mut v1238: Rc<str> = v1238.clone();
-            let mut v1239: i32 = v1239.clone();
-            let mut v1240: i32 = v1240.clone();
-            let mut v1241: i32 = v1241.clone();
-            let mut v1242: i32 = v1242.clone();
-            let mut v1243: i32 = v1243.clone();
+            let mut v1239: i32 = *v1239;
+            let mut v1240: i32 = *v1240;
+            let mut v1241: i32 = *v1241;
+            let mut v1242: i32 = *v1242;
+            let mut v1243: i32 = *v1243;
             let mut v1244: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
             method124(v0.clone(), v1238.clone(), v1244.clone(), v1239, v1240, v1241, v1242, v1243)
         }
-        _ => unreachable!(),
     };
     let mut v1266: US19 = match &v1247 {
         US11::US11_1(v1248, v1249, v1250, v1251, v1252, v1253) => { // Error
             let mut v1248: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1248.clone();
-            let mut v1249: i32 = v1249.clone();
-            let mut v1250: i32 = v1250.clone();
-            let mut v1251: i32 = v1251.clone();
-            let mut v1252: i32 = v1252.clone();
-            let mut v1253: i32 = v1253.clone();
+            let mut v1249: i32 = *v1249;
+            let mut v1250: i32 = *v1250;
+            let mut v1251: i32 = *v1251;
+            let mut v1252: i32 = *v1252;
+            let mut v1253: i32 = *v1253;
             let mut v1254: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
             US19::US19_0(v1254.clone(), 0i32, 0i32, 1i32, 1i32, v1)
         }
         US11::US11_0(v1256, v1257, v1258, v1259, v1260, v1261) => { // Ok
             let mut v1256: Rc<str> = v1256.clone();
-            let mut v1257: i32 = v1257.clone();
-            let mut v1258: i32 = v1258.clone();
-            let mut v1259: i32 = v1259.clone();
-            let mut v1260: i32 = v1260.clone();
-            let mut v1261: i32 = v1261.clone();
+            let mut v1257: i32 = *v1257;
+            let mut v1258: i32 = *v1258;
+            let mut v1259: i32 = *v1259;
+            let mut v1260: i32 = *v1260;
+            let mut v1261: i32 = *v1261;
             let mut v1262: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
             let mut v1263: Rc<UH0> = Rc::new(UH0::UH0_1(v1256.clone(), v1262.clone()));
             method131(v0.clone(), v1263.clone(), v1257, v1258, v1259, v1260, v1261)
         }
-        _ => unreachable!(),
     };
     let mut v1289: US20 = match &v1266 {
         US19::US19_1(v1280, v1281, v1282, v1283, v1284, v1285) => { // Error
             let mut v1280: Rc<dyn Fn(Rc<str>, i32, i32, i32, i32, i32) -> Rc<str>> = v1280.clone();
-            let mut v1281: i32 = v1281.clone();
-            let mut v1282: i32 = v1282.clone();
-            let mut v1283: i32 = v1283.clone();
-            let mut v1284: i32 = v1284.clone();
-            let mut v1285: i32 = v1285.clone();
+            let mut v1281: i32 = *v1281;
+            let mut v1282: i32 = *v1282;
+            let mut v1283: i32 = *v1283;
+            let mut v1284: i32 = *v1284;
+            let mut v1285: i32 = *v1285;
             let mut v1286: Rc<dyn Fn() -> Rc<str>> = closure34(v0.clone(), v1280.clone(), v1281, v1282, v1283, v1284, v1285);
             US20::US20_1(v1286.clone())
         }
         US19::US19_0(v1267, v1268, v1269, v1270, v1271, v1272) => { // Ok
             let mut v1267: Rc<UH0> = v1267.clone();
-            let mut v1268: i32 = v1268.clone();
-            let mut v1269: i32 = v1269.clone();
-            let mut v1270: i32 = v1270.clone();
-            let mut v1271: i32 = v1271.clone();
-            let mut v1272: i32 = v1272.clone();
+            let mut v1268: i32 = *v1268;
+            let mut v1269: i32 = *v1269;
+            let mut v1270: i32 = *v1270;
+            let mut v1271: i32 = *v1271;
+            let mut v1272: i32 = *v1272;
             let mut v1273: bool = v1268 >= v1272;
             let mut v1278: Rc<str> = if v1273 {
                 let mut v1274: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
                 v1274.clone()
             } else {
                 let mut v1275: bool = v1268 == v1272;
-                let mut v1276: i32 = v1272 - 1i32;
+                let mut v1276: i32 = v1272.wrapping_sub(1i32);
                 let mut v1277: Rc<str> = string_slice(&v0.clone(), v1268 as i64, v1276 as i64);
                 v1277.clone()
             };
             US20::US20_0(v1267.clone(), v1278.clone(), v1269, v1270, v1271, v1272)
         }
-        _ => unreachable!(),
     };
     let mut v1305: US21 = match &v1289 {
         US20::US20_1(v1302) => { // Error
@@ -10433,10 +10213,10 @@ fn method111(mut v0: Rc<str>) -> US18 {
         US20::US20_0(v1290, v1291, v1292, v1293, v1294, v1295) => { // Ok
             let mut v1290: Rc<UH0> = v1290.clone();
             let mut v1291: Rc<str> = v1291.clone();
-            let mut v1292: i32 = v1292.clone();
-            let mut v1293: i32 = v1293.clone();
-            let mut v1294: i32 = v1294.clone();
-            let mut v1295: i32 = v1295.clone();
+            let mut v1292: i32 = *v1292;
+            let mut v1293: i32 = *v1293;
+            let mut v1294: i32 = *v1294;
+            let mut v1295: i32 = *v1295;
             let mut v1296: i32 = 0i32;
             let mut v1297: i32 = method132(v1290.clone(), v1296);
             let mut v1298: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(Vec::with_capacity(v1297 as usize)));
@@ -10444,7 +10224,6 @@ fn method111(mut v0: Rc<str>) -> US18 {
             let mut v1300: i32 = method133(v1298.clone(), v1290.clone(), v1299);
             US21::US21_0(v1298.clone())
         }
-        _ => unreachable!(),
     };
     match &v1305 {
         US21::US21_1(v1308) => { // Error
@@ -10456,7 +10235,6 @@ fn method111(mut v0: Rc<str>) -> US18 {
             let mut v1306: Rc<RefCell<Vec<Rc<str>>>> = v1306.clone();
             US18::US18_0(v1306.clone())
         }
-        _ => unreachable!(),
     }
 }
 fn closure51() -> Rc<dyn Fn((Rc<str>)) -> std::string::String> {
@@ -10489,7 +10267,7 @@ fn method135(mut v0: Rc<str>, mut v1: Rc<str>) -> Rc<str> {
     method136(v3.clone());
     method15(v3.clone());
     method6(v3.clone(), v0.clone());
-    method41(v3.clone());
+    method56(v3.clone());
     method137(v3.clone());
     method15(v3.clone());
     method6(v3.clone(), v1.clone());
@@ -10568,7 +10346,7 @@ fn method142(mut v0: bool, mut v1: std::string::String) -> Rc<str> {
         v5.clone()
     };
     method6(v3.clone(), v6.clone());
-    method41(v3.clone());
+    method56(v3.clone());
     method104(v3.clone());
     method15(v3.clone());
     let mut v8: std::string::String = format!("{:#?}", v1);
@@ -10660,7 +10438,6 @@ fn closure52(mut v0: bool) -> Rc<dyn Fn(Result<std::string::String, std::string:
                     US0::US0_3 => { // Warning
                         40i32
                     }
-                    _ => unreachable!(),
                 };
                 let mut v97: bool = v87.borrow().l0.clone();
                 let mut v98: bool = v97 == false;
@@ -10682,7 +10459,7 @@ fn closure52(mut v0: bool) -> Rc<dyn Fn(Result<std::string::String, std::string:
                     { let _ = spiral_trace_hold(&v82); };
                     let (mut v116, mut v117, mut v118, mut v119, mut v120, mut v121): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v84) };
                     let mut v122: i64 = v116.borrow().l0.clone();
-                    let mut v123: i64 = v122 + 1i64;
+                    let mut v123: i64 = v122.wrapping_add(1i64);
                     v116.borrow_mut().l0 = v123;
                     let mut v124: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                     let mut v125: bool = cfg!(target_arch = "wasm32");
@@ -10761,7 +10538,6 @@ fn closure52(mut v0: bool) -> Rc<dyn Fn(Result<std::string::String, std::string:
                         US0::US0_3 => { // Warning
                             40i32
                         }
-                        _ => unreachable!(),
                     };
                     let mut v27: bool = v17.borrow().l0.clone();
                     let mut v28: bool = v27 == false;
@@ -10789,7 +10565,7 @@ fn closure52(mut v0: bool) -> Rc<dyn Fn(Result<std::string::String, std::string:
                         { let _ = spiral_trace_hold(&v12); };
                         let (mut v49, mut v50, mut v51, mut v52, mut v53, mut v54): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v14) };
                         let mut v55: i64 = v49.borrow().l0.clone();
-                        let mut v56: i64 = v55 + 1i64;
+                        let mut v56: i64 = v55.wrapping_add(1i64);
                         v49.borrow_mut().l0 = v56;
                         let mut v57: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                         let mut v58: bool = cfg!(target_arch = "wasm32");
@@ -10843,7 +10619,6 @@ fn closure52(mut v0: bool) -> Rc<dyn Fn(Result<std::string::String, std::string:
                 };
                 v5.clone()
             }
-            _ => unreachable!(),
         }
     })
 }
@@ -10876,7 +10651,6 @@ fn closure55(mut v0: bool) -> Rc<dyn Fn(Result<std::string::String, std::string:
                     US0::US0_3 => { // Warning
                         40i32
                     }
-                    _ => unreachable!(),
                 };
                 let mut v102: bool = v92.borrow().l0.clone();
                 let mut v103: bool = v102 == false;
@@ -10898,7 +10672,7 @@ fn closure55(mut v0: bool) -> Rc<dyn Fn(Result<std::string::String, std::string:
                     { let _ = spiral_trace_hold(&v87); };
                     let (mut v121, mut v122, mut v123, mut v124, mut v125, mut v126): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v89) };
                     let mut v127: i64 = v121.borrow().l0.clone();
-                    let mut v128: i64 = v127 + 1i64;
+                    let mut v128: i64 = v127.wrapping_add(1i64);
                     v121.borrow_mut().l0 = v128;
                     let mut v129: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                     let mut v130: bool = cfg!(target_arch = "wasm32");
@@ -10977,7 +10751,6 @@ fn closure55(mut v0: bool) -> Rc<dyn Fn(Result<std::string::String, std::string:
                         US0::US0_3 => { // Warning
                             40i32
                         }
-                        _ => unreachable!(),
                     };
                     let mut v27: bool = v17.borrow().l0.clone();
                     let mut v28: bool = v27 == false;
@@ -11005,7 +10778,7 @@ fn closure55(mut v0: bool) -> Rc<dyn Fn(Result<std::string::String, std::string:
                         { let _ = spiral_trace_hold(&v12); };
                         let (mut v49, mut v50, mut v51, mut v52, mut v53, mut v54): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v14) };
                         let mut v55: i64 = v49.borrow().l0.clone();
-                        let mut v56: i64 = v55 + 1i64;
+                        let mut v56: i64 = v55.wrapping_add(1i64);
                         v49.borrow_mut().l0 = v56;
                         let mut v57: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                         let mut v58: bool = cfg!(target_arch = "wasm32");
@@ -11062,7 +10835,6 @@ fn closure55(mut v0: bool) -> Rc<dyn Fn(Result<std::string::String, std::string:
                 let mut v84: std::string::String = String::from(v82);
                 v84.clone()
             }
-            _ => unreachable!(),
         }
     })
 }
@@ -11070,14 +10842,14 @@ fn method148(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>) -> Rc<str> {
     let mut v3: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
     let mut v4: Rc<RefCell<Mut3>> = Rc::new(RefCell::new(Mut3 { l0: v3.clone() }));
     method13(v4.clone());
-    method42(v4.clone());
+    method57(v4.clone());
     method15(v4.clone());
     method6(v4.clone(), v0.clone());
-    method41(v4.clone());
+    method56(v4.clone());
     method136(v4.clone());
     method15(v4.clone());
     method6(v4.clone(), v1.clone());
-    method41(v4.clone());
+    method56(v4.clone());
     method137(v4.clone());
     method15(v4.clone());
     method6(v4.clone(), v2.clone());
@@ -11144,7 +10916,7 @@ fn method152(mut v0: Rc<str>, mut v1: i32) -> i32 {
         if v2 {
             return -1i32;
         } else {
-            let mut v3: i32 = v1 - 1i32;
+            let mut v3: i32 = v1.wrapping_sub(1i32);
             let mut v4: u8 = v0.clone().as_bytes()[v3 as usize];
             let mut v5: bool = v4 == b' ';
             let mut v11: bool = if v5 {
@@ -11193,12 +10965,12 @@ fn method154(mut v0: Rc<str>, mut v1: i32, mut v2: i32) -> Rc<str> {
     method136(v4.clone());
     method15(v4.clone());
     method6(v4.clone(), v0.clone());
-    method41(v4.clone());
+    method56(v4.clone());
     method155(v4.clone());
     method15(v4.clone());
     let mut v5: Rc<str> = Rc::<str>::from(format!("{}", v1));
     method6(v4.clone(), v5.clone());
-    method41(v4.clone());
+    method56(v4.clone());
     method156(v4.clone());
     method15(v4.clone());
     let mut v6: Rc<str> = Rc::<str>::from(format!("{}", v2));
@@ -11237,7 +11009,6 @@ fn method79(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::At
             let mut v1205: US4 = v1205.clone();
             (v1204.clone(), v1205.clone())
         }
-        _ => unreachable!(),
     };
     let mut v1217: Rc<str> = match &v1213 {
         US4::US4_1 => { // None
@@ -11248,7 +11019,6 @@ fn method79(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::At
             let mut v1214: Rc<str> = v1214.clone();
             v1214.clone()
         }
-        _ => unreachable!(),
     };
     let mut v1218: US18 = method111(v1217.clone());
     let mut v1224: Rc<RefCell<Vec<Rc<str>>>> = match &v1218 {
@@ -11261,7 +11031,6 @@ fn method79(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::At
             let mut v1219: Rc<RefCell<Vec<Rc<str>>>> = v1219.clone();
             v1219.clone()
         }
-        _ => unreachable!(),
     };
     let mut v1225: Vec<Rc<str>> = (v1224).borrow().clone();
     let mut v1227: Rc<dyn Fn((Rc<str>)) -> std::string::String> = closure51();
@@ -11287,7 +11056,6 @@ fn method79(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::At
         US0::US0_3 => { // Warning
             40i32
         }
-        _ => unreachable!(),
     };
     let mut v1245: bool = v1235.borrow().l0.clone();
     let mut v1246: bool = v1245 == false;
@@ -11310,7 +11078,7 @@ fn method79(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::At
         { let _ = spiral_trace_hold(&v1230); };
         let (mut v1265, mut v1266, mut v1267, mut v1268, mut v1269, mut v1270): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v1232) };
         let mut v1271: i64 = v1265.borrow().l0.clone();
-        let mut v1272: i64 = v1271 + 1i64;
+        let mut v1272: i64 = v1271.wrapping_add(1i64);
         v1265.borrow_mut().l0 = v1272;
         let mut v1273: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
         let mut v1274: bool = cfg!(target_arch = "wasm32");
@@ -11386,7 +11154,6 @@ fn method79(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::At
             US0::US0_3 => { // Warning
                 40i32
             }
-            _ => unreachable!(),
         };
         let mut v1326: bool = v1316.borrow().l0.clone();
         let mut v1327: bool = v1326 == false;
@@ -11409,7 +11176,7 @@ fn method79(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::At
             { let _ = spiral_trace_hold(&v1230); };
             let (mut v1346, mut v1347, mut v1348, mut v1349, mut v1350, mut v1351): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v1232) };
             let mut v1352: i64 = v1346.borrow().l0.clone();
-            let mut v1353: i64 = v1352 + 1i64;
+            let mut v1353: i64 = v1352.wrapping_add(1i64);
             v1346.borrow_mut().l0 = v1353;
             let mut v1354: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
             let mut v1355: bool = cfg!(target_arch = "wasm32");
@@ -11478,7 +11245,6 @@ fn method79(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::At
                 US0::US0_3 => { // Warning
                     40i32
                 }
-                _ => unreachable!(),
             };
             let mut v1391: bool = v1381.borrow().l0.clone();
             let mut v1392: bool = v1391 == false;
@@ -11501,7 +11267,7 @@ fn method79(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::At
                 { let _ = spiral_trace_hold(&v1230); };
                 let (mut v1411, mut v1412, mut v1413, mut v1414, mut v1415, mut v1416): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v1232) };
                 let mut v1417: i64 = v1411.borrow().l0.clone();
-                let mut v1418: i64 = v1417 + 1i64;
+                let mut v1418: i64 = v1417.wrapping_add(1i64);
                 v1411.borrow_mut().l0 = v1418;
                 let mut v1419: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                 let mut v1420: bool = cfg!(target_arch = "wasm32");
@@ -11560,10 +11326,9 @@ fn method79(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::At
                     (-1i32, v1447.clone())
                 }
                 US23::US23_0(v1446) => { // Some
-                    let mut v1446: i32 = v1446.clone();
+                    let mut v1446: i32 = *v1446;
                     (v1446, v1303.clone())
                 }
-                _ => unreachable!(),
             };
             let mut v1453: Rc<dyn Fn((std::string::String)) -> Rc<str>> = closure57();
             let mut v1454: Vec<Rc<str>> = v1302.iter().map(|x| v1453(x.clone())).collect::<Vec<_>>();
@@ -11575,7 +11340,7 @@ fn method79(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::At
             let mut v1460: i32 = (v1459.clone().len() as i32);
             let mut v1461: i32 = 0i32;
             let mut v1462: i32 = method9(v1459.clone(), v1460, v1461);
-            let mut v1463: i32 = v1460 - 1i32;
+            let mut v1463: i32 = v1460.wrapping_sub(1i32);
             let mut v1464: Rc<str> = string_slice(&v1459.clone(), v1462 as i64, v1463 as i64);
             let mut v1465: i32 = (v1464.clone().len() as i32);
             let mut v1466: i32 = method152(v1464.clone(), v1465);
@@ -11608,7 +11373,6 @@ fn method79(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::At
         US0::US0_3 => { // Warning
             40i32
         }
-        _ => unreachable!(),
     };
     let mut v1488: bool = v1478.borrow().l0.clone();
     let mut v1489: bool = v1488 == false;
@@ -11631,7 +11395,7 @@ fn method79(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::At
         { let _ = spiral_trace_hold(&v1230); };
         let (mut v1508, mut v1509, mut v1510, mut v1511, mut v1512, mut v1513): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v1232) };
         let mut v1514: i64 = v1508.borrow().l0.clone();
-        let mut v1515: i64 = v1514 + 1i64;
+        let mut v1515: i64 = v1514.wrapping_add(1i64);
         v1508.borrow_mut().l0 = v1515;
         let mut v1516: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
         let mut v1517: bool = cfg!(target_arch = "wasm32");
@@ -11680,14 +11444,14 @@ fn method79(mut v0: Rc<str>, mut v1: Option<std::sync::Arc<std::sync::atomic::At
     (v1472, v1473.clone())
 }
 fn method157(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>) -> (Rc<str>, Rc<str>) {
-    let mut v3: Rc<str> = method47(v1.clone());
-    let mut v4: Rc<str> = method29(v2.clone(), v3.clone());
+    let mut v3: Rc<str> = method30(v1.clone());
+    let mut v4: Rc<str> = method39(v2.clone(), v3.clone());
     let mut v5: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("."); } LIT.with(|lit| lit.clone()) };
     let mut v7: i32 = v1.rfind(&*v5).map(|i| i as i32).unwrap_or(-1);
-    let mut v8: i32 = v7 - 1i32;
+    let mut v8: i32 = v7.wrapping_sub(1i32);
     let mut v9: Rc<str> = string_slice(&v1.clone(), 0i32 as i64, v8 as i64);
     let mut v10: i32 = v4.rfind(&*v5).map(|i| i as i32).unwrap_or(-1);
-    let mut v11: i32 = v10 - 1i32;
+    let mut v11: i32 = v10.wrapping_sub(1i32);
     let mut v12: Rc<str> = string_slice(&v4.clone(), 0i32 as i64, v11 as i64);
     let mut v13: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(".md"); } LIT.with(|lit| lit.clone()) };
     let mut v14: bool = v0.ends_with(&*v13);
@@ -11724,7 +11488,7 @@ fn method158(mut v0: Rc<Vec<Rc<str>>>, mut v1: i32, mut v2: Rc<UH0>) -> Rc<UH0> 
             return v2.clone();
         } else {
             let mut v4: Rc<str> = (v0)[v1 as usize].clone();
-            let mut v5: i32 = v1 - 1i32;
+            let mut v5: i32 = v1.wrapping_sub(1i32);
             let mut v6: Rc<UH0> = Rc::new(UH0::UH0_1(v4.clone(), v2.clone()));
             (v0, v1, v2) = (v0.clone(), v5, v6.clone());
             continue;
@@ -11869,46 +11633,46 @@ fn method165(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: i32, mut
     method166(v12.clone());
     method15(v12.clone());
     method6(v12.clone(), v0.clone());
-    method41(v12.clone());
+    method56(v12.clone());
     method167(v12.clone());
     method15(v12.clone());
     method6(v12.clone(), v1.clone());
-    method41(v12.clone());
+    method56(v12.clone());
     method168(v12.clone());
     method15(v12.clone());
     method6(v12.clone(), v2.clone());
-    method41(v12.clone());
+    method56(v12.clone());
     method169(v12.clone());
     method15(v12.clone());
     let mut v13: Rc<str> = Rc::<str>::from(format!("{}", v3));
     method6(v12.clone(), v13.clone());
-    method41(v12.clone());
+    method56(v12.clone());
     method170(v12.clone());
     method15(v12.clone());
     method6(v12.clone(), v4.clone());
-    method41(v12.clone());
+    method56(v12.clone());
     method171(v12.clone());
     method15(v12.clone());
     let mut v14: Rc<str> = Rc::<str>::from(format!("{}", v5));
     method6(v12.clone(), v14.clone());
-    method41(v12.clone());
+    method56(v12.clone());
     method172(v12.clone());
     method15(v12.clone());
     method6(v12.clone(), v6.clone());
-    method41(v12.clone());
+    method56(v12.clone());
     method173(v12.clone());
     method15(v12.clone());
     method6(v12.clone(), v7.clone());
-    method41(v12.clone());
+    method56(v12.clone());
     method174(v12.clone());
     method15(v12.clone());
     let mut v15: Rc<str> = method70(v8.clone());
     method6(v12.clone(), v15.clone());
-    method41(v12.clone());
+    method56(v12.clone());
     method175(v12.clone());
     method15(v12.clone());
     method6(v12.clone(), v9.clone());
-    method41(v12.clone());
+    method56(v12.clone());
     method176(v12.clone());
     method15(v12.clone());
     method6(v12.clone(), v10.clone());
@@ -11970,12 +11734,12 @@ fn method181(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: std::string::String) -> R
     method182(v4.clone());
     method15(v4.clone());
     method6(v4.clone(), v0.clone());
-    method41(v4.clone());
+    method56(v4.clone());
     method183(v4.clone());
     method15(v4.clone());
     method6(v4.clone(), v1.clone());
-    method41(v4.clone());
-    method42(v4.clone());
+    method56(v4.clone());
+    method57(v4.clone());
     method15(v4.clone());
     let mut v6: std::string::String = format!("{:#?}", v2);
     let mut v8: Rc<str> = Rc::<str>::from(v6);
@@ -12014,11 +11778,11 @@ fn method185(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: u64) -> Rc<str> {
     method182(v4.clone());
     method15(v4.clone());
     method6(v4.clone(), v0.clone());
-    method41(v4.clone());
+    method56(v4.clone());
     method183(v4.clone());
     method15(v4.clone());
     method6(v4.clone(), v1.clone());
-    method41(v4.clone());
+    method56(v4.clone());
     method186(v4.clone());
     method15(v4.clone());
     let mut v80: Rc<str> = Rc::<str>::from(format!("{}", v2));
@@ -12074,7 +11838,6 @@ fn method177(mut v0: Rc<str>, mut v1: Rc<str>) -> () {
                 US0::US0_3 => { // Warning
                     40i32
                 }
-                _ => unreachable!(),
             };
             let mut v94: bool = v84.borrow().l0.clone();
             let mut v95: bool = v94 == false;
@@ -12091,12 +11854,12 @@ fn method177(mut v0: Rc<str>, mut v1: Rc<str>) -> () {
                 { let _ = spiral_trace_hold(&v79); };
                 let (mut v102, mut v103, mut v104, mut v105, mut v106, mut v107): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v81) };
                 let mut v108: Rc<str> = method3(v102.clone(), v103.clone(), v104.clone(), v105.clone(), v106.clone(), v107.clone());
-                let mut v109: Rc<str> = method37();
+                let mut v109: Rc<str> = method52();
                 let mut v110: Rc<str> = method180(v102.clone(), v103.clone(), v104.clone(), v105.clone(), v106.clone(), v107.clone(), v108.clone(), v109.clone(), v1.clone(), v0.clone(), v77.clone());
                 { let _ = spiral_trace_hold(&v79); };
                 let (mut v113, mut v114, mut v115, mut v116, mut v117, mut v118): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v81) };
                 let mut v119: i64 = v113.borrow().l0.clone();
-                let mut v120: i64 = v119 + 1i64;
+                let mut v120: i64 = v119.wrapping_add(1i64);
                 v113.borrow_mut().l0 = v120;
                 let mut v121: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                 let mut v122: bool = cfg!(target_arch = "wasm32");
@@ -12146,7 +11909,7 @@ fn method177(mut v0: Rc<str>, mut v1: Rc<str>) -> () {
             ()
         }
         US26::US26_0(v10) => { // Ok
-            let mut v10: u64 = v10.clone();
+            let mut v10: u64 = *v10;
             let mut v12: Rc<dyn Fn() -> (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>)> = closure2();
             { let _ = spiral_trace_hold(&v12); };
             let mut v14: Rc<dyn Fn() -> (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>)> = closure3();
@@ -12168,7 +11931,6 @@ fn method177(mut v0: Rc<str>, mut v1: Rc<str>) -> () {
                 US0::US0_3 => { // Warning
                     40i32
                 }
-                _ => unreachable!(),
             };
             let mut v27: bool = v17.borrow().l0.clone();
             let mut v28: bool = v27 == false;
@@ -12190,7 +11952,7 @@ fn method177(mut v0: Rc<str>, mut v1: Rc<str>) -> () {
                 { let _ = spiral_trace_hold(&v12); };
                 let (mut v46, mut v47, mut v48, mut v49, mut v50, mut v51): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v14) };
                 let mut v52: i64 = v46.borrow().l0.clone();
-                let mut v53: i64 = v52 + 1i64;
+                let mut v53: i64 = v52.wrapping_add(1i64);
                 v46.borrow_mut().l0 = v53;
                 let mut v54: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                 let mut v55: bool = cfg!(target_arch = "wasm32");
@@ -12239,7 +12001,6 @@ fn method177(mut v0: Rc<str>, mut v1: Rc<str>) -> () {
             };
             ()
         }
-        _ => unreachable!(),
     }
 }
 fn method188(mut v0: Vec<u8>) -> Vec<u8> {
@@ -12291,12 +12052,12 @@ fn method193(mut v0: i32, mut v1: i32, mut v2: Rc<str>) -> Rc<str> {
     method15(v4.clone());
     let mut v5: Rc<str> = Rc::<str>::from(format!("{}", v0));
     method6(v4.clone(), v5.clone());
-    method41(v4.clone());
+    method56(v4.clone());
     method194(v4.clone());
     method15(v4.clone());
     let mut v6: Rc<str> = Rc::<str>::from(format!("{}", v1));
     method6(v4.clone(), v6.clone());
-    method41(v4.clone());
+    method56(v4.clone());
     method195(v4.clone());
     method15(v4.clone());
     method6(v4.clone(), v2.clone());
@@ -12338,13 +12099,13 @@ fn method187(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>, mu
         let mut v27: i32 = (v26.clone().len() as i32);
         let mut v28: i32 = 0i32;
         let mut v29: i32 = method9(v26.clone(), v27, v28);
-        let mut v30: i32 = v27 - 1i32;
+        let mut v30: i32 = v27.wrapping_sub(1i32);
         let mut v31: Rc<str> = string_slice(&v26.clone(), v29 as i64, v30 as i64);
         let mut v32: i32 = (v31.clone().len() as i32);
         let mut v33: i32 = method152(v31.clone(), v32);
         let mut v34: Rc<str> = string_slice(&v31.clone(), 0i32 as i64, v33 as i64);
         v22.clone().borrow_mut()[v25 as usize] = v34.clone();
-        let mut v35: i32 = v25 + 1i32;
+        let mut v35: i32 = v25.wrapping_add(1i32);
         v23.borrow_mut().l0 = v35;
         ()
     };
@@ -12359,12 +12120,12 @@ fn method187(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>, mu
         let mut v44: bool = v42 != v43 ;
         let mut v46: i32 = if v44 {
             v37.clone().borrow_mut()[v41 as usize] = v42.clone();
-            let mut v45: i32 = v41 + 1i32;
+            let mut v45: i32 = v41.wrapping_add(1i32);
             v45
         } else {
             v41
         };
-        let mut v47: i32 = v40 + 1i32;
+        let mut v47: i32 = v40.wrapping_add(1i32);
         v38.borrow_mut().l0 = v47;
         v38.borrow_mut().l1 = v46;
         ()
@@ -12376,7 +12137,7 @@ fn method187(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>, mu
         let mut v52: i32 = v50.borrow().l0.clone();
         let mut v53: Rc<str> = v37.clone().borrow()[v52 as usize].clone();
         v49.clone().borrow_mut()[v52 as usize] = v53.clone();
-        let mut v54: i32 = v52 + 1i32;
+        let mut v54: i32 = v52.wrapping_add(1i32);
         v50.borrow_mut().l0 = v54;
         ()
     };
@@ -12414,7 +12175,7 @@ fn method187(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>, mu
         v79.clone()
     };
     let mut v81: Rc<str> = Rc::<str>::from(format!("../alphabet/deps/hangulize/cmd/hangulize/hangulize{}", v80));
-    let mut v82: Rc<str> = method29(v0.clone(), v81.clone());
+    let mut v82: Rc<str> = method39(v0.clone(), v81.clone());
     let mut v83: Rc<str> = Rc::<str>::from(format!("{} {}", v82, v68));
     let mut v86: Rc<dyn Fn(std::sync::Arc<std::sync::Mutex<std::process::ChildStdin>>) -> ()> = closure66(v57.clone());
     let mut v87: Option<Rc<dyn Fn(std::sync::Arc<std::sync::Mutex<std::process::ChildStdin>>) -> ()>> = Some(v86.clone());
@@ -12432,11 +12193,11 @@ fn method187(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>, mu
         let mut v102: bool = v101.clone() == { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
         let (mut v124, mut v125, mut v126): (Rc<str>, i32, i32) = if v102 {
             let mut v103: Rc<str> = Rc::<str>::from(format!("{}{}", v98, v19));
-            let mut v104: i32 = v99 + 1i32;
-            let mut v105: i32 = v100 + 1i32;
+            let mut v104: i32 = v99.wrapping_add(1i32);
+            let mut v105: i32 = v100.wrapping_add(1i32);
             (v103.clone(), v104, v105)
         } else {
-            let mut v106: i32 = v99 - v100;
+            let mut v106: i32 = v99.wrapping_sub(v100);
             let mut v107: bool = v106 >= v93;
             let mut v122: Rc<str> = if v107 {
                 v98.clone()
@@ -12457,7 +12218,7 @@ fn method187(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>, mu
                     let mut v116: Rc<str> = Rc::<str>::from(format!("{}{}", v115, v101));
                     v116.clone()
                 };
-                let mut v118: i32 = v93 - 1i32;
+                let mut v118: i32 = v93.wrapping_sub(1i32);
                 let mut v119: bool = v106 == v118;
                 if v119 {
                     v117.clone()
@@ -12466,10 +12227,10 @@ fn method187(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>, mu
                     v120.clone()
                 }
             };
-            let mut v123: i32 = v99 + 1i32;
+            let mut v123: i32 = v99.wrapping_add(1i32);
             (v122.clone(), v123, v100)
         };
-        let mut v127: i32 = v97 + 1i32;
+        let mut v127: i32 = v97.wrapping_add(1i32);
         v95.borrow_mut().l0 = v127;
         v95.borrow_mut().l1 = v124.clone();
         v95.borrow_mut().l2 = v125;
@@ -12499,7 +12260,6 @@ fn method187(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>, mu
         US0::US0_3 => { // Warning
             40i32
         }
-        _ => unreachable!(),
     };
     let mut v148: bool = v138.borrow().l0.clone();
     let mut v149: bool = v148 == false;
@@ -12522,7 +12282,7 @@ fn method187(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>, mu
         { let _ = spiral_trace_hold(&v133); };
         let (mut v168, mut v169, mut v170, mut v171, mut v172, mut v173): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v135) };
         let mut v174: i64 = v168.borrow().l0.clone();
-        let mut v175: i64 = v174 + 1i64;
+        let mut v175: i64 = v174.wrapping_add(1i64);
         v168.borrow_mut().l0 = v175;
         let mut v176: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
         let mut v177: bool = cfg!(target_arch = "wasm32");
@@ -12580,7 +12340,7 @@ fn method198(mut v0: i32, mut v1: Rc<str>) -> Rc<str> {
     method15(v3.clone());
     let mut v4: Rc<str> = Rc::<str>::from(format!("{}", v0));
     method6(v3.clone(), v4.clone());
-    method41(v3.clone());
+    method56(v3.clone());
     method186(v3.clone());
     method15(v3.clone());
     method6(v3.clone(), v1.clone());
@@ -12607,19 +12367,19 @@ fn method197(mut v0: Rc<RefCell<Mut0>>, mut v1: Rc<RefCell<Mut1>>, mut v2: Rc<Re
 fn closure65(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut v4: bool, mut v5: Rc<str>) -> Rc<dyn Fn(Rc<str>) -> US24> {
     Rc::new(move |mut v6: Rc<str>| -> US24 {
         let (mut v7, mut v8): (Rc<str>, Rc<str>) = method157(v6.clone(), v5.clone(), v0.clone());
-        let mut v9: bool = method35(v7.clone());
+        let mut v9: bool = method51(v7.clone());
         let mut v10: bool = v9 == false;
         let mut v13: bool = if v10 {
             true
         } else {
-            let mut v11: bool = method35(v8.clone());
+            let mut v11: bool = method51(v8.clone());
             let mut v12: bool = v11 == false;
             v12
         };
         let mut v167: bool = if v13 {
             false
         } else {
-            let mut v14: Rc<str> = method43(v7.clone());
+            let mut v14: Rc<str> = method26(v7.clone());
             let mut v16: Result<std::fs::File, std::io::Error> = std::fs::File::open(&*v14);
             let mut v18: std::fs::File = v16.unwrap();
             let mut v20: std::io::BufReader<std::fs::File> = std::io::BufReader::new(v18);
@@ -12662,7 +12422,7 @@ fn closure65(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>,
             let mut v68: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(v67));
             let mut v69: Rc<Vec<Rc<str>>> = Rc::new((v68).borrow().clone());
             let mut v70: i32 = (v69).len() as i32;
-            let mut v71: i32 = v70 - 1i32;
+            let mut v71: i32 = v70.wrapping_sub(1i32);
             let mut v72: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
             let mut v73: Rc<UH0> = method158(v69.clone(), v71, v72.clone());
             let mut v74: Rc<str> = method159();
@@ -12684,9 +12444,8 @@ fn closure65(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>,
                     let mut v85: Rc<str> = v85.clone();
                     v85.clone()
                 }
-                _ => unreachable!(),
             };
-            let mut v91: Rc<str> = method43(v8.clone());
+            let mut v91: Rc<str> = method26(v8.clone());
             let mut v93: Result<std::fs::File, std::io::Error> = std::fs::File::open(&*v91);
             let mut v95: std::fs::File = v93.unwrap();
             let mut v97: std::io::BufReader<std::fs::File> = std::io::BufReader::new(v95);
@@ -12728,7 +12487,7 @@ fn closure65(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>,
             let mut v144: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(v143));
             let mut v145: Rc<Vec<Rc<str>>> = Rc::new((v144).borrow().clone());
             let mut v146: i32 = (v145).len() as i32;
-            let mut v147: i32 = v146 - 1i32;
+            let mut v147: i32 = v146.wrapping_sub(1i32);
             let mut v148: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
             let mut v149: Rc<UH0> = method158(v145.clone(), v147, v148.clone());
             let mut v150: Rc<str> = method159();
@@ -12749,7 +12508,6 @@ fn closure65(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>,
                     let mut v160: Rc<str> = v160.clone();
                     v160.clone()
                 }
-                _ => unreachable!(),
             };
             let mut v166: bool = v90.clone() == v165.clone();
             v166
@@ -12760,7 +12518,7 @@ fn closure65(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>,
             let mut v169: US27 = method187(v2.clone(), v3.clone(), v4, v7.clone(), v5.clone());
             match &v169 {
                 US27::US27_1(v253, v254) => { // Error
-                    let mut v253: i32 = v253.clone();
+                    let mut v253: i32 = *v253;
                     let mut v254: Rc<str> = v254.clone();
                     let (mut v255, mut v256): (Rc<str>, Rc<str>) = method196(v7.clone(), v254.clone());
                     let mut v257: (Rc<str>, Rc<str>) = (v255, v256);
@@ -12768,7 +12526,7 @@ fn closure65(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>,
                     US24::US24_0(v258.clone())
                 }
                 US27::US27_0(v170, v171) => { // Ok
-                    let mut v170: i32 = v170.clone();
+                    let mut v170: i32 = *v170;
                     let mut v171: Rc<str> = v171.clone();
                     let mut v173: bool = v170 != 0i32 ;
                     if v173 {
@@ -12793,7 +12551,6 @@ fn closure65(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>,
                             US0::US0_3 => { // Warning
                                 40i32
                             }
-                            _ => unreachable!(),
                         };
                         let mut v190: bool = v180.borrow().l0.clone();
                         let mut v191: bool = v190 == false;
@@ -12815,7 +12572,7 @@ fn closure65(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>,
                             { let _ = spiral_trace_hold(&v175); };
                             let (mut v209, mut v210, mut v211, mut v212, mut v213, mut v214): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v177) };
                             let mut v215: i64 = v209.borrow().l0.clone();
-                            let mut v216: i64 = v215 + 1i64;
+                            let mut v216: i64 = v215.wrapping_add(1i64);
                             v209.borrow_mut().l0 = v216;
                             let mut v217: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                             let mut v218: bool = cfg!(target_arch = "wasm32");
@@ -12867,7 +12624,7 @@ fn closure65(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>,
                         let mut v245: Result<Rc<str>, (Rc<str>, Rc<str>)> = Err::<Rc<str>, (Rc<str>, Rc<str>)>(v243);
                         US24::US24_0(v245.clone())
                     } else {
-                        let mut v247: bool = method35(v7.clone());
+                        let mut v247: bool = method51(v7.clone());
                         if v247 {
                             method177(v8.clone(), v7.clone())
                         } else {
@@ -12878,7 +12635,6 @@ fn closure65(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>,
                         US24::US24_0(v250.clone())
                     }
                 }
-                _ => unreachable!(),
             }
         }
     })
@@ -12896,11 +12652,11 @@ fn method201(mut v0: i32, mut v1: Rc<str>, mut v2: Rc<str>) -> Rc<str> {
     method15(v4.clone());
     let mut v5: Rc<str> = Rc::<str>::from(format!("{}", v0));
     method6(v4.clone(), v5.clone());
-    method41(v4.clone());
+    method56(v4.clone());
     method195(v4.clone());
     method15(v4.clone());
     method6(v4.clone(), v1.clone());
-    method41(v4.clone());
+    method56(v4.clone());
     method186(v4.clone());
     method15(v4.clone());
     method6(v4.clone(), v2.clone());
@@ -13049,7 +12805,6 @@ fn method199(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mu
             US0::US0_3 => { // Warning
                 40i32
             }
-            _ => unreachable!(),
         };
         let mut v92: bool = v82.borrow().l0.clone();
         let mut v93: bool = v92 == false;
@@ -13066,12 +12821,12 @@ fn method199(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mu
             { let _ = spiral_trace_hold(&v77); };
             let (mut v100, mut v101, mut v102, mut v103, mut v104, mut v105): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v79) };
             let mut v106: Rc<str> = method3(v100.clone(), v101.clone(), v102.clone(), v103.clone(), v104.clone(), v105.clone());
-            let mut v107: Rc<str> = method37();
+            let mut v107: Rc<str> = method52();
             let mut v108: Rc<str> = method200(v100.clone(), v101.clone(), v102.clone(), v103.clone(), v104.clone(), v105.clone(), v106.clone(), v107.clone(), v73, v1.clone(), v74.clone());
             { let _ = spiral_trace_hold(&v77); };
             let (mut v111, mut v112, mut v113, mut v114, mut v115, mut v116): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v79) };
             let mut v117: i64 = v111.borrow().l0.clone();
-            let mut v118: i64 = v117 + 1i64;
+            let mut v118: i64 = v117.wrapping_add(1i64);
             v111.borrow_mut().l0 = v118;
             let mut v119: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
             let mut v120: bool = cfg!(target_arch = "wasm32");
@@ -13158,7 +12913,6 @@ fn method199(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mu
             US0::US0_3 => { // Warning
                 40i32
             }
-            _ => unreachable!(),
         };
         let mut v179: bool = v169.borrow().l0.clone();
         let mut v180: bool = v179 == false;
@@ -13175,12 +12929,12 @@ fn method199(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mu
             { let _ = spiral_trace_hold(&v164); };
             let (mut v187, mut v188, mut v189, mut v190, mut v191, mut v192): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v166) };
             let mut v193: Rc<str> = method3(v187.clone(), v188.clone(), v189.clone(), v190.clone(), v191.clone(), v192.clone());
-            let mut v194: Rc<str> = method37();
+            let mut v194: Rc<str> = method52();
             let mut v195: Rc<str> = method202(v187.clone(), v188.clone(), v189.clone(), v190.clone(), v191.clone(), v192.clone(), v193.clone(), v194.clone(), v155, v1.clone(), v156.clone());
             { let _ = spiral_trace_hold(&v164); };
             let (mut v198, mut v199, mut v200, mut v201, mut v202, mut v203): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v166) };
             let mut v204: i64 = v198.borrow().l0.clone();
-            let mut v205: i64 = v204 + 1i64;
+            let mut v205: i64 = v204.wrapping_add(1i64);
             v198.borrow_mut().l0 = v205;
             let mut v206: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
             let mut v207: bool = cfg!(target_arch = "wasm32");
@@ -13233,19 +12987,19 @@ fn method199(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mu
 fn closure68(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>) -> Rc<dyn Fn(Rc<str>) -> US24> {
     Rc::new(move |mut v4: Rc<str>| -> US24 {
         let (mut v5, mut v6): (Rc<str>, Rc<str>) = method157(v4.clone(), v3.clone(), v0.clone());
-        let mut v7: bool = method35(v5.clone());
+        let mut v7: bool = method51(v5.clone());
         let mut v8: bool = v7 == false;
         let mut v11: bool = if v8 {
             true
         } else {
-            let mut v9: bool = method35(v6.clone());
+            let mut v9: bool = method51(v6.clone());
             let mut v10: bool = v9 == false;
             v10
         };
         let mut v165: bool = if v11 {
             false
         } else {
-            let mut v12: Rc<str> = method43(v5.clone());
+            let mut v12: Rc<str> = method26(v5.clone());
             let mut v14: Result<std::fs::File, std::io::Error> = std::fs::File::open(&*v12);
             let mut v16: std::fs::File = v14.unwrap();
             let mut v18: std::io::BufReader<std::fs::File> = std::io::BufReader::new(v16);
@@ -13288,7 +13042,7 @@ fn closure68(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>) ->
             let mut v66: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(v65));
             let mut v67: Rc<Vec<Rc<str>>> = Rc::new((v66).borrow().clone());
             let mut v68: i32 = (v67).len() as i32;
-            let mut v69: i32 = v68 - 1i32;
+            let mut v69: i32 = v68.wrapping_sub(1i32);
             let mut v70: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
             let mut v71: Rc<UH0> = method158(v67.clone(), v69, v70.clone());
             let mut v72: Rc<str> = method159();
@@ -13310,9 +13064,8 @@ fn closure68(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>) ->
                     let mut v83: Rc<str> = v83.clone();
                     v83.clone()
                 }
-                _ => unreachable!(),
             };
-            let mut v89: Rc<str> = method43(v6.clone());
+            let mut v89: Rc<str> = method26(v6.clone());
             let mut v91: Result<std::fs::File, std::io::Error> = std::fs::File::open(&*v89);
             let mut v93: std::fs::File = v91.unwrap();
             let mut v95: std::io::BufReader<std::fs::File> = std::io::BufReader::new(v93);
@@ -13354,7 +13107,7 @@ fn closure68(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>) ->
             let mut v142: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(v141));
             let mut v143: Rc<Vec<Rc<str>>> = Rc::new((v142).borrow().clone());
             let mut v144: i32 = (v143).len() as i32;
-            let mut v145: i32 = v144 - 1i32;
+            let mut v145: i32 = v144.wrapping_sub(1i32);
             let mut v146: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
             let mut v147: Rc<UH0> = method158(v143.clone(), v145, v146.clone());
             let mut v148: Rc<str> = method159();
@@ -13375,7 +13128,6 @@ fn closure68(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>) ->
                     let mut v158: Rc<str> = v158.clone();
                     v158.clone()
                 }
-                _ => unreachable!(),
             };
             let mut v164: bool = v88.clone() == v163.clone();
             v164
@@ -13386,7 +13138,7 @@ fn closure68(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>) ->
             let mut v167: US27 = method199(v2, v5.clone(), v3.clone(), v1.clone(), v4.clone());
             match &v167 {
                 US27::US27_1(v247, v248) => { // Error
-                    let mut v247: i32 = v247.clone();
+                    let mut v247: i32 = *v247;
                     let mut v248: Rc<str> = v248.clone();
                     let (mut v249, mut v250): (Rc<str>, Rc<str>) = method196(v5.clone(), v248.clone());
                     let mut v251: (Rc<str>, Rc<str>) = (v249, v250);
@@ -13394,7 +13146,7 @@ fn closure68(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>) ->
                     US24::US24_0(v252.clone())
                 }
                 US27::US27_0(v168, v169) => { // Ok
-                    let mut v168: i32 = v168.clone();
+                    let mut v168: i32 = *v168;
                     let mut v169: Rc<str> = v169.clone();
                     let mut v170: bool = v168 != 0i32 ;
                     if v170 {
@@ -13419,7 +13171,6 @@ fn closure68(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>) ->
                             US0::US0_3 => { // Warning
                                 40i32
                             }
-                            _ => unreachable!(),
                         };
                         let mut v187: bool = v177.borrow().l0.clone();
                         let mut v188: bool = v187 == false;
@@ -13441,7 +13192,7 @@ fn closure68(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>) ->
                             { let _ = spiral_trace_hold(&v172); };
                             let (mut v206, mut v207, mut v208, mut v209, mut v210, mut v211): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v174) };
                             let mut v212: i64 = v206.borrow().l0.clone();
-                            let mut v213: i64 = v212 + 1i64;
+                            let mut v213: i64 = v212.wrapping_add(1i64);
                             v206.borrow_mut().l0 = v213;
                             let mut v214: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                             let mut v215: bool = cfg!(target_arch = "wasm32");
@@ -13493,7 +13244,7 @@ fn closure68(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>) ->
                         let mut v240: Result<Rc<str>, (Rc<str>, Rc<str>)> = Err::<Rc<str>, (Rc<str>, Rc<str>)>(v239);
                         US24::US24_0(v240.clone())
                     } else {
-                        let mut v242: bool = method35(v5.clone());
+                        let mut v242: bool = method51(v5.clone());
                         if v242 {
                             method177(v6.clone(), v5.clone())
                         } else {
@@ -13504,7 +13255,6 @@ fn closure68(mut v0: Rc<str>, mut v1: Rc<str>, mut v2: bool, mut v3: Rc<str>) ->
                         US24::US24_0(v244.clone())
                     }
                 }
-                _ => unreachable!(),
             }
         }
     })
@@ -13528,7 +13278,7 @@ fn method204(mut v0: Rc<str>, mut v1: Rc<str>) -> Rc<str> {
     method195(v3.clone());
     method15(v3.clone());
     method6(v3.clone(), v0.clone());
-    method41(v3.clone());
+    method56(v3.clone());
     method205(v3.clone());
     method15(v3.clone());
     method6(v3.clone(), v1.clone());
@@ -13559,14 +13309,13 @@ fn method206(mut v0: Rc<RefCell<Vec<Rc<UH2>>>>, mut v1: Rc<UH1>, mut v2: i32) ->
                 let mut v3: Rc<UH2> = v3.clone();
                 let mut v4: Rc<UH1> = v4.clone();
                 v0.borrow_mut().push(v3);
-                let mut v5: i32 = v2 + 1i32;
+                let mut v5: i32 = v2.wrapping_add(1i32);
                 (v0, v1, v2) = (v0.clone(), v4.clone(), v5);
                 continue;
             }
             UH1::UH1_0 => { // Nil
                 return v2;
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -13580,7 +13329,7 @@ fn method208(mut v0: Rc<Vec<Rc<UH2>>>, mut v1: i32, mut v2: Rc<UH1>) -> Rc<UH1> 
             return v2.clone();
         } else {
             let mut v4: Rc<UH2> = (v0)[v1 as usize].clone();
-            let mut v5: i32 = v1 - 1i32;
+            let mut v5: i32 = v1.wrapping_sub(1i32);
             let mut v6: Rc<UH1> = Rc::new(UH1::UH1_1(v4.clone(), v2.clone()));
             (v0, v1, v2) = (v0.clone(), v5, v6.clone());
             continue;
@@ -13596,14 +13345,13 @@ fn method210(mut v0: Rc<RefCell<Vec<(Rc<str>, Rc<str>, Rc<dyn Fn(Rc<str>) -> Rc<
                 let mut v5: Rc<dyn Fn(Rc<str>) -> Rc<dyn Fn(Rc<str>) -> US24>> = v5.clone();
                 let mut v6: Rc<UH2> = v6.clone();
                 v0.borrow_mut().push((v3.clone(), v4.clone(), v5.clone()));
-                let mut v7: i32 = v2 + 1i32;
+                let mut v7: i32 = v2.wrapping_add(1i32);
                 (v0, v1, v2) = (v0.clone(), v6.clone(), v7);
                 continue;
             }
             UH2::UH2_0 => { // Nil
                 return v2;
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -13620,7 +13368,7 @@ fn method212(mut v0: Rc<RefCell<Vec<(Rc<str>, Rc<str>, Rc<dyn Fn(Rc<str>) -> Rc<
     loop {
         let mut v4: bool = v2 < v1;
         if v4 {
-            let mut v5: i32 = v2 + 1i32;
+            let mut v5: i32 = v2.wrapping_add(1i32);
             let (mut v9, mut v10, mut v11): (Rc<str>, Rc<str>, Rc<dyn Fn(Rc<str>) -> Rc<dyn Fn(Rc<str>) -> US24>>) = v0.clone().borrow()[v2 as usize].clone();
             let mut v12: Rc<dyn Fn(Rc<str>) -> US24> = v11(v10.clone());
             let mut v13: US24 = v12(v9.clone());
@@ -13634,7 +13382,6 @@ fn method212(mut v0: Rc<RefCell<Vec<(Rc<str>, Rc<str>, Rc<dyn Fn(Rc<str>) -> Rc<
                     let mut v16: Option<Result<Rc<str>, (Rc<str>, Rc<str>)>> = Some(v14.clone());
                     v16.clone()
                 }
-                _ => unreachable!(),
             };
             let mut v21: Option<Result<Rc<str>, (Rc<str>, Rc<str>)>> = method213(v20.clone());
             let mut v22: Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>> = method214(v3.clone());
@@ -13689,7 +13436,6 @@ fn method209(mut v0: Rc<UH1>, mut v1: Vec<Option<Result<Rc<str>, (Rc<str>, Rc<st
             UH1::UH1_0 => { // Nil
                 return v1.clone();
             }
-            _ => unreachable!(),
         }
     }
 }
@@ -13706,13 +13452,13 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
     loop {
         let mut v10: bool = v8 < v7;
         if v10 {
-            let mut v11: i32 = v8 + 1i32;
+            let mut v11: i32 = v8.wrapping_add(1i32);
             let mut v13: Rc<str> = v6.clone().borrow()[v8 as usize].clone();
             let mut v14: Rc<str> = method58(v13.clone());
             let mut v16: &str = &*v14;
             let mut v18: std::string::String = String::from(v16);
             let mut v20: std::path::PathBuf = std::path::PathBuf::from(v18);
-            let mut v21: std::path::PathBuf = method27(v20.clone());
+            let mut v21: std::path::PathBuf = method33(v20.clone());
             let mut v23: std::path::Display = v21.display();
             let mut v25: std::string::String = format!("{}", v23);
             let mut v27: Rc<str> = Rc::<str>::from(String::as_str(&v25));
@@ -13722,8 +13468,8 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
             let mut v32: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("/"); } LIT.with(|lit| lit.clone()) };
             let mut v33: Rc<str> = Rc::<str>::from(v30.replace(&*v31, &*v32));
             let mut v34: Rc<str> = Rc::<str>::from(format!(".{}", v33));
-            let mut v35: Rc<str> = method43(v14.clone());
-            let mut v36: Rc<str> = method29(v3.clone(), v34.clone());
+            let mut v35: Rc<str> = method26(v14.clone());
+            let mut v36: Rc<str> = method39(v3.clone(), v34.clone());
             let mut v37: Rc<str> = method78(v36.clone());
             let mut v39: Option<std::sync::Arc<std::sync::atomic::AtomicBool>> = None;
             let mut v40: Rc<RefCell<Vec<(Rc<str>, Rc<str>)>>> = Rc::new(RefCell::new(vec![]));
@@ -13735,7 +13481,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
             let mut v47: bool = true;
             let mut v48: bool = true;
             let (mut v49, mut v50): (i32, Rc<str>) = method79(v45.clone(), v39.clone(), v40.clone(), v42.clone(), v43.clone(), v47, v46.clone(), v48);
-            let mut v51: Rc<str> = method29(v4.clone(), v34.clone());
+            let mut v51: Rc<str> = method39(v4.clone(), v34.clone());
             let mut v52: Rc<str> = method78(v51.clone());
             let mut v53: Option<std::sync::Arc<std::sync::atomic::AtomicBool>> = None;
             let mut v54: Rc<RefCell<Vec<(Rc<str>, Rc<str>)>>> = Rc::new(RefCell::new(vec![]));
@@ -13747,7 +13493,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
             let mut v60: bool = true;
             let mut v61: bool = true;
             let (mut v62, mut v63): (i32, Rc<str>) = method79(v58.clone(), v53.clone(), v54.clone(), v55.clone(), v56.clone(), v60, v59.clone(), v61);
-            let mut v64: Rc<str> = method29(v5.clone(), v34.clone());
+            let mut v64: Rc<str> = method39(v5.clone(), v34.clone());
             let mut v65: Rc<str> = method78(v64.clone());
             let mut v66: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("hangul.md"); } LIT.with(|lit| lit.clone()) };
             let (mut v67, mut v68): (Rc<str>, Rc<str>) = method157(v66.clone(), v52.clone(), v5.clone());
@@ -13761,7 +13507,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
             let mut v452: Rc<UH1> = if v75 {
                 { thread_local!{ static CASE: Rc<UH1> = Rc::new(UH1::UH1_0); } CASE.with(|case| case.clone()) }
             } else {
-                let mut v77: Rc<str> = method43(v52.clone());
+                let mut v77: Rc<str> = method26(v52.clone());
                 let mut v79: Result<std::fs::File, std::io::Error> = std::fs::File::open(&*v77);
                 let mut v81: std::fs::File = v79.unwrap();
                 let mut v83: std::io::BufReader<std::fs::File> = std::io::BufReader::new(v81);
@@ -13804,7 +13550,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                 let mut v147: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(v146));
                 let mut v149: Rc<Vec<Rc<str>>> = Rc::new((v147).borrow().clone());
                 let mut v156: i32 = (v149).len() as i32;
-                let mut v157: i32 = v156 - 1i32;
+                let mut v157: i32 = v156.wrapping_sub(1i32);
                 let mut v158: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
                 let mut v159: Rc<UH0> = method158(v149.clone(), v157, v158.clone());
                 let mut v160: Rc<str> = method159();
@@ -13826,14 +13572,13 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                         let mut v173: Rc<str> = v173.clone();
                         v173.clone()
                     }
-                    _ => unreachable!(),
                 };
-                let mut v180: bool = method35(v65.clone());
+                let mut v180: bool = method51(v65.clone());
                 let mut v181: bool = v180 == false;
                 let mut v258: US4 = if v181 {
                     US4::US4_1
                 } else {
-                    let mut v183: Rc<str> = method43(v65.clone());
+                    let mut v183: Rc<str> = method26(v65.clone());
                     let mut v185: Result<std::fs::File, std::io::Error> = std::fs::File::open(&*v183);
                     let mut v187: std::fs::File = v185.unwrap();
                     let mut v189: std::io::BufReader<std::fs::File> = std::io::BufReader::new(v187);
@@ -13875,7 +13620,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                     let mut v236: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(v235));
                     let mut v237: Rc<Vec<Rc<str>>> = Rc::new((v236).borrow().clone());
                     let mut v238: i32 = (v237).len() as i32;
-                    let mut v239: i32 = v238 - 1i32;
+                    let mut v239: i32 = v238.wrapping_sub(1i32);
                     let mut v240: Rc<UH0> = { thread_local!{ static CASE: Rc<UH0> = Rc::new(UH0::UH0_0); } CASE.with(|case| case.clone()) };
                     let mut v241: Rc<UH0> = method158(v237.clone(), v239, v240.clone());
                     let mut v242: Rc<str> = method159();
@@ -13895,7 +13640,6 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             let mut v252: Rc<str> = v252.clone();
                             US4::US4_0(v252.clone())
                         }
-                        _ => unreachable!(),
                     }
                 };
                 match &v258 {
@@ -13926,7 +13670,6 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                                 US0::US0_3 => { // Warning
                                     40i32
                                 }
-                                _ => unreachable!(),
                             };
                             let mut v278: bool = v268.borrow().l0.clone();
                             let mut v279: bool = v278 == false;
@@ -13958,7 +13701,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                                 { let _ = spiral_trace_hold(&v263); };
                                 let (mut v304, mut v305, mut v306, mut v307, mut v308, mut v309): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v265) };
                                 let mut v310: i64 = v304.borrow().l0.clone();
-                                let mut v311: i64 = v310 + 1i64;
+                                let mut v311: i64 = v310.wrapping_add(1i64);
                                 v304.borrow_mut().l0 = v311;
                                 let mut v312: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                                 let mut v313: bool = cfg!(target_arch = "wasm32");
@@ -14051,7 +13794,6 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             US0::US0_3 => { // Warning
                                 40i32
                             }
-                            _ => unreachable!(),
                         };
                         let mut v373: bool = v363.borrow().l0.clone();
                         let mut v374: bool = v373 == false;
@@ -14083,7 +13825,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             { let _ = spiral_trace_hold(&v358); };
                             let (mut v399, mut v400, mut v401, mut v402, mut v403, mut v404): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v360) };
                             let mut v405: i64 = v399.borrow().l0.clone();
-                            let mut v406: i64 = v405 + 1i64;
+                            let mut v406: i64 = v405.wrapping_add(1i64);
                             v399.borrow_mut().l0 = v406;
                             let mut v407: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                             let mut v408: bool = cfg!(target_arch = "wasm32");
@@ -14169,11 +13911,11 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
             } else {
                 let mut v455: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("epub"); } LIT.with(|lit| lit.clone()) };
                 let (mut v456, mut v457): (Rc<str>, Rc<str>) = method157(v455.clone(), v67.clone(), v5.clone());
-                let mut v458: bool = method35(v456.clone());
+                let mut v458: bool = method51(v456.clone());
                 let mut v528: bool = if v458 {
                     true
                 } else {
-                    let mut v459: bool = method35(v457.clone());
+                    let mut v459: bool = method51(v457.clone());
                     let mut v460: bool = v459 == false;
                     if v460 {
                         true
@@ -14199,7 +13941,6 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             US0::US0_3 => { // Warning
                                 40i32
                             }
-                            _ => unreachable!(),
                         };
                         let mut v477: bool = v467.borrow().l0.clone();
                         let mut v478: bool = v477 == false;
@@ -14221,7 +13962,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             { let _ = spiral_trace_hold(&v462); };
                             let (mut v496, mut v497, mut v498, mut v499, mut v500, mut v501): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v464) };
                             let mut v502: i64 = v496.borrow().l0.clone();
-                            let mut v503: i64 = v502 + 1i64;
+                            let mut v503: i64 = v502.wrapping_add(1i64);
                             v496.borrow_mut().l0 = v503;
                             let mut v504: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                             let mut v505: bool = cfg!(target_arch = "wasm32");
@@ -14281,11 +14022,11 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                 };
                 let mut v534: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("pdf"); } LIT.with(|lit| lit.clone()) };
                 let (mut v535, mut v536): (Rc<str>, Rc<str>) = method157(v534.clone(), v67.clone(), v5.clone());
-                let mut v537: bool = method35(v535.clone());
+                let mut v537: bool = method51(v535.clone());
                 let mut v607: bool = if v537 {
                     true
                 } else {
-                    let mut v538: bool = method35(v536.clone());
+                    let mut v538: bool = method51(v536.clone());
                     let mut v539: bool = v538 == false;
                     if v539 {
                         true
@@ -14311,7 +14052,6 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             US0::US0_3 => { // Warning
                                 40i32
                             }
-                            _ => unreachable!(),
                         };
                         let mut v556: bool = v546.borrow().l0.clone();
                         let mut v557: bool = v556 == false;
@@ -14333,7 +14073,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             { let _ = spiral_trace_hold(&v541); };
                             let (mut v575, mut v576, mut v577, mut v578, mut v579, mut v580): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v543) };
                             let mut v581: i64 = v575.borrow().l0.clone();
-                            let mut v582: i64 = v581 + 1i64;
+                            let mut v582: i64 = v581.wrapping_add(1i64);
                             v575.borrow_mut().l0 = v582;
                             let mut v583: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                             let mut v584: bool = cfg!(target_arch = "wasm32");
@@ -14392,11 +14132,11 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                 };
                 let mut v611: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("html"); } LIT.with(|lit| lit.clone()) };
                 let (mut v612, mut v613): (Rc<str>, Rc<str>) = method157(v611.clone(), v67.clone(), v5.clone());
-                let mut v614: bool = method35(v612.clone());
+                let mut v614: bool = method51(v612.clone());
                 let mut v684: bool = if v614 {
                     true
                 } else {
-                    let mut v615: bool = method35(v613.clone());
+                    let mut v615: bool = method51(v613.clone());
                     let mut v616: bool = v615 == false;
                     if v616 {
                         true
@@ -14422,7 +14162,6 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             US0::US0_3 => { // Warning
                                 40i32
                             }
-                            _ => unreachable!(),
                         };
                         let mut v633: bool = v623.borrow().l0.clone();
                         let mut v634: bool = v633 == false;
@@ -14444,7 +14183,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             { let _ = spiral_trace_hold(&v618); };
                             let (mut v652, mut v653, mut v654, mut v655, mut v656, mut v657): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v620) };
                             let mut v658: i64 = v652.borrow().l0.clone();
-                            let mut v659: i64 = v658 + 1i64;
+                            let mut v659: i64 = v658.wrapping_add(1i64);
                             v652.borrow_mut().l0 = v659;
                             let mut v660: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                             let mut v661: bool = cfg!(target_arch = "wasm32");
@@ -14502,11 +14241,11 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                     v610.clone()
                 };
                 let (mut v688, mut v689): (Rc<str>, Rc<str>) = method157(v455.clone(), v52.clone(), v5.clone());
-                let mut v690: bool = method35(v688.clone());
+                let mut v690: bool = method51(v688.clone());
                 let mut v760: bool = if v690 {
                     true
                 } else {
-                    let mut v691: bool = method35(v689.clone());
+                    let mut v691: bool = method51(v689.clone());
                     let mut v692: bool = v691 == false;
                     if v692 {
                         true
@@ -14532,7 +14271,6 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             US0::US0_3 => { // Warning
                                 40i32
                             }
-                            _ => unreachable!(),
                         };
                         let mut v709: bool = v699.borrow().l0.clone();
                         let mut v710: bool = v709 == false;
@@ -14554,7 +14292,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             { let _ = spiral_trace_hold(&v694); };
                             let (mut v728, mut v729, mut v730, mut v731, mut v732, mut v733): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v696) };
                             let mut v734: i64 = v728.borrow().l0.clone();
-                            let mut v735: i64 = v734 + 1i64;
+                            let mut v735: i64 = v734.wrapping_add(1i64);
                             v728.borrow_mut().l0 = v735;
                             let mut v736: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                             let mut v737: bool = cfg!(target_arch = "wasm32");
@@ -14612,11 +14350,11 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                     v687.clone()
                 };
                 let (mut v764, mut v765): (Rc<str>, Rc<str>) = method157(v534.clone(), v52.clone(), v5.clone());
-                let mut v766: bool = method35(v764.clone());
+                let mut v766: bool = method51(v764.clone());
                 let mut v836: bool = if v766 {
                     true
                 } else {
-                    let mut v767: bool = method35(v765.clone());
+                    let mut v767: bool = method51(v765.clone());
                     let mut v768: bool = v767 == false;
                     if v768 {
                         true
@@ -14642,7 +14380,6 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             US0::US0_3 => { // Warning
                                 40i32
                             }
-                            _ => unreachable!(),
                         };
                         let mut v785: bool = v775.borrow().l0.clone();
                         let mut v786: bool = v785 == false;
@@ -14664,7 +14401,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             { let _ = spiral_trace_hold(&v770); };
                             let (mut v804, mut v805, mut v806, mut v807, mut v808, mut v809): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v772) };
                             let mut v810: i64 = v804.borrow().l0.clone();
-                            let mut v811: i64 = v810 + 1i64;
+                            let mut v811: i64 = v810.wrapping_add(1i64);
                             v804.borrow_mut().l0 = v811;
                             let mut v812: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                             let mut v813: bool = cfg!(target_arch = "wasm32");
@@ -14722,11 +14459,11 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                     v763.clone()
                 };
                 let (mut v840, mut v841): (Rc<str>, Rc<str>) = method157(v611.clone(), v52.clone(), v5.clone());
-                let mut v842: bool = method35(v840.clone());
+                let mut v842: bool = method51(v840.clone());
                 let mut v912: bool = if v842 {
                     true
                 } else {
-                    let mut v843: bool = method35(v841.clone());
+                    let mut v843: bool = method51(v841.clone());
                     let mut v844: bool = v843 == false;
                     if v844 {
                         true
@@ -14752,7 +14489,6 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             US0::US0_3 => { // Warning
                                 40i32
                             }
-                            _ => unreachable!(),
                         };
                         let mut v861: bool = v851.borrow().l0.clone();
                         let mut v862: bool = v861 == false;
@@ -14774,7 +14510,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             { let _ = spiral_trace_hold(&v846); };
                             let (mut v880, mut v881, mut v882, mut v883, mut v884, mut v885): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v848) };
                             let mut v886: i64 = v880.borrow().l0.clone();
-                            let mut v887: i64 = v886 + 1i64;
+                            let mut v887: i64 = v886.wrapping_add(1i64);
                             v880.borrow_mut().l0 = v887;
                             let mut v888: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                             let mut v889: bool = cfg!(target_arch = "wasm32");
@@ -14832,11 +14568,11 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                     v839.clone()
                 };
                 let (mut v916, mut v917): (Rc<str>, Rc<str>) = method157(v66.clone(), v52.clone(), v5.clone());
-                let mut v918: bool = method35(v916.clone());
+                let mut v918: bool = method51(v916.clone());
                 let mut v988: bool = if v918 {
                     true
                 } else {
-                    let mut v919: bool = method35(v917.clone());
+                    let mut v919: bool = method51(v917.clone());
                     let mut v920: bool = v919 == false;
                     if v920 {
                         true
@@ -14862,7 +14598,6 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             US0::US0_3 => { // Warning
                                 40i32
                             }
-                            _ => unreachable!(),
                         };
                         let mut v937: bool = v927.borrow().l0.clone();
                         let mut v938: bool = v937 == false;
@@ -14884,7 +14619,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
                             { let _ = spiral_trace_hold(&v922); };
                             let (mut v956, mut v957, mut v958, mut v959, mut v960, mut v961): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v924) };
                             let mut v962: i64 = v956.borrow().l0.clone();
-                            let mut v963: i64 = v962 + 1i64;
+                            let mut v963: i64 = v962.wrapping_add(1i64);
                             v956.borrow_mut().l0 = v963;
                             let mut v964: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                             let mut v965: bool = cfg!(target_arch = "wasm32");
@@ -14958,7 +14693,7 @@ fn method76(mut v0: bool, mut v1: Rc<str>, mut v2: Rc<str>, mut v3: Rc<str>, mut
             let mut v1017: Rc<RefCell<Vec<Rc<UH2>>>> = Rc::new(RefCell::new(v1016));
             let mut v1019: Rc<Vec<Rc<UH2>>> = Rc::new((v1017).borrow().clone());
             let mut v1026: i32 = (v1019).len() as i32;
-            let mut v1027: i32 = v1026 - 1i32;
+            let mut v1027: i32 = v1026.wrapping_sub(1i32);
             let mut v1028: Rc<UH1> = { thread_local!{ static CASE: Rc<UH1> = Rc::new(UH1::UH1_0); } CASE.with(|case| case.clone()) };
             let mut v1029: Rc<UH1> = method208(v1019.clone(), v1027, v1028.clone());
             let mut v1030: Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>> = method209(v1029.clone(), v1013.clone());
@@ -14981,70 +14716,74 @@ fn method221(mut v0: Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, R
     v0.clone()
 }
 fn method25(mut v0: bool, mut v1: US4, mut v2: Rc<str>, mut v3: Rc<str>, mut v4: Rc<str>, mut v5: Rc<str>) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>>, std::string::String>>>> {
-    let mut v6: Rc<str> = method26();
-    let mut v7: US4 = method28(v6.clone());
-    let mut v14: US4 = match &v7 {
-        US4::US4_1 => { // None
-            let mut v11: Rc<str> = Rc::<str>::from(env!("CARGO_MANIFEST_DIR"));
-            method28(v11.clone())
-        }
-        US4::US4_0(v8) => { // Some
-            let mut v8: Rc<str> = v8.clone();
-            US4::US4_0(v8.clone())
-        }
-        _ => unreachable!(),
-    };
-    let mut v20: US4 = match &v14 {
-        US4::US4_1 => { // None
-            let mut v17: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("/workspaces"); } LIT.with(|lit| lit.clone()) };
-            method28(v17.clone())
-        }
-        US4::US4_0(v15) => { // Some
-            let mut v15: Rc<str> = v15.clone();
-            US4::US4_0(v15.clone())
-        }
-        _ => unreachable!(),
-    };
-    let mut v24: Rc<str> = match &v20 {
-        US4::US4_1 => { // None
-            std::panic::panic_any::<std::string::String>(format!("{}", { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("Option does not have a value."); } LIT.with(|lit| lit.clone()) }))
-        }
-        US4::US4_0(v21) => { // Some
-            let mut v21: Rc<str> = v21.clone();
-            v21.clone()
-        }
-        _ => unreachable!(),
-    };
-    let mut v25: Rc<str> = method47(v24.clone());
-    let mut v26: bool = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("deps"); } LIT.with(|lit| lit.clone()) } == v25.clone();
-    let mut v35: Rc<str> = if v26 {
-        let mut v27: Option<Rc<str>> = method33(v24.clone());
-        let mut v29: Rc<str> = v27.unwrap();
-        let mut v30: US4 = method28(v29.clone());
-        match &v30 {
+    let mut v6: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("SPIRAL_REPO_ROOT"); } LIT.with(|lit| lit.clone()) };
+    let mut v7: Rc<str> = method1(v6.clone());
+    let mut v8: bool = v7.clone() == { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
+    let mut v9: bool = v8 != true;
+    let mut v43: Rc<str> = if v9 {
+        method26(v7.clone())
+    } else {
+        let mut v11: Rc<str> = method46();
+        let mut v12: US4 = method47(v11.clone());
+        let mut v19: US4 = match &v12 {
+            US4::US4_1 => { // None
+                let mut v16: Rc<str> = Rc::<str>::from(env!("CARGO_MANIFEST_DIR"));
+                method47(v16.clone())
+            }
+            US4::US4_0(v13) => { // Some
+                let mut v13: Rc<str> = v13.clone();
+                US4::US4_0(v13.clone())
+            }
+        };
+        let mut v25: US4 = match &v19 {
+            US4::US4_1 => { // None
+                let mut v22: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("/workspaces"); } LIT.with(|lit| lit.clone()) };
+                method47(v22.clone())
+            }
+            US4::US4_0(v20) => { // Some
+                let mut v20: Rc<str> = v20.clone();
+                US4::US4_0(v20.clone())
+            }
+        };
+        let mut v29: Rc<str> = match &v25 {
             US4::US4_1 => { // None
                 std::panic::panic_any::<std::string::String>(format!("{}", { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("Option does not have a value."); } LIT.with(|lit| lit.clone()) }))
             }
-            US4::US4_0(v31) => { // Some
-                let mut v31: Rc<str> = v31.clone();
-                v31.clone()
+            US4::US4_0(v26) => { // Some
+                let mut v26: Rc<str> = v26.clone();
+                v26.clone()
             }
-            _ => unreachable!(),
-        }
-    } else {
-        v24.clone()
+        };
+        let mut v30: Rc<str> = method30(v29.clone());
+        let mut v31: bool = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("deps"); } LIT.with(|lit| lit.clone()) } == v30.clone();
+        let mut v40: Rc<str> = if v31 {
+            let mut v32: Option<Rc<str>> = method32(v29.clone());
+            let mut v34: Rc<str> = v32.unwrap();
+            let mut v35: US4 = method47(v34.clone());
+            match &v35 {
+                US4::US4_1 => { // None
+                    std::panic::panic_any::<std::string::String>(format!("{}", { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("Option does not have a value."); } LIT.with(|lit| lit.clone()) }))
+                }
+                US4::US4_0(v36) => { // Some
+                    let mut v36: Rc<str> = v36.clone();
+                    v36.clone()
+                }
+            }
+        } else {
+            v29.clone()
+        };
+        let mut v41: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("spiral"); } LIT.with(|lit| lit.clone()) };
+        method39(v40.clone(), v41.clone())
     };
-    let mut v36: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("polyglot"); } LIT.with(|lit| lit.clone()) };
-    let mut v37: Rc<str> = method29(v35.clone(), v36.clone());
-    let mut v38: Rc<str> = method58(v5.clone());
-    let mut v39: Rc<str> = method58(v4.clone());
-    let mut v40: Rc<str> = method58(v3.clone());
-    let mut v42: Rc<dyn Fn() -> (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>)> = closure2();
-    { let _ = spiral_trace_hold(&v42); };
-    let mut v44: Rc<dyn Fn() -> (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>)> = closure3();
-    let (mut v45, mut v46, mut v47, mut v48, mut v49, mut v50): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v44) };
-    let mut v51: US0 = v49.borrow().l0.clone();
-    let mut v56: i32 = match &v51 {
+    let mut v44: Rc<str> = method58(v5.clone());
+    let mut v45: Rc<str> = method58(v4.clone());
+    let mut v46: Rc<str> = method58(v3.clone());
+    let mut v48: Rc<dyn Fn() -> (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>)> = closure2();
+    { let _ = spiral_trace_hold(&v48); };
+    let mut v50: Rc<dyn Fn() -> (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>)> = closure3();
+    let (mut v51, mut v52, mut v53, mut v54, mut v55, mut v56): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v50) };
+    let mut v57: US0 = v55.borrow().l0.clone();
+    let mut v62: i32 = match &v57 {
         US0::US0_4 => { // Critical
             50i32
         }
@@ -15060,94 +14799,92 @@ fn method25(mut v0: bool, mut v1: US4, mut v2: Rc<str>, mut v3: Rc<str>, mut v4:
         US0::US0_3 => { // Warning
             40i32
         }
-        _ => unreachable!(),
     };
-    let mut v57: bool = v47.borrow().l0.clone();
-    let mut v58: bool = v57 == false;
-    let mut v60: bool = if v58 {
+    let mut v63: bool = v53.borrow().l0.clone();
+    let mut v64: bool = v63 == false;
+    let mut v66: bool = if v64 {
         false
     } else {
-        let mut v59: bool = 20i32 >= v56;
-        v59
+        let mut v65: bool = 20i32 >= v62;
+        v65
     };
-    let mut v61: bool = v60 == false;
-    let mut v106: US2 = if v61 {
+    let mut v67: bool = v66 == false;
+    let mut v112: US2 = if v67 {
         US2::US2_1
     } else {
-        { let _ = spiral_trace_hold(&v42); };
-        let (mut v65, mut v66, mut v67, mut v68, mut v69, mut v70): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v44) };
-        let mut v71: Rc<str> = method3(v65.clone(), v66.clone(), v67.clone(), v68.clone(), v69.clone(), v70.clone());
-        let mut v72: Rc<str> = method62();
-        let mut v73: Rc<str> = method63(v65.clone(), v66.clone(), v67.clone(), v68.clone(), v69.clone(), v70.clone(), v71.clone(), v72.clone(), v38.clone(), v39.clone(), v40.clone(), v2.clone(), v1.clone(), v0);
-        { let _ = spiral_trace_hold(&v42); };
-        let (mut v76, mut v77, mut v78, mut v79, mut v80, mut v81): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v44) };
-        let mut v82: i64 = v76.borrow().l0.clone();
-        let mut v83: i64 = v82 + 1i64;
-        v76.borrow_mut().l0 = v83;
-        let mut v84: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
-        let mut v85: bool = cfg!(target_arch = "wasm32");
-        if v85 {
-            let mut v86: Rc<str> = v79.borrow().l0.clone();
-            let mut v87: bool = v86.clone() == { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
-            let mut v95: Rc<str> = if v87 {
-                v73.clone()
+        { let _ = spiral_trace_hold(&v48); };
+        let (mut v71, mut v72, mut v73, mut v74, mut v75, mut v76): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v50) };
+        let mut v77: Rc<str> = method3(v71.clone(), v72.clone(), v73.clone(), v74.clone(), v75.clone(), v76.clone());
+        let mut v78: Rc<str> = method62();
+        let mut v79: Rc<str> = method63(v71.clone(), v72.clone(), v73.clone(), v74.clone(), v75.clone(), v76.clone(), v77.clone(), v78.clone(), v44.clone(), v45.clone(), v46.clone(), v2.clone(), v1.clone(), v0);
+        { let _ = spiral_trace_hold(&v48); };
+        let (mut v82, mut v83, mut v84, mut v85, mut v86, mut v87): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v50) };
+        let mut v88: i64 = v82.borrow().l0.clone();
+        let mut v89: i64 = v88.wrapping_add(1i64);
+        v82.borrow_mut().l0 = v89;
+        let mut v90: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
+        let mut v91: bool = cfg!(target_arch = "wasm32");
+        if v91 {
+            let mut v92: Rc<str> = v85.borrow().l0.clone();
+            let mut v93: bool = v92.clone() == { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
+            let mut v101: Rc<str> = if v93 {
+                v79.clone()
             } else {
-                let mut v88: bool = v73.clone() == { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
-                if v88 {
-                    let mut v89: Rc<str> = v79.borrow().l0.clone();
-                    v89.clone()
+                let mut v94: bool = v79.clone() == { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
+                if v94 {
+                    let mut v95: Rc<str> = v85.borrow().l0.clone();
+                    v95.clone()
                 } else {
-                    let mut v90: Rc<str> = v79.borrow().l0.clone();
-                    let mut v91: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("\n"); } LIT.with(|lit| lit.clone()) };
-                    let mut v92: Rc<str> = Rc::<str>::from(format!("{}{}", v90, v91));
-                    let mut v93: Rc<str> = Rc::<str>::from(format!("{}{}", v92, v73));
-                    v93.clone()
+                    let mut v96: Rc<str> = v85.borrow().l0.clone();
+                    let mut v97: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("\n"); } LIT.with(|lit| lit.clone()) };
+                    let mut v98: Rc<str> = Rc::<str>::from(format!("{}{}", v96, v97));
+                    let mut v99: Rc<str> = Rc::<str>::from(format!("{}{}", v98, v79));
+                    v99.clone()
                 }
             };
-            let mut v97: i32 = ((v95.chars().count() + 14999) / 15000) as i32;
-            let mut v98: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
-            let mut v99: bool = v73 != v98 ;
-            let mut v101: bool = if v99 {
-                let mut v100: bool = v97 <= 1i32;
-                v100
+            let mut v103: i32 = ((v101.chars().count() + 14999) / 15000) as i32;
+            let mut v104: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
+            let mut v105: bool = v79 != v104 ;
+            let mut v107: bool = if v105 {
+                let mut v106: bool = v103 <= 1i32;
+                v106
             } else {
                 false
             };
-            if v101 {
-                v79.borrow_mut().l0 = v95.clone();
+            if v107 {
+                v85.borrow_mut().l0 = v101.clone();
                 ()
             } else {
-                v79.borrow_mut().l0 = v98.clone();
-                { #[cfg(target_arch = "wasm32")] spiral_trace_near_log(&v95); };
+                v85.borrow_mut().l0 = v104.clone();
+                { #[cfg(target_arch = "wasm32")] spiral_trace_near_log(&v101); };
                 ()
             }
         } else {
-            println!("{}", v73);
+            println!("{}", v79);
             ()
         };
-        let mut v104: Rc<dyn Fn(Rc<str>) -> ()> = v77.borrow().l0.clone();
-        v104(v73.clone());
-        US2::US2_0(v76.clone(), v77.clone(), v78.clone(), v79.clone(), v80.clone(), v81.clone())
+        let mut v110: Rc<dyn Fn(Rc<str>) -> ()> = v83.borrow().l0.clone();
+        v110(v79.clone());
+        US2::US2_0(v82.clone(), v83.clone(), v84.clone(), v85.clone(), v86.clone(), v87.clone())
     };
-    let mut v108: bool = true; let __future_init = Box::pin(/*;
-    let mut v110: bool = */ async move { /*;
-    let mut v112: bool = */ ();
-    let (mut v129, mut v130): (Rc<str>, bool) = match &v1 {
+    let mut v114: bool = true; let __future_init = Box::pin(/*;
+    let mut v116: bool = */ async move { /*;
+    let mut v118: bool = */ ();
+    let (mut v135, mut v136): (Rc<str>, bool) = match &v1 {
         US4::US4_1 => { // None
-            let mut v126: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
-            (v126.clone(), false)
+            let mut v132: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
+            (v132.clone(), false)
         }
-        US4::US4_0(v125) => { // Some
-            let mut v125: Rc<str> = v125.clone();
-            (v125.clone(), true)
+        US4::US4_0(v131) => { // Some
+            let mut v131: Rc<str> = v131.clone();
+            (v131.clone(), true)
         }
-        _ => unreachable!(),
     };
-    let mut v131: Vec<Rc<str>> = { let mut out: Vec<Rc<str>> = Vec::new(); let mut stack = vec![std::path::PathBuf::from(&*v39)]; while let Some(dir) = stack.pop() { if let Ok(entries) = std::fs::read_dir(&dir) { for entry in entries.flatten() { let path = entry.path(); if path.is_dir() { stack.push(path) } else { let s = path.display().to_string(); if s.ends_with(".md") && !s.ends_with(".hangul.md") && (!v130 || s.contains(&*v129)) { out.push(Rc::from(s.as_str())) } } } } } out };
-    { let _ = spiral_trace_hold(&v42); };
-    let (mut v134, mut v135, mut v136, mut v137, mut v138, mut v139): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v44) };
-    let mut v140: US0 = v138.borrow().l0.clone();
-    let mut v145: i32 = match &v140 {
+    let mut v137: Vec<Rc<str>> = { let mut out: Vec<Rc<str>> = Vec::new(); let mut stack = vec![std::path::PathBuf::from(&*v45)]; while let Some(dir) = stack.pop() { if let Ok(entries) = std::fs::read_dir(&dir) { for entry in entries.flatten() { let path = entry.path(); if path.is_dir() { stack.push(path) } else { let s = path.display().to_string(); if s.ends_with(".md") && !s.ends_with(".hangul.md") && (!v136 || s.contains(&*v135)) { out.push(Rc::from(s.as_str())) } } } } } out };
+    { let _ = spiral_trace_hold(&v48); };
+    let (mut v140, mut v141, mut v142, mut v143, mut v144, mut v145): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v50) };
+    let mut v146: US0 = v144.borrow().l0.clone();
+    let mut v151: i32 = match &v146 {
         US0::US0_4 => { // Critical
             50i32
         }
@@ -15163,90 +14900,89 @@ fn method25(mut v0: bool, mut v1: US4, mut v2: Rc<str>, mut v3: Rc<str>, mut v4:
         US0::US0_3 => { // Warning
             40i32
         }
-        _ => unreachable!(),
     };
-    let mut v146: bool = v136.borrow().l0.clone();
-    let mut v147: bool = v146 == false;
-    let mut v149: bool = if v147 {
+    let mut v152: bool = v142.borrow().l0.clone();
+    let mut v153: bool = v152 == false;
+    let mut v155: bool = if v153 {
         false
     } else {
-        let mut v148: bool = 20i32 >= v145;
-        v148
+        let mut v154: bool = 20i32 >= v151;
+        v154
     };
-    let mut v150: bool = v149 == false;
-    let mut v198: US2 = if v150 {
+    let mut v156: bool = v155 == false;
+    let mut v204: US2 = if v156 {
         US2::US2_1
     } else {
-        { let _ = spiral_trace_hold(&v42); };
-        let (mut v154, mut v155, mut v156, mut v157, mut v158, mut v159): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v44) };
-        let mut v160: Rc<str> = method3(v154.clone(), v155.clone(), v156.clone(), v157.clone(), v158.clone(), v159.clone());
-        let mut v161: Rc<str> = method62();
-        let mut v164: usize = ((v131).len() as usize);
-        let mut v165: Rc<str> = method72(v154.clone(), v155.clone(), v156.clone(), v157.clone(), v158.clone(), v159.clone(), v160.clone(), v161.clone(), v164.clone());
-        { let _ = spiral_trace_hold(&v42); };
-        let (mut v168, mut v169, mut v170, mut v171, mut v172, mut v173): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v44) };
-        let mut v174: i64 = v168.borrow().l0.clone();
-        let mut v175: i64 = v174 + 1i64;
-        v168.borrow_mut().l0 = v175;
-        let mut v176: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
-        let mut v177: bool = cfg!(target_arch = "wasm32");
-        if v177 {
-            let mut v178: Rc<str> = v171.borrow().l0.clone();
-            let mut v179: bool = v178.clone() == { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
-            let mut v187: Rc<str> = if v179 {
-                v165.clone()
+        { let _ = spiral_trace_hold(&v48); };
+        let (mut v160, mut v161, mut v162, mut v163, mut v164, mut v165): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v50) };
+        let mut v166: Rc<str> = method3(v160.clone(), v161.clone(), v162.clone(), v163.clone(), v164.clone(), v165.clone());
+        let mut v167: Rc<str> = method62();
+        let mut v170: usize = ((v137).len() as usize);
+        let mut v171: Rc<str> = method72(v160.clone(), v161.clone(), v162.clone(), v163.clone(), v164.clone(), v165.clone(), v166.clone(), v167.clone(), v170.clone());
+        { let _ = spiral_trace_hold(&v48); };
+        let (mut v174, mut v175, mut v176, mut v177, mut v178, mut v179): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v50) };
+        let mut v180: i64 = v174.borrow().l0.clone();
+        let mut v181: i64 = v180.wrapping_add(1i64);
+        v174.borrow_mut().l0 = v181;
+        let mut v182: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
+        let mut v183: bool = cfg!(target_arch = "wasm32");
+        if v183 {
+            let mut v184: Rc<str> = v177.borrow().l0.clone();
+            let mut v185: bool = v184.clone() == { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
+            let mut v193: Rc<str> = if v185 {
+                v171.clone()
             } else {
-                let mut v180: bool = v165.clone() == { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
-                if v180 {
-                    let mut v181: Rc<str> = v171.borrow().l0.clone();
-                    v181.clone()
+                let mut v186: bool = v171.clone() == { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
+                if v186 {
+                    let mut v187: Rc<str> = v177.borrow().l0.clone();
+                    v187.clone()
                 } else {
-                    let mut v182: Rc<str> = v171.borrow().l0.clone();
-                    let mut v183: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("\n"); } LIT.with(|lit| lit.clone()) };
-                    let mut v184: Rc<str> = Rc::<str>::from(format!("{}{}", v182, v183));
-                    let mut v185: Rc<str> = Rc::<str>::from(format!("{}{}", v184, v165));
-                    v185.clone()
+                    let mut v188: Rc<str> = v177.borrow().l0.clone();
+                    let mut v189: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("\n"); } LIT.with(|lit| lit.clone()) };
+                    let mut v190: Rc<str> = Rc::<str>::from(format!("{}{}", v188, v189));
+                    let mut v191: Rc<str> = Rc::<str>::from(format!("{}{}", v190, v171));
+                    v191.clone()
                 }
             };
-            let mut v189: i32 = ((v187.chars().count() + 14999) / 15000) as i32;
-            let mut v190: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
-            let mut v191: bool = v165 != v190 ;
-            let mut v193: bool = if v191 {
-                let mut v192: bool = v189 <= 1i32;
-                v192
+            let mut v195: i32 = ((v193.chars().count() + 14999) / 15000) as i32;
+            let mut v196: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
+            let mut v197: bool = v171 != v196 ;
+            let mut v199: bool = if v197 {
+                let mut v198: bool = v195 <= 1i32;
+                v198
             } else {
                 false
             };
-            if v193 {
-                v171.borrow_mut().l0 = v187.clone();
+            if v199 {
+                v177.borrow_mut().l0 = v193.clone();
                 ()
             } else {
-                v171.borrow_mut().l0 = v190.clone();
-                { #[cfg(target_arch = "wasm32")] spiral_trace_near_log(&v187); };
+                v177.borrow_mut().l0 = v196.clone();
+                { #[cfg(target_arch = "wasm32")] spiral_trace_near_log(&v193); };
                 ()
             }
         } else {
-            println!("{}", v165);
+            println!("{}", v171);
             ()
         };
-        let mut v196: Rc<dyn Fn(Rc<str>) -> ()> = v169.borrow().l0.clone();
-        v196(v165.clone());
-        US2::US2_0(v168.clone(), v169.clone(), v170.clone(), v171.clone(), v172.clone(), v173.clone())
+        let mut v202: Rc<dyn Fn(Rc<str>) -> ()> = v175.borrow().l0.clone();
+        v202(v171.clone());
+        US2::US2_0(v174.clone(), v175.clone(), v176.clone(), v177.clone(), v178.clone(), v179.clone())
     };
-    let mut v201: Vec<Rc<str>> = method75(v131.clone());
-    let mut v202: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(v201));
-    let mut v203: i32 = (v202.borrow().len() as i32);
-    let mut v204: i32 = 0i32;
-    let mut v207: Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>> = Vec::new();
-    let mut v208: Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>> = method76(v0, v2.clone(), v37.clone(), v38.clone(), v39.clone(), v40.clone(), v202.clone(), v203, v204, v207.clone());
-    let mut v211: Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>> = method221(v208.clone());
-    let mut v212: Rc<RefCell<Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>>>> = Rc::new(RefCell::new(v211));
-    let mut v215: Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>> = (v212).borrow().clone();
-    let mut v217: Result<Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>>, std::string::String> = Ok::<Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>>, std::string::String>(v215);
-    let mut v219: bool = true; (v217) }); //;
-    let mut v221: _ = __future_init;
-    let mut v223: std::pin::Pin<Box<dyn std::future::Future<Output = Result<Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>>, std::string::String>>>> = v221;
-    v223
+    let mut v207: Vec<Rc<str>> = method75(v137.clone());
+    let mut v208: Rc<RefCell<Vec<Rc<str>>>> = Rc::new(RefCell::new(v207));
+    let mut v209: i32 = (v208.borrow().len() as i32);
+    let mut v210: i32 = 0i32;
+    let mut v213: Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>> = Vec::new();
+    let mut v214: Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>> = method76(v0, v2.clone(), v43.clone(), v44.clone(), v45.clone(), v46.clone(), v208.clone(), v209, v210, v213.clone());
+    let mut v217: Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>> = method221(v214.clone());
+    let mut v218: Rc<RefCell<Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>>>> = Rc::new(RefCell::new(v217));
+    let mut v221: Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>> = (v218).borrow().clone();
+    let mut v223: Result<Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>>, std::string::String> = Ok::<Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>>, std::string::String>(v221);
+    let mut v225: bool = true; (v223) }); //;
+    let mut v227: _ = __future_init;
+    let mut v229: std::pin::Pin<Box<dyn std::future::Future<Output = Result<Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>>, std::string::String>>>> = v227;
+    v229
 }
 fn closure69() -> Rc<dyn Fn(Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>>) -> US28> {
     thread_local!{ static CLOSURE: Rc<dyn Fn(Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>>) -> US28> = Rc::new(move |mut v0: Vec<Result<(Rc<str>, Vec<Option<Result<Rc<str>, (Rc<str>, Rc<str>)>>>), std::string::String>>| -> US28 {
@@ -15270,7 +15006,7 @@ fn method225(mut v0: std::string::String) -> Rc<str> {
     let mut v1: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(""); } LIT.with(|lit| lit.clone()) };
     let mut v2: Rc<RefCell<Mut3>> = Rc::new(RefCell::new(Mut3 { l0: v1.clone() }));
     method13(v2.clone());
-    method42(v2.clone());
+    method57(v2.clone());
     method15(v2.clone());
     let mut v4: std::string::String = format!("{:#?}", v0);
     let mut v6: Rc<str> = Rc::<str>::from(v4);
@@ -15349,7 +15085,6 @@ fn spiral_main() -> i32 {
         US0::US0_3 => { // Warning
             40i32
         }
-        _ => unreachable!(),
     };
     let mut v38: bool = v28.borrow().l0.clone();
     let mut v39: bool = v38 == false;
@@ -15371,7 +15106,7 @@ fn spiral_main() -> i32 {
         { let _ = spiral_trace_hold(&v23); };
         let (mut v57, mut v58, mut v59, mut v60, mut v61, mut v62): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v25) };
         let mut v63: i64 = v57.borrow().l0.clone();
-        let mut v64: i64 = v63 + 1i64;
+        let mut v64: i64 = v63.wrapping_add(1i64);
         v57.borrow_mut().l0 = v64;
         let mut v65: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
         let mut v66: bool = cfg!(target_arch = "wasm32");
@@ -15436,7 +15171,6 @@ fn spiral_main() -> i32 {
             let mut v105: std::string::String = v105.clone();
             v105.clone()
         }
-        _ => unreachable!(),
     };
     let mut v110: Rc<str> = Rc::<str>::from(String::as_str(&v108));
     let mut v111: Rc<str> = method20();
@@ -15454,7 +15188,6 @@ fn spiral_main() -> i32 {
             let mut v120: std::string::String = v120.clone();
             v120.clone()
         }
-        _ => unreachable!(),
     };
     let mut v125: Rc<str> = Rc::<str>::from(String::as_str(&v123));
     let mut v126: Rc<str> = method21();
@@ -15472,7 +15205,6 @@ fn spiral_main() -> i32 {
             let mut v135: std::string::String = v135.clone();
             v135.clone()
         }
-        _ => unreachable!(),
     };
     let mut v140: Rc<str> = Rc::<str>::from(String::as_str(&v138));
     let mut v141: Rc<str> = method22();
@@ -15491,7 +15223,6 @@ fn spiral_main() -> i32 {
             let mut v152: Rc<str> = Rc::<str>::from(String::as_str(&v150));
             US4::US4_0(v152.clone())
         }
-        _ => unreachable!(),
     };
     let mut v160: Rc<str> = match &v156 {
         US4::US4_1 => { // None
@@ -15502,7 +15233,6 @@ fn spiral_main() -> i32 {
             let mut v157: Rc<str> = v157.clone();
             v157.clone()
         }
-        _ => unreachable!(),
     };
     let mut v161: Rc<str> = method23();
     let mut v163: &str = &*v161;
@@ -15520,7 +15250,6 @@ fn spiral_main() -> i32 {
             let mut v172: Rc<str> = Rc::<str>::from(String::as_str(&v170));
             US4::US4_0(v172.clone())
         }
-        _ => unreachable!(),
     };
     let mut v177: Rc<str> = method24();
     let mut v179: &str = &*v177;
@@ -15552,7 +15281,6 @@ fn spiral_main() -> i32 {
                 US0::US0_3 => { // Warning
                     40i32
                 }
-                _ => unreachable!(),
             };
             let mut v272: bool = v262.borrow().l0.clone();
             let mut v273: bool = v272 == false;
@@ -15574,7 +15302,7 @@ fn spiral_main() -> i32 {
                 { let _ = spiral_trace_hold(&v23); };
                 let (mut v291, mut v292, mut v293, mut v294, mut v295, mut v296): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v25) };
                 let mut v297: i64 = v291.borrow().l0.clone();
-                let mut v298: i64 = v297 + 1i64;
+                let mut v298: i64 = v297.wrapping_add(1i64);
                 v291.borrow_mut().l0 = v298;
                 let mut v299: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                 let mut v300: bool = cfg!(target_arch = "wasm32");
@@ -15644,7 +15372,6 @@ fn spiral_main() -> i32 {
                 US0::US0_3 => { // Warning
                     40i32
                 }
-                _ => unreachable!(),
             };
             let mut v204: bool = v194.borrow().l0.clone();
             let mut v205: bool = v204 == false;
@@ -15667,7 +15394,7 @@ fn spiral_main() -> i32 {
                 { let _ = spiral_trace_hold(&v23); };
                 let (mut v226, mut v227, mut v228, mut v229, mut v230, mut v231): (Rc<RefCell<Mut0>>, Rc<RefCell<Mut1>>, Rc<RefCell<Mut2>>, Rc<RefCell<Mut3>>, Rc<RefCell<Mut4>>, Option<i64>) = { spiral_trace_hold(&v25) };
                 let mut v232: i64 = v226.borrow().l0.clone();
-                let mut v233: i64 = v232 + 1i64;
+                let mut v233: i64 = v232.wrapping_add(1i64);
                 v226.borrow_mut().l0 = v233;
                 let mut v234: Rc<dyn Fn(Rc<str>) -> ()> = closure4();
                 let mut v235: bool = cfg!(target_arch = "wasm32");
@@ -15716,7 +15443,6 @@ fn spiral_main() -> i32 {
             };
             0i32
         }
-        _ => unreachable!(),
     };
     if v323 != 0 { std::process::exit(v323) };
     0
