@@ -17,10 +17,9 @@ if (!$fast) {
     Set-Location polyglot
     git pull
     Set-Location $ScriptDir
-    # alphabet's own builds use neither Fable nor dotnet-repl. The opt-ins serve what i574n.github runs after this init
-    # (its init reaches polyglot's only through dice's and alphabet's): workflow.dib through `spiral dib --path`
-    # (dotnet-repl) and spiral's and polyglot's builds (Fable fork, lib/typescript/fable).
-    pwsh ../../polyglot/scripts/init.ps1 -Fable 1 -Repl 1
+    # polyglot's init: what i574n.github runs after this init needs (its init reaches polyglot's only through dice's and
+    # alphabet's).
+    pwsh ../../polyglot/scripts/init.ps1
 }
 
 . ../../polyglot/scripts/core.ps1
@@ -31,7 +30,7 @@ EnsureSymbolicLink -Path "../deps/spiral" -Target "../../spiral"
 { pwsh ../deps/polyglot/apps/builder/build.ps1 -fast 1 } | Invoke-Block
 { pwsh ../deps/polyglot/apps/parser/build.ps1 -fast 1 } | Invoke-Block
 { pwsh ../deps/polyglot/apps/spiral/build.ps1 -fast 1 } | Invoke-Block
-{ pwsh ../deps/polyglot/deps/spiral/apps/spiral/build.ps1 -fast 1 -SkipFsx 1 } | Invoke-Block
+{ pwsh ../deps/polyglot/deps/spiral/apps/spiral/build.ps1 -fast 1 } | Invoke-Block
 { pwsh ../deps/polyglot/apps/dir-tree-html/build.ps1 -fast 1 } | Invoke-Block
 
 { sudo apt-get update } | Invoke-Block -Linux -Distro ubuntu -OnError Continue

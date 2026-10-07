@@ -34,7 +34,7 @@ rsync -av `
     --include '*.css' `
     --include '*.csproj' `
     --include '*.dependencies' `
-    --include '*.dib' `
+    --include '*.livemd' `
     --include '*.editorconfig' `
     --include '*.exs' `
     --include '*.fs' `
