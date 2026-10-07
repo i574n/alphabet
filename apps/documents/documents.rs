@@ -1805,18 +1805,18 @@ fn method69(mut v0: Rc<RefCell<Mut3>>) -> () {
 fn method70(mut v0: US4) -> Rc<str> {
     match &v0 {
         US4::US4_1 => { // None
-            let mut v8: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("None"); } LIT.with(|lit| lit.clone()) };
-            v8.clone()
+            let mut v25: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("None"); } LIT.with(|lit| lit.clone()) };
+            v25.clone()
         }
         US4::US4_0(v1) => { // Some
             let mut v1: Rc<str> = v1.clone();
-            let mut v2: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(")"); } LIT.with(|lit| lit.clone()) };
-            let mut v3: Rc<str> = Rc::<str>::from(format!("{}{}", v1, v2));
-            let mut v4: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("("); } LIT.with(|lit| lit.clone()) };
-            let mut v5: Rc<str> = Rc::<str>::from(format!("{}{}", v4, v3));
-            let mut v6: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("Some"); } LIT.with(|lit| lit.clone()) };
-            let mut v7: Rc<str> = Rc::<str>::from(format!("{}{}", v6, v5));
-            v7.clone()
+            let mut v4: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from(")"); } LIT.with(|lit| lit.clone()) };
+            let mut v5: Rc<str> = Rc::<str>::from(format!("{}{}", v1, v4));
+            let mut v8: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("("); } LIT.with(|lit| lit.clone()) };
+            let mut v9: Rc<str> = Rc::<str>::from(format!("{}{}", v8, v5));
+            let mut v20: Rc<str> = { thread_local!{ static LIT: Rc<str> = Rc::<str>::from("Some"); } LIT.with(|lit| lit.clone()) };
+            let mut v21: Rc<str> = Rc::<str>::from(format!("{}{}", v20, v9));
+            v21.clone()
         }
         _ => unreachable!(),
     }

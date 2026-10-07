@@ -267,7 +267,7 @@ let run { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
             run_target function
                 // Natively a synchronous walk with the same filters: async_walkdir's filter needs a Send + Sync
                 // closure returning a Send future, and native values are Rc-based.
-                | RustNative => fun () =>
+                | Rust => fun () =>
                     inl filter, has_filter = match filter with Some filter => filter, true | None => "", false
                     $'{ let mut out: Vec<Rc<str>> = Vec::new(); let mut stack = vec\![std::path::PathBuf::from(&*!dist_dir)]; while let Some(dir) = stack.pop() { if let Ok(entries) = std::fs::read_dir(&dir) { for entry in entries.flatten() { let path = entry.path(); if path.is_dir() { stack.push(path) } else { let s = path.display().to_string(); if s.ends_with(".md") && \!s.ends_with(".hangul.md") && (\!!has_filter || s.contains(&*!filter)) { out.push(Rc::from(s.as_str())) } } } } } out }' : am'.vec string
                 | _ => fun () =>

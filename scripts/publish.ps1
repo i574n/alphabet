@@ -20,7 +20,6 @@ rsync -av `
     --exclude 'bin' `
     --exclude 'build' `
     --exclude 'deps' `
-    --exclude 'fable_modules' `
     --exclude 'node_modules' `
     --exclude 'obj' `
     --exclude 'paket-files' `

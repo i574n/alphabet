@@ -96,7 +96,7 @@ Documents Sample
 <td>
 
 - Documents notebook  
-<https://i574n.github.io/alphabet/apps/documents/documents.dib.html>
+<https://i574n.github.io/alphabet/apps/documents/documents.livemd.html>
 
 </td>
 </tr>
