@@ -10,7 +10,6 @@ inl get_args () =
         source_dir = "source-dir", 's'
         dist_dir = "dist-dir", 'd'
         cache_dir = "cache-dir", 'c'
-        // `-h` is clap's help flag (debug builds reject a duplicate short name).
         hangul_spec = "hangul-spec", 'H'
         filter = "filter", 'f'
         transcribe_only = "transcribe-only", 't'
@@ -46,44 +45,44 @@ let crowbook hangul { ext dist_dir dist_path output_path } =
         inl args =
             inl default ext =
                 $'$" rendering.num_depth 6"'
-                +. $'$" rendering.highlight.theme \\\\\\"Solarized (dark)\\\\\\""'
+                ++# $'$" rendering.highlight.theme \\\\\\"Solarized (dark)\\\\\\""'
             match ext with
             | "html" =>
                 $'$"--set"'
-                +. $'$" html.css.add \\\\\\"\'"'
-                +. $'$" body {{ color: \#e8e6e3; background-color: \#202324; }}"'
-                +. $'$" a {{ color: \#989693; }}"'
-                +. $'$" pre {{ background-color: \#1b1b1b; padding: 10px; }}"'
-                +. $'$" \'\\\\\\""'
-                +. default ext
+                ++# $'$" html.css.add \\\\\\"\'"'
+                ++# $'$" body {{ color: \#e8e6e3; background-color: \#202324; }}"'
+                ++# $'$" a {{ color: \#989693; }}"'
+                ++# $'$" pre {{ background-color: \#1b1b1b; padding: 10px; }}"'
+                ++# $'$" \'\\\\\\""'
+                ++# default ext
             | "pdf" =>
                 $'$"--set"'
-                +. $'$" tex.paper.size a4paper"'
-                +. $'$" tex.template.add \\\"\\\\pagenumbering{{gobble}}\\\""'
-                +. (
+                ++# $'$" tex.paper.size a4paper"'
+                ++# $'$" tex.template.add \\\"\\\\pagenumbering{{gobble}}\\\""'
+                ++# (
                     if hangul |> not
                     then ""
                     else
                         $'$" tex.template.add \\\"\\\\usepackage{{polyglossia}}\\\""'
-                        +. $'$" tex.template.add \\\"\\\\setmainlanguage{{korean}}\\\""'
-                        +. $'$" tex.template.add \\\"\\\\setmainfont{{NanumGothicCoding}}\\\""'
-                        +. $'$" tex.font.size 13"'
+                        ++# $'$" tex.template.add \\\"\\\\setmainlanguage{{korean}}\\\""'
+                        ++# $'$" tex.template.add \\\"\\\\setmainfont{{NanumGothicCoding}}\\\""'
+                        ++# $'$" tex.font.size 13"'
                 )
-                +. default ext
+                ++# default ext
             | "epub" =>
                 $'$"--set"'
-                +. $'$" epub.version 3"'
-                +. $'$" html.css.add \\\\\\"\' "'
-                +. $'$" body {{ color: \#e8e6e3; background-color: \#202324; }} "'
-                +. $'$" a {{ color: \#989693; }} "'
-                +. $'$" \'\\\\\\""'
-                +. default ext
+                ++# $'$" epub.version 3"'
+                ++# $'$" html.css.add \\\\\\"\' "'
+                ++# $'$" body {{ color: \#e8e6e3; background-color: \#202324; }} "'
+                ++# $'$" a {{ color: \#989693; }} "'
+                ++# $'$" \'\\\\\\""'
+                ++# default ext
             | _ => ""
         inl exit_code, result =
             runtime.execution_options fun x => { x with
                 command =
                     $'$"crowbook --verbose --to {!ext}"'
-                    +. $'$" --single \\\"{!dist_path}\\\" --output \\\"{!output_path}\\\" {!args}"'
+                    ++# $'$" --single \\\"{!dist_path}\\\" --output \\\"{!output_path}\\\" {!args}"'
                 working_directory = dist_dir |> Some |> optionm'.box
             }
             |> runtime.execute_with_options
@@ -97,7 +96,7 @@ let crowbook hangul { ext dist_dir dist_path output_path } =
             runtime.execution_options fun x => { x with
                 command =
                     $'$"crowbook --verbose --to {!ext}"'
-                    +. $'$" --single \\\"{!dist_path}\\\" --output \\\"{!output_path}\\\""'
+                    ++# $'$" --single \\\"{!dist_path}\\\" --output \\\"{!output_path}\\\""'
                 working_directory = dist_dir |> Some |> optionm'.box
             }
             |> runtime.execute_with_options
@@ -265,8 +264,6 @@ let run { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
     fun () =>
         inl files =
             run_target function
-                // Natively a synchronous walk with the same filters: async_walkdir's filter needs a Send + Sync
-                // closure returning a Send future, and native values are Rc-based.
                 | Rust => fun () =>
                     inl filter, has_filter = match filter with Some filter => filter, true | None => "", false
                     $'{ let mut out: Vec<Rc<str>> = Vec::new(); let mut stack = vec\![std::path::PathBuf::from(&*!dist_dir)]; while let Some(dir) = stack.pop() { if let Ok(entries) = std::fs::read_dir(&dir) { for entry in entries.flatten() { let path = entry.path(); if path.is_dir() { stack.push(path) } else { let s = path.display().to_string(); if s.ends_with(".md") && \!s.ends_with(".hangul.md") && (\!!has_filter || s.contains(&*!filter)) { out.push(Rc::from(s.as_str())) } } } } } out }' : am'.vec string
@@ -389,8 +386,8 @@ let run { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
                         trace Info
                             fun () =>
                                 "documents.run / par_map"
-                                +. " / origin_hash |> sm\'.contains local_git_hash |> not"
-                                +. " / Some hash2 when hash1 = hash2"
+                                ++# " / origin_hash |> sm\'.contains local_git_hash |> not"
+                                ++# " / Some hash2 when hash1 = hash2"
                             fun () => {
                                 file
                                 real_path
@@ -511,10 +508,6 @@ inl main (args : array_base string) =
             fun () => { error }
         1i32
 inl main () =
-    // F# (the Fable path) gets `tests` and `main args`. The native Rust backend (`--backend Rust`, build.ps1's native
-    // section) runs `main` here: clap parses `std::env::args` itself (the args below only feed the `documents.main`
-    // trace) and a failure exits with its code. This `main` stays unit (a unit `main` exits with 0), since an i32 one
-    // would also change the F# output.
     backend_switch {
         Fsharp = fun () =>
             $'let tests () = !tests ()' : ()

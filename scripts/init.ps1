@@ -13,12 +13,10 @@ Write-Output "init.ps1 / url: $url / owner: $owner / domain: $domain"
 
 if (!$fast) {
     Set-Location (New-Item -ItemType Directory -Path "../.." -Force)
-    git clone --recurse-submodules https://$domain/$owner/polyglot.git # --branch gh-pages
+    git clone --recurse-submodules https://$domain/$owner/polyglot.git
     Set-Location polyglot
     git pull
     Set-Location $ScriptDir
-    # polyglot's init: what i574n.github runs after this init needs (its init reaches polyglot's only through dice's and
-    # alphabet's).
     pwsh ../../polyglot/scripts/init.ps1
 }
 

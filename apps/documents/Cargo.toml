@@ -5,7 +5,6 @@ edition = "2021"
 
 [workspace]
 
-# documents.rs is the Spiral compiler's native Rust output of documents.spi (build.ps1 regenerates it).
 [dependencies]
 inline_colorization = ">=0.1,<1"
 regex = "1.10"

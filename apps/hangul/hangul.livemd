@@ -96,7 +96,7 @@ Spiral.Kino.eval!(
 )
 ```
 
-<!-- livebook:{"chunks":null,"kind":"Elixir.Spiral.Kino.SmartCell","attrs":{"timeout":300,"source":"///- --test\n\n\"國語\"\n|> hanja_convert\n|> _assert_eq \"\" // \"국어\"","print_code":false},"livebook_object":"smart_cell"} -->
+<!-- livebook:{"chunks":null,"kind":"Elixir.Spiral.Kino.SmartCell","attrs":{"timeout":300,"source":"///- --test\n\n\"國語\"\n|> hanja_convert\n|> _assert_eq \"\"","print_code":false},"livebook_object":"smart_cell"} -->
 
 ```elixir
 Spiral.Kino.eval!(
@@ -105,7 +105,7 @@ Spiral.Kino.eval!(
 
   "國語"
   |> hanja_convert
-  |> _assert_eq "" // "국어"
+  |> _assert_eq ""
   """,
   timeout: 300_000
 )

@@ -11,9 +11,6 @@ $ErrorActionPreference = "Stop"
 
 $projectName = "hangul"
 
-# The notebook runs through Kino (spiral/apps/kino, `mix spiral.notebook`) from its .livemd: its F# cells and #!import
-# files on one `dotnet fsi` session. A run writes <nb>.livemd.ipynb and <nb>.livemd.html. The export is F# (hangul.fs,
-# --fs-path), so the run writes no .spi (--no-spi).
 $livebook = Join-Path $ScriptDir "../../deps/spiral/apps/kino/spi/run_notebook.ps1"
 $notebook = Join-Path $ScriptDir "$projectName.livemd"
 $ipynb = Join-Path $ScriptDir "$projectName.livemd.ipynb"

@@ -11,8 +11,6 @@ $ErrorActionPreference = "Stop"
 
 $projectName = "documents"
 
-# The notebook runs through Kino (spiral/apps/kino, `mix spiral.notebook`) from its .livemd; a successful run also writes
-# the .spi export. A run writes <nb>.livemd.ipynb and <nb>.livemd.html: README and gh-pages link to them.
 $livebook = Join-Path $ScriptDir "../../deps/polyglot/deps/spiral/apps/kino/spi/run_notebook.ps1"
 $notebook = Join-Path $ScriptDir "$projectName.livemd"
 $spi = Join-Path $ScriptDir "$projectName.spi"
@@ -24,26 +22,16 @@ else {
     { pwsh -NoProfile -File $livebook --path $notebook --spi-path $spi --export-only } | Invoke-Block
 }
 
-# F#: documents.spi -> documents.fsx (tracked) with the Spiral compiler's own F# backend.
 if (!(BuildSpiral "$projectName.spi" "$projectName.fsx" "alphabet/apps/documents" -Backend Fsharp)) {
     throw "FSHARP-FAILED alphabet/apps/documents / compile"
 }
 
 $targetDir = GetTargetDir $projectName
 
-# Rust: the documents.spi entry (its `main` has a `Rust` arm that runs `main` with the process args) compiled by the
-# Spiral compiler's own Rust backend, no Fable, straight to documents.rs, the crate's binary (Cargo.toml next to this
-# script; Cargo.lock pins its dependencies). documents.fsx above is the F# output; its .NET build isn't runnable: the
-# app's clap/IO calls exist only for Rust.
 if (!(BuildSpiral "$ScriptDir/$projectName.spi" "$ScriptDir/$projectName.rs" "alphabet/apps/documents")) {
     throw "RUST-FAILED alphabet/apps/documents / compile"
 }
 { cargo +nightly-2025-11-01 build --release } | Invoke-Block
-# Run check: the binary on a small sample (this repo's README.md and a short Portuguese note) with fresh src/dist/cache
-# dirs outside any git repository (the app compares git hashes of its inputs), run from this directory (so
-# get_workspace_root resolves and hangulize is found). It must exit 0, write the transcription and the html of both
-# inputs, and the note's transcription must be exactly the expected text (the output the former Fable binary and the
-# Rust one both produced, 2026-10-06).
 $rustRunRoot = Join-Path ([IO.Path]::GetTempPath()) "alphabet-documents-run-$PID"
 Remove-Item $rustRunRoot -Recurse -Force -ErrorAction Ignore
 $rustSample = [ordered]@{
