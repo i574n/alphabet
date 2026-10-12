@@ -46,10 +46,21 @@ jobs:
       - uses: awalsh128/cache-apt-pkgs-action@master
         if: contains(matrix.os, 'ubuntu')
         with:
-          packages: texlive-xetex texlive-latex-extra texlive-plain-generic pandoc fonts-nanum-coding
+          packages: texlive-xetex texlive-latex-extra texlive-plain-generic texlive-lang-english lmodern pandoc fonts-nanum-coding
           version: 1.0
 
       - run: pwsh scripts/workflow.ps1
+
+      - name: xelatex diagnostics
+        if: failure() && contains(matrix.os, 'ubuntu')
+        shell: bash
+        run: |
+          printf '# t\n\nhello\n' > /tmp/xe.md
+          command -v crowbook && crowbook --to tex --single /tmp/xe.md --output /tmp/xe.tex || true
+          cd /tmp && xelatex -interaction=nonstopmode xe.tex || true
+          tail -n 60 /tmp/xe.log || true
+          kpsewhich english.ldf babel-english.ldf lmodern.sty fontspec.sty xunicode.sty hyphenat.sty enumitem.sty polyglossia.sty || true
+          fc-list | grep -i -E 'latin modern|lmroman|nanum' | head -n 10 || true
 
       - uses: actions/upload-artifact@v5
         if: contains(matrix.os, 'ubuntu')
