@@ -49,10 +49,20 @@ jobs:
           packages: texlive-xetex texlive-latex-extra texlive-plain-generic texlive-lang-english texlive-lang-greek lmodern pandoc fonts-nanum-coding
           version: 1.0
 
+      - name: miktex
+        if: contains(matrix.os, 'windows')
+        shell: pwsh
+        run: |
+          choco install miktex --no-progress -y
+          $bin = 'C:\Program Files\MiKTeX\miktex\bin\x64'
+          $bin | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+          & "$bin\initexmf.exe" --admin --set-config-value=[MPM]AutoInstall=1
+          & "$bin\miktex.exe" --admin packages update-package-database
+
       - run: pwsh scripts/workflow.ps1
 
       - name: xelatex diagnostics
-        if: failure() && contains(matrix.os, 'ubuntu')
+        if: failure()
         shell: bash
         run: |
           printf '# t\n\nhello\n' > /tmp/xe.md
