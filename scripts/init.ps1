@@ -31,8 +31,8 @@ EnsureSymbolicLink -Path "../deps/spiral" -Target "../../spiral"
 
 { sudo apt-get update } | Invoke-Block -Linux -Distro ubuntu -OnError Continue
 { apt-get update } | Invoke-Block -Linux -Distro ubuntu -OnError Continue
-{ sudo apt install -y texlive-xetex pandoc fonts-nanum-coding } | Invoke-Block -Linux -Distro ubuntu -OnError Continue
-{ apt install -y texlive-xetex pandoc fonts-nanum-coding } | Invoke-Block -Linux -Distro ubuntu -OnError Continue
+{ sudo apt install -y texlive-xetex texlive-latex-extra texlive-plain-generic pandoc fonts-nanum-coding } | Invoke-Block -Linux -Distro ubuntu -OnError Continue
+{ apt install -y texlive-xetex texlive-latex-extra texlive-plain-generic pandoc fonts-nanum-coding } | Invoke-Block -Linux -Distro ubuntu -OnError Continue
 
 { cargo binstall -y --git https://github.com/crowdagger/crowbook.git --locked crowbook } | Invoke-Block -OnError Continue
 

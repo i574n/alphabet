@@ -46,7 +46,7 @@ jobs:
       - uses: awalsh128/cache-apt-pkgs-action@master
         if: contains(matrix.os, 'ubuntu')
         with:
-          packages: texlive-xetex pandoc fonts-nanum-coding
+          packages: texlive-xetex texlive-latex-extra texlive-plain-generic pandoc fonts-nanum-coding
           version: 1.0
 
       - run: pwsh scripts/workflow.ps1
