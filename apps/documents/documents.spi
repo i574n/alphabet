@@ -58,6 +58,7 @@ let crowbook hangul { ext dist_dir dist_path output_path } =
             | "pdf" =>
                 $'$"--set"'
                 ++# $'$" tex.paper.size a4paper"'
+                ++# $'$" tex.command tectonic"'
                 ++# $'$" tex.template.add \\\"\\\\pagenumbering{{gobble}}\\\""'
                 ++# (
                     if hangul |> not
@@ -97,6 +98,7 @@ let crowbook hangul { ext dist_dir dist_path output_path } =
                 command =
                     $'$"crowbook --verbose --to {!ext}"'
                     ++# $'$" --single \\\"{!dist_path}\\\" --output \\\"{!output_path}\\\""'
+                    ++# (if ext = "pdf" then $'$" --set tex.command tectonic"' else "")
                 working_directory = dist_dir |> Some |> optionm'.box
             }
             |> runtime.execute_with_options
