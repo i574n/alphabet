@@ -37,4 +37,28 @@ EnsureSymbolicLink -Path "../deps/spiral" -Target "../../spiral"
 { cargo binstall -y --git https://github.com/crowdagger/crowbook.git --locked crowbook } | Invoke-Block -OnError Continue
 { cargo binstall -y tectonic } | Invoke-Block -OnError Continue
 
+if ($IsWindows) {
+    $machineFontsDir = Join-Path $env:WINDIR "Fonts"
+    $userFontsDir = Join-Path $env:LOCALAPPDATA "Microsoft/Windows/Fonts"
+    $installedFont = @($machineFontsDir, $userFontsDir) | Where-Object { Test-Path (Join-Path $_ "NanumGothicCoding.ttf") }
+    if (!$installedFont) {
+        $nanumDir = New-Item -ItemType Directory -Path (Join-Path ([IO.Path]::GetTempPath()) "nanum-gothic-coding") -Force
+        $nanumZip = Join-Path $nanumDir "NanumGothicCoding-2.5.zip"
+        $nanumZipSha256 = "F4C9B1082CB36D793CCF75A331316C880EF9E4BC229408C22F9D2703B7619A3F"
+        Invoke-WebRequest "https://github.com/naver/nanumfont/releases/download/VER2.5/NanumGothicCoding-2.5.zip" -OutFile $nanumZip
+        $downloadedSha256 = (Get-FileHash $nanumZip -Algorithm SHA256).Hash
+        if ($downloadedSha256 -ne $nanumZipSha256) { throw "init.ps1 / NanumGothicCoding-2.5.zip sha256 $downloadedSha256, expected $nanumZipSha256" }
+        Expand-Archive $nanumZip -DestinationPath $nanumDir -Force
+        New-Item -ItemType Directory -Path $userFontsDir -Force | Out-Null
+        $userFontsKey = "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Fonts"
+        if (!(Test-Path $userFontsKey)) { New-Item $userFontsKey -Force | Out-Null }
+        foreach ($font in Get-ChildItem $nanumDir -Filter "NanumGothicCoding*.ttf") {
+            $installedPath = Join-Path $userFontsDir $font.Name
+            Copy-Item $font.FullName $installedPath -Force
+            New-ItemProperty $userFontsKey -Name "$($font.BaseName) (TrueType)" -Value $installedPath -Force | Out-Null
+        }
+        Write-Output "init.ps1 / installed NanumGothicCoding for the current user into $userFontsDir"
+    }
+}
+
 { pwsh ./dep_hangulize.ps1 } | Invoke-Block

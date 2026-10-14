@@ -12,14 +12,10 @@ $ErrorActionPreference = "Stop"
 $projectName = "documents"
 
 $livebook = Join-Path $ScriptDir "../../deps/polyglot/deps/spiral/apps/kino/spi/run_notebook.ps1"
-$notebook = Join-Path $ScriptDir "$projectName.livemd"
 $spi = Join-Path $ScriptDir "$projectName.spi"
-$ipynb = Join-Path $ScriptDir "$projectName.livemd.ipynb"
+$ipynb = Join-Path $ScriptDir "$projectName.spi.ipynb"
 if (!$fast -and !$SkipNotebook) {
-    { pwsh -NoProfile -File $livebook --path $notebook --spi-path $spi --output-path $ipynb } | Invoke-Block -Retries $($env:CI ? 3 : 1)
-}
-else {
-    { pwsh -NoProfile -File $livebook --path $notebook --spi-path $spi --export-only } | Invoke-Block
+    { pwsh -NoProfile -File $livebook --path $spi --output-path $ipynb } | Invoke-Block -Retries $($env:CI ? 3 : 1)
 }
 
 if (!(BuildSpiral "$projectName.spi" "$projectName.fsx" "alphabet/apps/documents" -Backend Fsharp)) {
@@ -55,7 +51,8 @@ Get-Content "$rustRunRoot.out", "$rustRunRoot.err" | Where-Object { $_ -match 'd
 $names = @(Get-ChildItem "$rustRunRoot/dist" -File | Sort-Object Name | ForEach-Object Name)
 Write-Output "alphabet/apps/documents/build.ps1 / run / exit code $($process.ExitCode) / $($names -join ', ')"
 $missing = foreach ($name in $rustSample.Keys) {
-    foreach ($expected in "$([IO.Path]::GetFileNameWithoutExtension($name)).hangul.md", "$name.html") {
+    $hangulName = "$([IO.Path]::GetFileNameWithoutExtension($name)).hangul.md"
+    foreach ($expected in $hangulName, "$name.html", "$hangulName.pdf") {
         if ($names -notcontains $expected) { $expected }
     }
 }
