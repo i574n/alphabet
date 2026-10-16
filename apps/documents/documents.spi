@@ -4,18 +4,23 @@ open sm'_operators
 open rust.rust_operators
 open rust
 
+test documents static =
+    open testing
+
 /// ## args
 inl get_args () =
     {
         source_dir = "source-dir", 's'
         dist_dir = "dist-dir", 'd'
         cache_dir = "cache-dir", 'c'
-        hangul_spec = "hangul-spec", 'h'
+        hangul_spec = "hangul-spec", 'H'
+        filter = "filter", 'f'
+        transcribe_only = "transcribe-only", 't'
     }
 
 /// ## get_command
 let get_command () =
-    ##"command"
+    ###"command"
     |> runtime.new_command
     |> runtime.command_init_arg (get_args () .source_dir) (
         runtime.arg_required true
@@ -27,7 +32,14 @@ let get_command () =
         runtime.arg_required true
     )
     |> runtime.command_init_arg (get_args () .hangul_spec) (
-        runtime.arg_required true
+        id
+    )
+    |> runtime.command_init_arg (get_args () .filter) (
+        id
+    )
+    |> runtime.command_init_arg (get_args () .transcribe_only) (
+        runtime.arg_default_value "false"
+        >> runtime.arg_action runtime.SetTrue
     )
 
 /// ## crowbook
@@ -36,46 +48,65 @@ let crowbook hangul { ext dist_dir dist_path output_path } =
         inl args =
             inl default ext =
                 $'$" rendering.num_depth 6"'
-                +. $'$" rendering.highlight.theme \\\\\\"Solarized (dark)\\\\\\""'
+                ++# $'$" rendering.highlight.theme \\\\\\"Solarized (dark)\\\\\\""'
             match ext with
             | "html" =>
                 $'$"--set"'
-                +. $'$" html.css.add \\\\\\"\'"'
-                +. $'$" body {{ color: #e8e6e3; background-color: #202324; }}"'
-                +. $'$" a {{ color: #989693; }}"'
-                +. $'$" pre {{ background-color: #1b1b1b; padding: 10px; }}"'
-                +. $'$" \'\\\\\\""'
-                +. default ext
+                ++# $'$" html.css.add \\\\\\"\'"'
+                ++# $'$" body {{ color: \#e8e6e3; background-color: \#202324; }}"'
+                ++# $'$" a {{ color: \#989693; }}"'
+                ++# $'$" pre {{ background-color: \#1b1b1b; padding: 10px; }}"'
+                ++# $'$" \'\\\\\\""'
+                ++# default ext
             | "pdf" =>
                 $'$"--set"'
-                +. $'$" tex.paper.size a4paper"'
-                +. $'$" tex.template.add \\\"\\\\pagenumbering{{gobble}}\\\""'
-                +. (
+                ++# $'$" tex.paper.size a4paper"'
+                ++# $'$" tex.command tectonic"'
+                ++# $'$" tex.template.add \\\"\\\\pagenumbering{{gobble}}\\\""'
+                ++# (
                     if hangul |> not
                     then ""
                     else
                         $'$" tex.template.add \\\"\\\\usepackage{{polyglossia}}\\\""'
-                        +. $'$" tex.template.add \\\"\\\\setmainlanguage{{korean}}\\\""'
-                        +. $'$" tex.template.add \\\"\\\\setmainfont{{NanumGothicCoding}}\\\""'
-                        +. $'$" tex.font.size 13"'
+                        ++# $'$" tex.template.add \\\"\\\\setmainlanguage{{korean}}\\\""'
+                        ++# $'$" tex.template.add \\\"\\\\setmainfont{{NanumGothicCoding}}\\\""'
+                        ++# $'$" tex.font.size 13"'
                 )
-                +. default ext
+                ++# default ext
             | "epub" =>
                 $'$"--set"'
-                +. $'$" epub.version 3"'
-                +. $'$" html.css.add \\\\\\"\' "'
-                +. $'$" body {{ color: #e8e6e3; background-color: #202324; }} "'
-                +. $'$" a {{ color: #989693; }} "'
-                +. $'$" \'\\\\\\""'
-                +. default ext
+                ++# $'$" epub.version 3"'
+                ++# $'$" html.css.add \\\\\\"\' "'
+                ++# $'$" body {{ color: \#e8e6e3; background-color: \#202324; }} "'
+                ++# $'$" a {{ color: \#989693; }} "'
+                ++# $'$" \'\\\\\\""'
+                ++# default ext
             | _ => ""
-        runtime.execution_options fun x => { x with
-            command =
-                $'$"crowbook --verbose --to {!ext}"'
-                +. $'$" --single \\\"{!dist_path}\\\" --output \\\"{!output_path}\\\" {!args}"'
-            working_directory = dist_dir |> Some |> optionm'.box
-        }
-        |> runtime.execute_with_options
+        inl exit_code, result =
+            runtime.execution_options fun x => { x with
+                command =
+                    $'$"crowbook --verbose --to {!ext}"'
+                    ++# $'$" --single \\\"{!dist_path}\\\" --output \\\"{!output_path}\\\" {!args}"'
+                working_directory = dist_dir |> Some |> optionm'.box
+            }
+            |> runtime.execute_with_options
+
+        if exit_code = 0
+        then exit_code, result
+        else
+            trace Warning
+                fun () => "documents.crowbook / attempt error"
+                fun () => { exit_code output_path result }
+            runtime.execution_options fun x => { x with
+                command =
+                    $'$"crowbook --verbose --to {!ext}"'
+                    ++# $'$" --single \\\"{!dist_path}\\\" --output \\\"{!output_path}\\\""'
+                    ++# (if ext = "pdf" then $'$" --set tex.command tectonic"' else "")
+                working_directory = dist_dir |> Some |> optionm'.box
+            }
+            |> runtime.execute_with_options
+
+
     if result |> sm'.contains "ERROR" |> not
     then (exit_code, result) |> Ok
     else
@@ -85,7 +116,7 @@ let crowbook hangul { ext dist_dir dist_path output_path } =
         (exit_code, result) |> Error
 
 /// ## hangul
-let hangul workspace_root hangul_spec { ext dist_dir dist_path output_path } =
+let hangul workspace_root hangul_spec transcribe_only { ext dist_dir dist_path output_path } =
     inl lines =
         dist_path
         |> file_system.read_all_text
@@ -94,10 +125,15 @@ let hangul workspace_root hangul_spec { ext dist_dir dist_path output_path } =
         |> am.map sm'.trim
     inl text =
         lines
-        |> am.filter ((<>.) "")
+        |> am.filter fun line => line <>. ""
         |> seq.of_array'
         |> sm'.concat "\n"
         |> fun x => $'$"{!x}\n\n"'
+    inl hangul_spec =
+        if (text |> sm'.contains " the ")
+            && (text |> sm'.contains " and ")
+        then "eng"
+        else hangul_spec
     inl exit_code, result =
         runtime.execution_options fun x => { x with
             command =
@@ -120,26 +156,42 @@ let hangul workspace_root hangul_spec { ext dist_dir dist_path output_path } =
             |> sm'.split "\n"
             |> fun x => a x : _ int _
         inl result_len = result |> am'.length
-        (("", (0, 0)), lines)
-        ||> am.fold fun (acc, (i, n)) x =>
-            if x = ""
-            then $'$"{!acc}\n"', (i + 1, n + 1)
+        (("", (0, 0), false), lines)
+        ||> am.fold fun (acc, (i, n), in_code_block) line =>
+            if line = ""
+            then acc ++# "\n", (i + 1, n + 1), in_code_block
             else
+                inl code_fence = line |> sm'.starts_with "```"
                 inl acc =
                     inl i = i - n
                     if i >= result_len
                     then acc
-                    else
-                        inl line = result |> am'.index i
+                    elif code_fence || in_code_block
+                    then
+                        inl result = acc ++# line
                         if i = result_len - 1
-                        then $'$"{!acc}{!line}"'
-                        else $'$"{!acc}{!line}\n"'
-                acc, (i + 1, n)
-        |> fst
+                        then result
+                        else result ++# "\n"
+                    else
+                        inl new_line = result |> am'.index i
+                        inl new_line =
+                            if new_line |> sm'.contains "://"
+                            then line
+                            else new_line
+                        inl result = acc ++# new_line
+                        inl result =
+                            if transcribe_only
+                            then result
+                            else result ++# "\n" ++# line
+                        if i = result_len - 1
+                        then result
+                        else result ++# "\n"
+                acc, (i + 1, n), (if code_fence then in_code_block |> not else in_code_block)
+        |> fun (acc, _, _) => acc
     result |> file_system.write_all_text output_path
     trace Info
         fun () => "documents.hangul"
-        fun () => { exit_code result_len = result |> sm'.length : int; output_path }
+        fun () => { exit_code result_len = ##result; output_path }
     (exit_code, result) |> Ok
     |> fun x => x : result (int * string) (int * string)
 
@@ -203,7 +255,7 @@ inl files_fn { dist_dir cache_dir } fn dist_path ext =
             output_path |> Ok |> resultm.box |> Some
 
 /// ## run
-let run { source_dir dist_dir cache_dir hangul_spec }
+let run { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
     : async.future_pin (
         resultm.result'
             (am'.vec (
@@ -220,47 +272,58 @@ let run { source_dir dist_dir cache_dir hangul_spec }
     inl cache_dir = cache_dir |> file_system.get_full_path
     trace Debug
         fun () => "documents.run"
-        fun () => { source_dir dist_dir cache_dir hangul_spec }
+        fun () => { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
     fun () =>
         inl files =
-            dist_dir
-            |> file_system.new_walk_dir
-            |> file_system.walk_dir_filter fun entry => async.new_future_move_send fun () =>
-                entry
-                |> file_system.dir_entry_file_type
-                |> async.await_send
-                |> resultm.map_error' sm'.format'
-                |> resultm.unbox
-                |> function
-                    | Ok file_type when file_type |> file_system.file_type_is_dir =>
-                        file_system.Ignore
-                    | _ =>
-                        inl path =
+            run_target function
+                | Rust => fun () =>
+                    inl filter, has_filter = match filter with Some filter => filter, true | None => "", false
+                    $'{ let mut out: Vec<Rc<str>> = Vec::new(); let mut stack = vec\![std::path::PathBuf::from(&*!dist_dir)]; while let Some(dir) = stack.pop() { if let Ok(entries) = std::fs::read_dir(&dir) { for entry in entries.flatten() { let path = entry.path(); if path.is_dir() { stack.push(path) } else { let s = path.display().to_string(); if s.ends_with(".md") && \!s.ends_with(".hangul.md") && (\!!has_filter || s.contains(&*!filter)) { out.push(Rc::from(s.as_str())) } } } } } out }' : am'.vec string
+                | _ => fun () =>
+                    dist_dir
+                    |> file_system.new_walk_dir
+                    |> file_system.walk_dir_filter fun entry => async.new_future_move_send fun () =>
+                        entry
+                        |> file_system.dir_entry_file_type
+                        |> async.await_send
+                        |> resultm.map_error' sm'.format'
+                        |> resultm.unbox
+                        |> function
+                            | Ok file_type when file_type |> file_system.file_type_is_dir =>
+                                file_system.Ignore
+                            | _ =>
+                                inl path =
+                                    entry
+                                    |> file_system.dir_entry_path
+                                    |> file_system.path_buf_display
+                                    |> sm'.format'
+                                    |> sm'.from_std_string
+                                if (path |> sm'.ends_with ".md" |> not)
+                                    || (
+                                        match filter with
+                                        | Some filter => path |> sm'.contains filter |> not
+                                        | None => false
+                                    )
+                                    || (path |> sm'.ends_with ".hangul.md")
+                                then file_system.Ignore
+                                else file_system.Continue
+                    |> async.stream_filter_map_futures fun (entry : _ _ file_system.async_walkdir_error) =>
+                        match entry |> resultm.map_error' sm'.format' |> resultm.unbox with
+                        | Ok entry =>
                             entry
                             |> file_system.dir_entry_path
                             |> file_system.path_buf_display
                             |> sm'.format'
                             |> sm'.from_std_string
-                        if (path |> sm'.ends_with ".md" |> not) || (path |> sm'.ends_with ".hangul.md")
-                        then file_system.Ignore
-                        else file_system.Continue
-            |> async.stream_filter_map_futures fun (entry : _ _ file_system.async_walkdir_error) =>
-                match entry |> resultm.map_error' sm'.format' |> resultm.unbox with
-                | Ok entry =>
-                    entry
-                    |> file_system.dir_entry_path
-                    |> file_system.path_buf_display
-                    |> sm'.format'
-                    |> sm'.from_std_string
-                    |> Some
-                | Error error =>
-                    trace Critical
-                        fun () => "documents.run / stream_filter_map"
-                        fun () => { error }
-                    None
-                |> optionm'.box
-            |> async.stream_collect_futures
-            |> async.await
+                            |> Some
+                        | Error error =>
+                            trace Critical
+                                fun () => "documents.run / stream_filter_map"
+                                fun () => { error }
+                            None
+                        |> optionm'.box
+                    |> async.stream_collect_futures
+                    |> async.await
         trace Debug
             fun () => "documents.run"
             fun () => { files_len = files |> am'.vec_len }
@@ -298,7 +361,7 @@ let run { source_dir dist_dir cache_dir hangul_spec }
             inl files =
                 inl files_fn = files_fn { dist_dir cache_dir }
                 inl files = [
-                    "hangul.md", dist_path, hangul workspace_root hangul_spec |> files_fn
+                    "hangul.md", dist_path, hangul workspace_root hangul_spec transcribe_only |> files_fn
                 ]
                 inl { output_path } = fix_paths { dist_path cache_dir ext = "hangul.md" }
                 inl files' = [
@@ -335,8 +398,8 @@ let run { source_dir dist_dir cache_dir hangul_spec }
                         trace Info
                             fun () =>
                                 "documents.run / par_map"
-                                +. " / origin_hash |> sm\'.contains local_git_hash |> not"
-                                +. " / Some hash2 when hash1 = hash2"
+                                ++# " / origin_hash |> sm\'.contains local_git_hash |> not"
+                                ++# " / Some hash2 when hash1 = hash2"
                             fun () => {
                                 file
                                 real_path
@@ -393,6 +456,197 @@ let run { source_dir dist_dir cache_dir hangul_spec }
         |> resultm.box
     |> async.new_future_move
 
+///> rust -d async-walkdir encoding_rs encoding_rs_io futures futures-lite rayon regex sha2
+test run =
+    inl workspace_root = file_system.get_workspace_root ()
+    inl source_dir = workspace_root </> "../alphabet/target/documents"
+    inl dist_dir = source_dir </> "dist"
+    inl cache_dir = source_dir </> "cache"
+    inl file_name_no_ext = "test"
+    inl file_name = join $'$"{!file_name_no_ext}.md"'
+
+    source_dir |> file_system.directory_delete true
+    dist_dir |> file_system.directory_delete true
+    cache_dir |> file_system.directory_delete true
+
+    source_dir |> file_system.create_dir |> ignore
+    dist_dir |> file_system.create_dir |> ignore
+    cache_dir |> file_system.create_dir |> ignore
+
+    inl text = "# a\n\n## b\n\n---\n\nabc\nabc\n\nabc\n\nhttp://abc.com\nabc\n"
+    text |> file_system.write_all_text (source_dir </> file_name)
+    text |> file_system.write_all_text (dist_dir </> file_name)
+
+    inl html_path = dist_dir </> $'$"{!file_name}.html"' |> file_system.absolute_path
+    inl pdf_path = dist_dir </> $'$"{!file_name}.pdf"' |> file_system.absolute_path
+    inl epub_path = dist_dir </> $'$"{!file_name}.epub"' |> file_system.absolute_path
+    inl hangul_path = dist_dir </> $'$"{!file_name_no_ext}.hangul.md"' |> file_system.absolute_path
+    inl hangul_html_path = dist_dir </> $'$"{!file_name_no_ext}.hangul.md.html"' |> file_system.absolute_path
+    inl hangul_pdf_path = dist_dir </> $'$"{!file_name_no_ext}.hangul.md.pdf"' |> file_system.absolute_path
+    inl hangul_epub_path = dist_dir </> $'$"{!file_name_no_ext}.hangul.md.epub"' |> file_system.absolute_path
+
+    run {
+        source_dir
+        dist_dir
+        cache_dir
+        hangul_spec = "por-br"
+        filter = None
+        transcribe_only = false
+    }
+    |> async.block_on_futures
+    |> resultm.unwrap'
+    |> sm'.format_debug'
+    |> sm'.from_std_string
+    |> _assert_eq (
+        ;[
+            Ok (
+                (dist_dir </> file_name |> file_system.absolute_path),
+                ;[
+                    hangul_path
+                    html_path
+                    pdf_path
+                    epub_path
+                    hangul_html_path
+                    hangul_pdf_path
+                    hangul_epub_path
+                ]
+                |> am'.to_vec |> am'.vec_map (Ok >> resultm.box >> Some >> optionm'.box)
+                |> fun x => x : _ (_ (_ _ sm'.std_string))
+            )
+        ]
+        |> am'.to_vec
+        |> am'.vec_map resultm.box
+        |> fun x => x : _ (_ _ sm'.std_string)
+        |> sm'.format_debug'
+        |> sm'.from_std_string
+    )
+
+    dist_dir |> file_system.directory_delete true
+    dist_dir |> file_system.create_dir |> ignore
+
+    text |> file_system.write_all_text (dist_dir </> file_name)
+
+    run {
+        source_dir = source_dir
+        dist_dir = dist_dir
+        cache_dir = cache_dir
+        hangul_spec = "por-br"
+        filter = None
+        transcribe_only = false
+    }
+    |> async.block_on_futures
+    |> resultm.unwrap'
+    |> sm'.format_debug'
+    |> sm'.from_std_string
+    |> _assert_eq (
+        ;[
+            Ok (
+                (dist_dir </> file_name |> file_system.absolute_path),
+                ;[]
+                |> am'.to_vec |> am'.vec_map ((optionm.map resultm.box) >> optionm'.box)
+            )
+        ]
+        |> am'.to_vec
+        |> am'.vec_map resultm.box
+        |> fun x =>
+            x : am'.vec (
+                resultm.result'
+                    (string * am'.vec (optionm'.option' (resultm.result' string string)))
+                    sm'.std_string
+            )
+        |> sm'.format_debug'
+        |> sm'.from_std_string
+    )
+
+    run {
+        source_dir = source_dir
+        dist_dir = dist_dir
+        cache_dir = cache_dir
+        hangul_spec = "por-br"
+        filter = None
+        transcribe_only = false
+    }
+    |> async.block_on_futures
+    |> resultm.unwrap'
+    |> sm'.format_debug'
+    |> sm'.from_std_string
+    |> _assert_eq (
+        ;[
+            Ok (
+                (dist_dir </> file_name |> file_system.absolute_path),
+                ;[ None; None; None; None; None; None; None ]
+                |> am'.to_vec |> am'.vec_map ((optionm.map resultm.box) >> optionm'.box)
+            )
+        ]
+        |> am'.to_vec
+        |> am'.vec_map resultm.box
+        |> fun x =>
+            x : am'.vec (
+                resultm.result'
+                    (string * am'.vec (optionm'.option' (resultm.result' string string)))
+                    sm'.std_string
+            )
+        |> sm'.format_debug'
+        |> sm'.from_std_string
+    )
+
+    hangul_path
+    |> file_system.read_all_text
+    |> _assert_eq (
+        "# 아"
+        ++\# "# a"
+        ++\# ""
+        ++\# "## 브"
+        ++\# "## b"
+        ++\# ""
+        ++\# "---"
+        ++\# "---"
+        ++\# ""
+        ++\# "아브크"
+        ++\# "abc"
+        ++\# "아브크"
+        ++\# "abc"
+        ++\# ""
+        ++\# "아브크"
+        ++\# "abc"
+        ++\# ""
+        ++\# "http://abc.com"
+        ++\# "http://abc.com"
+        ++\# "아브크"
+        ++\# "abc"
+        ++\# ""
+    )
+
+    html_path
+    |> file_system.read_all_text
+    |> sm'.contains "<p class = \"rule\">***</p>\n<p id = \"para-1\">abc abc</p>"
+    |> _assert_eq true
+
+    pdf_path
+    |> file_system.read_all_bytes
+    |> sm'.slice_contains "%PDF-1.5"
+    |> _assert_eq true
+
+    epub_path
+    |> file_system.read_all_bytes
+    |> sm'.slice_contains "application/epub+zip"
+    |> _assert_eq true
+
+    hangul_html_path
+    |> file_system.read_all_text
+    |> sm'.contains "<p class = \"rule\">***</p>\n<p id = \"para-1\">아브크 abc 아브크 abc</p>"
+    |> _assert_eq true
+
+    hangul_pdf_path
+    |> file_system.read_all_bytes
+    |> sm'.slice_contains "%PDF-1.5"
+    |> _assert_eq true
+
+    hangul_epub_path
+    |> file_system.read_all_bytes
+    |> sm'.slice_contains "application/epub+zip"
+    |> _assert_eq true
+
 /// ## tests
 inl tests () =
     testing.run_tests {
@@ -400,7 +654,7 @@ inl tests () =
     }
 
 /// ## main
-///! _
+///> _
 
 inl main (args : array_base string) =
     Info |> Some |> init_trace_state
@@ -431,10 +685,18 @@ inl main (args : array_base string) =
         arg_matches
         |> runtime.matches_get_one (get_args () .hangul_spec |> fst)
         |> optionm'.unbox
-        |> optionm.value
-        |> sm'.from_std_string
+        |> optionm.map sm'.from_std_string
+        |> optionm'.default_value "por-br"
+    inl filter =
+        arg_matches
+        |> runtime.matches_get_one (get_args () .filter |> fst)
+        |> optionm'.unbox
+        |> optionm.map sm'.from_std_string
+    inl transcribe_only =
+        arg_matches
+        |> runtime.matches_get_flag (get_args () .transcribe_only |> fst)
     inl result =
-        run { source_dir dist_dir cache_dir hangul_spec }
+        run { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
         |> async.block_on_futures
         |> resultm.unbox
     match result with
@@ -449,5 +711,14 @@ inl main (args : array_base string) =
             fun () => { error }
         1i32
 inl main () =
-    $'let tests () = !tests ()' : ()
-    $'let main args = !main args' : ()
+    backend_switch {
+        Fsharp = fun () =>
+            $'let tests () = !tests ()' : ()
+            $'let main args = !main args' : ()
+        Rust = fun () =>
+            inl args =
+                $'Rc::new(RefCell::new(std::env::args().skip(1).map(|x| Rc::<str>::from(x)).collect::<Vec<Rc<str>>>()))'
+                : array_base string
+            inl exit_code = main args
+            $'if !exit_code \!= 0 { std::process::exit(!exit_code) }' : ()
+    } : ()

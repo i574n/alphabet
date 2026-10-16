@@ -13,6 +13,7 @@
 - [Getting Started](#getting-started)
   - [Installation](#installation)
   - [Usage](#usage)
+- [Links](#links)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -41,12 +42,11 @@ Clone the repository:
 git clone https://github.com/i574n/alphabet.git
 ```
 
-Navigate to the directory, initialize dependencies then build the project:
+Navigate to the directory, initialize dependencies and build the project:
 
 ```powershell
 cd alphabet
-pwsh scripts/init.ps1
-pwsh scripts/build.ps1
+pwsh scripts/workflow.ps1
 ```
 
 ### Usage
@@ -69,6 +69,40 @@ Output:
 봉쥬르
 ```
 
+## Links
+
+<table>
+
+<tr>
+<td>
+
+Documentation
+
+</td>
+<td>
+
+- Repository file tree (HTML)  
+<https://i574n.github.io/alphabet>
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+Documents Sample
+
+</td>
+<td>
+
+- Documents notebook  
+<https://i574n.github.io/alphabet/apps/documents/documents.spi.html>
+
+</td>
+</tr>
+
+</table>
+
 ## Contributing
 
 Contributions are welcome! Please see the [CONTRIBUTING.md](https://github.com/i574n/.github/blob/main/CONTRIBUTING.md) for guidelines.
@@ -78,7 +112,3 @@ Contributions are welcome! Please see the [CONTRIBUTING.md](https://github.com/i
 This project is licensed under the AGPLv3 License. See the [LICENSE](https://github.com/i574n/alphabet/blob/main/LICENSE) file for details.
 
 Built with ❤️ for linguists, developers, and anyone passionate about languages.
-
----
-
-[![Star History Chart](https://api.star-history.com/svg?repos=i574n/alphabet&type=Timeline)]
