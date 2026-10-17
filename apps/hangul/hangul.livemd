@@ -4,10 +4,10 @@
 
 ## Tests
 
-<!-- livebook:{"chunks":null,"kind":"Elixir.Spiral.Kino.SmartCell","attrs":{"timeout":300,"source":"///- --test static --package ../alphabet/apps/hangul\n\nopen testing","print_code":false},"livebook_object":"smart_cell"} -->
+<!-- livebook:{"chunks":null,"kind":"Elixir.Spiral.Cells.SmartCell","attrs":{"timeout":300,"source":"///- --test static --package ../alphabet/apps/hangul\n\nopen testing","print_code":false},"livebook_object":"smart_cell"} -->
 
 ```elixir
-Spiral.Kino.eval!(
+Spiral.Cells.eval!(
   ~S"""
   ///- --test static --package ../alphabet/apps/hangul
 
@@ -49,10 +49,10 @@ let AssertIsFalse (condition: bool) =
 //     |> Map.ofArray
 ```
 
-<!-- livebook:{"chunks":null,"kind":"Elixir.Spiral.Kino.SmartCell","attrs":{"timeout":300,"source":"///- --test\n\nhanja.hanja_to_hangul_table ()\n|> fun x => a x : a int _\n|> am'.length\n|> console.write_line","print_code":false},"livebook_object":"smart_cell"} -->
+<!-- livebook:{"chunks":null,"kind":"Elixir.Spiral.Cells.SmartCell","attrs":{"timeout":300,"source":"///- --test\n\nhanja.hanja_to_hangul_table ()\n|> fun x => a x : a int _\n|> am'.length\n|> console.write_line","print_code":false},"livebook_object":"smart_cell"} -->
 
 ```elixir
-Spiral.Kino.eval!(
+Spiral.Cells.eval!(
   ~S"""
   ///- --test
 
@@ -84,10 +84,10 @@ let hanjaConvert (s: string) =
 AssertAreEqual("국어", hanjaConvert "國語")
 ```
 
-<!-- livebook:{"chunks":null,"kind":"Elixir.Spiral.Kino.SmartCell","attrs":{"timeout":300,"source":"inl hanja_convert (s : string) =\n    \"\"","print_code":false},"livebook_object":"smart_cell"} -->
+<!-- livebook:{"chunks":null,"kind":"Elixir.Spiral.Cells.SmartCell","attrs":{"timeout":300,"source":"inl hanja_convert (s : string) =\n    \"\"","print_code":false},"livebook_object":"smart_cell"} -->
 
 ```elixir
-Spiral.Kino.eval!(
+Spiral.Cells.eval!(
   ~S"""
   inl hanja_convert (s : string) =
       ""
@@ -96,10 +96,10 @@ Spiral.Kino.eval!(
 )
 ```
 
-<!-- livebook:{"chunks":null,"kind":"Elixir.Spiral.Kino.SmartCell","attrs":{"timeout":300,"source":"///- --test\n\n\"國語\"\n|> hanja_convert\n|> _assert_eq \"\"","print_code":false},"livebook_object":"smart_cell"} -->
+<!-- livebook:{"chunks":null,"kind":"Elixir.Spiral.Cells.SmartCell","attrs":{"timeout":300,"source":"///- --test\n\n\"國語\"\n|> hanja_convert\n|> _assert_eq \"\"","print_code":false},"livebook_object":"smart_cell"} -->
 
 ```elixir
-Spiral.Kino.eval!(
+Spiral.Cells.eval!(
   ~S"""
   ///- --test
 
