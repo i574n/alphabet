@@ -473,7 +473,22 @@ test run =
     dist_dir |> file_system.create_dir |> ignore
     cache_dir |> file_system.create_dir |> ignore
 
-    inl text = "# a\n\n## b\n\n---\n\nabc\nabc\n\nabc\n\nhttp://abc.com\nabc\n"
+    inl text = """
+        # a
+
+        ## b
+
+        ---
+
+        abc
+        abc
+
+        abc
+
+        http://abc.com
+        abc
+
+        """
     text |> file_system.write_all_text (source_dir </> file_name)
     text |> file_system.write_all_text (dist_dir </> file_name)
 

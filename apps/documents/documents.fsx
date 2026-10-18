@@ -11,9 +11,7 @@ type System_IO_FileInfo = System.IO.FileInfo
 
 type std_path_PathBuf = string
 type std_io_Error = string
-type std_ffi_OsString = class end
 type std_path_Display = string
-type regex_Regex = class end
 type std_borrow_Cow<'T> = class end
 type async_walkdir_WalkDir = class end
 type async_walkdir_DirEntry = class end
