@@ -27,7 +27,7 @@ $targetDir = GetTargetDir $projectName
 if (!(BuildSpiral "$ScriptDir/$projectName.spi" "$ScriptDir/$projectName.rs" "alphabet/apps/documents")) {
     throw "RUST-FAILED alphabet/apps/documents / compile"
 }
-{ cargo +nightly-2025-11-01 build --release } | Invoke-Block
+{ cargo +nightly-2026-10-18 build --release } | Invoke-Block
 $rustRunRoot = Join-Path ([IO.Path]::GetTempPath()) "alphabet-documents-run-$PID"
 Remove-Item $rustRunRoot -Recurse -Force -ErrorAction Ignore
 $rustSample = [ordered]@{
