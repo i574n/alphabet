@@ -49,7 +49,7 @@ let AssertIsFalse (condition: bool) =
 //     |> Map.ofArray
 ```
 
-<!-- livebook:{"chunks":null,"kind":"Elixir.Spiral.Cells.SmartCell","attrs":{"timeout":300,"source":"///- --test\n\nhanja.hanja_to_hangul_table ()\n|> fun x => a x : a int _\n|> am'.length\n|> console.write_line","print_code":false},"livebook_object":"smart_cell"} -->
+<!-- livebook:{"chunks":null,"kind":"Elixir.Spiral.Cells.SmartCell","attrs":{"timeout":300,"source":"///- --test\n\nhanja.hanja_to_hangul_table ()\n|> fun x => array x : array _\n|> am'.length\n|> console.write_line","print_code":false},"livebook_object":"smart_cell"} -->
 
 ```elixir
 Spiral.Cells.eval!(
@@ -57,7 +57,7 @@ Spiral.Cells.eval!(
   ///- --test
 
   hanja.hanja_to_hangul_table ()
-  |> fun x => a x : a int _
+  |> fun x => array x : array _
   |> am'.length
   |> console.write_line
   """,

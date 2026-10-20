@@ -121,11 +121,11 @@ let hangul workspace_root hangul_spec transcribe_only { ext dist_dir dist_path o
         dist_path
         |> file_system.read_all_text
         |> sm'.split "\n"
-        |> fun x => a x : _ int _
-        |> am.map sm'.trim
+        |> fun x => array x : array _
+        |> arraym.map sm'.trim
     inl text =
         lines
-        |> am.filter fun line => line <>. ""
+        |> arraym.filter fun line => line <>. ""
         |> seq.of_array'
         |> sm'.concat "\n"
         |> fun x => $'$"{!x}\n\n"'
@@ -154,10 +154,10 @@ let hangul workspace_root hangul_spec transcribe_only { ext dist_dir dist_path o
         inl result =
             result
             |> sm'.split "\n"
-            |> fun x => a x : _ int _
+            |> fun x => array x : array _
         inl result_len = result |> am'.length
         (("", (0, 0), false), lines)
-        ||> am.fold fun (acc, (i, n), in_code_block) line =>
+        ||> arraym.fold fun (acc, (i, n), in_code_block) line =>
             if line = ""
             then acc ++# "\n", (i + 1, n + 1), in_code_block
             else
@@ -513,7 +513,7 @@ test run =
     |> sm'.format_debug'
     |> sm'.from_std_string
     |> _assert_eq (
-        ;[
+        am'.base ;[
             Ok (
                 (dist_dir </> file_name |> file_system.absolute_path),
                 ;[
@@ -554,7 +554,7 @@ test run =
     |> sm'.format_debug'
     |> sm'.from_std_string
     |> _assert_eq (
-        ;[
+        am'.base ;[
             Ok (
                 (dist_dir </> file_name |> file_system.absolute_path),
                 ;[]
@@ -586,10 +586,10 @@ test run =
     |> sm'.format_debug'
     |> sm'.from_std_string
     |> _assert_eq (
-        ;[
+        am'.base ;[
             Ok (
                 (dist_dir </> file_name |> file_system.absolute_path),
-                ;[ None; None; None; None; None; None; None ]
+                am'.base ;[ None; None; None; None; None; None; None ]
                 |> am'.to_vec |> am'.vec_map ((optionm.map resultm.box) >> optionm'.box)
             )
         ]

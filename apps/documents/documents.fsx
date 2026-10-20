@@ -1,5 +1,3 @@
-thread_local! { static SPIRAL_TEST: std::cell::RefCell<Option<&'static str>> = const { std::cell::RefCell::new(None) }; }
-#[test] fn verify_app() { std::thread::Builder::new().stack_size(1 << 30).spawn(|| { SPIRAL_TEST.with(|t| *t.borrow_mut() = Some("verify_app")); spiral_main() }).unwrap().join().unwrap(); }
 type Ref<'T> = 'T
 type clap_Command = class end
 type clap_Arg = class end
@@ -13,9 +11,7 @@ type System_IO_FileInfo = System.IO.FileInfo
 
 type std_path_PathBuf = string
 type std_io_Error = string
-type std_ffi_OsString = class end
 type std_path_Display = string
-type regex_Regex = class end
 type std_borrow_Cow<'T> = class end
 type async_walkdir_WalkDir = class end
 type async_walkdir_DirEntry = class end
@@ -52,6 +48,14 @@ type Slice'<'T> = class end
 type Lifetime<'T, 'U> = class end
 type StaticLifetime = class end
 type Str = string
+let spiralStringIndex (s : string) (i : int) : char = char (System.Text.Encoding.UTF8.GetBytes(s).[i])
+let spiralStringSlice (s : string) (from : int) (upto : int) : string =
+    let bytes = System.Text.Encoding.UTF8.GetBytes(s)
+    let length = bytes.Length
+    if from < 0 || from > length || upto < from - 1 || upto >= length then exit 3
+    elif upto < from then ""
+    elif (bytes.[from] &&& 0xC0uy) = 0x80uy || (upto + 1 < length && (bytes.[upto + 1] &&& 0xC0uy) = 0x80uy) then exit 3
+    else System.Text.Encoding.UTF8.GetString(bytes, from, upto - from + 1)
 type Dyn<'T> = class end
 type std_future_Future<'T> = class end
 type std_sync_mpsc_Receiver<'T> = class end
@@ -84,150 +88,142 @@ and [<Struct>] US3 =
     | US3_None
 and Mut5 = {mutable l0 : int32; mutable l1 : US1}
 and [<Struct>] US4 =
-    | US4_Ok of f0_0 : int64
-    | US4_Error of f1_0 : exn
+    | US4_Some of f0_0 : Mut0 * f0_1 : Mut1 * f0_2 : Mut2 * f0_3 : Mut3 * f0_4 : Mut4 * f0_5 : int64 option
+    | US4_None
+and Mut6 = {mutable l0 : uint64}
 and [<Struct>] US5 =
-    | US5_Some of f0_0 : int64
+    | US5_Some of f0_0 : std_string_String
     | US5_None
 and [<Struct>] US6 =
-    | US6_Ok of f0_0 : int64
-    | US6_Error of f1_0 : exn
+    | US6_Ok of f0_0 : std_path_PathBuf
+    | US6_Error of f1_0 : std_io_Error
 and [<Struct>] US7 =
-    | US7_Some of f0_0 : Mut0 * f0_1 : Mut1 * f0_2 : Mut2 * f0_3 : Mut3 * f0_4 : Mut4 * f0_5 : int64 option
-    | US7_None
+    | US7_Ok of f0_0 : std_path_PathBuf
+    | US7_Error of f1_0 : string
 and [<Struct>] US8 =
-    | US8_Some of f0_0 : std_string_String
-    | US8_None
+    | US8_Ok of f0_0 : string
+    | US8_Error of f1_0 : exn
 and [<Struct>] US9 =
-    | US9_Ok of f0_0 : std_path_PathBuf
-    | US9_Error of f1_0 : std_io_Error
+    | US9_Some of f0_0 : std_path_PathBuf
+    | US9_None
 and [<Struct>] US10 =
-    | US10_Ok of f0_0 : std_path_PathBuf
-    | US10_Error of f1_0 : string
+    | US10_File
+    | US10_Directory
 and [<Struct>] US11 =
     | US11_Ok of f0_0 : string
-    | US11_Error of f1_0 : exn
+    | US11_Error of f1_0 : string
 and [<Struct>] US12 =
-    | US12_Some of f0_0 : std_path_PathBuf
-    | US12_None
+    | US12_Ok of f0_0 : std_fs_FileType
+    | US12_Error of f1_0 : std_io_Error
 and [<Struct>] US13 =
-    | US13_File
-    | US13_Directory
+    | US13_Ok of f0_0 : std_fs_FileType
+    | US13_Error of f1_0 : std_string_String
 and [<Struct>] US14 =
-    | US14_Ok of f0_0 : string
-    | US14_Error of f1_0 : string
+    | US14_Ignore
+    | US14_IgnoreDir
+    | US14_Continue
 and [<Struct>] US15 =
-    | US15_Ok of f0_0 : std_fs_FileType
-    | US15_Error of f1_0 : std_io_Error
+    | US15_Ok of f0_0 : async_walkdir_DirEntry
+    | US15_Error of f1_0 : async_walkdir_Error
 and [<Struct>] US16 =
-    | US16_Ok of f0_0 : std_fs_FileType
+    | US16_Ok of f0_0 : async_walkdir_DirEntry
     | US16_Error of f1_0 : std_string_String
 and [<Struct>] US17 =
-    | US17_Ignore
-    | US17_IgnoreDir
-    | US17_Continue
+    | US17_Ok of f0_0 : string * f0_1 : US3
+    | US17_Error of f1_0 : string
 and [<Struct>] US18 =
-    | US18_Ok of f0_0 : async_walkdir_DirEntry
-    | US18_Error of f1_0 : async_walkdir_Error
+    | US18_Ok of f0_0 : char * f0_1 : int32 * f0_2 : int32 * f0_3 : int32 * f0_4 : int32 * f0_5 : int32
+    | US18_Error of f1_0 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) * f1_1 : int32 * f1_2 : int32 * f1_3 : int32 * f1_4 : int32 * f1_5 : int32
 and [<Struct>] US19 =
-    | US19_Ok of f0_0 : async_walkdir_DirEntry
-    | US19_Error of f1_0 : std_string_String
+    | US19_Ok of f0_0 : string * f0_1 : int32 * f0_2 : int32 * f0_3 : int32 * f0_4 : int32 * f0_5 : int32
+    | US19_Error of f1_0 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) * f1_1 : int32 * f1_2 : int32 * f1_3 : int32 * f1_4 : int32 * f1_5 : int32
 and [<Struct>] US20 =
-    | US20_Ok of f0_0 : string * f0_1 : US3
-    | US20_Error of f1_0 : string
-and [<Struct>] US21 =
-    | US21_Ok of f0_0 : char * f0_1 : int32 * f0_2 : int32 * f0_3 : int32 * f0_4 : int32 * f0_5 : int32
-    | US21_Error of f1_0 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) * f1_1 : int32 * f1_2 : int32 * f1_3 : int32 * f1_4 : int32 * f1_5 : int32
+    | US20_Ok of f0_0 : int32 * f0_1 : int32 * f0_2 : int32 * f0_3 : int32 * f0_4 : int32
+    | US20_Error of f1_0 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) * f1_1 : int32 * f1_2 : int32 * f1_3 : int32 * f1_4 : int32 * f1_5 : int32
 and [<Struct>] US22 =
-    | US22_Ok of f0_0 : string * f0_1 : int32 * f0_2 : int32 * f0_3 : int32 * f0_4 : int32 * f0_5 : int32
-    | US22_Error of f1_0 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) * f1_1 : int32 * f1_2 : int32 * f1_3 : int32 * f1_4 : int32 * f1_5 : int32
+    | US22_Some of f0_0 : (unit -> string)
+    | US22_None
+and [<Struct>] US21 =
+    | US21_Ok of f0_0 : (unit -> string) * f0_1 : (unit -> US22) * f0_2 : int32 * f0_3 : int32 * f0_4 : int32 * f0_5 : int32 * f0_6 : int32
+    | US21_Error of f1_0 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) * f1_1 : int32 * f1_2 : int32 * f1_3 : int32 * f1_4 : int32 * f1_5 : int32
 and [<Struct>] US23 =
-    | US23_Ok of f0_0 : int32 * f0_1 : int32 * f0_2 : int32 * f0_3 : int32 * f0_4 : int32
+    | US23_Ok of f0_0 : US22 * f0_1 : int32 * f0_2 : int32 * f0_3 : int32 * f0_4 : int32 * f0_5 : int32
     | US23_Error of f1_0 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) * f1_1 : int32 * f1_2 : int32 * f1_3 : int32 * f1_4 : int32 * f1_5 : int32
-and [<Struct>] US25 =
-    | US25_Some of f0_0 : (unit -> string)
-    | US25_None
 and [<Struct>] US24 =
-    | US24_Ok of f0_0 : (unit -> string) * f0_1 : (unit -> US25) * f0_2 : int32 * f0_3 : int32 * f0_4 : int32 * f0_5 : int32 * f0_6 : int32
-    | US24_Error of f1_0 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) * f1_1 : int32 * f1_2 : int32 * f1_3 : int32 * f1_4 : int32 * f1_5 : int32
+    | US24_Ok of f0_0 : (unit -> string) * f0_1 : (unit -> US22) * f0_2 : string * f0_3 : int32 * f0_4 : int32 * f0_5 : int32 * f0_6 : int32
+    | US24_Error of f1_0 : (unit -> string)
+and [<Struct>] US25 =
+    | US25_Ok of f0_0 : string * f0_1 : US3
+    | US25_Error of f1_0 : (unit -> string)
 and [<Struct>] US26 =
-    | US26_Ok of f0_0 : US25 * f0_1 : int32 * f0_2 : int32 * f0_3 : int32 * f0_4 : int32 * f0_5 : int32
-    | US26_Error of f1_0 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) * f1_1 : int32 * f1_2 : int32 * f1_3 : int32 * f1_4 : int32 * f1_5 : int32
-and [<Struct>] US27 =
-    | US27_Ok of f0_0 : (unit -> string) * f0_1 : (unit -> US25) * f0_2 : string * f0_3 : int32 * f0_4 : int32 * f0_5 : int32 * f0_6 : int32
-    | US27_Error of f1_0 : (unit -> string)
-and [<Struct>] US28 =
-    | US28_Ok of f0_0 : string * f0_1 : US3
-    | US28_Error of f1_0 : (unit -> string)
-and [<Struct>] US29 =
-    | US29_Ok of f0_0 : (string [])
-    | US29_Error of f1_0 : string
+    | US26_Ok of f0_0 : (string [])
+    | US26_Error of f1_0 : string
 and UH0 =
     | UH0_Nil
     | UH0_Cons of string * UH0
+and [<Struct>] US27 =
+    | US27_Ok of f0_0 : UH0 * f0_1 : int32 * f0_2 : int32 * f0_3 : int32 * f0_4 : int32 * f0_5 : int32
+    | US27_Error of f1_0 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) * f1_1 : int32 * f1_2 : int32 * f1_3 : int32 * f1_4 : int32 * f1_5 : int32
+and [<Struct>] US28 =
+    | US28_Ok of f0_0 : UH0 * f0_1 : string * f0_2 : int32 * f0_3 : int32 * f0_4 : int32 * f0_5 : int32
+    | US28_Error of f1_0 : (unit -> string)
+and [<Struct>] US29 =
+    | US29_Ok of f0_0 : (string [])
+    | US29_Error of f1_0 : (unit -> string)
 and [<Struct>] US30 =
-    | US30_Ok of f0_0 : UH0 * f0_1 : int32 * f0_2 : int32 * f0_3 : int32 * f0_4 : int32 * f0_5 : int32
-    | US30_Error of f1_0 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) * f1_1 : int32 * f1_2 : int32 * f1_3 : int32 * f1_4 : int32 * f1_5 : int32
+    | US30_Ok of f0_0 : std_sync_Arc<std_sync_Mutex<std_process_Child option>>
+    | US30_Error of f1_0 : std_string_String
 and [<Struct>] US31 =
-    | US31_Ok of f0_0 : UH0 * f0_1 : string * f0_2 : int32 * f0_3 : int32 * f0_4 : int32 * f0_5 : int32
-    | US31_Error of f1_0 : (unit -> string)
+    | US31_Some of f0_0 : std_sync_Arc<std_sync_Mutex<std_sync_Arc<std_sync_mpsc_Receiver<std_string_String>>>>
+    | US31_None
 and [<Struct>] US32 =
-    | US32_Ok of f0_0 : (string [])
-    | US32_Error of f1_0 : (unit -> string)
+    | US32_Ok of f0_0 : std_string_String
+    | US32_Error of f1_0 : std_string_String
 and [<Struct>] US33 =
-    | US33_Ok of f0_0 : std_sync_Arc<std_sync_Mutex<std_process_Child option>>
-    | US33_Error of f1_0 : std_string_String
+    | US33_Some of f0_0 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit)
+    | US33_None
 and [<Struct>] US34 =
-    | US34_Some of f0_0 : std_sync_Arc<std_sync_Mutex<std_sync_Arc<std_sync_mpsc_Receiver<std_string_String>>>>
+    | US34_Some of f0_0 : std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>>
     | US34_None
 and [<Struct>] US35 =
-    | US35_Ok of f0_0 : std_string_String
+    | US35_Ok of f0_0 : std_process_Output
     | US35_Error of f1_0 : std_string_String
 and [<Struct>] US36 =
-    | US36_Some of f0_0 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit)
+    | US36_Some of f0_0 : int32
     | US36_None
 and [<Struct>] US37 =
-    | US37_Some of f0_0 : std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>>
+    | US37_Some of f0_0 : US3
     | US37_None
 and [<Struct>] US38 =
-    | US38_Ok of f0_0 : std_process_Output
-    | US38_Error of f1_0 : std_string_String
-and [<Struct>] US39 =
-    | US39_Some of f0_0 : int32
-    | US39_None
-and [<Struct>] US40 =
-    | US40_Some of f0_0 : US3
-    | US40_None
-and [<Struct>] US41 =
-    | US41_Some of f0_0 : Result<string, (string * string)>
-    | US41_None
+    | US38_Some of f0_0 : Result<string, (string * string)>
+    | US38_None
 and UH2 =
     | UH2_Nil
-    | UH2_Cons of string * string * (string -> (string -> US41)) * UH2
+    | UH2_Cons of string * string * (string -> (string -> US38)) * UH2
 and UH1 =
     | UH1_Nil
     | UH1_Cons of UH2 * UH1
+and [<Struct>] US39 =
+    | US39_Ok of f0_0 : unativeint
+    | US39_Error of f1_0 : exn
+and [<Struct>] US40 =
+    | US40_Some of f0_0 : unativeint
+    | US40_None
+and [<Struct>] US41 =
+    | US41_Ok of f0_0 : string
+    | US41_Error of f1_0 : std_io_Error
 and [<Struct>] US42 =
-    | US42_Ok of f0_0 : unativeint
-    | US42_Error of f1_0 : exn
+    | US42_Ok of f0_0 : string
+    | US42_Error of f1_0 : std_string_String
 and [<Struct>] US43 =
-    | US43_Some of f0_0 : unativeint
-    | US43_None
+    | US43_Ok of f0_0 : int32 * f0_1 : string
+    | US43_Error of f1_0 : int32 * f1_1 : string
+and Mut7 = {mutable l0 : int32}
+and Mut8 = {mutable l0 : int32; mutable l1 : int32}
+and Mut9 = {mutable l0 : int32; mutable l1 : string; mutable l2 : int32; mutable l3 : int32; mutable l4 : bool}
 and [<Struct>] US44 =
-    | US44_Ok of f0_0 : string
-    | US44_Error of f1_0 : std_io_Error
-and [<Struct>] US45 =
-    | US45_Ok of f0_0 : string
-    | US45_Error of f1_0 : std_string_String
-and [<Struct>] US46 =
-    | US46_Ok of f0_0 : int32 * f0_1 : string
-    | US46_Error of f1_0 : int32 * f1_1 : string
-and Mut6 = {mutable l0 : int32}
-and Mut7 = {mutable l0 : int32; mutable l1 : int32}
-and Mut8 = {mutable l0 : int32; mutable l1 : string; mutable l2 : int32; mutable l3 : int32}
-and [<Struct>] US47 =
-    | US47_Ok of f0_0 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>
-    | US47_Error of f1_0 : std_string_String
+    | US44_Ok of f0_0 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>
+    | US44_Error of f1_0 : std_string_String
 let rec get_command_0 () : clap_Command =
     let v0 : string = "command"
     let v1 : string = "r#\"" + v0 + "\"#"
@@ -359,36 +355,6 @@ and method5 (v0 : int32, v1 : Mut5) : bool =
     let v2 : int32 = v1.l0
     let v3 : bool = v2 < v0
     v3
-and closure3 (v0 : float) () : int64 =
-    let v1 : int64 = v0 |> int64 
-    v1
-and ok_c4 () (v0 : int64) : US4 =
-    US4_Ok(v0)
-and closure5 () (v0 : (unit -> exn)) : exn =
-    v0 ()
-and error_c6 () (v0 : exn) : US4 =
-    US4_Error(v0)
-and method6 (v0 : float) : US4 =
-    let v1 : (unit -> int64) = closure3(v0)
-    let v2 : (int64 -> US4) = ok_c4()
-    let v3 : ((unit -> exn) -> exn) = closure5()
-    let v4 : (exn -> US4) = error_c6()
-    let v5 : US4 = try v1 () |> v2 with ex -> (fun () -> ex) |> v3 |> v4 
-    v5
-and closure7 (v0 : int64) () : int64 =
-    let v1 : int64 = v0 |> int64 
-    v1
-and ok_c8 () (v0 : int64) : US6 =
-    US6_Ok(v0)
-and error_c9 () (v0 : exn) : US6 =
-    US6_Error(v0)
-and method7 (v0 : int64) : US6 =
-    let v1 : (unit -> int64) = closure7(v0)
-    let v2 : (int64 -> US6) = ok_c8()
-    let v3 : ((unit -> exn) -> exn) = closure5()
-    let v4 : (exn -> US6) = error_c9()
-    let v5 : US6 = try v1 () |> v2 with ex -> (fun () -> ex) |> v3 |> v4 
-    v5
 and method2 () : struct (US1 * US2) =
     let v0 : string = "TRACE_LEVEL"
     let v1 : string = get_environment_variable_3(v0)
@@ -464,52 +430,20 @@ and method2 () : struct (US1 * US2) =
     let v61 : string = get_environment_variable_3(v60)
     let v62 : string = "True"
     let v63 : bool = v61 <> v62 
-    let v96 : US2 =
+    let v68 : US2 =
         if v63 then
             US2_None
         else
             let v65 : System.DateTime = System.DateTime.Now
-            let v66 : System.DateTime = System.DateTime.MinValue
-            let v67 : System.TimeSpan = v65 - v66 
-            let v68 : (System.TimeSpan -> int64) = _.Ticks
-            let v69 : int64 = v68 v67
-            let v70 : int64 = v69 / 10000000L
-            let v71 : float = float v70
-            let v72 : float = 10000000.0 * v71
-            let v73 : US4 = method6(v72)
-            let v79 : US5 =
-                match v73 with
-                | US4_Error(v76) -> (* Error *)
-                    US5_None
-                | US4_Ok(v74) -> (* Ok *)
-                    US5_Some(v74)
-            let v83 : int64 =
-                match v79 with
-                | US5_None -> (* None *)
-                    failwith<int64> "Option does not have a value."
-                | US5_Some(v80) -> (* Some *)
-                    v80
-            let v84 : US6 = method7(v83)
-            let v90 : US2 =
-                match v84 with
-                | US6_Error(v87) -> (* Error *)
-                    US2_None
-                | US6_Ok(v85) -> (* Ok *)
-                    US2_Some(v85)
-            let v94 : int64 =
-                match v90 with
-                | US2_None -> (* None *)
-                    failwith<int64> "Option does not have a value."
-                | US2_Some(v91) -> (* Some *)
-                    v91
-            US2_Some(v94)
-    struct (v59, v96)
-and closure10 () (v0 : string) : unit =
+            let v66 : int64 = (v65.Ticks - 621355968000000000L) / 10L
+            US2_Some(v66)
+    struct (v59, v68)
+and closure3 () (v0 : string) : unit =
     ()
 and new_trace_state_1 (v0 : US0) : struct (Mut0 * Mut1 * Mut2 * Mut3 * Mut4 * int64 option) =
     let struct (v1 : US1, v2 : US2) = method2()
     let v3 : Mut0 = {l0 = 1L} : Mut0
-    let v4 : (string -> unit) = closure10()
+    let v4 : (string -> unit) = closure3()
     let v5 : Mut1 = {l0 = v4} : Mut1
     let v6 : Mut2 = {l0 = true} : Mut2
     let v7 : string = ""
@@ -530,96 +464,64 @@ and new_trace_state_1 (v0 : US0) : struct (Mut0 * Mut1 * Mut2 * Mut3 * Mut4 * in
             let v14 : int64 option = Some v13 
             v14
     struct (v3, v5, v6, v8, v12, v17)
-and closure11 () (v0 : int64) : US2 =
+and closure4 () (v0 : int64) : US2 =
     US2_Some(v0)
-and method9 () : (int64 -> US2) =
-    closure11()
-and method10 () : string =
+and method7 () : (int64 -> US2) =
+    closure4()
+and method8 () : string =
     let v0 : string = "HH:mm:ss"
     v0
-and method8 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option) : string =
-    let v6 : (int64 -> US2) = method9()
+and method6 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option) : string =
+    let v6 : (int64 -> US2) = method7()
     let v7 : US2 option = v5 |> Option.map v6 
     let v8 : US2 = US2_None
     let v9 : US2 = v7 |> Option.defaultValue v8 
-    let v54 : System.DateTime =
+    let v26 : System.DateTime =
         match v9 with
         | US2_None -> (* None *)
-            let v52 : System.DateTime = System.DateTime.Now
-            v52
+            let v24 : System.DateTime = System.DateTime.Now
+            v24
         | US2_Some(v10) -> (* Some *)
             let v11 : System.DateTime = System.DateTime.Now
-            let v12 : System.DateTime = System.DateTime.MinValue
-            let v13 : System.TimeSpan = v11 - v12 
-            let v14 : (System.TimeSpan -> int64) = _.Ticks
-            let v15 : int64 = v14 v13
-            let v16 : int64 = v15 / 10000000L
-            let v17 : float = float v16
-            let v18 : float = 10000000.0 * v17
-            let v19 : US4 = method6(v18)
-            let v25 : US5 =
-                match v19 with
-                | US4_Error(v22) -> (* Error *)
-                    US5_None
-                | US4_Ok(v20) -> (* Ok *)
-                    US5_Some(v20)
-            let v29 : int64 =
-                match v25 with
-                | US5_None -> (* None *)
-                    failwith<int64> "Option does not have a value."
-                | US5_Some(v26) -> (* Some *)
-                    v26
-            let v30 : US6 = method7(v29)
-            let v36 : US2 =
-                match v30 with
-                | US6_Error(v33) -> (* Error *)
-                    US2_None
-                | US6_Ok(v31) -> (* Ok *)
-                    US2_Some(v31)
-            let v40 : int64 =
-                match v36 with
-                | US2_None -> (* None *)
-                    failwith<int64> "Option does not have a value."
-                | US2_Some(v37) -> (* Some *)
-                    v37
-            let v41 : int64 = v40 - v10
-            let v42 : System.TimeSpan = v41 |> System.TimeSpan 
-            let v43 : (System.TimeSpan -> int32) = _.Hours
-            let v44 : int32 = v43 v42
-            let v45 : (System.TimeSpan -> int32) = _.Minutes
-            let v46 : int32 = v45 v42
-            let v47 : (System.TimeSpan -> int32) = _.Seconds
-            let v48 : int32 = v47 v42
-            let v49 : (System.TimeSpan -> int32) = _.Milliseconds
-            let v50 : int32 = v49 v42
-            let v51 : System.DateTime = System.DateTime (1, 1, 1, v44, v46, v48, v50)
-            v51
-    let v55 : string = method10()
-    let v56 : bool = v55 = ""
-    let v58 : string =
-        if v56 then
-            let v57 : string = "M-d-y hh:mm:ss tt"
-            v57
+            let v12 : int64 = (v11.Ticks - 621355968000000000L) / 10L
+            let v13 : int64 = v12 - v10
+            let v14 : System.TimeSpan = System.TimeSpan.FromTicks(v13 * 10L)
+            let v15 : (System.TimeSpan -> int32) = _.Hours
+            let v16 : int32 = v15 v14
+            let v17 : (System.TimeSpan -> int32) = _.Minutes
+            let v18 : int32 = v17 v14
+            let v19 : (System.TimeSpan -> int32) = _.Seconds
+            let v20 : int32 = v19 v14
+            let v21 : (System.TimeSpan -> int32) = _.Milliseconds
+            let v22 : int32 = v21 v14
+            let v23 : System.DateTime = System.DateTime (1, 1, 1, v16, v18, v20, v22)
+            v23
+    let v27 : string = method8()
+    let v28 : bool = v27 = ""
+    let v30 : string =
+        if v28 then
+            let v29 : string = "M-d-y hh:mm:ss tt"
+            v29
         else
-            v55
-    let v59 : (string -> string) = v54.ToString
-    v59 v58
-and method13 () : string =
+            v27
+    let v31 : (string -> string) = v26.ToString
+    v31 v30
+and method11 () : string =
     let v0 : string = ""
     v0
-and method14 (v0 : Mut3, v1 : string) : unit =
+and method12 (v0 : Mut3, v1 : string) : unit =
     let v2 : string = v0.l0
     let v3 : string = v2 + v1 
     v0.l0 <- v3
     ()
-and format_real_12 (v0 : char) : string =
-    let v1 : string = method13()
+and format_real_10 (v0 : char) : string =
+    let v1 : string = method11()
     let v2 : Mut3 = {l0 = v1} : Mut3
     let v3 : string = $"{v0}"
-    method14(v2, v3)
+    method12(v2, v3)
     let v4 : string = v2.l0
     v4
-and method11 () : string =
+and method9 () : string =
     let v0 : string = "\u001b[92m"
     
     
@@ -629,60 +531,58 @@ and method11 () : string =
     let v1 : string = "Info"
     let v2 : (unit -> string) = v1.ToLower
     let v3 : string = v2 ()
-    let v4 : char = v3.[int 0]
-    let v5 : string = format_real_12(v4)
+    let v4 : char = (spiralStringIndex v3 (int 0))
+    let v5 : string = format_real_10(v4)
     let v6 : string = v0 + v5 
     let v7 : string = "\u001b[0m"
     let v8 : string = v6 + v7 
     v8
-and format_real_16 (v0 : int64) : string =
-    let v1 : string = method13()
+and format_real_14 (v0 : int64) : string =
+    let v1 : string = method11()
     let v2 : Mut3 = {l0 = v1} : Mut3
     let v3 : string = $"{v0}"
-    method14(v2, v3)
+    method12(v2, v3)
     let v4 : string = v2.l0
     v4
-and method18 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "{ "
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method19 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "args"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method20 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = " = "
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method21 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = " }"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_17 (v0 : (string [])) : string =
-    let v1 : string = method13()
-    let v2 : Mut3 = {l0 = v1} : Mut3
-    method18(v2)
-    method19(v2)
-    method20(v2)
-    let v3 : string = $"%A{v0}"
-    method14(v2, v3)
-    method21(v2)
-    let v4 : string = v2.l0
-    v4
-and method23 (v0 : string, v1 : int32, v2 : int32) : int32 =
+and method16 (v0 : uint64, v1 : Mut6) : bool =
+    let v2 : uint64 = v1.l0
+    let v3 : bool = v2 < v0
+    v3
+and method15 (v0 : (string [])) : string =
+    let v1 : uint64 = System.Convert.ToUInt64 v0.Length
+    let v2 : uint64 = 0UL
+    let v3 : Mut6 = {l0 = v2} : Mut6
+    let v4 : string = ""
+    let v5 : Mut3 = {l0 = v4} : Mut3
+    while method16(v1, v3) do
+        let v7 : uint64 = v3.l0
+        let v8 : string = v0.[int v7]
+        let v9 : bool = v7 = 0UL
+        let v14 : string =
+            if v9 then
+                v8
+            else
+                let v10 : string = v5.l0
+                let v11 : string = ", "
+                let v12 : string = v10 + v11 
+                let v13 : string = v12 + v8 
+                v13
+        v5.l0 <- v14
+        let v15 : uint64 = v7 + 1UL
+        v3.l0 <- v15
+        ()
+    let v16 : string = v5.l0
+    let v17 : string = "["
+    let v18 : string = v17 + v16 
+    let v19 : string = "]"
+    let v20 : string = v18 + v19 
+    v20
+and method18 (v0 : string, v1 : int32, v2 : int32) : int32 =
     let v3 : bool = v2 >= v1
     if v3 then
         v1
     else
-        let v4 : char = v0.[int v2]
+        let v4 : char = (spiralStringIndex v0 (int v2))
         let v5 : bool = v4 = ' '
         let v11 : bool =
             if v5 then
@@ -700,16 +600,16 @@ and method23 (v0 : string, v1 : int32, v2 : int32) : int32 =
                         v8
         if v11 then
             let v12 : int32 = v2 + 1
-            method23(v0, v1, v12)
+            method18(v0, v1, v12)
         else
             v2
-and method24 (v0 : string, v1 : int32) : int32 =
+and method19 (v0 : string, v1 : int32) : int32 =
     let v2 : bool = v1 <= 0
     if v2 then
         -1
     else
         let v3 : int32 = v1 - 1
-        let v4 : char = v0.[int v3]
+        let v4 : char = (spiralStringIndex v0 (int v3))
         let v5 : bool = v4 = ' '
         let v7 : bool =
             if v5 then
@@ -718,24 +618,24 @@ and method24 (v0 : string, v1 : int32) : int32 =
                 let v6 : bool = v4 = '/'
                 v6
         if v7 then
-            method24(v0, v3)
+            method19(v0, v3)
         else
             v3
-and method22 (v0 : string) : string =
-    let v1 : int32 = v0.Length
+and method17 (v0 : string) : string =
+    let v1 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v0))
     let v2 : int32 = 0
-    let v3 : int32 = method23(v0, v1, v2)
+    let v3 : int32 = method18(v0, v1, v2)
     let v4 : int32 = v1 - 1
-    let v5 : string = v0.[int v3..int v4]
-    let v6 : int32 = v5.Length
-    let v7 : int32 = method24(v5, v6)
-    let v8 : string = v5.[int 0..int v7]
+    let v5 : string = (spiralStringSlice v0 (int v3) (int v4))
+    let v6 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v5))
+    let v7 : int32 = method19(v5, v6)
+    let v8 : string = (spiralStringSlice v5 (int 0) (int v7))
     v8
-and method15 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : (string [])) : string =
+and method13 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : (string [])) : string =
     let v9 : int64 = v0.l0
     let v10 : string = " "
     let v11 : string = v6 + v10 
-    let v12 : string = format_real_16(v9)
+    let v12 : string = format_real_14(v9)
     let v13 : string = v11 + v12 
     let v14 : string = v13 + v7 
     let v15 : string = v14 + v10 
@@ -743,47 +643,58 @@ and method15 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 
     let v17 : string = v15 + v16 
     let v18 : string = " / "
     let v19 : string = v17 + v18 
-    let v20 : string = format_real_17(v8)
-    let v21 : string = v19 + v20 
-    method22(v21)
-and closure12 () (v0 : string) : unit =
+    let v20 : string = ""
+    let v21 : string = v20 + v20 
+    let v22 : string = "args"
+    let v23 : string = v21 + v22 
+    let v24 : string = " = "
+    let v25 : string = v23 + v24 
+    let v26 : string = method15(v8)
+    let v27 : string = v25 + v26 
+    let v28 : string = "{ "
+    let v29 : string = v28 + v27 
+    let v30 : string = " }"
+    let v31 : string = v29 + v30 
+    let v32 : string = v19 + v31 
+    method17(v32)
+and closure5 () (v0 : string) : unit =
     let v1 : (string -> unit) = System.Console.WriteLine
     v1 v0
-and method25 () : string =
+and method20 () : string =
     let v0 : string = "source-dir"
     v0
-and closure13 () (v0 : std_string_String) : US8 =
-    US8_Some(v0)
-and method26 () : (std_string_String -> US8) =
-    closure13()
-and method27 () : string =
+and closure6 () (v0 : std_string_String) : US5 =
+    US5_Some(v0)
+and method21 () : (std_string_String -> US5) =
+    closure6()
+and method22 () : string =
     let v0 : string = "dist-dir"
     v0
-and method28 () : string =
+and method23 () : string =
     let v0 : string = "cache-dir"
     v0
-and method29 () : string =
+and method24 () : string =
     let v0 : string = "hangul-spec"
     v0
-and method30 () : string =
+and method25 () : string =
     let v0 : string = "filter"
     v0
-and method31 () : string =
+and method26 () : string =
     let v0 : string = "transcribe-only"
     v0
-and directory_info_attributes_36 (v0 : System_IO_DirectoryInfo) : System.IO.FileAttributes =
+and directory_info_attributes_31 (v0 : System_IO_DirectoryInfo) : System.IO.FileAttributes =
     let v1 : (System_IO_DirectoryInfo -> System.IO.FileAttributes) = _.Attributes
     v1 v0
-and file_attributes_reparse_point_37 () : System.IO.FileAttributes =
+and file_attributes_reparse_point_32 () : System.IO.FileAttributes =
     let v0 : System.IO.FileAttributes = System.IO.FileAttributes.ReparsePoint
     v0
-and file_attributes_has_flag_38 (v0 : System.IO.FileAttributes, v1 : System.IO.FileAttributes) : bool =
+and file_attributes_has_flag_33 (v0 : System.IO.FileAttributes, v1 : System.IO.FileAttributes) : bool =
     let v2 : bool = v1.HasFlag v0 
     v2
-and get_file_name_41 (v0 : string) : string =
+and get_file_name_36 (v0 : string) : string =
     let v1 : (string -> string) = System.IO.Path.GetFileName
     v1 v0
-and directory_get_parent_42 (v0 : string) : string option =
+and directory_get_parent_37 (v0 : string) : string option =
     let v1 : (string -> System_IO_DirectoryInfo) = System.IO.Directory.GetParent
     let v2 : System_IO_DirectoryInfo = v1 v0
     let v3 : System_IO_DirectoryInfo = null |> unbox<System_IO_DirectoryInfo>
@@ -802,54 +713,49 @@ and directory_get_parent_42 (v0 : string) : string option =
     | US3_Some(v10) -> (* Some *)
         let v11 : string option = Some v10 
         v11
-and format_real_43 (v0 : std_io_Error) : string =
-    let v1 : string = method13()
-    let v2 : Mut3 = {l0 = v1} : Mut3
-    let v3 : string = $"%A{v0}"
-    method14(v2, v3)
-    let v4 : string = v2.l0
-    v4
-and ok_c16 () (v0 : std_path_PathBuf) : US9 =
-    US9_Ok(v0)
-and method44 () : (std_path_PathBuf -> US9) =
-    ok_c16()
-and error_c17 () (v0 : std_io_Error) : US9 =
-    US9_Error(v0)
-and method45 () : (std_io_Error -> US9) =
-    error_c17()
-and ok_c18 () (v0 : std_path_PathBuf) : US10 =
-    US10_Ok(v0)
-and method46 () : (std_path_PathBuf -> US10) =
-    ok_c18()
-and error_c19 () (v0 : string) : US10 =
-    US10_Error(v0)
-and method47 () : (string -> US10) =
-    error_c19()
-and closure20 (v0 : std_path_Display) () : string =
+and ok_c9 () (v0 : std_path_PathBuf) : US6 =
+    US6_Ok(v0)
+and method38 () : (std_path_PathBuf -> US6) =
+    ok_c9()
+and error_c10 () (v0 : std_io_Error) : US6 =
+    US6_Error(v0)
+and method39 () : (std_io_Error -> US6) =
+    error_c10()
+and ok_c11 () (v0 : std_path_PathBuf) : US7 =
+    US7_Ok(v0)
+and method40 () : (std_path_PathBuf -> US7) =
+    ok_c11()
+and error_c12 () (v0 : string) : US7 =
+    US7_Error(v0)
+and method41 () : (string -> US7) =
+    error_c12()
+and closure13 (v0 : std_path_Display) () : string =
     let v1 : string = v0 |> string 
     v1
-and ok_c21 () (v0 : string) : US11 =
-    US11_Ok(v0)
-and error_c22 () (v0 : exn) : US11 =
-    US11_Error(v0)
-and method48 (v0 : std_path_Display) : US11 =
-    let v1 : (unit -> string) = closure20(v0)
-    let v2 : (string -> US11) = ok_c21()
-    let v3 : ((unit -> exn) -> exn) = closure5()
-    let v4 : (exn -> US11) = error_c22()
-    let v5 : US11 = try v1 () |> v2 with ex -> (fun () -> ex) |> v3 |> v4 
+and ok_c14 () (v0 : string) : US8 =
+    US8_Ok(v0)
+and closure15 () (v0 : (unit -> exn)) : exn =
+    v0 ()
+and error_c16 () (v0 : exn) : US8 =
+    US8_Error(v0)
+and method42 (v0 : std_path_Display) : US8 =
+    let v1 : (unit -> string) = closure13(v0)
+    let v2 : (string -> US8) = ok_c14()
+    let v3 : ((unit -> exn) -> exn) = closure15()
+    let v4 : (exn -> US8) = error_c16()
+    let v5 : US8 = try v1 () |> v2 with ex -> (fun () -> ex) |> v3 |> v4 
     v5
-and method49 (v0 : string, v1 : string) : string =
+and method43 (v0 : string, v1 : string) : string =
     let v2 : string = System.IO.Path.Combine (v0, v1)
     v2
-and run_40 (v0 : string, v1 : (uint8 -> (string -> Result<std_path_PathBuf, std_io_Error>)), v2 : uint8, v3 : std_io_Error, v4 : string) : Result<std_path_PathBuf, std_io_Error> =
-    let v5 : string = get_file_name_41(v4)
-    let v6 : string option = directory_get_parent_42(v4)
+and run_35 (v0 : string, v1 : (uint8 -> (string -> Result<std_path_PathBuf, std_io_Error>)), v2 : uint8, v3 : std_io_Error, v4 : string) : Result<std_path_PathBuf, std_io_Error> =
+    let v5 : string = get_file_name_36(v4)
+    let v6 : string option = directory_get_parent_37(v4)
     let v7 : (string -> US3) = method4()
     let v8 : US3 option = v6 |> Option.map v7 
     let v9 : US3 = US3_None
     let v10 : US3 = v8 |> Option.defaultValue v9 
-    let v11 : string = format_real_43(v3)
+    let v11 : string = $"%A{v3}"
     let v12 : bool = v2 >= 11uy
     if v12 then
         let v13 : string = $"file_system.read_link / "
@@ -867,43 +773,43 @@ and run_40 (v0 : string, v1 : (uint8 -> (string -> Result<std_path_PathBuf, std_
                 let v21 : uint8 = v2 + 1uy
                 let v22 : (string -> Result<std_path_PathBuf, std_io_Error>) = v1 v21
                 let v23 : Result<std_path_PathBuf, std_io_Error> = v22 v18
-                let v24 : (std_path_PathBuf -> US9) = method44()
-                let v25 : (std_io_Error -> US9) = method45()
-                let v26 : US9 = match v23 with Ok x -> v24 x | Error x -> v25 x
-                let v33 : US10 =
+                let v24 : (std_path_PathBuf -> US6) = method38()
+                let v25 : (std_io_Error -> US6) = method39()
+                let v26 : US6 = match v23 with Ok x -> v24 x | Error x -> v25 x
+                let v33 : US7 =
                     match v26 with
-                    | US9_Error(v29) -> (* Error *)
-                        let v30 : string = format_real_43(v29)
-                        US10_Error(v30)
-                    | US9_Ok(v27) -> (* Ok *)
-                        US10_Ok(v27)
+                    | US6_Error(v29) -> (* Error *)
+                        let v30 : string = $"%A{v29}"
+                        US7_Error(v30)
+                    | US6_Ok(v27) -> (* Ok *)
+                        US7_Ok(v27)
                 let v39 : Result<std_path_PathBuf, string> =
                     match v33 with
-                    | US10_Error(v36) -> (* Error *)
+                    | US7_Error(v36) -> (* Error *)
                         let v37 : Result<std_path_PathBuf, string> = Error v36 
                         v37
-                    | US10_Ok(v34) -> (* Ok *)
+                    | US7_Ok(v34) -> (* Ok *)
                         let v35 : Result<std_path_PathBuf, string> = Ok v34 
                         v35
-                let v40 : (std_path_PathBuf -> US10) = method46()
-                let v41 : (string -> US10) = method47()
-                let v42 : US10 = match v39 with Ok x -> v40 x | Error x -> v41 x
+                let v40 : (std_path_PathBuf -> US7) = method40()
+                let v41 : (string -> US7) = method41()
+                let v42 : US7 = match v39 with Ok x -> v40 x | Error x -> v41 x
                 match v42 with
-                | US10_Error(v61) -> (* Error *)
+                | US7_Error(v61) -> (* Error *)
                     let v62 : string = $"file_system.read_link / "
                     let v63 : string = $"error': {v61} / error: {v11} / name: {v5}"
                     let v64 : string = v62 + v63 
                     let v65 : std_io_Error = v64 |> unbox<std_io_Error>
                     let v66 : Result<std_path_PathBuf, std_io_Error> = Error v65 
                     v66
-                | US10_Ok(v43) -> (* Ok *)
+                | US7_Ok(v43) -> (* Ok *)
                     let v44 : std_path_Display = v43 |> unbox<std_path_Display>
-                    let v45 : US11 = method48(v44)
+                    let v45 : US8 = method42(v44)
                     let v51 : US3 =
                         match v45 with
-                        | US11_Error(v48) -> (* Error *)
+                        | US8_Error(v48) -> (* Error *)
                             US3_None
-                        | US11_Ok(v46) -> (* Ok *)
+                        | US8_Ok(v46) -> (* Ok *)
                             US3_Some(v46)
                     let v55 : string =
                         match v51 with
@@ -911,7 +817,7 @@ and run_40 (v0 : string, v1 : (uint8 -> (string -> Result<std_path_PathBuf, std_
                             failwith<string> "Option does not have a value."
                         | US3_Some(v52) -> (* Some *)
                             v52
-                    let v56 : string = method49(v55, v5)
+                    let v56 : string = method43(v55, v5)
                     let v57 : Ref<Str> = v56 |> unbox<Ref<Str>>
                     let v58 : std_string_String = v57 |> unbox<std_string_String>
                     let v59 : std_path_PathBuf = v58 |> unbox<std_path_PathBuf>
@@ -931,11 +837,11 @@ and run_40 (v0 : string, v1 : (uint8 -> (string -> Result<std_path_PathBuf, std_
             let v78 : std_io_Error = v77 |> unbox<std_io_Error>
             let v79 : Result<std_path_PathBuf, std_io_Error> = Error v78 
             v79
-and method39 (v0 : string, v1 : uint8, v2 : string) : Result<std_path_PathBuf, std_io_Error> =
+and method34 (v0 : string, v1 : uint8, v2 : string) : Result<std_path_PathBuf, std_io_Error> =
     let v3 : System_IO_DirectoryInfo = v2 |> System_IO_DirectoryInfo 
-    let v4 : System.IO.FileAttributes = directory_info_attributes_36(v3)
-    let v5 : System.IO.FileAttributes = file_attributes_reparse_point_37()
-    let v6 : bool = file_attributes_has_flag_38(v5, v4)
+    let v4 : System.IO.FileAttributes = directory_info_attributes_31(v3)
+    let v5 : System.IO.FileAttributes = file_attributes_reparse_point_32()
+    let v6 : bool = file_attributes_has_flag_33(v5, v4)
     if v6 then
         let v7 : System_IO_FileInfo = v2 |> System_IO_FileInfo 
         let v8 : (System_IO_FileInfo -> string) = _.LinkTarget
@@ -950,20 +856,20 @@ and method39 (v0 : string, v1 : uint8, v2 : string) : Result<std_path_PathBuf, s
         let v15 : string = $"path: {v0} / result: {v6} / path': {v2} / n: {v1}"
         let v16 : string = v14 + v15 
         let v17 : std_io_Error = v16 |> unbox<std_io_Error>
-        let v18 : (uint8 -> (string -> Result<std_path_PathBuf, std_io_Error>)) = closure14(v0)
-        run_40(v0, v18, v1, v17, v2)
-and closure15 (v0 : string, v1 : uint8) (v2 : string) : Result<std_path_PathBuf, std_io_Error> =
-    method39(v0, v1, v2)
-and closure14 (v0 : string) (v1 : uint8) : (string -> Result<std_path_PathBuf, std_io_Error>) =
-    closure15(v0, v1)
-and run_50 (v0 : string, v1 : (uint8 -> (string -> Result<std_path_PathBuf, std_io_Error>)), v2 : uint8, v3 : std_io_Error) : Result<std_path_PathBuf, std_io_Error> =
-    let v4 : string = get_file_name_41(v0)
-    let v5 : string option = directory_get_parent_42(v0)
+        let v18 : (uint8 -> (string -> Result<std_path_PathBuf, std_io_Error>)) = closure7(v0)
+        run_35(v0, v18, v1, v17, v2)
+and closure8 (v0 : string, v1 : uint8) (v2 : string) : Result<std_path_PathBuf, std_io_Error> =
+    method34(v0, v1, v2)
+and closure7 (v0 : string) (v1 : uint8) : (string -> Result<std_path_PathBuf, std_io_Error>) =
+    closure8(v0, v1)
+and run_44 (v0 : string, v1 : (uint8 -> (string -> Result<std_path_PathBuf, std_io_Error>)), v2 : uint8, v3 : std_io_Error) : Result<std_path_PathBuf, std_io_Error> =
+    let v4 : string = get_file_name_36(v0)
+    let v5 : string option = directory_get_parent_37(v0)
     let v6 : (string -> US3) = method4()
     let v7 : US3 option = v5 |> Option.map v6 
     let v8 : US3 = US3_None
     let v9 : US3 = v7 |> Option.defaultValue v8 
-    let v10 : string = format_real_43(v3)
+    let v10 : string = $"%A{v3}"
     let v11 : bool = v2 >= 11uy
     if v11 then
         let v12 : string = $"file_system.read_link / "
@@ -981,43 +887,43 @@ and run_50 (v0 : string, v1 : (uint8 -> (string -> Result<std_path_PathBuf, std_
                 let v20 : uint8 = v2 + 1uy
                 let v21 : (string -> Result<std_path_PathBuf, std_io_Error>) = v1 v20
                 let v22 : Result<std_path_PathBuf, std_io_Error> = v21 v17
-                let v23 : (std_path_PathBuf -> US9) = method44()
-                let v24 : (std_io_Error -> US9) = method45()
-                let v25 : US9 = match v22 with Ok x -> v23 x | Error x -> v24 x
-                let v32 : US10 =
+                let v23 : (std_path_PathBuf -> US6) = method38()
+                let v24 : (std_io_Error -> US6) = method39()
+                let v25 : US6 = match v22 with Ok x -> v23 x | Error x -> v24 x
+                let v32 : US7 =
                     match v25 with
-                    | US9_Error(v28) -> (* Error *)
-                        let v29 : string = format_real_43(v28)
-                        US10_Error(v29)
-                    | US9_Ok(v26) -> (* Ok *)
-                        US10_Ok(v26)
+                    | US6_Error(v28) -> (* Error *)
+                        let v29 : string = $"%A{v28}"
+                        US7_Error(v29)
+                    | US6_Ok(v26) -> (* Ok *)
+                        US7_Ok(v26)
                 let v38 : Result<std_path_PathBuf, string> =
                     match v32 with
-                    | US10_Error(v35) -> (* Error *)
+                    | US7_Error(v35) -> (* Error *)
                         let v36 : Result<std_path_PathBuf, string> = Error v35 
                         v36
-                    | US10_Ok(v33) -> (* Ok *)
+                    | US7_Ok(v33) -> (* Ok *)
                         let v34 : Result<std_path_PathBuf, string> = Ok v33 
                         v34
-                let v39 : (std_path_PathBuf -> US10) = method46()
-                let v40 : (string -> US10) = method47()
-                let v41 : US10 = match v38 with Ok x -> v39 x | Error x -> v40 x
+                let v39 : (std_path_PathBuf -> US7) = method40()
+                let v40 : (string -> US7) = method41()
+                let v41 : US7 = match v38 with Ok x -> v39 x | Error x -> v40 x
                 match v41 with
-                | US10_Error(v60) -> (* Error *)
+                | US7_Error(v60) -> (* Error *)
                     let v61 : string = $"file_system.read_link / "
                     let v62 : string = $"error': {v60} / error: {v10} / name: {v4}"
                     let v63 : string = v61 + v62 
                     let v64 : std_io_Error = v63 |> unbox<std_io_Error>
                     let v65 : Result<std_path_PathBuf, std_io_Error> = Error v64 
                     v65
-                | US10_Ok(v42) -> (* Ok *)
+                | US7_Ok(v42) -> (* Ok *)
                     let v43 : std_path_Display = v42 |> unbox<std_path_Display>
-                    let v44 : US11 = method48(v43)
+                    let v44 : US8 = method42(v43)
                     let v50 : US3 =
                         match v44 with
-                        | US11_Error(v47) -> (* Error *)
+                        | US8_Error(v47) -> (* Error *)
                             US3_None
-                        | US11_Ok(v45) -> (* Ok *)
+                        | US8_Ok(v45) -> (* Ok *)
                             US3_Some(v45)
                     let v54 : string =
                         match v50 with
@@ -1025,7 +931,7 @@ and run_50 (v0 : string, v1 : (uint8 -> (string -> Result<std_path_PathBuf, std_
                             failwith<string> "Option does not have a value."
                         | US3_Some(v51) -> (* Some *)
                             v51
-                    let v55 : string = method49(v54, v4)
+                    let v55 : string = method43(v54, v4)
                     let v56 : Ref<Str> = v55 |> unbox<Ref<Str>>
                     let v57 : std_string_String = v56 |> unbox<std_string_String>
                     let v58 : std_path_PathBuf = v57 |> unbox<std_path_PathBuf>
@@ -1045,11 +951,11 @@ and run_50 (v0 : string, v1 : (uint8 -> (string -> Result<std_path_PathBuf, std_
             let v77 : std_io_Error = v76 |> unbox<std_io_Error>
             let v78 : Result<std_path_PathBuf, std_io_Error> = Error v77 
             v78
-and method35 (v0 : string, v1 : uint8) : Result<std_path_PathBuf, std_io_Error> =
+and method30 (v0 : string, v1 : uint8) : Result<std_path_PathBuf, std_io_Error> =
     let v2 : System_IO_DirectoryInfo = v0 |> System_IO_DirectoryInfo 
-    let v3 : System.IO.FileAttributes = directory_info_attributes_36(v2)
-    let v4 : System.IO.FileAttributes = file_attributes_reparse_point_37()
-    let v5 : bool = file_attributes_has_flag_38(v4, v3)
+    let v3 : System.IO.FileAttributes = directory_info_attributes_31(v2)
+    let v4 : System.IO.FileAttributes = file_attributes_reparse_point_32()
+    let v5 : bool = file_attributes_has_flag_33(v4, v3)
     if v5 then
         let v6 : System_IO_FileInfo = v0 |> System_IO_FileInfo 
         let v7 : (System_IO_FileInfo -> string) = _.LinkTarget
@@ -1064,58 +970,58 @@ and method35 (v0 : string, v1 : uint8) : Result<std_path_PathBuf, std_io_Error> 
         let v14 : string = $"path: {v0} / result: {v5} / path': {v0} / n: {v1}"
         let v15 : string = v13 + v14 
         let v16 : std_io_Error = v15 |> unbox<std_io_Error>
-        let v17 : (uint8 -> (string -> Result<std_path_PathBuf, std_io_Error>)) = closure14(v0)
-        run_50(v0, v17, v1, v16)
-and read_link_34 (v0 : string) : Result<std_path_PathBuf, std_io_Error> =
+        let v17 : (uint8 -> (string -> Result<std_path_PathBuf, std_io_Error>)) = closure7(v0)
+        run_44(v0, v17, v1, v16)
+and read_link_29 (v0 : string) : Result<std_path_PathBuf, std_io_Error> =
     let v1 : uint8 = 0uy
-    method35(v0, v1)
-and closure23 () (v0 : std_path_PathBuf) : US12 =
-    US12_Some(v0)
-and method51 () : (std_path_PathBuf -> US12) =
-    closure23()
-and replace_regex_52 (v0 : string, v1 : string, v2 : string) : string =
+    method30(v0, v1)
+and closure17 () (v0 : std_path_PathBuf) : US9 =
+    US9_Some(v0)
+and method45 () : (std_path_PathBuf -> US9) =
+    closure17()
+and replace_regex_46 (v0 : string, v1 : string, v2 : string) : string =
     let v3 : string = System.Text.RegularExpressions.Regex.Replace (v2, v0, v1)
     v3
-and normalize_path_33 (v0 : string) : string =
+and normalize_path_28 (v0 : string) : string =
     let v1 : bool = v0 = ""
     if v1 then
         let v2 : string = ""
         v2
     else
-        let v3 : Result<std_path_PathBuf, std_io_Error> = read_link_34(v0)
-        let v4 : (std_path_PathBuf -> US9) = method44()
-        let v5 : (std_io_Error -> US9) = method45()
-        let v6 : US9 = match v3 with Ok x -> v4 x | Error x -> v5 x
-        let v12 : US12 =
+        let v3 : Result<std_path_PathBuf, std_io_Error> = read_link_29(v0)
+        let v4 : (std_path_PathBuf -> US6) = method38()
+        let v5 : (std_io_Error -> US6) = method39()
+        let v6 : US6 = match v3 with Ok x -> v4 x | Error x -> v5 x
+        let v12 : US9 =
             match v6 with
-            | US9_Error(v9) -> (* Error *)
-                US12_None
-            | US9_Ok(v7) -> (* Ok *)
-                US12_Some(v7)
+            | US6_Error(v9) -> (* Error *)
+                US9_None
+            | US6_Ok(v7) -> (* Ok *)
+                US9_Some(v7)
         let v17 : std_path_PathBuf option =
             match v12 with
-            | US12_None -> (* None *)
+            | US9_None -> (* None *)
                 let v15 : std_path_PathBuf option = None
                 v15
-            | US12_Some(v13) -> (* Some *)
+            | US9_Some(v13) -> (* Some *)
                 let v14 : std_path_PathBuf option = Some v13 
                 v14
-        let v18 : (std_path_PathBuf -> US12) = method51()
-        let v19 : US12 option = v17 |> Option.map v18 
-        let v20 : US12 = US12_None
-        let v21 : US12 = v19 |> Option.defaultValue v20 
+        let v18 : (std_path_PathBuf -> US9) = method45()
+        let v19 : US9 option = v17 |> Option.map v18 
+        let v20 : US9 = US9_None
+        let v21 : US9 = v19 |> Option.defaultValue v20 
         let v36 : string =
             match v21 with
-            | US12_None -> (* None *)
+            | US9_None -> (* None *)
                 v0
-            | US12_Some(v22) -> (* Some *)
+            | US9_Some(v22) -> (* Some *)
                 let v23 : std_path_Display = v22 |> unbox<std_path_Display>
-                let v24 : US11 = method48(v23)
+                let v24 : US8 = method42(v23)
                 let v30 : US3 =
                     match v24 with
-                    | US11_Error(v27) -> (* Error *)
+                    | US8_Error(v27) -> (* Error *)
                         US3_None
-                    | US11_Ok(v25) -> (* Ok *)
+                    | US8_Ok(v25) -> (* Ok *)
                         US3_Some(v25)
                 match v30 with
                 | US3_None -> (* None *)
@@ -1130,42 +1036,42 @@ and normalize_path_33 (v0 : string) : string =
                 v36
         let v39 : string = "^\\\\\\\\\\?\\\\"
         let v40 : string = ""
-        let v41 : string = replace_regex_52(v39, v40, v38)
-        let v42 : int32 = v41.Length
+        let v41 : string = replace_regex_46(v39, v40, v38)
+        let v42 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v41))
         let v43 : bool = v42 < 2
         if v43 then
             v0
         else
-            let v44 : string = v41.[int 0..int 0]
+            let v44 : string = (spiralStringSlice v41 (int 0) (int 0))
             let v45 : (unit -> string) = v44.ToLower
             let v46 : string = v45 ()
             let v47 : int32 = v42 - 1
-            let v48 : string = v41.[int 1..int v47]
+            let v48 : string = (spiralStringSlice v41 (int 1) (int v47))
             let v49 : string = v46 + v48 
             let v50 : string = "\\"
             let v51 : string = "/"
             let v52 : string = v49.Replace (v50, v51)
             v52
-and get_current_directory_53 () : string =
+and get_current_directory_47 () : string =
     let v0 : (unit -> string) = System.IO.Directory.GetCurrentDirectory
     v0 ()
-and file_exists_56 (v0 : string) : bool =
+and file_exists_50 (v0 : string) : bool =
     let v1 : (string -> bool) = System.IO.File.Exists
     v1 v0
-and closure24 () (v0 : string) : bool =
-    file_exists_56(v0)
-and directory_exists_57 (v0 : string) : bool =
+and closure18 () (v0 : string) : bool =
+    file_exists_50(v0)
+and directory_exists_51 (v0 : string) : bool =
     let v1 : (string -> bool) = System.IO.Directory.Exists
     v1 v0
-and closure25 () (v0 : string) : bool =
-    directory_exists_57(v0)
-and method59 (v0 : string, v1 : string, v2 : bool, v3 : (string -> bool), v4 : string) : US14 =
-    let v5 : string = method49(v4, v0)
+and closure19 () (v0 : string) : bool =
+    directory_exists_51(v0)
+and method53 (v0 : string, v1 : string, v2 : bool, v3 : (string -> bool), v4 : string) : US11 =
+    let v5 : string = method43(v4, v0)
     let v6 : bool = v3 v5
     if v6 then
-        US14_Ok(v4)
+        US11_Ok(v4)
     else
-        let v8 : string option = directory_get_parent_42(v4)
+        let v8 : string option = directory_get_parent_37(v4)
         let v9 : (string -> US3) = method4()
         let v10 : US3 option = v8 |> Option.map v9 
         let v11 : US3 = US3_None
@@ -1183,16 +1089,16 @@ and method59 (v0 : string, v1 : string, v2 : bool, v3 : (string -> bool), v4 : s
             let v19 : string = v18 + v17 
             let v20 : string = $" '{v0}' at '{v1}' (until '{v4}')"
             let v21 : string = v19 + v20 
-            US14_Error(v21)
+            US11_Error(v21)
         | US3_Some(v13) -> (* Some *)
-            method59(v0, v1, v2, v3, v13)
-and method58 (v0 : string, v1 : string, v2 : bool, v3 : (string -> bool)) : US14 =
-    let v4 : string = method49(v1, v0)
+            method53(v0, v1, v2, v3, v13)
+and method52 (v0 : string, v1 : string, v2 : bool, v3 : (string -> bool)) : US11 =
+    let v4 : string = method43(v1, v0)
     let v5 : bool = v3 v4
     if v5 then
-        US14_Ok(v1)
+        US11_Ok(v1)
     else
-        let v7 : string option = directory_get_parent_42(v1)
+        let v7 : string option = directory_get_parent_37(v1)
         let v8 : (string -> US3) = method4()
         let v9 : US3 option = v7 |> Option.map v8 
         let v10 : US3 = US3_None
@@ -1210,23 +1116,23 @@ and method58 (v0 : string, v1 : string, v2 : bool, v3 : (string -> bool)) : US14
             let v18 : string = v17 + v16 
             let v19 : string = $" '{v0}' at '{v1}' (until '{v1}')"
             let v20 : string = v18 + v19 
-            US14_Error(v20)
+            US11_Error(v20)
         | US3_Some(v12) -> (* Some *)
-            method59(v0, v1, v2, v3, v12)
-and find_parent_55 (v0 : US13, v1 : string, v2 : string) : US14 =
+            method53(v0, v1, v2, v3, v12)
+and find_parent_49 (v0 : US10, v1 : string, v2 : string) : US11 =
     let v3 : bool =
         match v0 with
-        | US13_File -> (* File *)
+        | US10_File -> (* File *)
             true
         | _ ->
             false
     let v6 : (string -> bool) =
         if v3 then
-            closure24()
+            closure18()
         else
-            closure25()
-    method58(v1, v2, v3, v6)
-and method60 () : string =
+            closure19()
+    method52(v1, v2, v3, v6)
+and method54 () : string =
     let v0 : string = "\u001b[93m"
     
     
@@ -1236,49 +1142,17 @@ and method60 () : string =
     let v1 : string = "Warning"
     let v2 : (unit -> string) = v1.ToLower
     let v3 : string = v2 ()
-    let v4 : char = v3.[int 0]
-    let v5 : string = format_real_12(v4)
+    let v4 : char = (spiralStringIndex v3 (int 0))
+    let v5 : string = format_real_10(v4)
     let v6 : string = v0 + v5 
     let v7 : string = "\u001b[0m"
     let v8 : string = v6 + v7 
     v8
-and method63 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "dir"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method64 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "; "
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method65 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "error"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_62 (v0 : string, v1 : string) : string =
-    let v2 : string = method13()
-    let v3 : Mut3 = {l0 = v2} : Mut3
-    method18(v3)
-    method63(v3)
-    method20(v3)
-    method14(v3, v0)
-    method64(v3)
-    method65(v3)
-    method20(v3)
-    method14(v3, v1)
-    method21(v3)
-    let v4 : string = v3.l0
-    v4
-and method61 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : string, v9 : string) : string =
+and method55 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : string, v9 : string) : string =
     let v10 : int64 = v0.l0
     let v11 : string = " "
     let v12 : string = v6 + v11 
-    let v13 : string = format_real_16(v10)
+    let v13 : string = format_real_14(v10)
     let v14 : string = v12 + v13 
     let v15 : string = v14 + v7 
     let v16 : string = v15 + v11 
@@ -1286,17 +1160,33 @@ and method61 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 
     let v18 : string = v16 + v17 
     let v19 : string = " / "
     let v20 : string = v18 + v19 
-    let v21 : string = format_real_62(v8, v9)
-    let v22 : string = v20 + v21 
-    method22(v22)
-and run_54 (v0 : string) : US3 =
-    let v1 : US13 = US13_Directory
+    let v21 : string = ""
+    let v22 : string = v21 + v21 
+    let v23 : string = "dir"
+    let v24 : string = v22 + v23 
+    let v25 : string = " = "
+    let v26 : string = v24 + v25 
+    let v27 : string = v26 + v8 
+    let v28 : string = "; "
+    let v29 : string = v27 + v28 
+    let v30 : string = "error"
+    let v31 : string = v29 + v30 
+    let v32 : string = v31 + v25 
+    let v33 : string = v32 + v9 
+    let v34 : string = "{ "
+    let v35 : string = v34 + v33 
+    let v36 : string = " }"
+    let v37 : string = v35 + v36 
+    let v38 : string = v20 + v37 
+    method17(v38)
+and run_48 (v0 : string) : US3 =
+    let v1 : US10 = US10_Directory
     let v2 : string = "spiral"
     let v3 : string = "workspace"
-    let v4 : string = method49(v2, v3)
-    let v5 : US14 = find_parent_55(v1, v4, v0)
+    let v4 : string = method43(v2, v3)
+    let v5 : US11 = find_parent_49(v1, v4, v0)
     match v5 with
-    | US14_Error(v9) -> (* Error *)
+    | US11_Error(v9) -> (* Error *)
         let v10 : bool = TraceState.trace_state.IsNone
         if v10 then
             let v11 : US0 = US0_Verbose
@@ -1327,9 +1217,9 @@ and run_54 (v0 : string) : US3 =
                 let v33 : bool = 40 >= v30
                 v33
         let v35 : bool = v34 = false
-        let v75 : US7 =
+        let v75 : US4 =
             if v35 then
-                US7_None
+                US4_None
             else
                 let v37 : bool = TraceState.trace_state.IsNone
                 if v37 then
@@ -1339,9 +1229,9 @@ and run_54 (v0 : string) : US3 =
                     TraceState.trace_state <- v45 
                     ()
                 let struct (v46 : Mut0, v47 : Mut1, v48 : Mut2, v49 : Mut3, v50 : Mut4, v51 : int64 option) = TraceState.trace_state.Value
-                let v52 : string = method8(v46, v47, v48, v49, v50, v51)
-                let v53 : string = method60()
-                let v54 : string = method61(v46, v47, v48, v49, v50, v51, v52, v53, v0, v9)
+                let v52 : string = method6(v46, v47, v48, v49, v50, v51)
+                let v53 : string = method54()
+                let v54 : string = method55(v46, v47, v48, v49, v50, v51, v52, v53, v0, v9)
                 let v55 : bool = TraceState.trace_state.IsNone
                 if v55 then
                     let v56 : US0 = US0_Verbose
@@ -1353,19 +1243,19 @@ and run_54 (v0 : string) : US3 =
                 let v70 : int64 = v64.l0
                 let v71 : int64 = v70 + 1L
                 v64.l0 <- v71
-                let v72 : (string -> unit) = closure12()
+                let v72 : (string -> unit) = closure5()
                 v72 v54
                 let v73 : (string -> unit) = v65.l0
                 v73 v54
-                US7_Some(v64, v65, v66, v67, v68, v69)
+                US4_Some(v64, v65, v66, v67, v68, v69)
         US3_None
-    | US14_Ok(v6) -> (* Ok *)
-        let v7 : string = normalize_path_33(v6)
+    | US11_Ok(v6) -> (* Ok *)
+        let v7 : string = normalize_path_28(v6)
         US3_Some(v7)
-and get_full_path_66 (v0 : string) : string =
+and get_full_path_56 (v0 : string) : string =
     let v1 : (string -> string) = System.IO.Path.GetFullPath
     v1 v0
-and method67 () : string =
+and method57 () : string =
     let v0 : string = "\u001b[94m"
     
     
@@ -1375,91 +1265,43 @@ and method67 () : string =
     let v1 : string = "Debug"
     let v2 : (unit -> string) = v1.ToLower
     let v3 : string = v2 ()
-    let v4 : char = v3.[int 0]
-    let v5 : string = format_real_12(v4)
+    let v4 : char = (spiralStringIndex v3 (int 0))
+    let v5 : string = format_real_10(v4)
     let v6 : string = v0 + v5 
     let v7 : string = "\u001b[0m"
     let v8 : string = v6 + v7 
     v8
-and method70 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "source_dir"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method71 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "dist_dir"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method72 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "cache_dir"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method73 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "hangul_spec"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method74 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "filter"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method75 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "transcribe_only"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_69 (v0 : string, v1 : string, v2 : string, v3 : string, v4 : US3, v5 : bool) : string =
-    let v6 : string = method13()
-    let v7 : Mut3 = {l0 = v6} : Mut3
-    method18(v7)
-    method70(v7)
-    method20(v7)
-    method14(v7, v0)
-    method64(v7)
-    method71(v7)
-    method20(v7)
-    method14(v7, v1)
-    method64(v7)
-    method72(v7)
-    method20(v7)
-    method14(v7, v2)
-    method64(v7)
-    method73(v7)
-    method20(v7)
-    method14(v7, v3)
-    method64(v7)
-    method74(v7)
-    method20(v7)
-    let v8 : string = $"%A{v4}"
-    method14(v7, v8)
-    method64(v7)
-    method75(v7)
-    method20(v7)
-    let v11 : string =
-        if v5 then
-            let v9 : string = "true"
-            v9
+and method59 (v0 : US3) : string =
+    match v0 with
+    | US3_None -> (* None *)
+        let v8 : string = "None"
+        v8
+    | US3_Some(v1) -> (* Some *)
+        let v2 : string = "Some"
+        let v3 : string = "("
+        let v4 : string = v2 + v3 
+        let v5 : string = v4 + v1 
+        let v6 : string = ")"
+        let v7 : string = v5 + v6 
+        v7
+and format_real_60 (v0 : bool) : string =
+    let v1 : string = method11()
+    let v2 : Mut3 = {l0 = v1} : Mut3
+    let v5 : string =
+        if v0 then
+            let v3 : string = "true"
+            v3
         else
-            let v10 : string = "false"
-            v10
-    method14(v7, v11)
-    method21(v7)
-    let v12 : string = v7.l0
-    v12
-and method68 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : string, v9 : string, v10 : string, v11 : string, v12 : US3, v13 : bool) : string =
+            let v4 : string = "false"
+            v4
+    method12(v2, v5)
+    let v6 : string = v2.l0
+    v6
+and method58 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : string, v9 : string, v10 : string, v11 : string, v12 : US3, v13 : bool) : string =
     let v14 : int64 = v0.l0
     let v15 : string = " "
     let v16 : string = v6 + v15 
-    let v17 : string = format_real_16(v14)
+    let v17 : string = format_real_14(v14)
     let v18 : string = v16 + v17 
     let v19 : string = v18 + v7 
     let v20 : string = v19 + v15 
@@ -1467,26 +1309,64 @@ and method68 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 
     let v22 : string = v20 + v21 
     let v23 : string = " / "
     let v24 : string = v22 + v23 
-    let v25 : string = format_real_69(v8, v9, v10, v11, v12, v13)
-    let v26 : string = v24 + v25 
-    method22(v26)
-and ok_c27 () (v0 : std_fs_FileType) : US15 =
-    US15_Ok(v0)
-and method76 () : (std_fs_FileType -> US15) =
-    ok_c27()
-and error_c28 () (v0 : std_io_Error) : US15 =
-    US15_Error(v0)
-and method77 () : (std_io_Error -> US15) =
-    error_c28()
-and ok_c29 () (v0 : std_fs_FileType) : US16 =
-    US16_Ok(v0)
-and method78 () : (std_fs_FileType -> US16) =
-    ok_c29()
-and error_c30 () (v0 : std_string_String) : US16 =
-    US16_Error(v0)
-and method79 () : (std_string_String -> US16) =
-    error_c30()
-and fn_c26 (v0 : US3) (v1 : async_walkdir_DirEntry) : std_pin_Pin<Box<Dyn<std_future_Future<async_walkdir_Filtering>>>> =
+    let v25 : string = ""
+    let v26 : string = v25 + v25 
+    let v27 : string = "source_dir"
+    let v28 : string = v26 + v27 
+    let v29 : string = " = "
+    let v30 : string = v28 + v29 
+    let v31 : string = v30 + v8 
+    let v32 : string = "; "
+    let v33 : string = v31 + v32 
+    let v34 : string = "dist_dir"
+    let v35 : string = v33 + v34 
+    let v36 : string = v35 + v29 
+    let v37 : string = v36 + v9 
+    let v38 : string = v37 + v32 
+    let v39 : string = "cache_dir"
+    let v40 : string = v38 + v39 
+    let v41 : string = v40 + v29 
+    let v42 : string = v41 + v10 
+    let v43 : string = v42 + v32 
+    let v44 : string = "hangul_spec"
+    let v45 : string = v43 + v44 
+    let v46 : string = v45 + v29 
+    let v47 : string = v46 + v11 
+    let v48 : string = v47 + v32 
+    let v49 : string = "filter"
+    let v50 : string = v48 + v49 
+    let v51 : string = v50 + v29 
+    let v52 : string = method59(v12)
+    let v53 : string = v51 + v52 
+    let v54 : string = v53 + v32 
+    let v55 : string = "transcribe_only"
+    let v56 : string = v54 + v55 
+    let v57 : string = v56 + v29 
+    let v58 : string = format_real_60(v13)
+    let v59 : string = v57 + v58 
+    let v60 : string = "{ "
+    let v61 : string = v60 + v59 
+    let v62 : string = " }"
+    let v63 : string = v61 + v62 
+    let v64 : string = v24 + v63 
+    method17(v64)
+and ok_c21 () (v0 : std_fs_FileType) : US12 =
+    US12_Ok(v0)
+and method61 () : (std_fs_FileType -> US12) =
+    ok_c21()
+and error_c22 () (v0 : std_io_Error) : US12 =
+    US12_Error(v0)
+and method62 () : (std_io_Error -> US12) =
+    error_c22()
+and ok_c23 () (v0 : std_fs_FileType) : US13 =
+    US13_Ok(v0)
+and method63 () : (std_fs_FileType -> US13) =
+    ok_c23()
+and error_c24 () (v0 : std_string_String) : US13 =
+    US13_Error(v0)
+and method64 () : (std_string_String -> US13) =
+    error_c24()
+and fn_c20 (v0 : US3) (v1 : async_walkdir_DirEntry) : std_pin_Pin<Box<Dyn<std_future_Future<async_walkdir_Filtering>>>> =
     let v2 : string = "true; let __future_init = Box::pin(/*"
     let v3 : bool = __spiral_emit_rust () v2 
     let v4 : string = "*/ async { /*"
@@ -1505,34 +1385,34 @@ and fn_c26 (v0 : US3) (v1 : async_walkdir_DirEntry) : std_pin_Pin<Box<Dyn<std_fu
     let v17 : std_pin_Pin<Box<Dyn<std_future_Future<Result<std_fs_FileType, std_io_Error>>>>> = __spiral_emit_rust () v16 
     let v18 : string = "v17.await"
     let v19 : Result<std_fs_FileType, std_io_Error> = __spiral_emit_rust () v18 
-    let v20 : (std_fs_FileType -> US15) = method76()
-    let v21 : (std_io_Error -> US15) = method77()
-    let v22 : US15 = match v19 with Ok x -> v20 x | Error x -> v21 x
-    let v29 : US16 =
+    let v20 : (std_fs_FileType -> US12) = method61()
+    let v21 : (std_io_Error -> US12) = method62()
+    let v22 : US12 = match v19 with Ok x -> v20 x | Error x -> v21 x
+    let v29 : US13 =
         match v22 with
-        | US15_Error(v25) -> (* Error *)
+        | US12_Error(v25) -> (* Error *)
             let v26 : std_string_String = null |> unbox<std_string_String>
-            US16_Error(v26)
-        | US15_Ok(v23) -> (* Ok *)
-            US16_Ok(v23)
+            US13_Error(v26)
+        | US12_Ok(v23) -> (* Ok *)
+            US13_Ok(v23)
     let v35 : Result<std_fs_FileType, std_string_String> =
         match v29 with
-        | US16_Error(v32) -> (* Error *)
+        | US13_Error(v32) -> (* Error *)
             let v33 : Result<std_fs_FileType, std_string_String> = Error v32 
             v33
-        | US16_Ok(v30) -> (* Ok *)
+        | US13_Ok(v30) -> (* Ok *)
             let v31 : Result<std_fs_FileType, std_string_String> = Ok v30 
             v31
-    let v36 : (std_fs_FileType -> US16) = method78()
-    let v37 : (std_string_String -> US16) = method79()
-    let v38 : US16 = match v35 with Ok x -> v36 x | Error x -> v37 x
-    let v86 : US17 =
+    let v36 : (std_fs_FileType -> US13) = method63()
+    let v37 : (std_string_String -> US13) = method64()
+    let v38 : US13 = match v35 with Ok x -> v36 x | Error x -> v37 x
+    let v86 : US14 =
         match v38 with
-        | US16_Ok(v39) -> (* Ok *)
+        | US13_Ok(v39) -> (* Ok *)
             let v40 : string = "std::fs::FileType::is_dir(&$0)"
             let v41 : bool = __spiral_emit_rust v39 v40 
             if v41 then
-                US17_Ignore
+                US14_Ignore
             else
                 let v43 : string = "async_walkdir::DirEntry::path(&$0)"
                 let v44 : std_path_PathBuf = __spiral_emit_rust v1 v43 
@@ -1562,9 +1442,9 @@ and fn_c26 (v0 : US3) (v1 : async_walkdir_DirEntry) : std_pin_Pin<Box<Dyn<std_fu
                         let v59 : bool = v48.EndsWith (v58, false, null)
                         v59
                 if v60 then
-                    US17_Ignore
+                    US14_Ignore
                 else
-                    US17_Continue
+                    US14_Continue
         | _ ->
             let v65 : string = "async_walkdir::DirEntry::path(&$0)"
             let v66 : std_path_PathBuf = __spiral_emit_rust v1 v65 
@@ -1594,28 +1474,28 @@ and fn_c26 (v0 : US3) (v1 : async_walkdir_DirEntry) : std_pin_Pin<Box<Dyn<std_fu
                     let v81 : bool = v70.EndsWith (v80, false, null)
                     v81
             if v82 then
-                US17_Ignore
+                US14_Ignore
             else
-                US17_Continue
+                US14_Continue
     let v87 : string = "Fsharp"
     () // backend.backend_switch / record_type_try_find / key: v87 
     let v88 : string = "__future_init"
     let v89 : _ = __spiral_emit_rust () v88 
     let v90 : string = "v89"
-    let v91 : std_pin_Pin<Box<Dyn<std_future_Future<US17>>>> = __spiral_emit_rust () v90 
+    let v91 : std_pin_Pin<Box<Dyn<std_future_Future<US14>>>> = __spiral_emit_rust () v90 
     let v92 : string = "v91.await"
-    let v93 : US17 = __spiral_emit_rust () v92 
+    let v93 : US14 = __spiral_emit_rust () v92 
     let v102 : async_walkdir_Filtering =
         match v93 with
-        | US17_Continue -> (* Continue *)
+        | US14_Continue -> (* Continue *)
             let v98 : string = "async_walkdir::Filtering::Continue"
             let v99 : async_walkdir_Filtering = __spiral_emit_rust () v98 
             v99
-        | US17_Ignore -> (* Ignore *)
+        | US14_Ignore -> (* Ignore *)
             let v94 : string = "async_walkdir::Filtering::Ignore"
             let v95 : async_walkdir_Filtering = __spiral_emit_rust () v94 
             v95
-        | US17_IgnoreDir -> (* IgnoreDir *)
+        | US14_IgnoreDir -> (* IgnoreDir *)
             let v96 : string = "async_walkdir::Filtering::IgnoreDir"
             let v97 : async_walkdir_Filtering = __spiral_emit_rust () v96 
             v97
@@ -1625,23 +1505,23 @@ and fn_c26 (v0 : US3) (v1 : async_walkdir_DirEntry) : std_pin_Pin<Box<Dyn<std_fu
     let v105 : string = "v104"
     let v106 : std_pin_Pin<Box<Dyn<std_future_Future<async_walkdir_Filtering>>>> = __spiral_emit_rust () v105 
     v106
-and ok_c32 () (v0 : async_walkdir_DirEntry) : US18 =
-    US18_Ok(v0)
-and method81 () : (async_walkdir_DirEntry -> US18) =
-    ok_c32()
-and error_c33 () (v0 : async_walkdir_Error) : US18 =
-    US18_Error(v0)
-and method82 () : (async_walkdir_Error -> US18) =
-    error_c33()
-and ok_c34 () (v0 : async_walkdir_DirEntry) : US19 =
-    US19_Ok(v0)
-and method83 () : (async_walkdir_DirEntry -> US19) =
-    ok_c34()
-and error_c35 () (v0 : std_string_String) : US19 =
-    US19_Error(v0)
-and method84 () : (std_string_String -> US19) =
-    error_c35()
-and method85 () : string =
+and ok_c26 () (v0 : async_walkdir_DirEntry) : US15 =
+    US15_Ok(v0)
+and method66 () : (async_walkdir_DirEntry -> US15) =
+    ok_c26()
+and error_c27 () (v0 : async_walkdir_Error) : US15 =
+    US15_Error(v0)
+and method67 () : (async_walkdir_Error -> US15) =
+    error_c27()
+and ok_c28 () (v0 : async_walkdir_DirEntry) : US16 =
+    US16_Ok(v0)
+and method68 () : (async_walkdir_DirEntry -> US16) =
+    ok_c28()
+and error_c29 () (v0 : std_string_String) : US16 =
+    US16_Error(v0)
+and method69 () : (std_string_String -> US16) =
+    error_c29()
+and method70 () : string =
     let v0 : string = "\u001b[91m"
     
     
@@ -1651,28 +1531,17 @@ and method85 () : string =
     let v1 : string = "Critical"
     let v2 : (unit -> string) = v1.ToLower
     let v3 : string = v2 ()
-    let v4 : char = v3.[int 0]
-    let v5 : string = format_real_12(v4)
+    let v4 : char = (spiralStringIndex v3 (int 0))
+    let v5 : string = format_real_10(v4)
     let v6 : string = v0 + v5 
     let v7 : string = "\u001b[0m"
     let v8 : string = v6 + v7 
     v8
-and format_real_87 (v0 : std_string_String) : string =
-    let v1 : string = method13()
-    let v2 : Mut3 = {l0 = v1} : Mut3
-    method18(v2)
-    method65(v2)
-    method20(v2)
-    let v3 : string = $"%A{v0}"
-    method14(v2, v3)
-    method21(v2)
-    let v4 : string = v2.l0
-    v4
-and method86 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : std_string_String) : string =
+and method71 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : std_string_String) : string =
     let v9 : int64 = v0.l0
     let v10 : string = " "
     let v11 : string = v6 + v10 
-    let v12 : string = format_real_16(v9)
+    let v12 : string = format_real_14(v9)
     let v13 : string = v11 + v12 
     let v14 : string = v13 + v7 
     let v15 : string = v14 + v10 
@@ -1680,34 +1549,45 @@ and method86 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 
     let v17 : string = v15 + v16 
     let v18 : string = " / "
     let v19 : string = v17 + v18 
-    let v20 : string = format_real_87(v8)
-    let v21 : string = v19 + v20 
-    method22(v21)
-and closure31 () (v0 : Result<async_walkdir_DirEntry, async_walkdir_Error>) : string option =
-    let v1 : (async_walkdir_DirEntry -> US18) = method81()
-    let v2 : (async_walkdir_Error -> US18) = method82()
-    let v3 : US18 = match v0 with Ok x -> v1 x | Error x -> v2 x
-    let v10 : US19 =
+    let v20 : string = ""
+    let v21 : string = v20 + v20 
+    let v22 : string = "error"
+    let v23 : string = v21 + v22 
+    let v24 : string = " = "
+    let v25 : string = v23 + v24 
+    let v26 : string = $"%A{v8}"
+    let v27 : string = v25 + v26 
+    let v28 : string = "{ "
+    let v29 : string = v28 + v27 
+    let v30 : string = " }"
+    let v31 : string = v29 + v30 
+    let v32 : string = v19 + v31 
+    method17(v32)
+and closure25 () (v0 : Result<async_walkdir_DirEntry, async_walkdir_Error>) : string option =
+    let v1 : (async_walkdir_DirEntry -> US15) = method66()
+    let v2 : (async_walkdir_Error -> US15) = method67()
+    let v3 : US15 = match v0 with Ok x -> v1 x | Error x -> v2 x
+    let v10 : US16 =
         match v3 with
-        | US18_Error(v6) -> (* Error *)
+        | US15_Error(v6) -> (* Error *)
             let v7 : std_string_String = null |> unbox<std_string_String>
-            US19_Error(v7)
-        | US18_Ok(v4) -> (* Ok *)
-            US19_Ok(v4)
+            US16_Error(v7)
+        | US15_Ok(v4) -> (* Ok *)
+            US16_Ok(v4)
     let v16 : Result<async_walkdir_DirEntry, std_string_String> =
         match v10 with
-        | US19_Error(v13) -> (* Error *)
+        | US16_Error(v13) -> (* Error *)
             let v14 : Result<async_walkdir_DirEntry, std_string_String> = Error v13 
             v14
-        | US19_Ok(v11) -> (* Ok *)
+        | US16_Ok(v11) -> (* Ok *)
             let v12 : Result<async_walkdir_DirEntry, std_string_String> = Ok v11 
             v12
-    let v17 : (async_walkdir_DirEntry -> US19) = method83()
-    let v18 : (std_string_String -> US19) = method84()
-    let v19 : US19 = match v16 with Ok x -> v17 x | Error x -> v18 x
+    let v17 : (async_walkdir_DirEntry -> US16) = method68()
+    let v18 : (std_string_String -> US16) = method69()
+    let v19 : US16 = match v16 with Ok x -> v17 x | Error x -> v18 x
     let v97 : US3 =
         match v19 with
-        | US19_Error(v28) -> (* Error *)
+        | US16_Error(v28) -> (* Error *)
             let v29 : bool = TraceState.trace_state.IsNone
             if v29 then
                 let v30 : US0 = US0_Verbose
@@ -1738,9 +1618,9 @@ and closure31 () (v0 : Result<async_walkdir_DirEntry, async_walkdir_Error>) : st
                     let v52 : bool = 50 >= v49
                     v52
             let v54 : bool = v53 = false
-            let v94 : US7 =
+            let v94 : US4 =
                 if v54 then
-                    US7_None
+                    US4_None
                 else
                     let v56 : bool = TraceState.trace_state.IsNone
                     if v56 then
@@ -1750,9 +1630,9 @@ and closure31 () (v0 : Result<async_walkdir_DirEntry, async_walkdir_Error>) : st
                         TraceState.trace_state <- v64 
                         ()
                     let struct (v65 : Mut0, v66 : Mut1, v67 : Mut2, v68 : Mut3, v69 : Mut4, v70 : int64 option) = TraceState.trace_state.Value
-                    let v71 : string = method8(v65, v66, v67, v68, v69, v70)
-                    let v72 : string = method85()
-                    let v73 : string = method86(v65, v66, v67, v68, v69, v70, v71, v72, v28)
+                    let v71 : string = method6(v65, v66, v67, v68, v69, v70)
+                    let v72 : string = method70()
+                    let v73 : string = method71(v65, v66, v67, v68, v69, v70, v71, v72, v28)
                     let v74 : bool = TraceState.trace_state.IsNone
                     if v74 then
                         let v75 : US0 = US0_Verbose
@@ -1764,13 +1644,13 @@ and closure31 () (v0 : Result<async_walkdir_DirEntry, async_walkdir_Error>) : st
                     let v89 : int64 = v83.l0
                     let v90 : int64 = v89 + 1L
                     v83.l0 <- v90
-                    let v91 : (string -> unit) = closure12()
+                    let v91 : (string -> unit) = closure5()
                     v91 v73
                     let v92 : (string -> unit) = v84.l0
                     v92 v73
-                    US7_Some(v83, v84, v85, v86, v87, v88)
+                    US4_Some(v83, v84, v85, v86, v87, v88)
             US3_None
-        | US19_Ok(v20) -> (* Ok *)
+        | US16_Ok(v20) -> (* Ok *)
             let v21 : string = "async_walkdir::DirEntry::path(&$0)"
             let v22 : std_path_PathBuf = __spiral_emit_rust v20 v21 
             let v23 : std_path_Display = v22 |> unbox<std_path_Display>
@@ -1785,30 +1665,13 @@ and closure31 () (v0 : Result<async_walkdir_DirEntry, async_walkdir_Error>) : st
     | US3_Some(v98) -> (* Some *)
         let v99 : string option = Some v98 
         v99
-and method80 () : (Result<async_walkdir_DirEntry, async_walkdir_Error> -> string option) =
-    closure31()
-and method90 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "files_len"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_89 (v0 : unativeint) : string =
-    let v1 : string = method13()
-    let v2 : Mut3 = {l0 = v1} : Mut3
-    method18(v2)
-    method90(v2)
-    method20(v2)
-    let v3 : string = $"%A{v0}"
-    method14(v2, v3)
-    method21(v2)
-    let v4 : string = v2.l0
-    v4
-and method88 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : unativeint) : string =
+and method65 () : (Result<async_walkdir_DirEntry, async_walkdir_Error> -> string option) =
+    closure25()
+and method72 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : unativeint) : string =
     let v9 : int64 = v0.l0
     let v10 : string = " "
     let v11 : string = v6 + v10 
-    let v12 : string = format_real_16(v9)
+    let v12 : string = format_real_14(v9)
     let v13 : string = v11 + v12 
     let v14 : string = v13 + v7 
     let v15 : string = v14 + v10 
@@ -1816,159 +1679,119 @@ and method88 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 
     let v17 : string = v15 + v16 
     let v18 : string = " / "
     let v19 : string = v17 + v18 
-    let v20 : string = format_real_89(v8)
-    let v21 : string = v19 + v20 
-    method22(v21)
-and method92 () : string =
+    let v20 : string = ""
+    let v21 : string = v20 + v20 
+    let v22 : string = "files_len"
+    let v23 : string = v21 + v22 
+    let v24 : string = " = "
+    let v25 : string = v23 + v24 
+    let v26 : string = $"%A{v8}"
+    let v27 : string = v25 + v26 
+    let v28 : string = "{ "
+    let v29 : string = v28 + v27 
+    let v30 : string = " }"
+    let v31 : string = v29 + v30 
+    let v32 : string = v19 + v31 
+    method17(v32)
+and method74 () : string =
     let v0 : string = ""
     v0
-and standardize_path_93 (v0 : string) : string =
-    let v1 : string = get_full_path_66(v0)
-    normalize_path_33(v1)
-and method95 (v0 : string, v1 : System.Threading.CancellationToken option, v2 : (struct (string * string) []), v3 : (struct (int32 * string * bool) -> Async<unit>) option, v4 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option, v5 : bool, v6 : string option, v7 : bool) : string =
+and standardize_path_75 (v0 : string) : string =
+    let v1 : string = get_full_path_56(v0)
+    normalize_path_28(v1)
+and method77 (v0 : string, v1 : System.Threading.CancellationToken option, v2 : (struct (string * string) []), v3 : (struct (int32 * string * bool) -> Async<unit>) option, v4 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option, v5 : bool, v6 : string option, v7 : bool) : string =
     v0
-and method98 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "c"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method99 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "s'"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method100 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "line_start"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method101 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "position"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method102 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "line"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method103 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "col"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method104 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "text_length"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_97 (v0 : char, v1 : int32, v2 : int32, v3 : int32, v4 : int32) : string =
-    let v5 : string = method13()
-    let v6 : Mut3 = {l0 = v5} : Mut3
-    method18(v6)
-    method98(v6)
-    method20(v6)
-    let v7 : string = $"{v0}"
-    method14(v6, v7)
-    method64(v6)
-    method99(v6)
-    method20(v6)
-    method18(v6)
-    method100(v6)
-    method20(v6)
-    let v8 : string = $"{v1}"
-    method14(v6, v8)
-    method64(v6)
-    method101(v6)
-    method20(v6)
-    method18(v6)
-    method102(v6)
-    method20(v6)
-    let v9 : string = $"{v2}"
-    method14(v6, v9)
-    method64(v6)
-    method103(v6)
-    method20(v6)
-    let v10 : string = $"{v3}"
-    method14(v6, v10)
-    method21(v6)
-    method64(v6)
-    method104(v6)
-    method20(v6)
-    let v11 : string = $"{v4}"
-    method14(v6, v11)
-    method21(v6)
-    method21(v6)
-    let v12 : string = v6.l0
-    v12
-and closure36 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : char = '"'
-    let v7 : string = format_real_97(v6, v2, v3, v4, v5)
-    let v8 : string = "parsing.p_char / unexpected end of text / "
-    let v9 : string = v8 + v7 
-    v9
-and method105 (v0 : string, v1 : int32, v2 : int32) : int32 =
+and format_real_79 (v0 : int32) : string =
+    let v1 : string = method11()
+    let v2 : Mut3 = {l0 = v1} : Mut3
+    let v3 : string = $"{v0}"
+    method12(v2, v3)
+    let v4 : string = v2.l0
+    v4
+and closure30 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v6 : string = ""
+    let v7 : string = v6 + v6 
+    let v8 : string = "c"
+    let v9 : string = v7 + v8 
+    let v10 : string = " = "
+    let v11 : string = v9 + v10 
+    let v12 : char = '"'
+    let v13 : string = format_real_10(v12)
+    let v14 : string = v11 + v13 
+    let v15 : string = "; "
+    let v16 : string = v14 + v15 
+    let v17 : string = "s'"
+    let v18 : string = v16 + v17 
+    let v19 : string = v18 + v10 
+    let v20 : string = v6 + v6 
+    let v21 : string = "line_start"
+    let v22 : string = v20 + v21 
+    let v23 : string = v22 + v10 
+    let v24 : string = format_real_79(v2)
+    let v25 : string = v23 + v24 
+    let v26 : string = v25 + v15 
+    let v27 : string = "position"
+    let v28 : string = v26 + v27 
+    let v29 : string = v28 + v10 
+    let v30 : string = v6 + v6 
+    let v31 : string = "line"
+    let v32 : string = v30 + v31 
+    let v33 : string = v32 + v10 
+    let v34 : string = format_real_79(v3)
+    let v35 : string = v33 + v34 
+    let v36 : string = v35 + v15 
+    let v37 : string = "col"
+    let v38 : string = v36 + v37 
+    let v39 : string = v38 + v10 
+    let v40 : string = format_real_79(v4)
+    let v41 : string = v39 + v40 
+    let v42 : string = "{ "
+    let v43 : string = v42 + v41 
+    let v44 : string = " }"
+    let v45 : string = v43 + v44 
+    let v46 : string = v29 + v45 
+    let v47 : string = v46 + v15 
+    let v48 : string = "text_length"
+    let v49 : string = v47 + v48 
+    let v50 : string = v49 + v10 
+    let v51 : string = format_real_79(v5)
+    let v52 : string = v50 + v51 
+    let v53 : string = v42 + v52 
+    let v54 : string = v53 + v44 
+    let v55 : string = v19 + v54 
+    let v56 : string = v42 + v55 
+    let v57 : string = v56 + v44 
+    let v58 : string = "parsing.p_char / unexpected end of text / "
+    let v59 : string = v58 + v57 
+    v59
+and method80 (v0 : string, v1 : int32, v2 : int32) : int32 =
     let v3 : bool = v2 >= v1
     if v3 then
         v2
     else
-        let v4 : char = v0.[int v2]
+        let v4 : char = (spiralStringIndex v0 (int v2))
         let v5 : bool = '\n' = v4
         let v6 : bool = v5 <> true
         if v6 then
             let v7 : int32 = v2 + 1
-            method105(v0, v1, v7)
+            method80(v0, v1, v7)
         else
             v2
-and closure38 (v0 : int32, v1 : int32) (v2 : string) : string =
+and closure32 (v0 : int32, v1 : int32) (v2 : string) : string =
     let v3 : bool = v1 >= v0
     if v3 then
         v2
     else
         let v4 : int32 = v1 + 1
-        let v5 : (string -> string) = method106(v0, v4)
+        let v5 : (string -> string) = method81(v0, v4)
         let v6 : string = " "
         let v7 : string = v2 + v6 
         v5 v7
-and method106 (v0 : int32, v1 : int32) : (string -> string) =
-    closure38(v0, v1)
-and method108 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "expected"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_107 (v0 : char, v1 : int32, v2 : int32) : string =
-    let v3 : string = method13()
-    let v4 : Mut3 = {l0 = v3} : Mut3
-    method18(v4)
-    method108(v4)
-    method20(v4)
-    let v5 : string = $"{v0}"
-    method14(v4, v5)
-    method64(v4)
-    method102(v4)
-    method20(v4)
-    let v6 : string = $"{v1}"
-    method14(v4, v6)
-    method64(v4)
-    method103(v4)
-    method20(v4)
-    let v7 : string = $"{v2}"
-    method14(v4, v7)
-    method21(v4)
-    let v8 : string = v4.l0
-    v8
-and closure37 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : int32 = v0.Length
-    let v7 : int32 = method105(v0, v6, v1)
+and method81 (v0 : int32, v1 : int32) : (string -> string) =
+    closure32(v0, v1)
+and closure31 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v6 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v0))
+    let v7 : int32 = method80(v0, v6, v1)
     let v8 : int32 = v1 + 80
     let v9 : bool = v7 < v8
     let v10 : int32 =
@@ -1984,14 +1807,14 @@ and closure37 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : i
         else
             let v13 : bool = v2 = v10
             let v14 : int32 = v10 - 1
-            let v15 : string = v0.[int v2..int v14]
+            let v15 : string = (spiralStringSlice v0 (int v2) (int v14))
             v15
-    let v17 : int32 = v16.Length
+    let v17 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v16))
     let v18 : bool = v17 > 0
     let v22 : bool =
         if v18 then
             let v19 : int32 = v17 - 1
-            let v20 : char = v16.[int v19]
+            let v20 : char = (spiralStringIndex v16 (int v19))
             let v21 : bool = v20 = '\n'
             v21
         else
@@ -2005,31 +1828,104 @@ and closure37 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : i
             v24
     let v26 : int32 = v4 - 1
     let v27 : int32 = 0
-    let v28 : (string -> string) = method106(v26, v27)
+    let v28 : (string -> string) = method81(v26, v27)
     let v29 : string = ""
     let v30 : string = v28 v29
     let v31 : string = "^"
     let v32 : string = v30 + v31 
-    let v33 : char = '"'
-    let v34 : string = format_real_107(v33, v3, v4)
-    let v35 : string = "parsing.p_char / "
-    let v36 : string = v35 + v34 
-    let v37 : string = "\n"
+    let v33 : string = v29 + v29 
+    let v34 : string = "expected"
+    let v35 : string = v33 + v34 
+    let v36 : string = " = "
+    let v37 : string = v35 + v36 
+    let v38 : char = '"'
+    let v39 : string = format_real_10(v38)
+    let v40 : string = v37 + v39 
+    let v41 : string = "; "
+    let v42 : string = v40 + v41 
+    let v43 : string = "line"
+    let v44 : string = v42 + v43 
+    let v45 : string = v44 + v36 
+    let v46 : string = format_real_79(v3)
+    let v47 : string = v45 + v46 
+    let v48 : string = v47 + v41 
+    let v49 : string = "col"
+    let v50 : string = v48 + v49 
+    let v51 : string = v50 + v36 
+    let v52 : string = format_real_79(v4)
+    let v53 : string = v51 + v52 
+    let v54 : string = "{ "
+    let v55 : string = v54 + v53 
+    let v56 : string = " }"
+    let v57 : string = v55 + v56 
+    let v58 : string = "parsing.p_char / "
+    let v59 : string = v58 + v57 
+    let v60 : string = "\n"
+    let v61 : string = v59 + v60 
+    let v62 : string = v61 + v16 
+    let v63 : string = v62 + v25 
+    let v64 : string = v63 + v32 
+    let v65 : string = v64 + v60 
+    v65
+and closure33 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v6 : string = ""
+    let v7 : string = v6 + v6 
+    let v8 : string = "c"
+    let v9 : string = v7 + v8 
+    let v10 : string = " = "
+    let v11 : string = v9 + v10 
+    let v12 : char = '''
+    let v13 : string = format_real_10(v12)
+    let v14 : string = v11 + v13 
+    let v15 : string = "; "
+    let v16 : string = v14 + v15 
+    let v17 : string = "s'"
+    let v18 : string = v16 + v17 
+    let v19 : string = v18 + v10 
+    let v20 : string = v6 + v6 
+    let v21 : string = "line_start"
+    let v22 : string = v20 + v21 
+    let v23 : string = v22 + v10 
+    let v24 : string = format_real_79(v2)
+    let v25 : string = v23 + v24 
+    let v26 : string = v25 + v15 
+    let v27 : string = "position"
+    let v28 : string = v26 + v27 
+    let v29 : string = v28 + v10 
+    let v30 : string = v6 + v6 
+    let v31 : string = "line"
+    let v32 : string = v30 + v31 
+    let v33 : string = v32 + v10 
+    let v34 : string = format_real_79(v3)
+    let v35 : string = v33 + v34 
+    let v36 : string = v35 + v15 
+    let v37 : string = "col"
     let v38 : string = v36 + v37 
-    let v39 : string = v38 + v16 
-    let v40 : string = v39 + v25 
-    let v41 : string = v40 + v32 
-    let v42 : string = v41 + v37 
-    v42
-and closure39 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : char = '''
-    let v7 : string = format_real_97(v6, v2, v3, v4, v5)
-    let v8 : string = "parsing.p_char / unexpected end of text / "
-    let v9 : string = v8 + v7 
-    v9
-and closure40 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : int32 = v0.Length
-    let v7 : int32 = method105(v0, v6, v1)
+    let v39 : string = v38 + v10 
+    let v40 : string = format_real_79(v4)
+    let v41 : string = v39 + v40 
+    let v42 : string = "{ "
+    let v43 : string = v42 + v41 
+    let v44 : string = " }"
+    let v45 : string = v43 + v44 
+    let v46 : string = v29 + v45 
+    let v47 : string = v46 + v15 
+    let v48 : string = "text_length"
+    let v49 : string = v47 + v48 
+    let v50 : string = v49 + v10 
+    let v51 : string = format_real_79(v5)
+    let v52 : string = v50 + v51 
+    let v53 : string = v42 + v52 
+    let v54 : string = v53 + v44 
+    let v55 : string = v19 + v54 
+    let v56 : string = v42 + v55 
+    let v57 : string = v56 + v44 
+    let v58 : string = "parsing.p_char / unexpected end of text / "
+    let v59 : string = v58 + v57 
+    v59
+and closure34 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v6 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v0))
+    let v7 : int32 = method80(v0, v6, v1)
     let v8 : int32 = v1 + 80
     let v9 : bool = v7 < v8
     let v10 : int32 =
@@ -2045,14 +1941,14 @@ and closure40 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : i
         else
             let v13 : bool = v2 = v10
             let v14 : int32 = v10 - 1
-            let v15 : string = v0.[int v2..int v14]
+            let v15 : string = (spiralStringSlice v0 (int v2) (int v14))
             v15
-    let v17 : int32 = v16.Length
+    let v17 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v16))
     let v18 : bool = v17 > 0
     let v22 : bool =
         if v18 then
             let v19 : int32 = v17 - 1
-            let v20 : char = v16.[int v19]
+            let v20 : char = (spiralStringIndex v16 (int v19))
             let v21 : bool = v20 = '\n'
             v21
         else
@@ -2066,119 +1962,216 @@ and closure40 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : i
             v24
     let v26 : int32 = v4 - 1
     let v27 : int32 = 0
-    let v28 : (string -> string) = method106(v26, v27)
+    let v28 : (string -> string) = method81(v26, v27)
     let v29 : string = ""
     let v30 : string = v28 v29
     let v31 : string = "^"
     let v32 : string = v30 + v31 
-    let v33 : char = '''
-    let v34 : string = format_real_107(v33, v3, v4)
-    let v35 : string = "parsing.p_char / "
-    let v36 : string = v35 + v34 
-    let v37 : string = "\n"
-    let v38 : string = v36 + v37 
-    let v39 : string = v38 + v16 
-    let v40 : string = v39 + v25 
-    let v41 : string = v40 + v32 
-    let v42 : string = v41 + v37 
-    v42
-and closure41 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v33 : string = v29 + v29 
+    let v34 : string = "expected"
+    let v35 : string = v33 + v34 
+    let v36 : string = " = "
+    let v37 : string = v35 + v36 
+    let v38 : char = '''
+    let v39 : string = format_real_10(v38)
+    let v40 : string = v37 + v39 
+    let v41 : string = "; "
+    let v42 : string = v40 + v41 
+    let v43 : string = "line"
+    let v44 : string = v42 + v43 
+    let v45 : string = v44 + v36 
+    let v46 : string = format_real_79(v3)
+    let v47 : string = v45 + v46 
+    let v48 : string = v47 + v41 
+    let v49 : string = "col"
+    let v50 : string = v48 + v49 
+    let v51 : string = v50 + v36 
+    let v52 : string = format_real_79(v4)
+    let v53 : string = v51 + v52 
+    let v54 : string = "{ "
+    let v55 : string = v54 + v53 
+    let v56 : string = " }"
+    let v57 : string = v55 + v56 
+    let v58 : string = "parsing.p_char / "
+    let v59 : string = v58 + v57 
+    let v60 : string = "\n"
+    let v61 : string = v59 + v60 
+    let v62 : string = v61 + v16 
+    let v63 : string = v62 + v25 
+    let v64 : string = v63 + v32 
+    let v65 : string = v64 + v60 
+    v65
+and closure35 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : string = "parsing.choice / no parsers succeeded"
     v6
-and format_real_109 (v0 : (char [])) : string =
-    let v1 : string = method13()
-    let v2 : Mut3 = {l0 = v1} : Mut3
-    let v3 : string = $"%A{v0}"
-    method14(v2, v3)
-    let v4 : string = v2.l0
-    v4
-and method111 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "chars'"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method112 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "s"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_110 (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32) : string =
-    let v5 : string = method13()
-    let v6 : Mut3 = {l0 = v5} : Mut3
-    method18(v6)
-    method111(v6)
-    method20(v6)
-    method14(v6, v0)
-    method64(v6)
-    method112(v6)
-    method20(v6)
-    let v7 : string = $"%A{struct (v1, v2, v3, v4)}"
-    method14(v6, v7)
-    method21(v6)
-    let v8 : string = v6.l0
-    v8
-and closure42 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+and method82 (v0 : (char [])) : string =
+    let v1 : uint64 = System.Convert.ToUInt64 v0.Length
+    let v2 : uint64 = 0UL
+    let v3 : Mut6 = {l0 = v2} : Mut6
+    let v4 : string = ""
+    let v5 : Mut3 = {l0 = v4} : Mut3
+    while method16(v1, v3) do
+        let v7 : uint64 = v3.l0
+        let v8 : char = v0.[int v7]
+        let v9 : string = format_real_10(v8)
+        let v10 : bool = v7 = 0UL
+        let v15 : string =
+            if v10 then
+                v9
+            else
+                let v11 : string = v5.l0
+                let v12 : string = ", "
+                let v13 : string = v11 + v12 
+                let v14 : string = v13 + v9 
+                v14
+        v5.l0 <- v15
+        let v16 : uint64 = v7 + 1UL
+        v3.l0 <- v16
+        ()
+    let v17 : string = v5.l0
+    let v18 : string = "["
+    let v19 : string = v18 + v17 
+    let v20 : string = "]"
+    let v21 : string = v19 + v20 
+    v21
+and closure36 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : char list = []
     let v7 : char list = ''' :: v6 
     let v8 : char list = '"' :: v7 
     let v9 : (char list -> (char [])) = List.toArray
     let v10 : (char []) = v9 v8
-    let v11 : string = format_real_109(v10)
-    let v12 : string = format_real_110(v11, v2, v3, v4, v5)
-    let v13 : string = "parsing.none_of / unexpected end of text / "
-    let v14 : string = v13 + v12 
-    v14
-and method114 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "first_char"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_113 (v0 : char, v1 : string, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : string = method13()
-    let v7 : Mut3 = {l0 = v6} : Mut3
-    method18(v7)
-    method114(v7)
-    method20(v7)
-    let v8 : string = $"{v0}"
-    method14(v7, v8)
-    method64(v7)
-    method111(v7)
-    method20(v7)
-    method14(v7, v1)
-    method64(v7)
-    method112(v7)
-    method20(v7)
-    let v9 : string = $"%A{struct (v2, v3, v4, v5)}"
-    method14(v7, v9)
-    method21(v7)
-    let v10 : string = v7.l0
-    v10
-and closure43 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : char = v0.[int v1]
+    let v11 : string = method82(v10)
+    let v12 : string = ""
+    let v13 : string = v12 + v12 
+    let v14 : string = "chars'"
+    let v15 : string = v13 + v14 
+    let v16 : string = " = "
+    let v17 : string = v15 + v16 
+    let v18 : string = v17 + v11 
+    let v19 : string = "; "
+    let v20 : string = v18 + v19 
+    let v21 : string = "s"
+    let v22 : string = v20 + v21 
+    let v23 : string = v22 + v16 
+    let v24 : string = v12 + v12 
+    let v25 : string = "line_start"
+    let v26 : string = v24 + v25 
+    let v27 : string = v26 + v16 
+    let v28 : string = format_real_79(v2)
+    let v29 : string = v27 + v28 
+    let v30 : string = v29 + v19 
+    let v31 : string = "position"
+    let v32 : string = v30 + v31 
+    let v33 : string = v32 + v16 
+    let v34 : string = v12 + v12 
+    let v35 : string = "line"
+    let v36 : string = v34 + v35 
+    let v37 : string = v36 + v16 
+    let v38 : string = format_real_79(v3)
+    let v39 : string = v37 + v38 
+    let v40 : string = v39 + v19 
+    let v41 : string = "col"
+    let v42 : string = v40 + v41 
+    let v43 : string = v42 + v16 
+    let v44 : string = format_real_79(v4)
+    let v45 : string = v43 + v44 
+    let v46 : string = "{ "
+    let v47 : string = v46 + v45 
+    let v48 : string = " }"
+    let v49 : string = v47 + v48 
+    let v50 : string = v33 + v49 
+    let v51 : string = v50 + v19 
+    let v52 : string = "text_length"
+    let v53 : string = v51 + v52 
+    let v54 : string = v53 + v16 
+    let v55 : string = format_real_79(v5)
+    let v56 : string = v54 + v55 
+    let v57 : string = v46 + v56 
+    let v58 : string = v57 + v48 
+    let v59 : string = v23 + v58 
+    let v60 : string = v46 + v59 
+    let v61 : string = v60 + v48 
+    let v62 : string = "parsing.none_of / unexpected end of text / "
+    let v63 : string = v62 + v61 
+    v63
+and closure37 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v6 : char = (spiralStringIndex v0 (int v1))
     let v7 : char list = []
     let v8 : char list = ''' :: v7 
     let v9 : char list = '"' :: v8 
     let v10 : (char list -> (char [])) = List.toArray
     let v11 : (char []) = v10 v9
-    let v12 : string = format_real_109(v11)
-    let v13 : string = format_real_113(v6, v12, v2, v3, v4, v5)
-    let v14 : string = "parsing.none_of / unexpected char / "
-    let v15 : string = v14 + v13 
-    v15
-and closure44 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v12 : string = method82(v11)
+    let v13 : string = ""
+    let v14 : string = v13 + v13 
+    let v15 : string = "first_char"
+    let v16 : string = v14 + v15 
+    let v17 : string = " = "
+    let v18 : string = v16 + v17 
+    let v19 : string = format_real_10(v6)
+    let v20 : string = v18 + v19 
+    let v21 : string = "; "
+    let v22 : string = v20 + v21 
+    let v23 : string = "chars'"
+    let v24 : string = v22 + v23 
+    let v25 : string = v24 + v17 
+    let v26 : string = v25 + v12 
+    let v27 : string = v26 + v21 
+    let v28 : string = "s"
+    let v29 : string = v27 + v28 
+    let v30 : string = v29 + v17 
+    let v31 : string = v13 + v13 
+    let v32 : string = "line_start"
+    let v33 : string = v31 + v32 
+    let v34 : string = v33 + v17 
+    let v35 : string = format_real_79(v2)
+    let v36 : string = v34 + v35 
+    let v37 : string = v36 + v21 
+    let v38 : string = "position"
+    let v39 : string = v37 + v38 
+    let v40 : string = v39 + v17 
+    let v41 : string = v13 + v13 
+    let v42 : string = "line"
+    let v43 : string = v41 + v42 
+    let v44 : string = v43 + v17 
+    let v45 : string = format_real_79(v3)
+    let v46 : string = v44 + v45 
+    let v47 : string = v46 + v21 
+    let v48 : string = "col"
+    let v49 : string = v47 + v48 
+    let v50 : string = v49 + v17 
+    let v51 : string = format_real_79(v4)
+    let v52 : string = v50 + v51 
+    let v53 : string = "{ "
+    let v54 : string = v53 + v52 
+    let v55 : string = " }"
+    let v56 : string = v54 + v55 
+    let v57 : string = v40 + v56 
+    let v58 : string = v57 + v21 
+    let v59 : string = "text_length"
+    let v60 : string = v58 + v59 
+    let v61 : string = v60 + v17 
+    let v62 : string = format_real_79(v5)
+    let v63 : string = v61 + v62 
+    let v64 : string = v53 + v63 
+    let v65 : string = v64 + v55 
+    let v66 : string = v30 + v65 
+    let v67 : string = v53 + v66 
+    let v68 : string = v67 + v55 
+    let v69 : string = "parsing.none_of / unexpected char / "
+    let v70 : string = v69 + v68 
+    v70
+and closure38 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : string = "parsing.many1_chars / inner parser succeeded without consuming text"
     v6
-and method115 (v0 : int32, v1 : string, v2 : int32, v3 : int32, v4 : int32, v5 : int32, v6 : int32) : US22 =
+and method83 (v0 : int32, v1 : string, v2 : int32, v3 : int32, v4 : int32, v5 : int32, v6 : int32) : US19 =
     let v7 : bool = v2 >= v6
-    let v28 : US21 =
+    let v28 : US18 =
         if v7 then
-            let v8 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure42()
-            US21_Error(v8, v2, v3, v4, v5, v6)
+            let v8 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
+            US18_Error(v8, v2, v3, v4, v5, v6)
         else
-            let v10 : char = v1.[int v2]
+            let v10 : char = (spiralStringIndex v1 (int v2))
             let v11 : bool = v10 = '"'
             let v13 : bool =
                 if v11 then
@@ -2198,12 +2191,12 @@ and method115 (v0 : int32, v1 : string, v2 : int32, v3 : int32, v4 : int32, v5 :
                     else
                         let v19 : int32 = v5 + 1
                         struct (v3, v4, v19, v6)
-                US21_Ok(v10, v15, v20, v21, v22, v23)
+                US18_Ok(v10, v15, v20, v21, v22, v23)
             else
-                let v25 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure43()
-                US21_Error(v25, v2, v3, v4, v5, v6)
+                let v25 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
+                US18_Error(v25, v2, v3, v4, v5, v6)
     match v28 with
-    | US21_Error(v29, v30, v31, v32, v33, v34) -> (* Error *)
+    | US18_Error(v29, v30, v31, v32, v33, v34) -> (* Error *)
         let v35 : bool = v0 >= v2
         let v40 : string =
             if v35 then
@@ -2212,36 +2205,20 @@ and method115 (v0 : int32, v1 : string, v2 : int32, v3 : int32, v4 : int32, v5 :
             else
                 let v37 : bool = v0 = v2
                 let v38 : int32 = v2 - 1
-                let v39 : string = v1.[int v0..int v38]
+                let v39 : string = (spiralStringSlice v1 (int v0) (int v38))
                 v39
-        US22_Ok(v40, v2, v3, v4, v5, v6)
-    | US21_Ok(v42, v43, v44, v45, v46, v47) -> (* Ok *)
+        US19_Ok(v40, v2, v3, v4, v5, v6)
+    | US18_Ok(v42, v43, v44, v45, v46, v47) -> (* Ok *)
         let v48 : bool = v43 = v2
         let v49 : bool = v48 <> true
         if v49 then
-            method115(v0, v1, v43, v44, v45, v46, v47)
+            method83(v0, v1, v43, v44, v45, v46, v47)
         else
-            let v51 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure44()
-            US22_Error(v51, v2, v3, v4, v5, v6)
-and method117 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "rest'"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_116 (v0 : string) : string =
-    let v1 : string = method13()
-    let v2 : Mut3 = {l0 = v1} : Mut3
-    method18(v2)
-    method117(v2)
-    method20(v2)
-    method14(v2, v0)
-    method21(v2)
-    let v3 : string = v2.l0
-    v3
-and closure45 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+            let v51 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure38()
+            US19_Error(v51, v2, v3, v4, v5, v6)
+and closure39 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : int32 = v1 + 80
-    let v7 : int32 = v0.Length
+    let v7 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v0))
     let v8 : bool = v7 < v6
     let v9 : int32 =
         if v8 then
@@ -2256,57 +2233,33 @@ and closure45 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : i
         else
             let v12 : bool = v1 = v9
             let v13 : int32 = v9 - 1
-            let v14 : string = v0.[int v1..int v13]
+            let v14 : string = (spiralStringSlice v0 (int v1) (int v13))
             v14
-    let v16 : string = format_real_116(v15)
-    let v17 : string = "parsing.between / expected content or closing delimiter / "
-    let v18 : string = v17 + v16 
-    v18
-and e_c47 (v0 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string), v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32, v6 : string) () : string =
+    let v16 : string = ""
+    let v17 : string = v16 + v16 
+    let v18 : string = "rest'"
+    let v19 : string = v17 + v18 
+    let v20 : string = " = "
+    let v21 : string = v19 + v20 
+    let v22 : string = v21 + v15 
+    let v23 : string = "{ "
+    let v24 : string = v23 + v22 
+    let v25 : string = " }"
+    let v26 : string = v24 + v25 
+    let v27 : string = "parsing.between / expected content or closing delimiter / "
+    let v28 : string = v27 + v26 
+    v28
+and e_c41 (v0 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string), v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32, v6 : string) () : string =
     v0 struct (v6, v1, v2, v3, v4, v5)
-and method119 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "e"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method120 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "t"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method121 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "rest''"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_118 (v0 : (unit -> string), v1 : string, v2 : string, v3 : string) : string =
-    let v4 : string = method13()
-    let v5 : Mut3 = {l0 = v4} : Mut3
-    method18(v5)
-    method119(v5)
-    method20(v5)
-    let v6 : string = v0 ()
-    method14(v5, v6)
-    method64(v5)
-    method120(v5)
-    method20(v5)
-    method14(v5, v1)
-    method64(v5)
-    method117(v5)
-    method20(v5)
-    method14(v5, v2)
-    method64(v5)
-    method121(v5)
-    method20(v5)
-    method14(v5, v3)
-    method21(v5)
-    let v7 : string = v5.l0
-    v7
-and closure46 (v0 : int32, v1 : int32, v2 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string), v3 : int32, v4 : int32, v5 : int32, v6 : int32, v7 : int32) struct (v8 : string, v9 : int32, v10 : int32, v11 : int32, v12 : int32, v13 : int32) : string =
-    let v14 : int32 = v8.Length
+and format_real_84 (v0 : (unit -> string)) : string =
+    let v1 : string = method11()
+    let v2 : Mut3 = {l0 = v1} : Mut3
+    let v3 : string = v0 ()
+    method12(v2, v3)
+    let v4 : string = v2.l0
+    v4
+and closure40 (v0 : int32, v1 : int32, v2 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string), v3 : int32, v4 : int32, v5 : int32, v6 : int32, v7 : int32) struct (v8 : string, v9 : int32, v10 : int32, v11 : int32, v12 : int32, v13 : int32) : string =
+    let v14 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v8))
     let v15 : int32 = v0 + 80
     let v16 : bool = v14 < v15
     let v17 : int32 =
@@ -2329,7 +2282,7 @@ and closure46 (v0 : int32, v1 : int32, v2 : (struct (string * int32 * int32 * in
         else
             let v23 : bool = v0 = v17
             let v24 : int32 = v17 - 1
-            let v25 : string = v8.[int v0..int v24]
+            let v25 : string = (spiralStringSlice v8 (int v0) (int v24))
             v25
     let v27 : bool = v1 >= v20
     let v32 : string =
@@ -2339,46 +2292,177 @@ and closure46 (v0 : int32, v1 : int32, v2 : (struct (string * int32 * int32 * in
         else
             let v29 : bool = v1 = v20
             let v30 : int32 = v20 - 1
-            let v31 : string = v8.[int v1..int v30]
+            let v31 : string = (spiralStringSlice v8 (int v1) (int v30))
             v31
-    let v33 : (unit -> string) = e_c47(v2, v3, v4, v5, v6, v7, v8)
-    let v34 : string = format_real_118(v33, v8, v26, v32)
-    let v35 : string = "parsing.between / expected closing delimiter / "
-    let v36 : string = v35 + v34 
-    v36
-and closure48 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v33 : string = ""
+    let v34 : string = v33 + v33 
+    let v35 : string = "e"
+    let v36 : string = v34 + v35 
+    let v37 : string = " = "
+    let v38 : string = v36 + v37 
+    let v39 : (unit -> string) = e_c41(v2, v3, v4, v5, v6, v7, v8)
+    let v40 : string = format_real_84(v39)
+    let v41 : string = v38 + v40 
+    let v42 : string = "; "
+    let v43 : string = v41 + v42 
+    let v44 : string = "t"
+    let v45 : string = v43 + v44 
+    let v46 : string = v45 + v37 
+    let v47 : string = v46 + v8 
+    let v48 : string = v47 + v42 
+    let v49 : string = "rest'"
+    let v50 : string = v48 + v49 
+    let v51 : string = v50 + v37 
+    let v52 : string = v51 + v26 
+    let v53 : string = v52 + v42 
+    let v54 : string = "rest''"
+    let v55 : string = v53 + v54 
+    let v56 : string = v55 + v37 
+    let v57 : string = v56 + v32 
+    let v58 : string = "{ "
+    let v59 : string = v58 + v57 
+    let v60 : string = " }"
+    let v61 : string = v59 + v60 
+    let v62 : string = "parsing.between / expected closing delimiter / "
+    let v63 : string = v62 + v61 
+    v63
+and closure42 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : char list = []
     let v7 : char list = ' ' :: v6 
     let v8 : char list = ''' :: v7 
     let v9 : char list = '"' :: v8 
     let v10 : (char list -> (char [])) = List.toArray
     let v11 : (char []) = v10 v9
-    let v12 : string = format_real_109(v11)
-    let v13 : string = format_real_110(v12, v2, v3, v4, v5)
-    let v14 : string = "parsing.none_of / unexpected end of text / "
-    let v15 : string = v14 + v13 
-    v15
-and closure49 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : char = v0.[int v1]
+    let v12 : string = method82(v11)
+    let v13 : string = ""
+    let v14 : string = v13 + v13 
+    let v15 : string = "chars'"
+    let v16 : string = v14 + v15 
+    let v17 : string = " = "
+    let v18 : string = v16 + v17 
+    let v19 : string = v18 + v12 
+    let v20 : string = "; "
+    let v21 : string = v19 + v20 
+    let v22 : string = "s"
+    let v23 : string = v21 + v22 
+    let v24 : string = v23 + v17 
+    let v25 : string = v13 + v13 
+    let v26 : string = "line_start"
+    let v27 : string = v25 + v26 
+    let v28 : string = v27 + v17 
+    let v29 : string = format_real_79(v2)
+    let v30 : string = v28 + v29 
+    let v31 : string = v30 + v20 
+    let v32 : string = "position"
+    let v33 : string = v31 + v32 
+    let v34 : string = v33 + v17 
+    let v35 : string = v13 + v13 
+    let v36 : string = "line"
+    let v37 : string = v35 + v36 
+    let v38 : string = v37 + v17 
+    let v39 : string = format_real_79(v3)
+    let v40 : string = v38 + v39 
+    let v41 : string = v40 + v20 
+    let v42 : string = "col"
+    let v43 : string = v41 + v42 
+    let v44 : string = v43 + v17 
+    let v45 : string = format_real_79(v4)
+    let v46 : string = v44 + v45 
+    let v47 : string = "{ "
+    let v48 : string = v47 + v46 
+    let v49 : string = " }"
+    let v50 : string = v48 + v49 
+    let v51 : string = v34 + v50 
+    let v52 : string = v51 + v20 
+    let v53 : string = "text_length"
+    let v54 : string = v52 + v53 
+    let v55 : string = v54 + v17 
+    let v56 : string = format_real_79(v5)
+    let v57 : string = v55 + v56 
+    let v58 : string = v47 + v57 
+    let v59 : string = v58 + v49 
+    let v60 : string = v24 + v59 
+    let v61 : string = v47 + v60 
+    let v62 : string = v61 + v49 
+    let v63 : string = "parsing.none_of / unexpected end of text / "
+    let v64 : string = v63 + v62 
+    v64
+and closure43 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v6 : char = (spiralStringIndex v0 (int v1))
     let v7 : char list = []
     let v8 : char list = ' ' :: v7 
     let v9 : char list = ''' :: v8 
     let v10 : char list = '"' :: v9 
     let v11 : (char list -> (char [])) = List.toArray
     let v12 : (char []) = v11 v10
-    let v13 : string = format_real_109(v12)
-    let v14 : string = format_real_113(v6, v13, v2, v3, v4, v5)
-    let v15 : string = "parsing.none_of / unexpected char / "
-    let v16 : string = v15 + v14 
-    v16
-and method122 (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : US22 =
+    let v13 : string = method82(v12)
+    let v14 : string = ""
+    let v15 : string = v14 + v14 
+    let v16 : string = "first_char"
+    let v17 : string = v15 + v16 
+    let v18 : string = " = "
+    let v19 : string = v17 + v18 
+    let v20 : string = format_real_10(v6)
+    let v21 : string = v19 + v20 
+    let v22 : string = "; "
+    let v23 : string = v21 + v22 
+    let v24 : string = "chars'"
+    let v25 : string = v23 + v24 
+    let v26 : string = v25 + v18 
+    let v27 : string = v26 + v13 
+    let v28 : string = v27 + v22 
+    let v29 : string = "s"
+    let v30 : string = v28 + v29 
+    let v31 : string = v30 + v18 
+    let v32 : string = v14 + v14 
+    let v33 : string = "line_start"
+    let v34 : string = v32 + v33 
+    let v35 : string = v34 + v18 
+    let v36 : string = format_real_79(v2)
+    let v37 : string = v35 + v36 
+    let v38 : string = v37 + v22 
+    let v39 : string = "position"
+    let v40 : string = v38 + v39 
+    let v41 : string = v40 + v18 
+    let v42 : string = v14 + v14 
+    let v43 : string = "line"
+    let v44 : string = v42 + v43 
+    let v45 : string = v44 + v18 
+    let v46 : string = format_real_79(v3)
+    let v47 : string = v45 + v46 
+    let v48 : string = v47 + v22 
+    let v49 : string = "col"
+    let v50 : string = v48 + v49 
+    let v51 : string = v50 + v18 
+    let v52 : string = format_real_79(v4)
+    let v53 : string = v51 + v52 
+    let v54 : string = "{ "
+    let v55 : string = v54 + v53 
+    let v56 : string = " }"
+    let v57 : string = v55 + v56 
+    let v58 : string = v41 + v57 
+    let v59 : string = v58 + v22 
+    let v60 : string = "text_length"
+    let v61 : string = v59 + v60 
+    let v62 : string = v61 + v18 
+    let v63 : string = format_real_79(v5)
+    let v64 : string = v62 + v63 
+    let v65 : string = v54 + v64 
+    let v66 : string = v65 + v56 
+    let v67 : string = v31 + v66 
+    let v68 : string = v54 + v67 
+    let v69 : string = v68 + v56 
+    let v70 : string = "parsing.none_of / unexpected char / "
+    let v71 : string = v70 + v69 
+    v71
+and method85 (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : US19 =
     let v6 : bool = v1 >= v5
-    let v29 : US21 =
+    let v29 : US18 =
         if v6 then
-            let v7 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure48()
-            US21_Error(v7, v1, v2, v3, v4, v5)
+            let v7 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure42()
+            US18_Error(v7, v1, v2, v3, v4, v5)
         else
-            let v9 : char = v0.[int v1]
+            let v9 : char = (spiralStringIndex v0 (int v1))
             let v10 : bool = v9 = '"'
             let v14 : bool =
                 if v10 then
@@ -2402,12 +2486,12 @@ and method122 (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 :
                     else
                         let v20 : int32 = v4 + 1
                         struct (v2, v3, v20, v5)
-                US21_Ok(v9, v16, v21, v22, v23, v24)
+                US18_Ok(v9, v16, v21, v22, v23, v24)
             else
-                let v26 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure49()
-                US21_Error(v26, v1, v2, v3, v4, v5)
+                let v26 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure43()
+                US18_Error(v26, v1, v2, v3, v4, v5)
     match v29 with
-    | US21_Error(v30, v31, v32, v33, v34, v35) -> (* Error *)
+    | US18_Error(v30, v31, v32, v33, v34, v35) -> (* Error *)
         let v36 : bool = 0 >= v1
         let v41 : string =
             if v36 then
@@ -2416,34 +2500,18 @@ and method122 (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 :
             else
                 let v38 : bool = 0 = v1
                 let v39 : int32 = v1 - 1
-                let v40 : string = v0.[int 0..int v39]
+                let v40 : string = (spiralStringSlice v0 (int 0) (int v39))
                 v40
-        US22_Ok(v41, v1, v2, v3, v4, v5)
-    | US21_Ok(v43, v44, v45, v46, v47, v48) -> (* Ok *)
+        US19_Ok(v41, v1, v2, v3, v4, v5)
+    | US18_Ok(v43, v44, v45, v46, v47, v48) -> (* Ok *)
         let v49 : bool = v44 = v1
         let v50 : bool = v49 <> true
         if v50 then
-            method122(v0, v44, v45, v46, v47, v48)
+            method85(v0, v44, v45, v46, v47, v48)
         else
-            let v52 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure44()
-            US22_Error(v52, v1, v2, v3, v4, v5)
-and method124 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "rest"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_123 (v0 : string) : string =
-    let v1 : string = method13()
-    let v2 : Mut3 = {l0 = v1} : Mut3
-    method18(v2)
-    method124(v2)
-    method20(v2)
-    method14(v2, v0)
-    method21(v2)
-    let v3 : string = v2.l0
-    v3
-and closure50 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+            let v52 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure38()
+            US19_Error(v52, v1, v2, v3, v4, v5)
+and closure44 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : bool = v1 >= v5
     let v11 : string =
         if v6 then
@@ -2452,18 +2520,28 @@ and closure50 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : i
         else
             let v8 : bool = v1 = v5
             let v9 : int32 = v5 - 1
-            let v10 : string = v0.[int v1..int v9]
+            let v10 : string = (spiralStringSlice v0 (int v1) (int v9))
             v10
-    let v12 : string = format_real_123(v11)
-    let v13 : string = "parsing.eof / expected end of text / "
-    let v14 : string = v13 + v12 
-    v14
-and method125 (v0 : string, v1 : int32, v2 : int32) : int32 =
+    let v12 : string = ""
+    let v13 : string = v12 + v12 
+    let v14 : string = "rest"
+    let v15 : string = v13 + v14 
+    let v16 : string = " = "
+    let v17 : string = v15 + v16 
+    let v18 : string = v17 + v11 
+    let v19 : string = "{ "
+    let v20 : string = v19 + v18 
+    let v21 : string = " }"
+    let v22 : string = v20 + v21 
+    let v23 : string = "parsing.eof / expected end of text / "
+    let v24 : string = v23 + v22 
+    v24
+and method86 (v0 : string, v1 : int32, v2 : int32) : int32 =
     let v3 : bool = v2 >= v1
     if v3 then
         v2
     else
-        let v4 : char = v0.[int v2]
+        let v4 : char = (spiralStringIndex v0 (int v2))
         let v5 : bool = v4 = ' '
         let v7 : bool =
             if v5 then
@@ -2479,10 +2557,10 @@ and method125 (v0 : string, v1 : int32, v2 : int32) : int32 =
                 v8
         if v9 then
             let v10 : int32 = v2 + 1
-            method125(v0, v1, v10)
+            method86(v0, v1, v10)
         else
             v2
-and closure51 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+and closure45 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : int32 = v1 + 80
     let v7 : bool = v5 < v6
     let v8 : int32 =
@@ -2498,29 +2576,39 @@ and closure51 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : i
         else
             let v11 : bool = v1 = v8
             let v12 : int32 = v8 - 1
-            let v13 : string = v0.[int v1..int v12]
+            let v13 : string = (spiralStringSlice v0 (int v1) (int v12))
             v13
-    let v15 : string = format_real_123(v14)
-    let v16 : string = "parsing.spaces1 / expected at least one space / "
-    let v17 : string = v16 + v15 
-    v17
-and closure52 (v0 : string) () : string =
+    let v15 : string = ""
+    let v16 : string = v15 + v15 
+    let v17 : string = "rest"
+    let v18 : string = v16 + v17 
+    let v19 : string = " = "
+    let v20 : string = v18 + v19 
+    let v21 : string = v20 + v14 
+    let v22 : string = "{ "
+    let v23 : string = v22 + v21 
+    let v24 : string = " }"
+    let v25 : string = v23 + v24 
+    let v26 : string = "parsing.spaces1 / expected at least one space / "
+    let v27 : string = v26 + v25 
+    v27
+and closure46 (v0 : string) () : string =
     v0
-and closure53 (v0 : string) () : string =
+and closure47 (v0 : string) () : string =
     v0
-and closure54 (v0 : US25) () : US25 =
+and closure48 (v0 : US22) () : US22 =
     v0
-and closure55 (v0 : string, v1 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string), v2 : int32, v3 : int32, v4 : int32, v5 : int32, v6 : int32) () : string =
+and closure49 (v0 : string, v1 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string), v2 : int32, v3 : int32, v4 : int32, v5 : int32, v6 : int32) () : string =
     v1 struct (v0, v2, v3, v4, v5, v6)
-and split_command_96 (v0 : string) : US20 =
-    let v1 : int32 = v0.Length
+and split_command_78 (v0 : string) : US17 =
+    let v1 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v0))
     let v2 : bool = 0 >= v1
-    let v16 : US21 =
+    let v16 : US18 =
         if v2 then
-            let v3 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-            US21_Error(v3, 0, 0, 1, 1, v1)
+            let v3 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+            US18_Error(v3, 0, 0, 1, 1, v1)
         else
-            let v5 : char = v0.[int 0]
+            let v5 : char = (spiralStringIndex v0 (int 0))
             let v6 : bool = v5 = '"'
             if v6 then
                 let v7 : bool = '\n' = v5
@@ -2529,19 +2617,19 @@ and split_command_96 (v0 : string) : US20 =
                         struct (1, 2, 1, v1)
                     else
                         struct (0, 1, 2, v1)
-                US21_Ok('"', 1, v8, v9, v10, v11)
+                US18_Ok('"', 1, v8, v9, v10, v11)
             else
-                let v13 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                US21_Error(v13, 0, 0, 1, 1, v1)
-    let v60 : US21 =
+                let v13 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                US18_Error(v13, 0, 0, 1, 1, v1)
+    let v60 : US18 =
         match v16 with
-        | US21_Error(v23, v24, v25, v26, v27, v28) -> (* Error *)
-            let v42 : US21 =
+        | US18_Error(v23, v24, v25, v26, v27, v28) -> (* Error *)
+            let v42 : US18 =
                 if v2 then
-                    let v29 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure39()
-                    US21_Error(v29, 0, 0, 1, 1, v1)
+                    let v29 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure33()
+                    US18_Error(v29, 0, 0, 1, 1, v1)
                 else
-                    let v31 : char = v0.[int 0]
+                    let v31 : char = (spiralStringIndex v0 (int 0))
                     let v32 : bool = v31 = '''
                     if v32 then
                         let v33 : bool = '\n' = v31
@@ -2550,30 +2638,30 @@ and split_command_96 (v0 : string) : US20 =
                                 struct (1, 2, 1, v1)
                             else
                                 struct (0, 1, 2, v1)
-                        US21_Ok(''', 1, v34, v35, v36, v37)
+                        US18_Ok(''', 1, v34, v35, v36, v37)
                     else
-                        let v39 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure40()
-                        US21_Error(v39, 0, 0, 1, 1, v1)
+                        let v39 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure34()
+                        US18_Error(v39, 0, 0, 1, 1, v1)
             match v42 with
-            | US21_Error(v49, v50, v51, v52, v53, v54) -> (* Error *)
-                let v55 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                US21_Error(v55, 0, 0, 1, 1, v1)
-            | US21_Ok(v43, v44, v45, v46, v47, v48) -> (* Ok *)
+            | US18_Error(v49, v50, v51, v52, v53, v54) -> (* Error *)
+                let v55 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                US18_Error(v55, 0, 0, 1, 1, v1)
+            | US18_Ok(v43, v44, v45, v46, v47, v48) -> (* Ok *)
                 v42
-        | US21_Ok(v17, v18, v19, v20, v21, v22) -> (* Ok *)
+        | US18_Ok(v17, v18, v19, v20, v21, v22) -> (* Ok *)
             v16
-    let v312 : US22 =
+    let v312 : US19 =
         match v60 with
-        | US21_Error(v304, v305, v306, v307, v308, v309) -> (* Error *)
-            US22_Error(v304, v305, v306, v307, v308, v309)
-        | US21_Ok(v61, v62, v63, v64, v65, v66) -> (* Ok *)
+        | US18_Error(v304, v305, v306, v307, v308, v309) -> (* Error *)
+            US19_Error(v304, v305, v306, v307, v308, v309)
+        | US18_Ok(v61, v62, v63, v64, v65, v66) -> (* Ok *)
             let v67 : bool = v62 >= v66
-            let v88 : US21 =
+            let v88 : US18 =
                 if v67 then
-                    let v68 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure42()
-                    US21_Error(v68, v62, v63, v64, v65, v66)
+                    let v68 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
+                    US18_Error(v68, v62, v63, v64, v65, v66)
                 else
-                    let v70 : char = v0.[int v62]
+                    let v70 : char = (spiralStringIndex v0 (int v62))
                     let v71 : bool = v70 = '"'
                     let v73 : bool =
                         if v71 then
@@ -2593,31 +2681,31 @@ and split_command_96 (v0 : string) : US20 =
                             else
                                 let v79 : int32 = v65 + 1
                                 struct (v63, v64, v79, v66)
-                        US21_Ok(v70, v75, v80, v81, v82, v83)
+                        US18_Ok(v70, v75, v80, v81, v82, v83)
                     else
-                        let v85 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure43()
-                        US21_Error(v85, v62, v63, v64, v65, v66)
-            let v104 : US22 =
+                        let v85 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
+                        US18_Error(v85, v62, v63, v64, v65, v66)
+            let v104 : US19 =
                 match v88 with
-                | US21_Error(v89, v90, v91, v92, v93, v94) -> (* Error *)
-                    US22_Error(v89, v90, v91, v92, v93, v94)
-                | US21_Ok(v96, v97, v98, v99, v100, v101) -> (* Ok *)
-                    method115(v62, v0, v97, v98, v99, v100, v101)
-            let v121 : US22 =
+                | US18_Error(v89, v90, v91, v92, v93, v94) -> (* Error *)
+                    US19_Error(v89, v90, v91, v92, v93, v94)
+                | US18_Ok(v96, v97, v98, v99, v100, v101) -> (* Ok *)
+                    method83(v62, v0, v97, v98, v99, v100, v101)
+            let v121 : US19 =
                 match v104 with
-                | US22_Error(v112, v113, v114, v115, v116, v117) -> (* Error *)
+                | US19_Error(v112, v113, v114, v115, v116, v117) -> (* Error *)
                     let v118 : string = ""
-                    US22_Ok(v118, v62, v63, v64, v65, v66)
-                | US22_Ok(v105, v106, v107, v108, v109, v110) -> (* Ok *)
-                    US22_Ok(v105, v106, v107, v108, v109, v110)
+                    US19_Ok(v118, v62, v63, v64, v65, v66)
+                | US19_Ok(v105, v106, v107, v108, v109, v110) -> (* Ok *)
+                    US19_Ok(v105, v106, v107, v108, v109, v110)
             match v121 with
-            | US22_Error(v212, v213, v214, v215, v216, v217) -> (* Error *)
-                let v235 : US21 =
+            | US19_Error(v212, v213, v214, v215, v216, v217) -> (* Error *)
+                let v235 : US18 =
                     if v67 then
-                        let v218 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                        US21_Error(v218, v62, v63, v64, v65, v66)
+                        let v218 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                        US18_Error(v218, v62, v63, v64, v65, v66)
                     else
-                        let v220 : char = v0.[int v62]
+                        let v220 : char = (spiralStringIndex v0 (int v62))
                         let v221 : bool = v220 = '"'
                         if v221 then
                             let v222 : int32 = v62 + 1
@@ -2630,19 +2718,19 @@ and split_command_96 (v0 : string) : US20 =
                                 else
                                     let v226 : int32 = v65 + 1
                                     struct (v63, v64, v226, v66)
-                            US21_Ok('"', v222, v227, v228, v229, v230)
+                            US18_Ok('"', v222, v227, v228, v229, v230)
                         else
-                            let v232 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                            US21_Error(v232, v62, v63, v64, v65, v66)
-                let v283 : US21 =
+                            let v232 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                            US18_Error(v232, v62, v63, v64, v65, v66)
+                let v283 : US18 =
                     match v235 with
-                    | US21_Error(v242, v243, v244, v245, v246, v247) -> (* Error *)
-                        let v265 : US21 =
+                    | US18_Error(v242, v243, v244, v245, v246, v247) -> (* Error *)
+                        let v265 : US18 =
                             if v67 then
-                                let v248 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure39()
-                                US21_Error(v248, v62, v63, v64, v65, v66)
+                                let v248 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure33()
+                                US18_Error(v248, v62, v63, v64, v65, v66)
                             else
-                                let v250 : char = v0.[int v62]
+                                let v250 : char = (spiralStringIndex v0 (int v62))
                                 let v251 : bool = v250 = '''
                                 if v251 then
                                     let v252 : int32 = v62 + 1
@@ -2655,33 +2743,33 @@ and split_command_96 (v0 : string) : US20 =
                                         else
                                             let v256 : int32 = v65 + 1
                                             struct (v63, v64, v256, v66)
-                                    US21_Ok(''', v252, v257, v258, v259, v260)
+                                    US18_Ok(''', v252, v257, v258, v259, v260)
                                 else
-                                    let v262 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure40()
-                                    US21_Error(v262, v62, v63, v64, v65, v66)
+                                    let v262 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure34()
+                                    US18_Error(v262, v62, v63, v64, v65, v66)
                         match v265 with
-                        | US21_Error(v272, v273, v274, v275, v276, v277) -> (* Error *)
-                            let v278 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                            US21_Error(v278, v62, v63, v64, v65, v66)
-                        | US21_Ok(v266, v267, v268, v269, v270, v271) -> (* Ok *)
+                        | US18_Error(v272, v273, v274, v275, v276, v277) -> (* Error *)
+                            let v278 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                            US18_Error(v278, v62, v63, v64, v65, v66)
+                        | US18_Ok(v266, v267, v268, v269, v270, v271) -> (* Ok *)
                             v265
-                    | US21_Ok(v236, v237, v238, v239, v240, v241) -> (* Ok *)
+                    | US18_Ok(v236, v237, v238, v239, v240, v241) -> (* Ok *)
                         v235
                 match v283 with
-                | US21_Error(v292, v293, v294, v295, v296, v297) -> (* Error *)
-                    let v298 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure45()
-                    US22_Error(v298, v62, v63, v64, v65, v66)
-                | US21_Ok(v284, v285, v286, v287, v288, v289) -> (* Ok *)
+                | US18_Error(v292, v293, v294, v295, v296, v297) -> (* Error *)
+                    let v298 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure39()
+                    US19_Error(v298, v62, v63, v64, v65, v66)
+                | US18_Ok(v284, v285, v286, v287, v288, v289) -> (* Ok *)
                     let v290 : string = ""
-                    US22_Ok(v290, v285, v286, v287, v288, v289)
-            | US22_Ok(v122, v123, v124, v125, v126, v127) -> (* Ok *)
+                    US19_Ok(v290, v285, v286, v287, v288, v289)
+            | US19_Ok(v122, v123, v124, v125, v126, v127) -> (* Ok *)
                 let v128 : bool = v123 >= v127
-                let v146 : US21 =
+                let v146 : US18 =
                     if v128 then
-                        let v129 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                        US21_Error(v129, v123, v124, v125, v126, v127)
+                        let v129 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                        US18_Error(v129, v123, v124, v125, v126, v127)
                     else
-                        let v131 : char = v0.[int v123]
+                        let v131 : char = (spiralStringIndex v0 (int v123))
                         let v132 : bool = v131 = '"'
                         if v132 then
                             let v133 : int32 = v123 + 1
@@ -2694,19 +2782,19 @@ and split_command_96 (v0 : string) : US20 =
                                 else
                                     let v137 : int32 = v126 + 1
                                     struct (v124, v125, v137, v127)
-                            US21_Ok('"', v133, v138, v139, v140, v141)
+                            US18_Ok('"', v133, v138, v139, v140, v141)
                         else
-                            let v143 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                            US21_Error(v143, v123, v124, v125, v126, v127)
-                let v194 : US21 =
+                            let v143 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                            US18_Error(v143, v123, v124, v125, v126, v127)
+                let v194 : US18 =
                     match v146 with
-                    | US21_Error(v153, v154, v155, v156, v157, v158) -> (* Error *)
-                        let v176 : US21 =
+                    | US18_Error(v153, v154, v155, v156, v157, v158) -> (* Error *)
+                        let v176 : US18 =
                             if v128 then
-                                let v159 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure39()
-                                US21_Error(v159, v123, v124, v125, v126, v127)
+                                let v159 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure33()
+                                US18_Error(v159, v123, v124, v125, v126, v127)
                             else
-                                let v161 : char = v0.[int v123]
+                                let v161 : char = (spiralStringIndex v0 (int v123))
                                 let v162 : bool = v161 = '''
                                 if v162 then
                                     let v163 : int32 = v123 + 1
@@ -2719,42 +2807,42 @@ and split_command_96 (v0 : string) : US20 =
                                         else
                                             let v167 : int32 = v126 + 1
                                             struct (v124, v125, v167, v127)
-                                    US21_Ok(''', v163, v168, v169, v170, v171)
+                                    US18_Ok(''', v163, v168, v169, v170, v171)
                                 else
-                                    let v173 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure40()
-                                    US21_Error(v173, v123, v124, v125, v126, v127)
+                                    let v173 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure34()
+                                    US18_Error(v173, v123, v124, v125, v126, v127)
                         match v176 with
-                        | US21_Error(v183, v184, v185, v186, v187, v188) -> (* Error *)
-                            let v189 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                            US21_Error(v189, v123, v124, v125, v126, v127)
-                        | US21_Ok(v177, v178, v179, v180, v181, v182) -> (* Ok *)
+                        | US18_Error(v183, v184, v185, v186, v187, v188) -> (* Error *)
+                            let v189 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                            US18_Error(v189, v123, v124, v125, v126, v127)
+                        | US18_Ok(v177, v178, v179, v180, v181, v182) -> (* Ok *)
                             v176
-                    | US21_Ok(v147, v148, v149, v150, v151, v152) -> (* Ok *)
+                    | US18_Ok(v147, v148, v149, v150, v151, v152) -> (* Ok *)
                         v146
                 match v194 with
-                | US21_Error(v202, v203, v204, v205, v206, v207) -> (* Error *)
-                    let v208 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure46(v62, v123, v202, v203, v204, v205, v206, v207)
-                    US22_Error(v208, v123, v124, v125, v126, v127)
-                | US21_Ok(v195, v196, v197, v198, v199, v200) -> (* Ok *)
-                    US22_Ok(v122, v196, v197, v198, v199, v200)
-    let v331 : US22 =
+                | US18_Error(v202, v203, v204, v205, v206, v207) -> (* Error *)
+                    let v208 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure40(v62, v123, v202, v203, v204, v205, v206, v207)
+                    US19_Error(v208, v123, v124, v125, v126, v127)
+                | US18_Ok(v195, v196, v197, v198, v199, v200) -> (* Ok *)
+                    US19_Ok(v122, v196, v197, v198, v199, v200)
+    let v331 : US19 =
         match v312 with
-        | US22_Error(v323, v324, v325, v326, v327, v328) -> (* Error *)
-            US22_Error(v323, v324, v325, v326, v327, v328)
-        | US22_Ok(v313, v314, v315, v316, v317, v318) -> (* Ok *)
+        | US19_Error(v323, v324, v325, v326, v327, v328) -> (* Error *)
+            US19_Error(v323, v324, v325, v326, v327, v328)
+        | US19_Ok(v313, v314, v315, v316, v317, v318) -> (* Ok *)
             let v319 : string = "\\"
             let v320 : string = "/"
             let v321 : string = v313.Replace (v319, v320)
-            US22_Ok(v321, v314, v315, v316, v317, v318)
-    let v399 : US22 =
+            US19_Ok(v321, v314, v315, v316, v317, v318)
+    let v399 : US19 =
         match v331 with
-        | US22_Error(v338, v339, v340, v341, v342, v343) -> (* Error *)
-            let v362 : US21 =
+        | US19_Error(v338, v339, v340, v341, v342, v343) -> (* Error *)
+            let v362 : US18 =
                 if v2 then
-                    let v344 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure48()
-                    US21_Error(v344, 0, 0, 1, 1, v1)
+                    let v344 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure42()
+                    US18_Error(v344, 0, 0, 1, 1, v1)
                 else
-                    let v346 : char = v0.[int 0]
+                    let v346 : char = (spiralStringIndex v0 (int 0))
                     let v347 : bool = v346 = '"'
                     let v351 : bool =
                         if v347 then
@@ -2774,55 +2862,55 @@ and split_command_96 (v0 : string) : US20 =
                                 struct (1, 2, 1, v1)
                             else
                                 struct (0, 1, 2, v1)
-                        US21_Ok(v346, 1, v354, v355, v356, v357)
+                        US18_Ok(v346, 1, v354, v355, v356, v357)
                     else
-                        let v359 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure49()
-                        US21_Error(v359, 0, 0, 1, 1, v1)
-            let v378 : US22 =
+                        let v359 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure43()
+                        US18_Error(v359, 0, 0, 1, 1, v1)
+            let v378 : US19 =
                 match v362 with
-                | US21_Error(v363, v364, v365, v366, v367, v368) -> (* Error *)
-                    US22_Error(v363, v364, v365, v366, v367, v368)
-                | US21_Ok(v370, v371, v372, v373, v374, v375) -> (* Ok *)
-                    method122(v0, v371, v372, v373, v374, v375)
+                | US18_Error(v363, v364, v365, v366, v367, v368) -> (* Error *)
+                    US19_Error(v363, v364, v365, v366, v367, v368)
+                | US18_Ok(v370, v371, v372, v373, v374, v375) -> (* Ok *)
+                    method85(v0, v371, v372, v373, v374, v375)
             match v378 with
-            | US22_Error(v389, v390, v391, v392, v393, v394) -> (* Error *)
-                US22_Error(v389, v390, v391, v392, v393, v394)
-            | US22_Ok(v379, v380, v381, v382, v383, v384) -> (* Ok *)
+            | US19_Error(v389, v390, v391, v392, v393, v394) -> (* Error *)
+                US19_Error(v389, v390, v391, v392, v393, v394)
+            | US19_Ok(v379, v380, v381, v382, v383, v384) -> (* Ok *)
                 let v385 : string = "\\"
                 let v386 : string = "/"
                 let v387 : string = v379.Replace (v385, v386)
-                US22_Ok(v387, v380, v381, v382, v383, v384)
-        | US22_Ok(v332, v333, v334, v335, v336, v337) -> (* Ok *)
+                US19_Ok(v387, v380, v381, v382, v383, v384)
+        | US19_Ok(v332, v333, v334, v335, v336, v337) -> (* Ok *)
             v331
-    let v434 : US22 =
+    let v434 : US19 =
         match v399 with
-        | US22_Error(v406, v407, v408, v409, v410, v411) -> (* Error *)
+        | US19_Error(v406, v407, v408, v409, v410, v411) -> (* Error *)
             let v412 : bool = v1 = 0
-            let v416 : US23 =
+            let v416 : US20 =
                 if v412 then
-                    US23_Ok(0, 0, 1, 1, v1)
+                    US20_Ok(0, 0, 1, 1, v1)
                 else
-                    let v414 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
-                    US23_Error(v414, 0, 0, 1, 1, v1)
+                    let v414 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure44()
+                    US20_Error(v414, 0, 0, 1, 1, v1)
             match v416 with
-            | US23_Error(v424, v425, v426, v427, v428, v429) -> (* Error *)
-                US22_Error(v424, v425, v426, v427, v428, v429)
-            | US23_Ok(v417, v418, v419, v420, v421) -> (* Ok *)
+            | US20_Error(v424, v425, v426, v427, v428, v429) -> (* Error *)
+                US19_Error(v424, v425, v426, v427, v428, v429)
+            | US20_Ok(v417, v418, v419, v420, v421) -> (* Ok *)
                 let v422 : string = ""
-                US22_Ok(v422, v417, v418, v419, v420, v421)
-        | US22_Ok(v400, v401, v402, v403, v404, v405) -> (* Ok *)
+                US19_Ok(v422, v417, v418, v419, v420, v421)
+        | US19_Ok(v400, v401, v402, v403, v404, v405) -> (* Ok *)
             v399
-    let v547 : US24 =
+    let v547 : US21 =
         match v434 with
-        | US22_Error(v435, v436, v437, v438, v439, v440) -> (* Error *)
-            US24_Error(v435, v436, v437, v438, v439, v440)
-        | US22_Ok(v442, v443, v444, v445, v446, v447) -> (* Ok *)
+        | US19_Error(v435, v436, v437, v438, v439, v440) -> (* Error *)
+            US21_Error(v435, v436, v437, v438, v439, v440)
+        | US19_Ok(v442, v443, v444, v445, v446, v447) -> (* Ok *)
             let v448 : bool = v443 >= v447
             let struct (v460 : int32, v461 : int32, v462 : int32, v463 : int32, v464 : int32) =
                 if v448 then
                     struct (v443, v444, v445, v446, v447)
                 else
-                    let v449 : int32 = method125(v0, v1, v443)
+                    let v449 : int32 = method86(v0, v1, v443)
                     let v450 : bool = v449 > v447
                     let v451 : int32 =
                         if v450 then
@@ -2838,23 +2926,23 @@ and split_command_96 (v0 : string) : US20 =
                         struct (v451, v444, v445, v454, v447)
             let v465 : bool = v460 = v443
             let v466 : bool = v465 <> true
-            let v470 : US23 =
+            let v470 : US20 =
                 if v466 then
-                    US23_Ok(v460, v461, v462, v463, v464)
+                    US20_Ok(v460, v461, v462, v463, v464)
                 else
-                    let v468 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
-                    US23_Error(v468, v443, v444, v445, v446, v447)
-            let v508 : US22 =
+                    let v468 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure45()
+                    US20_Error(v468, v443, v444, v445, v446, v447)
+            let v508 : US19 =
                 match v470 with
-                | US23_Error(v500, v501, v502, v503, v504, v505) -> (* Error *)
-                    US22_Error(v500, v501, v502, v503, v504, v505)
-                | US23_Ok(v471, v472, v473, v474, v475) -> (* Ok *)
+                | US20_Error(v500, v501, v502, v503, v504, v505) -> (* Error *)
+                    US19_Error(v500, v501, v502, v503, v504, v505)
+                | US20_Ok(v471, v472, v473, v474, v475) -> (* Ok *)
                     let v476 : bool = v471 >= v475
                     let struct (v488 : int32, v489 : int32, v490 : int32, v491 : int32, v492 : int32) =
                         if v476 then
                             struct (v471, v472, v473, v474, v475)
                         else
-                            let v477 : int32 = method105(v0, v1, v471)
+                            let v477 : int32 = method80(v0, v1, v471)
                             let v478 : bool = v477 > v475
                             let v479 : int32 =
                                 if v478 then
@@ -2876,31 +2964,31 @@ and split_command_96 (v0 : string) : US20 =
                         else
                             let v495 : bool = v471 = v488
                             let v496 : int32 = v488 - 1
-                            let v497 : string = v0.[int v471..int v496]
+                            let v497 : string = (spiralStringSlice v0 (int v471) (int v496))
                             v497
-                    US22_Ok(v498, v488, v489, v490, v491, v492)
-            let v527 : US26 =
+                    US19_Ok(v498, v488, v489, v490, v491, v492)
+            let v527 : US23 =
                 match v508 with
-                | US22_Error(v518, v519, v520, v521, v522, v523) -> (* Error *)
-                    let v524 : US25 = US25_None
-                    US26_Ok(v524, v443, v444, v445, v446, v447)
-                | US22_Ok(v509, v510, v511, v512, v513, v514) -> (* Ok *)
-                    let v515 : (unit -> string) = closure52(v509)
-                    let v516 : US25 = US25_Some(v515)
-                    US26_Ok(v516, v510, v511, v512, v513, v514)
+                | US19_Error(v518, v519, v520, v521, v522, v523) -> (* Error *)
+                    let v524 : US22 = US22_None
+                    US23_Ok(v524, v443, v444, v445, v446, v447)
+                | US19_Ok(v509, v510, v511, v512, v513, v514) -> (* Ok *)
+                    let v515 : (unit -> string) = closure46(v509)
+                    let v516 : US22 = US22_Some(v515)
+                    US23_Ok(v516, v510, v511, v512, v513, v514)
             match v527 with
-            | US26_Error(v537, v538, v539, v540, v541, v542) -> (* Error *)
-                US24_Error(v537, v538, v539, v540, v541, v542)
-            | US26_Ok(v528, v529, v530, v531, v532, v533) -> (* Ok *)
-                let v534 : (unit -> string) = closure53(v442)
-                let v535 : (unit -> US25) = closure54(v528)
-                US24_Ok(v534, v535, v529, v530, v531, v532, v533)
-    let v571 : US27 =
+            | US23_Error(v537, v538, v539, v540, v541, v542) -> (* Error *)
+                US21_Error(v537, v538, v539, v540, v541, v542)
+            | US23_Ok(v528, v529, v530, v531, v532, v533) -> (* Ok *)
+                let v534 : (unit -> string) = closure47(v442)
+                let v535 : (unit -> US22) = closure48(v528)
+                US21_Ok(v534, v535, v529, v530, v531, v532, v533)
+    let v571 : US24 =
         match v547 with
-        | US24_Error(v562, v563, v564, v565, v566, v567) -> (* Error *)
-            let v568 : (unit -> string) = closure55(v0, v562, v563, v564, v565, v566, v567)
-            US27_Error(v568)
-        | US24_Ok(v548, v549, v550, v551, v552, v553, v554) -> (* Ok *)
+        | US21_Error(v562, v563, v564, v565, v566, v567) -> (* Error *)
+            let v568 : (unit -> string) = closure49(v0, v562, v563, v564, v565, v566, v567)
+            US24_Error(v568)
+        | US21_Ok(v548, v549, v550, v551, v552, v553, v554) -> (* Ok *)
             let v555 : bool = v550 >= v554
             let v560 : string =
                 if v555 then
@@ -2909,39 +2997,89 @@ and split_command_96 (v0 : string) : US20 =
                 else
                     let v557 : bool = v550 = v554
                     let v558 : int32 = v554 - 1
-                    let v559 : string = v0.[int v550..int v558]
+                    let v559 : string = (spiralStringSlice v0 (int v550) (int v558))
                     v559
-            US27_Ok(v548, v549, v560, v551, v552, v553, v554)
-    let v591 : US28 =
+            US24_Ok(v548, v549, v560, v551, v552, v553, v554)
+    let v591 : US25 =
         match v571 with
-        | US27_Error(v588) -> (* Error *)
-            US28_Error(v588)
-        | US27_Ok(v572, v573, v574, v575, v576, v577, v578) -> (* Ok *)
+        | US24_Error(v588) -> (* Error *)
+            US25_Error(v588)
+        | US24_Ok(v572, v573, v574, v575, v576, v577, v578) -> (* Ok *)
             let v579 : string = v572 ()
-            let v580 : US25 = v573 ()
+            let v580 : US22 = v573 ()
             let v586 : US3 =
                 match v580 with
-                | US25_None -> (* None *)
+                | US22_None -> (* None *)
                     US3_None
-                | US25_Some(v581) -> (* Some *)
+                | US22_Some(v581) -> (* Some *)
                     let v582 : string = v581 ()
                     US3_Some(v582)
-            US28_Ok(v579, v586)
+            US25_Ok(v579, v586)
     match v591 with
-    | US28_Error(v595) -> (* Error *)
+    | US25_Error(v595) -> (* Error *)
         let v596 : string = v595 ()
-        US20_Error(v596)
-    | US28_Ok(v592, v593) -> (* Ok *)
-        US20_Ok(v592, v593)
-and closure56 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : char = '\\'
-    let v7 : string = format_real_97(v6, v2, v3, v4, v5)
-    let v8 : string = "parsing.p_char / unexpected end of text / "
-    let v9 : string = v8 + v7 
-    v9
-and closure57 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : int32 = v0.Length
-    let v7 : int32 = method105(v0, v6, v1)
+        US17_Error(v596)
+    | US25_Ok(v592, v593) -> (* Ok *)
+        US17_Ok(v592, v593)
+and closure50 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v6 : string = ""
+    let v7 : string = v6 + v6 
+    let v8 : string = "c"
+    let v9 : string = v7 + v8 
+    let v10 : string = " = "
+    let v11 : string = v9 + v10 
+    let v12 : char = '\\'
+    let v13 : string = format_real_10(v12)
+    let v14 : string = v11 + v13 
+    let v15 : string = "; "
+    let v16 : string = v14 + v15 
+    let v17 : string = "s'"
+    let v18 : string = v16 + v17 
+    let v19 : string = v18 + v10 
+    let v20 : string = v6 + v6 
+    let v21 : string = "line_start"
+    let v22 : string = v20 + v21 
+    let v23 : string = v22 + v10 
+    let v24 : string = format_real_79(v2)
+    let v25 : string = v23 + v24 
+    let v26 : string = v25 + v15 
+    let v27 : string = "position"
+    let v28 : string = v26 + v27 
+    let v29 : string = v28 + v10 
+    let v30 : string = v6 + v6 
+    let v31 : string = "line"
+    let v32 : string = v30 + v31 
+    let v33 : string = v32 + v10 
+    let v34 : string = format_real_79(v3)
+    let v35 : string = v33 + v34 
+    let v36 : string = v35 + v15 
+    let v37 : string = "col"
+    let v38 : string = v36 + v37 
+    let v39 : string = v38 + v10 
+    let v40 : string = format_real_79(v4)
+    let v41 : string = v39 + v40 
+    let v42 : string = "{ "
+    let v43 : string = v42 + v41 
+    let v44 : string = " }"
+    let v45 : string = v43 + v44 
+    let v46 : string = v29 + v45 
+    let v47 : string = v46 + v15 
+    let v48 : string = "text_length"
+    let v49 : string = v47 + v48 
+    let v50 : string = v49 + v10 
+    let v51 : string = format_real_79(v5)
+    let v52 : string = v50 + v51 
+    let v53 : string = v42 + v52 
+    let v54 : string = v53 + v44 
+    let v55 : string = v19 + v54 
+    let v56 : string = v42 + v55 
+    let v57 : string = v56 + v44 
+    let v58 : string = "parsing.p_char / unexpected end of text / "
+    let v59 : string = v58 + v57 
+    v59
+and closure51 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v6 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v0))
+    let v7 : int32 = method80(v0, v6, v1)
     let v8 : int32 = v1 + 80
     let v9 : bool = v7 < v8
     let v10 : int32 =
@@ -2957,14 +3095,14 @@ and closure57 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : i
         else
             let v13 : bool = v2 = v10
             let v14 : int32 = v10 - 1
-            let v15 : string = v0.[int v2..int v14]
+            let v15 : string = (spiralStringSlice v0 (int v2) (int v14))
             v15
-    let v17 : int32 = v16.Length
+    let v17 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v16))
     let v18 : bool = v17 > 0
     let v22 : bool =
         if v18 then
             let v19 : int32 = v17 - 1
-            let v20 : char = v16.[int v19]
+            let v20 : char = (spiralStringIndex v16 (int v19))
             let v21 : bool = v20 = '\n'
             v21
         else
@@ -2978,31 +3116,104 @@ and closure57 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : i
             v24
     let v26 : int32 = v4 - 1
     let v27 : int32 = 0
-    let v28 : (string -> string) = method106(v26, v27)
+    let v28 : (string -> string) = method81(v26, v27)
     let v29 : string = ""
     let v30 : string = v28 v29
     let v31 : string = "^"
     let v32 : string = v30 + v31 
-    let v33 : char = '\\'
-    let v34 : string = format_real_107(v33, v3, v4)
-    let v35 : string = "parsing.p_char / "
-    let v36 : string = v35 + v34 
-    let v37 : string = "\n"
+    let v33 : string = v29 + v29 
+    let v34 : string = "expected"
+    let v35 : string = v33 + v34 
+    let v36 : string = " = "
+    let v37 : string = v35 + v36 
+    let v38 : char = '\\'
+    let v39 : string = format_real_10(v38)
+    let v40 : string = v37 + v39 
+    let v41 : string = "; "
+    let v42 : string = v40 + v41 
+    let v43 : string = "line"
+    let v44 : string = v42 + v43 
+    let v45 : string = v44 + v36 
+    let v46 : string = format_real_79(v3)
+    let v47 : string = v45 + v46 
+    let v48 : string = v47 + v41 
+    let v49 : string = "col"
+    let v50 : string = v48 + v49 
+    let v51 : string = v50 + v36 
+    let v52 : string = format_real_79(v4)
+    let v53 : string = v51 + v52 
+    let v54 : string = "{ "
+    let v55 : string = v54 + v53 
+    let v56 : string = " }"
+    let v57 : string = v55 + v56 
+    let v58 : string = "parsing.p_char / "
+    let v59 : string = v58 + v57 
+    let v60 : string = "\n"
+    let v61 : string = v59 + v60 
+    let v62 : string = v61 + v16 
+    let v63 : string = v62 + v25 
+    let v64 : string = v63 + v32 
+    let v65 : string = v64 + v60 
+    v65
+and closure52 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v6 : string = ""
+    let v7 : string = v6 + v6 
+    let v8 : string = "c"
+    let v9 : string = v7 + v8 
+    let v10 : string = " = "
+    let v11 : string = v9 + v10 
+    let v12 : char = '`'
+    let v13 : string = format_real_10(v12)
+    let v14 : string = v11 + v13 
+    let v15 : string = "; "
+    let v16 : string = v14 + v15 
+    let v17 : string = "s'"
+    let v18 : string = v16 + v17 
+    let v19 : string = v18 + v10 
+    let v20 : string = v6 + v6 
+    let v21 : string = "line_start"
+    let v22 : string = v20 + v21 
+    let v23 : string = v22 + v10 
+    let v24 : string = format_real_79(v2)
+    let v25 : string = v23 + v24 
+    let v26 : string = v25 + v15 
+    let v27 : string = "position"
+    let v28 : string = v26 + v27 
+    let v29 : string = v28 + v10 
+    let v30 : string = v6 + v6 
+    let v31 : string = "line"
+    let v32 : string = v30 + v31 
+    let v33 : string = v32 + v10 
+    let v34 : string = format_real_79(v3)
+    let v35 : string = v33 + v34 
+    let v36 : string = v35 + v15 
+    let v37 : string = "col"
     let v38 : string = v36 + v37 
-    let v39 : string = v38 + v16 
-    let v40 : string = v39 + v25 
-    let v41 : string = v40 + v32 
-    let v42 : string = v41 + v37 
-    v42
-and closure58 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : char = '`'
-    let v7 : string = format_real_97(v6, v2, v3, v4, v5)
-    let v8 : string = "parsing.p_char / unexpected end of text / "
-    let v9 : string = v8 + v7 
-    v9
-and closure59 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : int32 = v0.Length
-    let v7 : int32 = method105(v0, v6, v1)
+    let v39 : string = v38 + v10 
+    let v40 : string = format_real_79(v4)
+    let v41 : string = v39 + v40 
+    let v42 : string = "{ "
+    let v43 : string = v42 + v41 
+    let v44 : string = " }"
+    let v45 : string = v43 + v44 
+    let v46 : string = v29 + v45 
+    let v47 : string = v46 + v15 
+    let v48 : string = "text_length"
+    let v49 : string = v47 + v48 
+    let v50 : string = v49 + v10 
+    let v51 : string = format_real_79(v5)
+    let v52 : string = v50 + v51 
+    let v53 : string = v42 + v52 
+    let v54 : string = v53 + v44 
+    let v55 : string = v19 + v54 
+    let v56 : string = v42 + v55 
+    let v57 : string = v56 + v44 
+    let v58 : string = "parsing.p_char / unexpected end of text / "
+    let v59 : string = v58 + v57 
+    v59
+and closure53 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v6 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v0))
+    let v7 : int32 = method80(v0, v6, v1)
     let v8 : int32 = v1 + 80
     let v9 : bool = v7 < v8
     let v10 : int32 =
@@ -3018,14 +3229,14 @@ and closure59 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : i
         else
             let v13 : bool = v2 = v10
             let v14 : int32 = v10 - 1
-            let v15 : string = v0.[int v2..int v14]
+            let v15 : string = (spiralStringSlice v0 (int v2) (int v14))
             v15
-    let v17 : int32 = v16.Length
+    let v17 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v16))
     let v18 : bool = v17 > 0
     let v22 : bool =
         if v18 then
             let v19 : int32 = v17 - 1
-            let v20 : char = v16.[int v19]
+            let v20 : char = (spiralStringIndex v16 (int v19))
             let v21 : bool = v20 = '\n'
             v21
         else
@@ -3039,28 +3250,51 @@ and closure59 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : i
             v24
     let v26 : int32 = v4 - 1
     let v27 : int32 = 0
-    let v28 : (string -> string) = method106(v26, v27)
+    let v28 : (string -> string) = method81(v26, v27)
     let v29 : string = ""
     let v30 : string = v28 v29
     let v31 : string = "^"
     let v32 : string = v30 + v31 
-    let v33 : char = '`'
-    let v34 : string = format_real_107(v33, v3, v4)
-    let v35 : string = "parsing.p_char / "
-    let v36 : string = v35 + v34 
-    let v37 : string = "\n"
-    let v38 : string = v36 + v37 
-    let v39 : string = v38 + v16 
-    let v40 : string = v39 + v25 
-    let v41 : string = v40 + v32 
-    let v42 : string = v41 + v37 
-    v42
-and method128 (v0 : int32, v1 : int32, v2 : int32, v3 : int32, v4 : string, v5 : int32, v6 : int32, v7 : int32, v8 : int32, v9 : int32) : struct (int32 * int32 * int32 * int32 * int32) =
+    let v33 : string = v29 + v29 
+    let v34 : string = "expected"
+    let v35 : string = v33 + v34 
+    let v36 : string = " = "
+    let v37 : string = v35 + v36 
+    let v38 : char = '`'
+    let v39 : string = format_real_10(v38)
+    let v40 : string = v37 + v39 
+    let v41 : string = "; "
+    let v42 : string = v40 + v41 
+    let v43 : string = "line"
+    let v44 : string = v42 + v43 
+    let v45 : string = v44 + v36 
+    let v46 : string = format_real_79(v3)
+    let v47 : string = v45 + v46 
+    let v48 : string = v47 + v41 
+    let v49 : string = "col"
+    let v50 : string = v48 + v49 
+    let v51 : string = v50 + v36 
+    let v52 : string = format_real_79(v4)
+    let v53 : string = v51 + v52 
+    let v54 : string = "{ "
+    let v55 : string = v54 + v53 
+    let v56 : string = " }"
+    let v57 : string = v55 + v56 
+    let v58 : string = "parsing.p_char / "
+    let v59 : string = v58 + v57 
+    let v60 : string = "\n"
+    let v61 : string = v59 + v60 
+    let v62 : string = v61 + v16 
+    let v63 : string = v62 + v25 
+    let v64 : string = v63 + v32 
+    let v65 : string = v64 + v60 
+    v65
+and method89 (v0 : int32, v1 : int32, v2 : int32, v3 : int32, v4 : string, v5 : int32, v6 : int32, v7 : int32, v8 : int32, v9 : int32) : struct (int32 * int32 * int32 * int32 * int32) =
     let v10 : bool = v5 >= v3
     if v10 then
         struct (v5, v6, v7, v8, v9)
     else
-        let v11 : char = v4.[int v5]
+        let v11 : char = (spiralStringIndex v4 (int v5))
         let v12 : bool = v11 = '\\'
         let v16 : bool =
             if v12 then
@@ -3084,15 +3318,15 @@ and method128 (v0 : int32, v1 : int32, v2 : int32, v3 : int32, v4 : string, v5 :
                 else
                     let v22 : int32 = v8 + 1
                     struct (v6, v7, v22, v9)
-            method128(v0, v1, v2, v3, v4, v18, v23, v24, v25, v26)
+            method89(v0, v1, v2, v3, v4, v18, v23, v24, v25, v26)
         else
             struct (v5, v6, v7, v8, v9)
-and method127 (v0 : int32, v1 : int32, v2 : int32, v3 : int32, v4 : string, v5 : int32) : struct (int32 * int32 * int32 * int32 * int32) =
+and method88 (v0 : int32, v1 : int32, v2 : int32, v3 : int32, v4 : string, v5 : int32) : struct (int32 * int32 * int32 * int32 * int32) =
     let v6 : bool = v5 >= v3
     if v6 then
         struct (v5, v0, v1, v2, v3)
     else
-        let v7 : char = v4.[int v5]
+        let v7 : char = (spiralStringIndex v4 (int v5))
         let v8 : bool = v7 = '\\'
         let v12 : bool =
             if v8 then
@@ -3116,61 +3350,193 @@ and method127 (v0 : int32, v1 : int32, v2 : int32, v3 : int32, v4 : string, v5 :
                 else
                     let v18 : int32 = v2 + 1
                     struct (v0, v1, v18, v3)
-            method128(v0, v1, v2, v3, v4, v14, v19, v20, v21, v22)
+            method89(v0, v1, v2, v3, v4, v14, v19, v20, v21, v22)
         else
             struct (v5, v0, v1, v2, v3)
-and method130 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "i"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_129 (v0 : int32, v1 : int32, v2 : int32, v3 : int32, v4 : int32) : string =
-    let v5 : string = method13()
-    let v6 : Mut3 = {l0 = v5} : Mut3
-    method18(v6)
-    method130(v6)
-    method20(v6)
-    let v7 : string = $"{v0}"
-    method14(v6, v7)
-    method64(v6)
-    method112(v6)
-    method20(v6)
-    let v8 : string = $"%A{struct (v1, v2, v3, v4)}"
-    method14(v6, v8)
-    method21(v6)
-    let v9 : string = v6.l0
-    v9
-and closure60 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : string = format_real_129(v1, v2, v3, v4, v5)
-    let v7 : string = "parsing.many1_satisfy / no matching char / "
-    let v8 : string = v7 + v6 
-    v8
-and closure61 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+and closure54 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v6 : string = ""
+    let v7 : string = v6 + v6 
+    let v8 : string = "i"
+    let v9 : string = v7 + v8 
+    let v10 : string = " = "
+    let v11 : string = v9 + v10 
+    let v12 : string = format_real_79(v1)
+    let v13 : string = v11 + v12 
+    let v14 : string = "; "
+    let v15 : string = v13 + v14 
+    let v16 : string = "s"
+    let v17 : string = v15 + v16 
+    let v18 : string = v17 + v10 
+    let v19 : string = v6 + v6 
+    let v20 : string = "line_start"
+    let v21 : string = v19 + v20 
+    let v22 : string = v21 + v10 
+    let v23 : string = format_real_79(v2)
+    let v24 : string = v22 + v23 
+    let v25 : string = v24 + v14 
+    let v26 : string = "position"
+    let v27 : string = v25 + v26 
+    let v28 : string = v27 + v10 
+    let v29 : string = v6 + v6 
+    let v30 : string = "line"
+    let v31 : string = v29 + v30 
+    let v32 : string = v31 + v10 
+    let v33 : string = format_real_79(v3)
+    let v34 : string = v32 + v33 
+    let v35 : string = v34 + v14 
+    let v36 : string = "col"
+    let v37 : string = v35 + v36 
+    let v38 : string = v37 + v10 
+    let v39 : string = format_real_79(v4)
+    let v40 : string = v38 + v39 
+    let v41 : string = "{ "
+    let v42 : string = v41 + v40 
+    let v43 : string = " }"
+    let v44 : string = v42 + v43 
+    let v45 : string = v28 + v44 
+    let v46 : string = v45 + v14 
+    let v47 : string = "text_length"
+    let v48 : string = v46 + v47 
+    let v49 : string = v48 + v10 
+    let v50 : string = format_real_79(v5)
+    let v51 : string = v49 + v50 
+    let v52 : string = v41 + v51 
+    let v53 : string = v52 + v43 
+    let v54 : string = v18 + v53 
+    let v55 : string = v41 + v54 
+    let v56 : string = v55 + v43 
+    let v57 : string = "parsing.many1_satisfy / no matching char / "
+    let v58 : string = v57 + v56 
+    v58
+and closure55 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : char list = []
     let v7 : char list = '"' :: v6 
     let v8 : (char list -> (char [])) = List.toArray
     let v9 : (char []) = v8 v7
-    let v10 : string = format_real_109(v9)
-    let v11 : string = format_real_110(v10, v2, v3, v4, v5)
-    let v12 : string = "parsing.none_of / unexpected end of text / "
-    let v13 : string = v12 + v11 
-    v13
-and closure62 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : char = v0.[int v1]
+    let v10 : string = method82(v9)
+    let v11 : string = ""
+    let v12 : string = v11 + v11 
+    let v13 : string = "chars'"
+    let v14 : string = v12 + v13 
+    let v15 : string = " = "
+    let v16 : string = v14 + v15 
+    let v17 : string = v16 + v10 
+    let v18 : string = "; "
+    let v19 : string = v17 + v18 
+    let v20 : string = "s"
+    let v21 : string = v19 + v20 
+    let v22 : string = v21 + v15 
+    let v23 : string = v11 + v11 
+    let v24 : string = "line_start"
+    let v25 : string = v23 + v24 
+    let v26 : string = v25 + v15 
+    let v27 : string = format_real_79(v2)
+    let v28 : string = v26 + v27 
+    let v29 : string = v28 + v18 
+    let v30 : string = "position"
+    let v31 : string = v29 + v30 
+    let v32 : string = v31 + v15 
+    let v33 : string = v11 + v11 
+    let v34 : string = "line"
+    let v35 : string = v33 + v34 
+    let v36 : string = v35 + v15 
+    let v37 : string = format_real_79(v3)
+    let v38 : string = v36 + v37 
+    let v39 : string = v38 + v18 
+    let v40 : string = "col"
+    let v41 : string = v39 + v40 
+    let v42 : string = v41 + v15 
+    let v43 : string = format_real_79(v4)
+    let v44 : string = v42 + v43 
+    let v45 : string = "{ "
+    let v46 : string = v45 + v44 
+    let v47 : string = " }"
+    let v48 : string = v46 + v47 
+    let v49 : string = v32 + v48 
+    let v50 : string = v49 + v18 
+    let v51 : string = "text_length"
+    let v52 : string = v50 + v51 
+    let v53 : string = v52 + v15 
+    let v54 : string = format_real_79(v5)
+    let v55 : string = v53 + v54 
+    let v56 : string = v45 + v55 
+    let v57 : string = v56 + v47 
+    let v58 : string = v22 + v57 
+    let v59 : string = v45 + v58 
+    let v60 : string = v59 + v47 
+    let v61 : string = "parsing.none_of / unexpected end of text / "
+    let v62 : string = v61 + v60 
+    v62
+and closure56 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v6 : char = (spiralStringIndex v0 (int v1))
     let v7 : char list = []
     let v8 : char list = '"' :: v7 
     let v9 : (char list -> (char [])) = List.toArray
     let v10 : (char []) = v9 v8
-    let v11 : string = format_real_109(v10)
-    let v12 : string = format_real_113(v6, v11, v2, v3, v4, v5)
-    let v13 : string = "parsing.none_of / unexpected char / "
-    let v14 : string = v13 + v12 
-    v14
-and closure63 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v11 : string = method82(v10)
+    let v12 : string = ""
+    let v13 : string = v12 + v12 
+    let v14 : string = "first_char"
+    let v15 : string = v13 + v14 
+    let v16 : string = " = "
+    let v17 : string = v15 + v16 
+    let v18 : string = format_real_10(v6)
+    let v19 : string = v17 + v18 
+    let v20 : string = "; "
+    let v21 : string = v19 + v20 
+    let v22 : string = "chars'"
+    let v23 : string = v21 + v22 
+    let v24 : string = v23 + v16 
+    let v25 : string = v24 + v11 
+    let v26 : string = v25 + v20 
+    let v27 : string = "s"
+    let v28 : string = v26 + v27 
+    let v29 : string = v28 + v16 
+    let v30 : string = v12 + v12 
+    let v31 : string = "line_start"
+    let v32 : string = v30 + v31 
+    let v33 : string = v32 + v16 
+    let v34 : string = format_real_79(v2)
+    let v35 : string = v33 + v34 
+    let v36 : string = v35 + v20 
+    let v37 : string = "position"
+    let v38 : string = v36 + v37 
+    let v39 : string = v38 + v16 
+    let v40 : string = v12 + v12 
+    let v41 : string = "line"
+    let v42 : string = v40 + v41 
+    let v43 : string = v42 + v16 
+    let v44 : string = format_real_79(v3)
+    let v45 : string = v43 + v44 
+    let v46 : string = v45 + v20 
+    let v47 : string = "col"
+    let v48 : string = v46 + v47 
+    let v49 : string = v48 + v16 
+    let v50 : string = format_real_79(v4)
+    let v51 : string = v49 + v50 
+    let v52 : string = "{ "
+    let v53 : string = v52 + v51 
+    let v54 : string = " }"
+    let v55 : string = v53 + v54 
+    let v56 : string = v39 + v55 
+    let v57 : string = v56 + v20 
+    let v58 : string = "text_length"
+    let v59 : string = v57 + v58 
+    let v60 : string = v59 + v16 
+    let v61 : string = format_real_79(v5)
+    let v62 : string = v60 + v61 
+    let v63 : string = v52 + v62 
+    let v64 : string = v63 + v54 
+    let v65 : string = v29 + v64 
+    let v66 : string = v52 + v65 
+    let v67 : string = v66 + v54 
+    let v68 : string = "parsing.none_of / unexpected char / "
+    let v69 : string = v68 + v67 
+    v69
+and closure57 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : string = "parsing.many_strings / first inner parser consumed no text"
     v6
-and pass_133 (v0 : bool, v1 : UH0, v2 : UH0) : UH0 =
+and pass_92 (v0 : bool, v1 : UH0, v2 : UH0) : UH0 =
     match v1 with
     | UH0_Cons(v3, v4) -> (* Cons *)
         match v4 with
@@ -3183,12 +3549,12 @@ and pass_133 (v0 : bool, v1 : UH0, v2 : UH0) : UH0 =
                     let v8 : string = v3 + v5 
                     v8
             let v10 : UH0 = UH0_Cons(v9, v2)
-            pass_133(v0, v6, v10)
+            pass_92(v0, v6, v10)
         | UH0_Nil -> (* Nil *)
             UH0_Cons(v3, v2)
     | UH0_Nil -> (* Nil *)
         v2
-and method132 (v0 : bool, v1 : UH0) : string =
+and method91 (v0 : bool, v1 : UH0) : string =
     match v1 with
     | UH0_Cons(v3, v4) -> (* Cons *)
         match v4 with
@@ -3197,18 +3563,18 @@ and method132 (v0 : bool, v1 : UH0) : string =
         | _ ->
             let v5 : bool = v0 = false
             let v6 : UH0 = UH0_Nil
-            let v7 : UH0 = pass_133(v0, v1, v6)
-            method132(v5, v7)
+            let v7 : UH0 = pass_92(v0, v1, v6)
+            method91(v5, v7)
     | UH0_Nil -> (* Nil *)
         let v2 : string = ""
         v2
-and closure64 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+and closure58 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : string = "parsing.many_strings / inner parser succeeded without consuming text"
     v6
-and method131 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : int32, v6 : int32, v7 : int32) : US22 =
-    let struct (v8 : int32, v9 : int32, v10 : int32, v11 : int32, v12 : int32) = method127(v4, v5, v6, v7, v0, v3)
+and method90 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : int32, v6 : int32, v7 : int32) : US19 =
+    let struct (v8 : int32, v9 : int32, v10 : int32, v11 : int32, v12 : int32) = method88(v4, v5, v6, v7, v0, v3)
     let v13 : bool = v8 > v3
-    let v23 : US22 =
+    let v23 : US19 =
         if v13 then
             let v14 : bool = v3 >= v8
             let v19 : string =
@@ -3218,22 +3584,22 @@ and method131 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                 else
                     let v16 : bool = v3 = v8
                     let v17 : int32 = v8 - 1
-                    let v18 : string = v0.[int v3..int v17]
+                    let v18 : string = (spiralStringSlice v0 (int v3) (int v17))
                     v18
-            US22_Ok(v19, v8, v9, v10, v11, v12)
+            US19_Ok(v19, v8, v9, v10, v11, v12)
         else
-            let v21 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure60()
-            US22_Error(v21, v3, v4, v5, v6, v7)
-    let v218 : US22 =
+            let v21 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure54()
+            US19_Error(v21, v3, v4, v5, v6, v7)
+    let v218 : US19 =
         match v23 with
-        | US22_Error(v30, v31, v32, v33, v34, v35) -> (* Error *)
+        | US19_Error(v30, v31, v32, v33, v34, v35) -> (* Error *)
             let v36 : bool = v3 >= v7
-            let v54 : US21 =
+            let v54 : US18 =
                 if v36 then
-                    let v37 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                    US21_Error(v37, v3, v4, v5, v6, v7)
+                    let v37 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                    US18_Error(v37, v3, v4, v5, v6, v7)
                 else
-                    let v39 : char = v0.[int v3]
+                    let v39 : char = (spiralStringIndex v0 (int v3))
                     let v40 : bool = v39 = '\\'
                     if v40 then
                         let v41 : int32 = v3 + 1
@@ -3246,21 +3612,21 @@ and method131 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                             else
                                 let v45 : int32 = v6 + 1
                                 struct (v4, v5, v45, v7)
-                        US21_Ok('\\', v41, v46, v47, v48, v49)
+                        US18_Ok('\\', v41, v46, v47, v48, v49)
                     else
-                        let v51 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                        US21_Error(v51, v3, v4, v5, v6, v7)
-            let v89 : US21 =
+                        let v51 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                        US18_Error(v51, v3, v4, v5, v6, v7)
+            let v89 : US18 =
                 match v54 with
-                | US21_Error(v81, v82, v83, v84, v85, v86) -> (* Error *)
-                    US21_Error(v81, v82, v83, v84, v85, v86)
-                | US21_Ok(v55, v56, v57, v58, v59, v60) -> (* Ok *)
+                | US18_Error(v81, v82, v83, v84, v85, v86) -> (* Error *)
+                    US18_Error(v81, v82, v83, v84, v85, v86)
+                | US18_Ok(v55, v56, v57, v58, v59, v60) -> (* Ok *)
                     let v61 : bool = v56 >= v60
                     if v61 then
-                        let v62 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure61()
-                        US21_Error(v62, v56, v57, v58, v59, v60)
+                        let v62 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure55()
+                        US18_Error(v62, v56, v57, v58, v59, v60)
                     else
-                        let v64 : char = v0.[int v56]
+                        let v64 : char = (spiralStringIndex v0 (int v56))
                         let v65 : bool = v64 = '"'
                         let v66 : bool = v65 = false
                         if v66 then
@@ -3274,15 +3640,15 @@ and method131 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                 else
                                     let v71 : int32 = v59 + 1
                                     struct (v57, v58, v71, v60)
-                            US21_Ok(v64, v67, v72, v73, v74, v75)
+                            US18_Ok(v64, v67, v72, v73, v74, v75)
                         else
-                            let v77 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure62()
-                            US21_Error(v77, v56, v57, v58, v59, v60)
-            let v111 : US22 =
+                            let v77 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
+                            US18_Error(v77, v56, v57, v58, v59, v60)
+            let v111 : US19 =
                 match v89 with
-                | US21_Error(v103, v104, v105, v106, v107, v108) -> (* Error *)
-                    US22_Error(v103, v104, v105, v106, v107, v108)
-                | US21_Ok(v90, v91, v92, v93, v94, v95) -> (* Ok *)
+                | US18_Error(v103, v104, v105, v106, v107, v108) -> (* Error *)
+                    US19_Error(v103, v104, v105, v106, v107, v108)
+                | US18_Ok(v90, v91, v92, v93, v94, v95) -> (* Ok *)
                     let v96 : bool = v3 >= v91
                     let v101 : string =
                         if v96 then
@@ -3291,17 +3657,17 @@ and method131 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                         else
                             let v98 : bool = v3 = v91
                             let v99 : int32 = v91 - 1
-                            let v100 : string = v0.[int v3..int v99]
+                            let v100 : string = (spiralStringSlice v0 (int v3) (int v99))
                             v100
-                    US22_Ok(v101, v91, v92, v93, v94, v95)
+                    US19_Ok(v101, v91, v92, v93, v94, v95)
             match v111 with
-            | US22_Error(v118, v119, v120, v121, v122, v123) -> (* Error *)
-                let v141 : US21 =
+            | US19_Error(v118, v119, v120, v121, v122, v123) -> (* Error *)
+                let v141 : US18 =
                     if v36 then
-                        let v124 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                        US21_Error(v124, v3, v4, v5, v6, v7)
+                        let v124 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                        US18_Error(v124, v3, v4, v5, v6, v7)
                     else
-                        let v126 : char = v0.[int v3]
+                        let v126 : char = (spiralStringIndex v0 (int v3))
                         let v127 : bool = v126 = '`'
                         if v127 then
                             let v128 : int32 = v3 + 1
@@ -3314,21 +3680,21 @@ and method131 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                 else
                                     let v132 : int32 = v6 + 1
                                     struct (v4, v5, v132, v7)
-                            US21_Ok('`', v128, v133, v134, v135, v136)
+                            US18_Ok('`', v128, v133, v134, v135, v136)
                         else
-                            let v138 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                            US21_Error(v138, v3, v4, v5, v6, v7)
-                let v176 : US21 =
+                            let v138 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                            US18_Error(v138, v3, v4, v5, v6, v7)
+                let v176 : US18 =
                     match v141 with
-                    | US21_Error(v168, v169, v170, v171, v172, v173) -> (* Error *)
-                        US21_Error(v168, v169, v170, v171, v172, v173)
-                    | US21_Ok(v142, v143, v144, v145, v146, v147) -> (* Ok *)
+                    | US18_Error(v168, v169, v170, v171, v172, v173) -> (* Error *)
+                        US18_Error(v168, v169, v170, v171, v172, v173)
+                    | US18_Ok(v142, v143, v144, v145, v146, v147) -> (* Ok *)
                         let v148 : bool = v143 >= v147
                         if v148 then
-                            let v149 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure61()
-                            US21_Error(v149, v143, v144, v145, v146, v147)
+                            let v149 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure55()
+                            US18_Error(v149, v143, v144, v145, v146, v147)
                         else
-                            let v151 : char = v0.[int v143]
+                            let v151 : char = (spiralStringIndex v0 (int v143))
                             let v152 : bool = v151 = '"'
                             let v153 : bool = v152 = false
                             if v153 then
@@ -3342,15 +3708,15 @@ and method131 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                     else
                                         let v158 : int32 = v146 + 1
                                         struct (v144, v145, v158, v147)
-                                US21_Ok(v151, v154, v159, v160, v161, v162)
+                                US18_Ok(v151, v154, v159, v160, v161, v162)
                             else
-                                let v164 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure62()
-                                US21_Error(v164, v143, v144, v145, v146, v147)
-                let v198 : US22 =
+                                let v164 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
+                                US18_Error(v164, v143, v144, v145, v146, v147)
+                let v198 : US19 =
                     match v176 with
-                    | US21_Error(v190, v191, v192, v193, v194, v195) -> (* Error *)
-                        US22_Error(v190, v191, v192, v193, v194, v195)
-                    | US21_Ok(v177, v178, v179, v180, v181, v182) -> (* Ok *)
+                    | US18_Error(v190, v191, v192, v193, v194, v195) -> (* Error *)
+                        US19_Error(v190, v191, v192, v193, v194, v195)
+                    | US18_Ok(v177, v178, v179, v180, v181, v182) -> (* Ok *)
                         let v183 : bool = v3 >= v178
                         let v188 : string =
                             if v183 then
@@ -3359,59 +3725,92 @@ and method131 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                             else
                                 let v185 : bool = v3 = v178
                                 let v186 : int32 = v178 - 1
-                                let v187 : string = v0.[int v3..int v186]
+                                let v187 : string = (spiralStringSlice v0 (int v3) (int v186))
                                 v187
-                        US22_Ok(v188, v178, v179, v180, v181, v182)
+                        US19_Ok(v188, v178, v179, v180, v181, v182)
                 match v198 with
-                | US22_Error(v205, v206, v207, v208, v209, v210) -> (* Error *)
-                    let v211 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                    US22_Error(v211, v3, v4, v5, v6, v7)
-                | US22_Ok(v199, v200, v201, v202, v203, v204) -> (* Ok *)
+                | US19_Error(v205, v206, v207, v208, v209, v210) -> (* Error *)
+                    let v211 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                    US19_Error(v211, v3, v4, v5, v6, v7)
+                | US19_Ok(v199, v200, v201, v202, v203, v204) -> (* Ok *)
                     v198
-            | US22_Ok(v112, v113, v114, v115, v116, v117) -> (* Ok *)
+            | US19_Ok(v112, v113, v114, v115, v116, v117) -> (* Ok *)
                 v111
-        | US22_Ok(v24, v25, v26, v27, v28, v29) -> (* Ok *)
+        | US19_Ok(v24, v25, v26, v27, v28, v29) -> (* Ok *)
             v23
     match v218 with
-    | US22_Error(v219, v220, v221, v222, v223, v224) -> (* Error *)
+    | US19_Error(v219, v220, v221, v222, v223, v224) -> (* Error *)
         let v228 : string =
             match v2 with
             | UH0_Nil -> (* Nil *)
                 v1
             | _ ->
                 let v225 : bool = true
-                let v226 : string = method132(v225, v2)
+                let v226 : string = method91(v225, v2)
                 let v227 : string = v1 + v226 
                 v227
-        US22_Ok(v228, v3, v4, v5, v6, v7)
-    | US22_Ok(v230, v231, v232, v233, v234, v235) -> (* Ok *)
+        US19_Ok(v228, v3, v4, v5, v6, v7)
+    | US19_Ok(v230, v231, v232, v233, v234, v235) -> (* Ok *)
         let v236 : bool = v231 > v3
         if v236 then
             let v237 : UH0 = UH0_Cons(v230, v2)
-            method131(v0, v1, v237, v231, v232, v233, v234, v235)
+            method90(v0, v1, v237, v231, v232, v233, v234, v235)
         else
-            let v239 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure64()
-            US22_Error(v239, v3, v4, v5, v6, v7)
-and format_real_134 (v0 : int32, v1 : int32, v2 : int32, v3 : int32) : string =
-    let v4 : string = method13()
-    let v5 : Mut3 = {l0 = v4} : Mut3
-    method18(v5)
-    method112(v5)
-    method20(v5)
-    let v6 : string = $"%A{struct (v0, v1, v2, v3)}"
-    method14(v5, v6)
-    method21(v5)
-    let v7 : string = v5.l0
-    v7
-and closure65 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : string = format_real_134(v2, v3, v4, v5)
-    let v7 : string = "parsing.any_char / unexpected end of t / "
-    let v8 : string = v7 + v6 
-    v8
-and method135 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : int32, v6 : int32, v7 : int32) : US22 =
-    let struct (v8 : int32, v9 : int32, v10 : int32, v11 : int32, v12 : int32) = method127(v4, v5, v6, v7, v0, v3)
+            let v239 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
+            US19_Error(v239, v3, v4, v5, v6, v7)
+and closure59 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v6 : string = ""
+    let v7 : string = v6 + v6 
+    let v8 : string = "s"
+    let v9 : string = v7 + v8 
+    let v10 : string = " = "
+    let v11 : string = v9 + v10 
+    let v12 : string = v6 + v6 
+    let v13 : string = "line_start"
+    let v14 : string = v12 + v13 
+    let v15 : string = v14 + v10 
+    let v16 : string = format_real_79(v2)
+    let v17 : string = v15 + v16 
+    let v18 : string = "; "
+    let v19 : string = v17 + v18 
+    let v20 : string = "position"
+    let v21 : string = v19 + v20 
+    let v22 : string = v21 + v10 
+    let v23 : string = v6 + v6 
+    let v24 : string = "line"
+    let v25 : string = v23 + v24 
+    let v26 : string = v25 + v10 
+    let v27 : string = format_real_79(v3)
+    let v28 : string = v26 + v27 
+    let v29 : string = v28 + v18 
+    let v30 : string = "col"
+    let v31 : string = v29 + v30 
+    let v32 : string = v31 + v10 
+    let v33 : string = format_real_79(v4)
+    let v34 : string = v32 + v33 
+    let v35 : string = "{ "
+    let v36 : string = v35 + v34 
+    let v37 : string = " }"
+    let v38 : string = v36 + v37 
+    let v39 : string = v22 + v38 
+    let v40 : string = v39 + v18 
+    let v41 : string = "text_length"
+    let v42 : string = v40 + v41 
+    let v43 : string = v42 + v10 
+    let v44 : string = format_real_79(v5)
+    let v45 : string = v43 + v44 
+    let v46 : string = v35 + v45 
+    let v47 : string = v46 + v37 
+    let v48 : string = v11 + v47 
+    let v49 : string = v35 + v48 
+    let v50 : string = v49 + v37 
+    let v51 : string = "parsing.any_char / unexpected end of t / "
+    let v52 : string = v51 + v50 
+    v52
+and method93 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : int32, v6 : int32, v7 : int32) : US19 =
+    let struct (v8 : int32, v9 : int32, v10 : int32, v11 : int32, v12 : int32) = method88(v4, v5, v6, v7, v0, v3)
     let v13 : bool = v8 > v3
-    let v23 : US22 =
+    let v23 : US19 =
         if v13 then
             let v14 : bool = v3 >= v8
             let v19 : string =
@@ -3421,22 +3820,22 @@ and method135 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                 else
                     let v16 : bool = v3 = v8
                     let v17 : int32 = v8 - 1
-                    let v18 : string = v0.[int v3..int v17]
+                    let v18 : string = (spiralStringSlice v0 (int v3) (int v17))
                     v18
-            US22_Ok(v19, v8, v9, v10, v11, v12)
+            US19_Ok(v19, v8, v9, v10, v11, v12)
         else
-            let v21 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure60()
-            US22_Error(v21, v3, v4, v5, v6, v7)
-    let v208 : US22 =
+            let v21 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure54()
+            US19_Error(v21, v3, v4, v5, v6, v7)
+    let v208 : US19 =
         match v23 with
-        | US22_Error(v30, v31, v32, v33, v34, v35) -> (* Error *)
+        | US19_Error(v30, v31, v32, v33, v34, v35) -> (* Error *)
             let v36 : bool = v3 >= v7
-            let v54 : US21 =
+            let v54 : US18 =
                 if v36 then
-                    let v37 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                    US21_Error(v37, v3, v4, v5, v6, v7)
+                    let v37 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                    US18_Error(v37, v3, v4, v5, v6, v7)
                 else
-                    let v39 : char = v0.[int v3]
+                    let v39 : char = (spiralStringIndex v0 (int v3))
                     let v40 : bool = v39 = '\\'
                     if v40 then
                         let v41 : int32 = v3 + 1
@@ -3449,21 +3848,21 @@ and method135 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                             else
                                 let v45 : int32 = v6 + 1
                                 struct (v4, v5, v45, v7)
-                        US21_Ok('\\', v41, v46, v47, v48, v49)
+                        US18_Ok('\\', v41, v46, v47, v48, v49)
                     else
-                        let v51 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                        US21_Error(v51, v3, v4, v5, v6, v7)
-            let v84 : US21 =
+                        let v51 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                        US18_Error(v51, v3, v4, v5, v6, v7)
+            let v84 : US18 =
                 match v54 with
-                | US21_Error(v76, v77, v78, v79, v80, v81) -> (* Error *)
-                    US21_Error(v76, v77, v78, v79, v80, v81)
-                | US21_Ok(v55, v56, v57, v58, v59, v60) -> (* Ok *)
+                | US18_Error(v76, v77, v78, v79, v80, v81) -> (* Error *)
+                    US18_Error(v76, v77, v78, v79, v80, v81)
+                | US18_Ok(v55, v56, v57, v58, v59, v60) -> (* Ok *)
                     let v61 : bool = v56 >= v60
                     if v61 then
-                        let v62 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure65()
-                        US21_Error(v62, v56, v57, v58, v59, v60)
+                        let v62 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
+                        US18_Error(v62, v56, v57, v58, v59, v60)
                     else
-                        let v64 : char = v0.[int v56]
+                        let v64 : char = (spiralStringIndex v0 (int v56))
                         let v65 : int32 = v56 + 1
                         let v66 : bool = '\n' = v64
                         let struct (v70 : int32, v71 : int32, v72 : int32, v73 : int32) =
@@ -3474,12 +3873,12 @@ and method135 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                             else
                                 let v69 : int32 = v59 + 1
                                 struct (v57, v58, v69, v60)
-                        US21_Ok(v64, v65, v70, v71, v72, v73)
-            let v106 : US22 =
+                        US18_Ok(v64, v65, v70, v71, v72, v73)
+            let v106 : US19 =
                 match v84 with
-                | US21_Error(v98, v99, v100, v101, v102, v103) -> (* Error *)
-                    US22_Error(v98, v99, v100, v101, v102, v103)
-                | US21_Ok(v85, v86, v87, v88, v89, v90) -> (* Ok *)
+                | US18_Error(v98, v99, v100, v101, v102, v103) -> (* Error *)
+                    US19_Error(v98, v99, v100, v101, v102, v103)
+                | US18_Ok(v85, v86, v87, v88, v89, v90) -> (* Ok *)
                     let v91 : bool = v3 >= v86
                     let v96 : string =
                         if v91 then
@@ -3488,17 +3887,17 @@ and method135 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                         else
                             let v93 : bool = v3 = v86
                             let v94 : int32 = v86 - 1
-                            let v95 : string = v0.[int v3..int v94]
+                            let v95 : string = (spiralStringSlice v0 (int v3) (int v94))
                             v95
-                    US22_Ok(v96, v86, v87, v88, v89, v90)
+                    US19_Ok(v96, v86, v87, v88, v89, v90)
             match v106 with
-            | US22_Error(v113, v114, v115, v116, v117, v118) -> (* Error *)
-                let v136 : US21 =
+            | US19_Error(v113, v114, v115, v116, v117, v118) -> (* Error *)
+                let v136 : US18 =
                     if v36 then
-                        let v119 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                        US21_Error(v119, v3, v4, v5, v6, v7)
+                        let v119 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                        US18_Error(v119, v3, v4, v5, v6, v7)
                     else
-                        let v121 : char = v0.[int v3]
+                        let v121 : char = (spiralStringIndex v0 (int v3))
                         let v122 : bool = v121 = '`'
                         if v122 then
                             let v123 : int32 = v3 + 1
@@ -3511,21 +3910,21 @@ and method135 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                 else
                                     let v127 : int32 = v6 + 1
                                     struct (v4, v5, v127, v7)
-                            US21_Ok('`', v123, v128, v129, v130, v131)
+                            US18_Ok('`', v123, v128, v129, v130, v131)
                         else
-                            let v133 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                            US21_Error(v133, v3, v4, v5, v6, v7)
-                let v166 : US21 =
+                            let v133 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                            US18_Error(v133, v3, v4, v5, v6, v7)
+                let v166 : US18 =
                     match v136 with
-                    | US21_Error(v158, v159, v160, v161, v162, v163) -> (* Error *)
-                        US21_Error(v158, v159, v160, v161, v162, v163)
-                    | US21_Ok(v137, v138, v139, v140, v141, v142) -> (* Ok *)
+                    | US18_Error(v158, v159, v160, v161, v162, v163) -> (* Error *)
+                        US18_Error(v158, v159, v160, v161, v162, v163)
+                    | US18_Ok(v137, v138, v139, v140, v141, v142) -> (* Ok *)
                         let v143 : bool = v138 >= v142
                         if v143 then
-                            let v144 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure65()
-                            US21_Error(v144, v138, v139, v140, v141, v142)
+                            let v144 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
+                            US18_Error(v144, v138, v139, v140, v141, v142)
                         else
-                            let v146 : char = v0.[int v138]
+                            let v146 : char = (spiralStringIndex v0 (int v138))
                             let v147 : int32 = v138 + 1
                             let v148 : bool = '\n' = v146
                             let struct (v152 : int32, v153 : int32, v154 : int32, v155 : int32) =
@@ -3536,12 +3935,12 @@ and method135 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                 else
                                     let v151 : int32 = v141 + 1
                                     struct (v139, v140, v151, v142)
-                            US21_Ok(v146, v147, v152, v153, v154, v155)
-                let v188 : US22 =
+                            US18_Ok(v146, v147, v152, v153, v154, v155)
+                let v188 : US19 =
                     match v166 with
-                    | US21_Error(v180, v181, v182, v183, v184, v185) -> (* Error *)
-                        US22_Error(v180, v181, v182, v183, v184, v185)
-                    | US21_Ok(v167, v168, v169, v170, v171, v172) -> (* Ok *)
+                    | US18_Error(v180, v181, v182, v183, v184, v185) -> (* Error *)
+                        US19_Error(v180, v181, v182, v183, v184, v185)
+                    | US18_Ok(v167, v168, v169, v170, v171, v172) -> (* Ok *)
                         let v173 : bool = v3 >= v168
                         let v178 : string =
                             if v173 then
@@ -3550,45 +3949,45 @@ and method135 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                             else
                                 let v175 : bool = v3 = v168
                                 let v176 : int32 = v168 - 1
-                                let v177 : string = v0.[int v3..int v176]
+                                let v177 : string = (spiralStringSlice v0 (int v3) (int v176))
                                 v177
-                        US22_Ok(v178, v168, v169, v170, v171, v172)
+                        US19_Ok(v178, v168, v169, v170, v171, v172)
                 match v188 with
-                | US22_Error(v195, v196, v197, v198, v199, v200) -> (* Error *)
-                    let v201 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                    US22_Error(v201, v3, v4, v5, v6, v7)
-                | US22_Ok(v189, v190, v191, v192, v193, v194) -> (* Ok *)
+                | US19_Error(v195, v196, v197, v198, v199, v200) -> (* Error *)
+                    let v201 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                    US19_Error(v201, v3, v4, v5, v6, v7)
+                | US19_Ok(v189, v190, v191, v192, v193, v194) -> (* Ok *)
                     v188
-            | US22_Ok(v107, v108, v109, v110, v111, v112) -> (* Ok *)
+            | US19_Ok(v107, v108, v109, v110, v111, v112) -> (* Ok *)
                 v106
-        | US22_Ok(v24, v25, v26, v27, v28, v29) -> (* Ok *)
+        | US19_Ok(v24, v25, v26, v27, v28, v29) -> (* Ok *)
             v23
     match v208 with
-    | US22_Error(v209, v210, v211, v212, v213, v214) -> (* Error *)
+    | US19_Error(v209, v210, v211, v212, v213, v214) -> (* Error *)
         let v218 : string =
             match v2 with
             | UH0_Nil -> (* Nil *)
                 v1
             | _ ->
                 let v215 : bool = true
-                let v216 : string = method132(v215, v2)
+                let v216 : string = method91(v215, v2)
                 let v217 : string = v1 + v216 
                 v217
-        US22_Ok(v218, v3, v4, v5, v6, v7)
-    | US22_Ok(v220, v221, v222, v223, v224, v225) -> (* Ok *)
+        US19_Ok(v218, v3, v4, v5, v6, v7)
+    | US19_Ok(v220, v221, v222, v223, v224, v225) -> (* Ok *)
         let v226 : bool = v221 > v3
         if v226 then
             let v227 : UH0 = UH0_Cons(v220, v2)
-            method135(v0, v1, v227, v221, v222, v223, v224, v225)
+            method93(v0, v1, v227, v221, v222, v223, v224, v225)
         else
-            let v229 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure64()
-            US22_Error(v229, v3, v4, v5, v6, v7)
-and method137 (v0 : int32, v1 : string, v2 : int32, v3 : int32, v4 : int32, v5 : int32, v6 : int32) : struct (int32 * int32 * int32 * int32 * int32) =
+            let v229 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
+            US19_Error(v229, v3, v4, v5, v6, v7)
+and method95 (v0 : int32, v1 : string, v2 : int32, v3 : int32, v4 : int32, v5 : int32, v6 : int32) : struct (int32 * int32 * int32 * int32 * int32) =
     let v7 : bool = v2 >= v0
     if v7 then
         struct (v2, v3, v4, v5, v6)
     else
-        let v8 : char = v1.[int v2]
+        let v8 : char = (spiralStringIndex v1 (int v2))
         let v9 : bool = v8 = '\\'
         let v15 : bool =
             if v9 then
@@ -3616,15 +4015,15 @@ and method137 (v0 : int32, v1 : string, v2 : int32, v3 : int32, v4 : int32, v5 :
                 else
                     let v21 : int32 = v5 + 1
                     struct (v3, v4, v21, v6)
-            method137(v0, v1, v17, v22, v23, v24, v25)
+            method95(v0, v1, v17, v22, v23, v24, v25)
         else
             struct (v2, v3, v4, v5, v6)
-and method136 (v0 : int32, v1 : string, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : struct (int32 * int32 * int32 * int32 * int32) =
+and method94 (v0 : int32, v1 : string, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : struct (int32 * int32 * int32 * int32 * int32) =
     let v6 : bool = v2 >= v0
     if v6 then
         struct (v2, v3, v4, v5, v0)
     else
-        let v7 : char = v1.[int v2]
+        let v7 : char = (spiralStringIndex v1 (int v2))
         let v8 : bool = v7 = '\\'
         let v14 : bool =
             if v8 then
@@ -3652,52 +4051,156 @@ and method136 (v0 : int32, v1 : string, v2 : int32, v3 : int32, v4 : int32, v5 :
                 else
                     let v20 : int32 = v5 + 1
                     struct (v3, v4, v20, v0)
-            method137(v0, v1, v16, v21, v22, v23, v24)
+            method95(v0, v1, v16, v21, v22, v23, v24)
         else
             struct (v2, v3, v4, v5, v0)
-and closure66 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+and closure60 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : char list = []
     let v7 : char list = '"' :: v6 
     let v8 : char list = '`' :: v7 
     let v9 : char list = '\\' :: v8 
     let v10 : (char list -> (char [])) = List.toArray
     let v11 : (char []) = v10 v9
-    let v12 : string = format_real_109(v11)
-    let v13 : string = format_real_110(v12, v2, v3, v4, v5)
-    let v14 : string = "parsing.none_of / unexpected end of text / "
-    let v15 : string = v14 + v13 
-    v15
-and closure67 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
-    let v6 : char = v0.[int v1]
+    let v12 : string = method82(v11)
+    let v13 : string = ""
+    let v14 : string = v13 + v13 
+    let v15 : string = "chars'"
+    let v16 : string = v14 + v15 
+    let v17 : string = " = "
+    let v18 : string = v16 + v17 
+    let v19 : string = v18 + v12 
+    let v20 : string = "; "
+    let v21 : string = v19 + v20 
+    let v22 : string = "s"
+    let v23 : string = v21 + v22 
+    let v24 : string = v23 + v17 
+    let v25 : string = v13 + v13 
+    let v26 : string = "line_start"
+    let v27 : string = v25 + v26 
+    let v28 : string = v27 + v17 
+    let v29 : string = format_real_79(v2)
+    let v30 : string = v28 + v29 
+    let v31 : string = v30 + v20 
+    let v32 : string = "position"
+    let v33 : string = v31 + v32 
+    let v34 : string = v33 + v17 
+    let v35 : string = v13 + v13 
+    let v36 : string = "line"
+    let v37 : string = v35 + v36 
+    let v38 : string = v37 + v17 
+    let v39 : string = format_real_79(v3)
+    let v40 : string = v38 + v39 
+    let v41 : string = v40 + v20 
+    let v42 : string = "col"
+    let v43 : string = v41 + v42 
+    let v44 : string = v43 + v17 
+    let v45 : string = format_real_79(v4)
+    let v46 : string = v44 + v45 
+    let v47 : string = "{ "
+    let v48 : string = v47 + v46 
+    let v49 : string = " }"
+    let v50 : string = v48 + v49 
+    let v51 : string = v34 + v50 
+    let v52 : string = v51 + v20 
+    let v53 : string = "text_length"
+    let v54 : string = v52 + v53 
+    let v55 : string = v54 + v17 
+    let v56 : string = format_real_79(v5)
+    let v57 : string = v55 + v56 
+    let v58 : string = v47 + v57 
+    let v59 : string = v58 + v49 
+    let v60 : string = v24 + v59 
+    let v61 : string = v47 + v60 
+    let v62 : string = v61 + v49 
+    let v63 : string = "parsing.none_of / unexpected end of text / "
+    let v64 : string = v63 + v62 
+    v64
+and closure61 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+    let v6 : char = (spiralStringIndex v0 (int v1))
     let v7 : char list = []
     let v8 : char list = '"' :: v7 
     let v9 : char list = '`' :: v8 
     let v10 : char list = '\\' :: v9 
     let v11 : (char list -> (char [])) = List.toArray
     let v12 : (char []) = v11 v10
-    let v13 : string = format_real_109(v12)
-    let v14 : string = format_real_113(v6, v13, v2, v3, v4, v5)
-    let v15 : string = "parsing.none_of / unexpected char / "
-    let v16 : string = v15 + v14 
-    v16
-and method139 (v0 : UH0, v1 : UH0) : UH0 =
+    let v13 : string = method82(v12)
+    let v14 : string = ""
+    let v15 : string = v14 + v14 
+    let v16 : string = "first_char"
+    let v17 : string = v15 + v16 
+    let v18 : string = " = "
+    let v19 : string = v17 + v18 
+    let v20 : string = format_real_10(v6)
+    let v21 : string = v19 + v20 
+    let v22 : string = "; "
+    let v23 : string = v21 + v22 
+    let v24 : string = "chars'"
+    let v25 : string = v23 + v24 
+    let v26 : string = v25 + v18 
+    let v27 : string = v26 + v13 
+    let v28 : string = v27 + v22 
+    let v29 : string = "s"
+    let v30 : string = v28 + v29 
+    let v31 : string = v30 + v18 
+    let v32 : string = v14 + v14 
+    let v33 : string = "line_start"
+    let v34 : string = v32 + v33 
+    let v35 : string = v34 + v18 
+    let v36 : string = format_real_79(v2)
+    let v37 : string = v35 + v36 
+    let v38 : string = v37 + v22 
+    let v39 : string = "position"
+    let v40 : string = v38 + v39 
+    let v41 : string = v40 + v18 
+    let v42 : string = v14 + v14 
+    let v43 : string = "line"
+    let v44 : string = v42 + v43 
+    let v45 : string = v44 + v18 
+    let v46 : string = format_real_79(v3)
+    let v47 : string = v45 + v46 
+    let v48 : string = v47 + v22 
+    let v49 : string = "col"
+    let v50 : string = v48 + v49 
+    let v51 : string = v50 + v18 
+    let v52 : string = format_real_79(v4)
+    let v53 : string = v51 + v52 
+    let v54 : string = "{ "
+    let v55 : string = v54 + v53 
+    let v56 : string = " }"
+    let v57 : string = v55 + v56 
+    let v58 : string = v41 + v57 
+    let v59 : string = v58 + v22 
+    let v60 : string = "text_length"
+    let v61 : string = v59 + v60 
+    let v62 : string = v61 + v18 
+    let v63 : string = format_real_79(v5)
+    let v64 : string = v62 + v63 
+    let v65 : string = v54 + v64 
+    let v66 : string = v65 + v56 
+    let v67 : string = v31 + v66 
+    let v68 : string = v54 + v67 
+    let v69 : string = v68 + v56 
+    let v70 : string = "parsing.none_of / unexpected char / "
+    let v71 : string = v70 + v69 
+    v71
+and method97 (v0 : UH0, v1 : UH0) : UH0 =
     match v0 with
     | UH0_Cons(v2, v3) -> (* Cons *)
         let v4 : UH0 = UH0_Cons(v2, v1)
-        method139(v3, v4)
+        method97(v3, v4)
     | UH0_Nil -> (* Nil *)
         v1
-and closure68 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+and closure62 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : string = "parsing.many / inner parser succeeded without consuming text"
     v6
-and method138 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : int32, v6 : int32) : US30 =
+and method96 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : int32, v6 : int32) : US27 =
     let v7 : bool = v2 >= v6
-    let v25 : US21 =
+    let v25 : US18 =
         if v7 then
-            let v8 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-            US21_Error(v8, v2, v3, v4, v5, v6)
+            let v8 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+            US18_Error(v8, v2, v3, v4, v5, v6)
         else
-            let v10 : char = v0.[int v2]
+            let v10 : char = (spiralStringIndex v0 (int v2))
             let v11 : bool = v10 = '\\'
             if v11 then
                 let v12 : int32 = v2 + 1
@@ -3710,21 +4213,21 @@ and method138 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                     else
                         let v16 : int32 = v5 + 1
                         struct (v3, v4, v16, v6)
-                US21_Ok('\\', v12, v17, v18, v19, v20)
+                US18_Ok('\\', v12, v17, v18, v19, v20)
             else
-                let v22 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                US21_Error(v22, v2, v3, v4, v5, v6)
-    let v55 : US21 =
+                let v22 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                US18_Error(v22, v2, v3, v4, v5, v6)
+    let v55 : US18 =
         match v25 with
-        | US21_Error(v47, v48, v49, v50, v51, v52) -> (* Error *)
-            US21_Error(v47, v48, v49, v50, v51, v52)
-        | US21_Ok(v26, v27, v28, v29, v30, v31) -> (* Ok *)
+        | US18_Error(v47, v48, v49, v50, v51, v52) -> (* Error *)
+            US18_Error(v47, v48, v49, v50, v51, v52)
+        | US18_Ok(v26, v27, v28, v29, v30, v31) -> (* Ok *)
             let v32 : bool = v27 >= v31
             if v32 then
-                let v33 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure65()
-                US21_Error(v33, v27, v28, v29, v30, v31)
+                let v33 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
+                US18_Error(v33, v27, v28, v29, v30, v31)
             else
-                let v35 : char = v0.[int v27]
+                let v35 : char = (spiralStringIndex v0 (int v27))
                 let v36 : int32 = v27 + 1
                 let v37 : bool = '\n' = v35
                 let struct (v41 : int32, v42 : int32, v43 : int32, v44 : int32) =
@@ -3735,12 +4238,12 @@ and method138 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                     else
                         let v40 : int32 = v30 + 1
                         struct (v28, v29, v40, v31)
-                US21_Ok(v35, v36, v41, v42, v43, v44)
-    let v77 : US22 =
+                US18_Ok(v35, v36, v41, v42, v43, v44)
+    let v77 : US19 =
         match v55 with
-        | US21_Error(v69, v70, v71, v72, v73, v74) -> (* Error *)
-            US22_Error(v69, v70, v71, v72, v73, v74)
-        | US21_Ok(v56, v57, v58, v59, v60, v61) -> (* Ok *)
+        | US18_Error(v69, v70, v71, v72, v73, v74) -> (* Error *)
+            US19_Error(v69, v70, v71, v72, v73, v74)
+        | US18_Ok(v56, v57, v58, v59, v60, v61) -> (* Ok *)
             let v62 : bool = v2 >= v57
             let v67 : string =
                 if v62 then
@@ -3749,18 +4252,18 @@ and method138 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                 else
                     let v64 : bool = v2 = v57
                     let v65 : int32 = v57 - 1
-                    let v66 : string = v0.[int v2..int v65]
+                    let v66 : string = (spiralStringSlice v0 (int v2) (int v65))
                     v66
-            US22_Ok(v67, v57, v58, v59, v60, v61)
-    let v177 : US22 =
+            US19_Ok(v67, v57, v58, v59, v60, v61)
+    let v177 : US19 =
         match v77 with
-        | US22_Error(v84, v85, v86, v87, v88, v89) -> (* Error *)
-            let v107 : US21 =
+        | US19_Error(v84, v85, v86, v87, v88, v89) -> (* Error *)
+            let v107 : US18 =
                 if v7 then
-                    let v90 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                    US21_Error(v90, v2, v3, v4, v5, v6)
+                    let v90 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                    US18_Error(v90, v2, v3, v4, v5, v6)
                 else
-                    let v92 : char = v0.[int v2]
+                    let v92 : char = (spiralStringIndex v0 (int v2))
                     let v93 : bool = v92 = '`'
                     if v93 then
                         let v94 : int32 = v2 + 1
@@ -3773,21 +4276,21 @@ and method138 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                             else
                                 let v98 : int32 = v5 + 1
                                 struct (v3, v4, v98, v6)
-                        US21_Ok('`', v94, v99, v100, v101, v102)
+                        US18_Ok('`', v94, v99, v100, v101, v102)
                     else
-                        let v104 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                        US21_Error(v104, v2, v3, v4, v5, v6)
-            let v137 : US21 =
+                        let v104 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                        US18_Error(v104, v2, v3, v4, v5, v6)
+            let v137 : US18 =
                 match v107 with
-                | US21_Error(v129, v130, v131, v132, v133, v134) -> (* Error *)
-                    US21_Error(v129, v130, v131, v132, v133, v134)
-                | US21_Ok(v108, v109, v110, v111, v112, v113) -> (* Ok *)
+                | US18_Error(v129, v130, v131, v132, v133, v134) -> (* Error *)
+                    US18_Error(v129, v130, v131, v132, v133, v134)
+                | US18_Ok(v108, v109, v110, v111, v112, v113) -> (* Ok *)
                     let v114 : bool = v109 >= v113
                     if v114 then
-                        let v115 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure65()
-                        US21_Error(v115, v109, v110, v111, v112, v113)
+                        let v115 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
+                        US18_Error(v115, v109, v110, v111, v112, v113)
                     else
-                        let v117 : char = v0.[int v109]
+                        let v117 : char = (spiralStringIndex v0 (int v109))
                         let v118 : int32 = v109 + 1
                         let v119 : bool = '\n' = v117
                         let struct (v123 : int32, v124 : int32, v125 : int32, v126 : int32) =
@@ -3798,12 +4301,12 @@ and method138 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                             else
                                 let v122 : int32 = v112 + 1
                                 struct (v110, v111, v122, v113)
-                        US21_Ok(v117, v118, v123, v124, v125, v126)
-            let v159 : US22 =
+                        US18_Ok(v117, v118, v123, v124, v125, v126)
+            let v159 : US19 =
                 match v137 with
-                | US21_Error(v151, v152, v153, v154, v155, v156) -> (* Error *)
-                    US22_Error(v151, v152, v153, v154, v155, v156)
-                | US21_Ok(v138, v139, v140, v141, v142, v143) -> (* Ok *)
+                | US18_Error(v151, v152, v153, v154, v155, v156) -> (* Error *)
+                    US19_Error(v151, v152, v153, v154, v155, v156)
+                | US18_Ok(v138, v139, v140, v141, v142, v143) -> (* Ok *)
                     let v144 : bool = v2 >= v139
                     let v149 : string =
                         if v144 then
@@ -3812,36 +4315,36 @@ and method138 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                         else
                             let v146 : bool = v2 = v139
                             let v147 : int32 = v139 - 1
-                            let v148 : string = v0.[int v2..int v147]
+                            let v148 : string = (spiralStringSlice v0 (int v2) (int v147))
                             v148
-                    US22_Ok(v149, v139, v140, v141, v142, v143)
+                    US19_Ok(v149, v139, v140, v141, v142, v143)
             match v159 with
-            | US22_Error(v166, v167, v168, v169, v170, v171) -> (* Error *)
-                let v172 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                US22_Error(v172, v2, v3, v4, v5, v6)
-            | US22_Ok(v160, v161, v162, v163, v164, v165) -> (* Ok *)
+            | US19_Error(v166, v167, v168, v169, v170, v171) -> (* Error *)
+                let v172 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                US19_Error(v172, v2, v3, v4, v5, v6)
+            | US19_Ok(v160, v161, v162, v163, v164, v165) -> (* Ok *)
                 v159
-        | US22_Ok(v78, v79, v80, v81, v82, v83) -> (* Ok *)
+        | US19_Ok(v78, v79, v80, v81, v82, v83) -> (* Ok *)
             v77
-    let v194 : US22 =
+    let v194 : US19 =
         match v177 with
-        | US22_Error(v186, v187, v188, v189, v190, v191) -> (* Error *)
-            US22_Error(v186, v187, v188, v189, v190, v191)
-        | US22_Ok(v178, v179, v180, v181, v182, v183) -> (* Ok *)
+        | US19_Error(v186, v187, v188, v189, v190, v191) -> (* Error *)
+            US19_Error(v186, v187, v188, v189, v190, v191)
+        | US19_Ok(v178, v179, v180, v181, v182, v183) -> (* Ok *)
             let v184 : string = ""
-            US22_Ok(v184, v179, v180, v181, v182, v183)
-    let v250 : US22 =
+            US19_Ok(v184, v179, v180, v181, v182, v183)
+    let v250 : US19 =
         match v194 with
-        | US22_Error(v242, v243, v244, v245, v246, v247) -> (* Error *)
-            US22_Error(v242, v243, v244, v245, v246, v247)
-        | US22_Ok(v195, v196, v197, v198, v199, v200) -> (* Ok *)
+        | US19_Error(v242, v243, v244, v245, v246, v247) -> (* Error *)
+            US19_Error(v242, v243, v244, v245, v246, v247)
+        | US19_Ok(v195, v196, v197, v198, v199, v200) -> (* Ok *)
             let v201 : bool = v196 >= v200
-            let v224 : US21 =
+            let v224 : US18 =
                 if v201 then
-                    let v202 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure66()
-                    US21_Error(v202, v196, v197, v198, v199, v200)
+                    let v202 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure60()
+                    US18_Error(v202, v196, v197, v198, v199, v200)
                 else
-                    let v204 : char = v0.[int v196]
+                    let v204 : char = (spiralStringIndex v0 (int v196))
                     let v205 : bool = v204 = '\\'
                     let v209 : bool =
                         if v205 then
@@ -3865,34 +4368,34 @@ and method138 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                             else
                                 let v215 : int32 = v199 + 1
                                 struct (v197, v198, v215, v200)
-                        US21_Ok(v204, v211, v216, v217, v218, v219)
+                        US18_Ok(v204, v211, v216, v217, v218, v219)
                     else
-                        let v221 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure67()
-                        US21_Error(v221, v196, v197, v198, v199, v200)
+                        let v221 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure61()
+                        US18_Error(v221, v196, v197, v198, v199, v200)
             match v224 with
-            | US21_Error(v233, v234, v235, v236, v237, v238) -> (* Error *)
-                US22_Error(v233, v234, v235, v236, v237, v238)
-            | US21_Ok(v225, v226, v227, v228, v229, v230) -> (* Ok *)
+            | US18_Error(v233, v234, v235, v236, v237, v238) -> (* Error *)
+                US19_Error(v233, v234, v235, v236, v237, v238)
+            | US18_Ok(v225, v226, v227, v228, v229, v230) -> (* Ok *)
                 let v231 : string = v225 |> _.ToString()
-                US22_Ok(v231, v226, v227, v228, v229, v230)
+                US19_Ok(v231, v226, v227, v228, v229, v230)
     match v250 with
-    | US22_Error(v251, v252, v253, v254, v255, v256) -> (* Error *)
+    | US19_Error(v251, v252, v253, v254, v255, v256) -> (* Error *)
         let v257 : UH0 = UH0_Nil
-        let v258 : UH0 = method139(v1, v257)
-        US30_Ok(v258, v2, v3, v4, v5, v6)
-    | US22_Ok(v260, v261, v262, v263, v264, v265) -> (* Ok *)
+        let v258 : UH0 = method97(v1, v257)
+        US27_Ok(v258, v2, v3, v4, v5, v6)
+    | US19_Ok(v260, v261, v262, v263, v264, v265) -> (* Ok *)
         let v266 : bool = v261 > v2
         if v266 then
             let v267 : UH0 = UH0_Cons(v260, v1)
-            method138(v0, v267, v261, v262, v263, v264, v265)
+            method96(v0, v267, v261, v262, v263, v264, v265)
         else
-            let v269 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure68()
-            US30_Error(v269, v2, v3, v4, v5, v6)
-and method140 (v0 : UH0, v1 : string) : struct (string * string) =
+            let v269 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure62()
+            US27_Error(v269, v2, v3, v4, v5, v6)
+and method98 (v0 : UH0, v1 : string) : struct (string * string) =
     let struct (v11 : string, v12 : string) =
         match v0 with
         | UH0_Cons(v2, v3) -> (* Cons *)
-            let struct (v4 : string, v5 : string) = method140(v3, v1)
+            let struct (v4 : string, v5 : string) = method98(v3, v1)
             let v6 : string = v2 + v5 
             let v7 : string = v6 + v4 
             let v8 : string = ""
@@ -3904,15 +4407,15 @@ and method140 (v0 : UH0, v1 : string) : struct (string * string) =
                     struct (v1, v1)
             struct (v9, v10)
     struct (v11, v12)
-and closure69 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+and closure63 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : string = "runtime.split_args / segment zero-length success"
     v6
-and method143 (v0 : int32, v1 : int32, v2 : int32, v3 : int32, v4 : string, v5 : int32, v6 : int32, v7 : int32, v8 : int32, v9 : int32) : struct (int32 * int32 * int32 * int32 * int32) =
+and method101 (v0 : int32, v1 : int32, v2 : int32, v3 : int32, v4 : string, v5 : int32, v6 : int32, v7 : int32, v8 : int32, v9 : int32) : struct (int32 * int32 * int32 * int32 * int32) =
     let v10 : bool = v5 >= v3
     if v10 then
         struct (v5, v6, v7, v8, v9)
     else
-        let v11 : char = v4.[int v5]
+        let v11 : char = (spiralStringIndex v4 (int v5))
         let v12 : bool = v11 = '\\'
         let v18 : bool =
             if v12 then
@@ -3940,15 +4443,15 @@ and method143 (v0 : int32, v1 : int32, v2 : int32, v3 : int32, v4 : string, v5 :
                 else
                     let v24 : int32 = v8 + 1
                     struct (v6, v7, v24, v9)
-            method143(v0, v1, v2, v3, v4, v20, v25, v26, v27, v28)
+            method101(v0, v1, v2, v3, v4, v20, v25, v26, v27, v28)
         else
             struct (v5, v6, v7, v8, v9)
-and method142 (v0 : int32, v1 : int32, v2 : int32, v3 : int32, v4 : string, v5 : int32) : struct (int32 * int32 * int32 * int32 * int32) =
+and method100 (v0 : int32, v1 : int32, v2 : int32, v3 : int32, v4 : string, v5 : int32) : struct (int32 * int32 * int32 * int32 * int32) =
     let v6 : bool = v5 >= v3
     if v6 then
         struct (v5, v0, v1, v2, v3)
     else
-        let v7 : char = v4.[int v5]
+        let v7 : char = (spiralStringIndex v4 (int v5))
         let v8 : bool = v7 = '\\'
         let v14 : bool =
             if v8 then
@@ -3976,20 +4479,20 @@ and method142 (v0 : int32, v1 : int32, v2 : int32, v3 : int32, v4 : string, v5 :
                 else
                     let v20 : int32 = v2 + 1
                     struct (v0, v1, v20, v3)
-            method143(v0, v1, v2, v3, v4, v16, v21, v22, v23, v24)
+            method101(v0, v1, v2, v3, v4, v16, v21, v22, v23, v24)
         else
             struct (v5, v0, v1, v2, v3)
-and closure70 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+and closure64 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : string = "parsing.many1_strings / inner parser succeeded without consuming text"
     v6
-and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : int32, v6 : int32, v7 : int32) : US22 =
+and method99 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : int32, v6 : int32, v7 : int32) : US19 =
     let v8 : bool = v3 >= v7
-    let v26 : US21 =
+    let v26 : US18 =
         if v8 then
-            let v9 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-            US21_Error(v9, v3, v4, v5, v6, v7)
+            let v9 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+            US18_Error(v9, v3, v4, v5, v6, v7)
         else
-            let v11 : char = v0.[int v3]
+            let v11 : char = (spiralStringIndex v0 (int v3))
             let v12 : bool = v11 = '\\'
             if v12 then
                 let v13 : int32 = v3 + 1
@@ -4002,21 +4505,21 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                     else
                         let v17 : int32 = v6 + 1
                         struct (v4, v5, v17, v7)
-                US21_Ok('\\', v13, v18, v19, v20, v21)
+                US18_Ok('\\', v13, v18, v19, v20, v21)
             else
-                let v23 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                US21_Error(v23, v3, v4, v5, v6, v7)
-    let v60 : US21 =
+                let v23 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                US18_Error(v23, v3, v4, v5, v6, v7)
+    let v60 : US18 =
         match v26 with
-        | US21_Error(v52, v53, v54, v55, v56, v57) -> (* Error *)
-            US21_Error(v52, v53, v54, v55, v56, v57)
-        | US21_Ok(v27, v28, v29, v30, v31, v32) -> (* Ok *)
+        | US18_Error(v52, v53, v54, v55, v56, v57) -> (* Error *)
+            US18_Error(v52, v53, v54, v55, v56, v57)
+        | US18_Ok(v27, v28, v29, v30, v31, v32) -> (* Ok *)
             let v33 : bool = v28 >= v32
             if v33 then
-                let v34 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                US21_Error(v34, v28, v29, v30, v31, v32)
+                let v34 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                US18_Error(v34, v28, v29, v30, v31, v32)
             else
-                let v36 : char = v0.[int v28]
+                let v36 : char = (spiralStringIndex v0 (int v28))
                 let v37 : bool = v36 = '"'
                 if v37 then
                     let v38 : int32 = v28 + 1
@@ -4029,25 +4532,25 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                         else
                             let v42 : int32 = v31 + 1
                             struct (v29, v30, v42, v32)
-                    US21_Ok('"', v38, v43, v44, v45, v46)
+                    US18_Ok('"', v38, v43, v44, v45, v46)
                 else
-                    let v48 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                    US21_Error(v48, v28, v29, v30, v31, v32)
-    let v76 : US21 =
+                    let v48 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                    US18_Error(v48, v28, v29, v30, v31, v32)
+    let v76 : US18 =
         match v60 with
-        | US21_Error(v68, v69, v70, v71, v72, v73) -> (* Error *)
-            US21_Error(v68, v69, v70, v71, v72, v73)
-        | US21_Ok(v61, v62, v63, v64, v65, v66) -> (* Ok *)
-            US21_Ok('"', v62, v63, v64, v65, v66)
-    let v174 : US21 =
+        | US18_Error(v68, v69, v70, v71, v72, v73) -> (* Error *)
+            US18_Error(v68, v69, v70, v71, v72, v73)
+        | US18_Ok(v61, v62, v63, v64, v65, v66) -> (* Ok *)
+            US18_Ok('"', v62, v63, v64, v65, v66)
+    let v174 : US18 =
         match v76 with
-        | US21_Error(v83, v84, v85, v86, v87, v88) -> (* Error *)
-            let v106 : US21 =
+        | US18_Error(v83, v84, v85, v86, v87, v88) -> (* Error *)
+            let v106 : US18 =
                 if v8 then
-                    let v89 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                    US21_Error(v89, v3, v4, v5, v6, v7)
+                    let v89 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                    US18_Error(v89, v3, v4, v5, v6, v7)
                 else
-                    let v91 : char = v0.[int v3]
+                    let v91 : char = (spiralStringIndex v0 (int v3))
                     let v92 : bool = v91 = '`'
                     if v92 then
                         let v93 : int32 = v3 + 1
@@ -4060,21 +4563,21 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                             else
                                 let v97 : int32 = v6 + 1
                                 struct (v4, v5, v97, v7)
-                        US21_Ok('`', v93, v98, v99, v100, v101)
+                        US18_Ok('`', v93, v98, v99, v100, v101)
                     else
-                        let v103 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                        US21_Error(v103, v3, v4, v5, v6, v7)
-            let v140 : US21 =
+                        let v103 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                        US18_Error(v103, v3, v4, v5, v6, v7)
+            let v140 : US18 =
                 match v106 with
-                | US21_Error(v132, v133, v134, v135, v136, v137) -> (* Error *)
-                    US21_Error(v132, v133, v134, v135, v136, v137)
-                | US21_Ok(v107, v108, v109, v110, v111, v112) -> (* Ok *)
+                | US18_Error(v132, v133, v134, v135, v136, v137) -> (* Error *)
+                    US18_Error(v132, v133, v134, v135, v136, v137)
+                | US18_Ok(v107, v108, v109, v110, v111, v112) -> (* Ok *)
                     let v113 : bool = v108 >= v112
                     if v113 then
-                        let v114 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                        US21_Error(v114, v108, v109, v110, v111, v112)
+                        let v114 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                        US18_Error(v114, v108, v109, v110, v111, v112)
                     else
-                        let v116 : char = v0.[int v108]
+                        let v116 : char = (spiralStringIndex v0 (int v108))
                         let v117 : bool = v116 = '"'
                         if v117 then
                             let v118 : int32 = v108 + 1
@@ -4087,32 +4590,32 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                 else
                                     let v122 : int32 = v111 + 1
                                     struct (v109, v110, v122, v112)
-                            US21_Ok('"', v118, v123, v124, v125, v126)
+                            US18_Ok('"', v118, v123, v124, v125, v126)
                         else
-                            let v128 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                            US21_Error(v128, v108, v109, v110, v111, v112)
-            let v156 : US21 =
+                            let v128 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                            US18_Error(v128, v108, v109, v110, v111, v112)
+            let v156 : US18 =
                 match v140 with
-                | US21_Error(v148, v149, v150, v151, v152, v153) -> (* Error *)
-                    US21_Error(v148, v149, v150, v151, v152, v153)
-                | US21_Ok(v141, v142, v143, v144, v145, v146) -> (* Ok *)
-                    US21_Ok('"', v142, v143, v144, v145, v146)
+                | US18_Error(v148, v149, v150, v151, v152, v153) -> (* Error *)
+                    US18_Error(v148, v149, v150, v151, v152, v153)
+                | US18_Ok(v141, v142, v143, v144, v145, v146) -> (* Ok *)
+                    US18_Ok('"', v142, v143, v144, v145, v146)
             match v156 with
-            | US21_Error(v163, v164, v165, v166, v167, v168) -> (* Error *)
-                let v169 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                US21_Error(v169, v3, v4, v5, v6, v7)
-            | US21_Ok(v157, v158, v159, v160, v161, v162) -> (* Ok *)
+            | US18_Error(v163, v164, v165, v166, v167, v168) -> (* Error *)
+                let v169 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                US18_Error(v169, v3, v4, v5, v6, v7)
+            | US18_Ok(v157, v158, v159, v160, v161, v162) -> (* Ok *)
                 v156
-        | US21_Ok(v77, v78, v79, v80, v81, v82) -> (* Ok *)
+        | US18_Ok(v77, v78, v79, v80, v81, v82) -> (* Ok *)
             v76
-    let v805 : US22 =
+    let v805 : US19 =
         match v174 with
-        | US21_Error(v797, v798, v799, v800, v801, v802) -> (* Error *)
-            US22_Error(v797, v798, v799, v800, v801, v802)
-        | US21_Ok(v175, v176, v177, v178, v179, v180) -> (* Ok *)
-            let struct (v181 : int32, v182 : int32, v183 : int32, v184 : int32, v185 : int32) = method127(v177, v178, v179, v180, v0, v176)
+        | US18_Error(v797, v798, v799, v800, v801, v802) -> (* Error *)
+            US19_Error(v797, v798, v799, v800, v801, v802)
+        | US18_Ok(v175, v176, v177, v178, v179, v180) -> (* Ok *)
+            let struct (v181 : int32, v182 : int32, v183 : int32, v184 : int32, v185 : int32) = method88(v177, v178, v179, v180, v0, v176)
             let v186 : bool = v181 > v176
-            let v196 : US22 =
+            let v196 : US19 =
                 if v186 then
                     let v187 : bool = v176 >= v181
                     let v192 : string =
@@ -4122,22 +4625,22 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                         else
                             let v189 : bool = v176 = v181
                             let v190 : int32 = v181 - 1
-                            let v191 : string = v0.[int v176..int v190]
+                            let v191 : string = (spiralStringSlice v0 (int v176) (int v190))
                             v191
-                    US22_Ok(v192, v181, v182, v183, v184, v185)
+                    US19_Ok(v192, v181, v182, v183, v184, v185)
                 else
-                    let v194 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure60()
-                    US22_Error(v194, v176, v177, v178, v179, v180)
-            let v391 : US22 =
+                    let v194 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure54()
+                    US19_Error(v194, v176, v177, v178, v179, v180)
+            let v391 : US19 =
                 match v196 with
-                | US22_Error(v203, v204, v205, v206, v207, v208) -> (* Error *)
+                | US19_Error(v203, v204, v205, v206, v207, v208) -> (* Error *)
                     let v209 : bool = v176 >= v180
-                    let v227 : US21 =
+                    let v227 : US18 =
                         if v209 then
-                            let v210 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                            US21_Error(v210, v176, v177, v178, v179, v180)
+                            let v210 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                            US18_Error(v210, v176, v177, v178, v179, v180)
                         else
-                            let v212 : char = v0.[int v176]
+                            let v212 : char = (spiralStringIndex v0 (int v176))
                             let v213 : bool = v212 = '\\'
                             if v213 then
                                 let v214 : int32 = v176 + 1
@@ -4150,21 +4653,21 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                     else
                                         let v218 : int32 = v179 + 1
                                         struct (v177, v178, v218, v180)
-                                US21_Ok('\\', v214, v219, v220, v221, v222)
+                                US18_Ok('\\', v214, v219, v220, v221, v222)
                             else
-                                let v224 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                                US21_Error(v224, v176, v177, v178, v179, v180)
-                    let v262 : US21 =
+                                let v224 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                                US18_Error(v224, v176, v177, v178, v179, v180)
+                    let v262 : US18 =
                         match v227 with
-                        | US21_Error(v254, v255, v256, v257, v258, v259) -> (* Error *)
-                            US21_Error(v254, v255, v256, v257, v258, v259)
-                        | US21_Ok(v228, v229, v230, v231, v232, v233) -> (* Ok *)
+                        | US18_Error(v254, v255, v256, v257, v258, v259) -> (* Error *)
+                            US18_Error(v254, v255, v256, v257, v258, v259)
+                        | US18_Ok(v228, v229, v230, v231, v232, v233) -> (* Ok *)
                             let v234 : bool = v229 >= v233
                             if v234 then
-                                let v235 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure61()
-                                US21_Error(v235, v229, v230, v231, v232, v233)
+                                let v235 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure55()
+                                US18_Error(v235, v229, v230, v231, v232, v233)
                             else
-                                let v237 : char = v0.[int v229]
+                                let v237 : char = (spiralStringIndex v0 (int v229))
                                 let v238 : bool = v237 = '"'
                                 let v239 : bool = v238 = false
                                 if v239 then
@@ -4178,15 +4681,15 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                         else
                                             let v244 : int32 = v232 + 1
                                             struct (v230, v231, v244, v233)
-                                    US21_Ok(v237, v240, v245, v246, v247, v248)
+                                    US18_Ok(v237, v240, v245, v246, v247, v248)
                                 else
-                                    let v250 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure62()
-                                    US21_Error(v250, v229, v230, v231, v232, v233)
-                    let v284 : US22 =
+                                    let v250 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
+                                    US18_Error(v250, v229, v230, v231, v232, v233)
+                    let v284 : US19 =
                         match v262 with
-                        | US21_Error(v276, v277, v278, v279, v280, v281) -> (* Error *)
-                            US22_Error(v276, v277, v278, v279, v280, v281)
-                        | US21_Ok(v263, v264, v265, v266, v267, v268) -> (* Ok *)
+                        | US18_Error(v276, v277, v278, v279, v280, v281) -> (* Error *)
+                            US19_Error(v276, v277, v278, v279, v280, v281)
+                        | US18_Ok(v263, v264, v265, v266, v267, v268) -> (* Ok *)
                             let v269 : bool = v176 >= v264
                             let v274 : string =
                                 if v269 then
@@ -4195,17 +4698,17 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                 else
                                     let v271 : bool = v176 = v264
                                     let v272 : int32 = v264 - 1
-                                    let v273 : string = v0.[int v176..int v272]
+                                    let v273 : string = (spiralStringSlice v0 (int v176) (int v272))
                                     v273
-                            US22_Ok(v274, v264, v265, v266, v267, v268)
+                            US19_Ok(v274, v264, v265, v266, v267, v268)
                     match v284 with
-                    | US22_Error(v291, v292, v293, v294, v295, v296) -> (* Error *)
-                        let v314 : US21 =
+                    | US19_Error(v291, v292, v293, v294, v295, v296) -> (* Error *)
+                        let v314 : US18 =
                             if v209 then
-                                let v297 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                                US21_Error(v297, v176, v177, v178, v179, v180)
+                                let v297 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                                US18_Error(v297, v176, v177, v178, v179, v180)
                             else
-                                let v299 : char = v0.[int v176]
+                                let v299 : char = (spiralStringIndex v0 (int v176))
                                 let v300 : bool = v299 = '`'
                                 if v300 then
                                     let v301 : int32 = v176 + 1
@@ -4218,21 +4721,21 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                         else
                                             let v305 : int32 = v179 + 1
                                             struct (v177, v178, v305, v180)
-                                    US21_Ok('`', v301, v306, v307, v308, v309)
+                                    US18_Ok('`', v301, v306, v307, v308, v309)
                                 else
-                                    let v311 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                                    US21_Error(v311, v176, v177, v178, v179, v180)
-                        let v349 : US21 =
+                                    let v311 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                                    US18_Error(v311, v176, v177, v178, v179, v180)
+                        let v349 : US18 =
                             match v314 with
-                            | US21_Error(v341, v342, v343, v344, v345, v346) -> (* Error *)
-                                US21_Error(v341, v342, v343, v344, v345, v346)
-                            | US21_Ok(v315, v316, v317, v318, v319, v320) -> (* Ok *)
+                            | US18_Error(v341, v342, v343, v344, v345, v346) -> (* Error *)
+                                US18_Error(v341, v342, v343, v344, v345, v346)
+                            | US18_Ok(v315, v316, v317, v318, v319, v320) -> (* Ok *)
                                 let v321 : bool = v316 >= v320
                                 if v321 then
-                                    let v322 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure61()
-                                    US21_Error(v322, v316, v317, v318, v319, v320)
+                                    let v322 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure55()
+                                    US18_Error(v322, v316, v317, v318, v319, v320)
                                 else
-                                    let v324 : char = v0.[int v316]
+                                    let v324 : char = (spiralStringIndex v0 (int v316))
                                     let v325 : bool = v324 = '"'
                                     let v326 : bool = v325 = false
                                     if v326 then
@@ -4246,15 +4749,15 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                             else
                                                 let v331 : int32 = v319 + 1
                                                 struct (v317, v318, v331, v320)
-                                        US21_Ok(v324, v327, v332, v333, v334, v335)
+                                        US18_Ok(v324, v327, v332, v333, v334, v335)
                                     else
-                                        let v337 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure62()
-                                        US21_Error(v337, v316, v317, v318, v319, v320)
-                        let v371 : US22 =
+                                        let v337 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
+                                        US18_Error(v337, v316, v317, v318, v319, v320)
+                        let v371 : US19 =
                             match v349 with
-                            | US21_Error(v363, v364, v365, v366, v367, v368) -> (* Error *)
-                                US22_Error(v363, v364, v365, v366, v367, v368)
-                            | US21_Ok(v350, v351, v352, v353, v354, v355) -> (* Ok *)
+                            | US18_Error(v363, v364, v365, v366, v367, v368) -> (* Error *)
+                                US19_Error(v363, v364, v365, v366, v367, v368)
+                            | US18_Ok(v350, v351, v352, v353, v354, v355) -> (* Ok *)
                                 let v356 : bool = v176 >= v351
                                 let v361 : string =
                                     if v356 then
@@ -4263,41 +4766,41 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                     else
                                         let v358 : bool = v176 = v351
                                         let v359 : int32 = v351 - 1
-                                        let v360 : string = v0.[int v176..int v359]
+                                        let v360 : string = (spiralStringSlice v0 (int v176) (int v359))
                                         v360
-                                US22_Ok(v361, v351, v352, v353, v354, v355)
+                                US19_Ok(v361, v351, v352, v353, v354, v355)
                         match v371 with
-                        | US22_Error(v378, v379, v380, v381, v382, v383) -> (* Error *)
-                            let v384 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                            US22_Error(v384, v176, v177, v178, v179, v180)
-                        | US22_Ok(v372, v373, v374, v375, v376, v377) -> (* Ok *)
+                        | US19_Error(v378, v379, v380, v381, v382, v383) -> (* Error *)
+                            let v384 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                            US19_Error(v384, v176, v177, v178, v179, v180)
+                        | US19_Ok(v372, v373, v374, v375, v376, v377) -> (* Ok *)
                             v371
-                    | US22_Ok(v285, v286, v287, v288, v289, v290) -> (* Ok *)
+                    | US19_Ok(v285, v286, v287, v288, v289, v290) -> (* Ok *)
                         v284
-                | US22_Ok(v197, v198, v199, v200, v201, v202) -> (* Ok *)
+                | US19_Ok(v197, v198, v199, v200, v201, v202) -> (* Ok *)
                     v196
-            let v413 : US22 =
+            let v413 : US19 =
                 match v391 with
-                | US22_Error(v392, v393, v394, v395, v396, v397) -> (* Error *)
+                | US19_Error(v392, v393, v394, v395, v396, v397) -> (* Error *)
                     let v398 : string = ""
-                    US22_Ok(v398, v176, v177, v178, v179, v180)
-                | US22_Ok(v400, v401, v402, v403, v404, v405) -> (* Ok *)
+                    US19_Ok(v398, v176, v177, v178, v179, v180)
+                | US19_Ok(v400, v401, v402, v403, v404, v405) -> (* Ok *)
                     let v406 : bool = v401 = v176
                     if v406 then
-                        let v407 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure63()
-                        US22_Error(v407, v176, v177, v178, v179, v180)
+                        let v407 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
+                        US19_Error(v407, v176, v177, v178, v179, v180)
                     else
                         let v409 : UH0 = UH0_Nil
-                        method131(v0, v400, v409, v401, v402, v403, v404, v405)
+                        method90(v0, v400, v409, v401, v402, v403, v404, v405)
             match v413 with
-            | US22_Error(v604, v605, v606, v607, v608, v609) -> (* Error *)
+            | US19_Error(v604, v605, v606, v607, v608, v609) -> (* Error *)
                 let v610 : bool = v176 >= v180
-                let v628 : US21 =
+                let v628 : US18 =
                     if v610 then
-                        let v611 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                        US21_Error(v611, v176, v177, v178, v179, v180)
+                        let v611 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                        US18_Error(v611, v176, v177, v178, v179, v180)
                     else
-                        let v613 : char = v0.[int v176]
+                        let v613 : char = (spiralStringIndex v0 (int v176))
                         let v614 : bool = v613 = '\\'
                         if v614 then
                             let v615 : int32 = v176 + 1
@@ -4310,21 +4813,21 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                 else
                                     let v619 : int32 = v179 + 1
                                     struct (v177, v178, v619, v180)
-                            US21_Ok('\\', v615, v620, v621, v622, v623)
+                            US18_Ok('\\', v615, v620, v621, v622, v623)
                         else
-                            let v625 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                            US21_Error(v625, v176, v177, v178, v179, v180)
-                let v662 : US21 =
+                            let v625 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                            US18_Error(v625, v176, v177, v178, v179, v180)
+                let v662 : US18 =
                     match v628 with
-                    | US21_Error(v654, v655, v656, v657, v658, v659) -> (* Error *)
-                        US21_Error(v654, v655, v656, v657, v658, v659)
-                    | US21_Ok(v629, v630, v631, v632, v633, v634) -> (* Ok *)
+                    | US18_Error(v654, v655, v656, v657, v658, v659) -> (* Error *)
+                        US18_Error(v654, v655, v656, v657, v658, v659)
+                    | US18_Ok(v629, v630, v631, v632, v633, v634) -> (* Ok *)
                         let v635 : bool = v630 >= v634
                         if v635 then
-                            let v636 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                            US21_Error(v636, v630, v631, v632, v633, v634)
+                            let v636 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                            US18_Error(v636, v630, v631, v632, v633, v634)
                         else
-                            let v638 : char = v0.[int v630]
+                            let v638 : char = (spiralStringIndex v0 (int v630))
                             let v639 : bool = v638 = '"'
                             if v639 then
                                 let v640 : int32 = v630 + 1
@@ -4337,25 +4840,25 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                     else
                                         let v644 : int32 = v633 + 1
                                         struct (v631, v632, v644, v634)
-                                US21_Ok('"', v640, v645, v646, v647, v648)
+                                US18_Ok('"', v640, v645, v646, v647, v648)
                             else
-                                let v650 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                US21_Error(v650, v630, v631, v632, v633, v634)
-                let v678 : US21 =
+                                let v650 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                US18_Error(v650, v630, v631, v632, v633, v634)
+                let v678 : US18 =
                     match v662 with
-                    | US21_Error(v670, v671, v672, v673, v674, v675) -> (* Error *)
-                        US21_Error(v670, v671, v672, v673, v674, v675)
-                    | US21_Ok(v663, v664, v665, v666, v667, v668) -> (* Ok *)
-                        US21_Ok('"', v664, v665, v666, v667, v668)
-                let v776 : US21 =
+                    | US18_Error(v670, v671, v672, v673, v674, v675) -> (* Error *)
+                        US18_Error(v670, v671, v672, v673, v674, v675)
+                    | US18_Ok(v663, v664, v665, v666, v667, v668) -> (* Ok *)
+                        US18_Ok('"', v664, v665, v666, v667, v668)
+                let v776 : US18 =
                     match v678 with
-                    | US21_Error(v685, v686, v687, v688, v689, v690) -> (* Error *)
-                        let v708 : US21 =
+                    | US18_Error(v685, v686, v687, v688, v689, v690) -> (* Error *)
+                        let v708 : US18 =
                             if v610 then
-                                let v691 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                                US21_Error(v691, v176, v177, v178, v179, v180)
+                                let v691 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                                US18_Error(v691, v176, v177, v178, v179, v180)
                             else
-                                let v693 : char = v0.[int v176]
+                                let v693 : char = (spiralStringIndex v0 (int v176))
                                 let v694 : bool = v693 = '`'
                                 if v694 then
                                     let v695 : int32 = v176 + 1
@@ -4368,21 +4871,21 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                         else
                                             let v699 : int32 = v179 + 1
                                             struct (v177, v178, v699, v180)
-                                    US21_Ok('`', v695, v700, v701, v702, v703)
+                                    US18_Ok('`', v695, v700, v701, v702, v703)
                                 else
-                                    let v705 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                                    US21_Error(v705, v176, v177, v178, v179, v180)
-                        let v742 : US21 =
+                                    let v705 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                                    US18_Error(v705, v176, v177, v178, v179, v180)
+                        let v742 : US18 =
                             match v708 with
-                            | US21_Error(v734, v735, v736, v737, v738, v739) -> (* Error *)
-                                US21_Error(v734, v735, v736, v737, v738, v739)
-                            | US21_Ok(v709, v710, v711, v712, v713, v714) -> (* Ok *)
+                            | US18_Error(v734, v735, v736, v737, v738, v739) -> (* Error *)
+                                US18_Error(v734, v735, v736, v737, v738, v739)
+                            | US18_Ok(v709, v710, v711, v712, v713, v714) -> (* Ok *)
                                 let v715 : bool = v710 >= v714
                                 if v715 then
-                                    let v716 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                                    US21_Error(v716, v710, v711, v712, v713, v714)
+                                    let v716 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                                    US18_Error(v716, v710, v711, v712, v713, v714)
                                 else
-                                    let v718 : char = v0.[int v710]
+                                    let v718 : char = (spiralStringIndex v0 (int v710))
                                     let v719 : bool = v718 = '"'
                                     if v719 then
                                         let v720 : int32 = v710 + 1
@@ -4395,39 +4898,39 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                             else
                                                 let v724 : int32 = v713 + 1
                                                 struct (v711, v712, v724, v714)
-                                        US21_Ok('"', v720, v725, v726, v727, v728)
+                                        US18_Ok('"', v720, v725, v726, v727, v728)
                                     else
-                                        let v730 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                        US21_Error(v730, v710, v711, v712, v713, v714)
-                        let v758 : US21 =
+                                        let v730 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                        US18_Error(v730, v710, v711, v712, v713, v714)
+                        let v758 : US18 =
                             match v742 with
-                            | US21_Error(v750, v751, v752, v753, v754, v755) -> (* Error *)
-                                US21_Error(v750, v751, v752, v753, v754, v755)
-                            | US21_Ok(v743, v744, v745, v746, v747, v748) -> (* Ok *)
-                                US21_Ok('"', v744, v745, v746, v747, v748)
+                            | US18_Error(v750, v751, v752, v753, v754, v755) -> (* Error *)
+                                US18_Error(v750, v751, v752, v753, v754, v755)
+                            | US18_Ok(v743, v744, v745, v746, v747, v748) -> (* Ok *)
+                                US18_Ok('"', v744, v745, v746, v747, v748)
                         match v758 with
-                        | US21_Error(v765, v766, v767, v768, v769, v770) -> (* Error *)
-                            let v771 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                            US21_Error(v771, v176, v177, v178, v179, v180)
-                        | US21_Ok(v759, v760, v761, v762, v763, v764) -> (* Ok *)
+                        | US18_Error(v765, v766, v767, v768, v769, v770) -> (* Error *)
+                            let v771 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                            US18_Error(v771, v176, v177, v178, v179, v180)
+                        | US18_Ok(v759, v760, v761, v762, v763, v764) -> (* Ok *)
                             v758
-                    | US21_Ok(v679, v680, v681, v682, v683, v684) -> (* Ok *)
+                    | US18_Ok(v679, v680, v681, v682, v683, v684) -> (* Ok *)
                         v678
                 match v776 with
-                | US21_Error(v785, v786, v787, v788, v789, v790) -> (* Error *)
-                    let v791 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure45()
-                    US22_Error(v791, v176, v177, v178, v179, v180)
-                | US21_Ok(v777, v778, v779, v780, v781, v782) -> (* Ok *)
+                | US18_Error(v785, v786, v787, v788, v789, v790) -> (* Error *)
+                    let v791 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure39()
+                    US19_Error(v791, v176, v177, v178, v179, v180)
+                | US18_Ok(v777, v778, v779, v780, v781, v782) -> (* Ok *)
                     let v783 : string = ""
-                    US22_Ok(v783, v778, v779, v780, v781, v782)
-            | US22_Ok(v414, v415, v416, v417, v418, v419) -> (* Ok *)
+                    US19_Ok(v783, v778, v779, v780, v781, v782)
+            | US19_Ok(v414, v415, v416, v417, v418, v419) -> (* Ok *)
                 let v420 : bool = v415 >= v419
-                let v438 : US21 =
+                let v438 : US18 =
                     if v420 then
-                        let v421 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                        US21_Error(v421, v415, v416, v417, v418, v419)
+                        let v421 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                        US18_Error(v421, v415, v416, v417, v418, v419)
                     else
-                        let v423 : char = v0.[int v415]
+                        let v423 : char = (spiralStringIndex v0 (int v415))
                         let v424 : bool = v423 = '\\'
                         if v424 then
                             let v425 : int32 = v415 + 1
@@ -4440,21 +4943,21 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                 else
                                     let v429 : int32 = v418 + 1
                                     struct (v416, v417, v429, v419)
-                            US21_Ok('\\', v425, v430, v431, v432, v433)
+                            US18_Ok('\\', v425, v430, v431, v432, v433)
                         else
-                            let v435 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                            US21_Error(v435, v415, v416, v417, v418, v419)
-                let v472 : US21 =
+                            let v435 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                            US18_Error(v435, v415, v416, v417, v418, v419)
+                let v472 : US18 =
                     match v438 with
-                    | US21_Error(v464, v465, v466, v467, v468, v469) -> (* Error *)
-                        US21_Error(v464, v465, v466, v467, v468, v469)
-                    | US21_Ok(v439, v440, v441, v442, v443, v444) -> (* Ok *)
+                    | US18_Error(v464, v465, v466, v467, v468, v469) -> (* Error *)
+                        US18_Error(v464, v465, v466, v467, v468, v469)
+                    | US18_Ok(v439, v440, v441, v442, v443, v444) -> (* Ok *)
                         let v445 : bool = v440 >= v444
                         if v445 then
-                            let v446 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                            US21_Error(v446, v440, v441, v442, v443, v444)
+                            let v446 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                            US18_Error(v446, v440, v441, v442, v443, v444)
                         else
-                            let v448 : char = v0.[int v440]
+                            let v448 : char = (spiralStringIndex v0 (int v440))
                             let v449 : bool = v448 = '"'
                             if v449 then
                                 let v450 : int32 = v440 + 1
@@ -4467,25 +4970,25 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                     else
                                         let v454 : int32 = v443 + 1
                                         struct (v441, v442, v454, v444)
-                                US21_Ok('"', v450, v455, v456, v457, v458)
+                                US18_Ok('"', v450, v455, v456, v457, v458)
                             else
-                                let v460 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                US21_Error(v460, v440, v441, v442, v443, v444)
-                let v488 : US21 =
+                                let v460 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                US18_Error(v460, v440, v441, v442, v443, v444)
+                let v488 : US18 =
                     match v472 with
-                    | US21_Error(v480, v481, v482, v483, v484, v485) -> (* Error *)
-                        US21_Error(v480, v481, v482, v483, v484, v485)
-                    | US21_Ok(v473, v474, v475, v476, v477, v478) -> (* Ok *)
-                        US21_Ok('"', v474, v475, v476, v477, v478)
-                let v586 : US21 =
+                    | US18_Error(v480, v481, v482, v483, v484, v485) -> (* Error *)
+                        US18_Error(v480, v481, v482, v483, v484, v485)
+                    | US18_Ok(v473, v474, v475, v476, v477, v478) -> (* Ok *)
+                        US18_Ok('"', v474, v475, v476, v477, v478)
+                let v586 : US18 =
                     match v488 with
-                    | US21_Error(v495, v496, v497, v498, v499, v500) -> (* Error *)
-                        let v518 : US21 =
+                    | US18_Error(v495, v496, v497, v498, v499, v500) -> (* Error *)
+                        let v518 : US18 =
                             if v420 then
-                                let v501 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                                US21_Error(v501, v415, v416, v417, v418, v419)
+                                let v501 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                                US18_Error(v501, v415, v416, v417, v418, v419)
                             else
-                                let v503 : char = v0.[int v415]
+                                let v503 : char = (spiralStringIndex v0 (int v415))
                                 let v504 : bool = v503 = '`'
                                 if v504 then
                                     let v505 : int32 = v415 + 1
@@ -4498,21 +5001,21 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                         else
                                             let v509 : int32 = v418 + 1
                                             struct (v416, v417, v509, v419)
-                                    US21_Ok('`', v505, v510, v511, v512, v513)
+                                    US18_Ok('`', v505, v510, v511, v512, v513)
                                 else
-                                    let v515 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                                    US21_Error(v515, v415, v416, v417, v418, v419)
-                        let v552 : US21 =
+                                    let v515 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                                    US18_Error(v515, v415, v416, v417, v418, v419)
+                        let v552 : US18 =
                             match v518 with
-                            | US21_Error(v544, v545, v546, v547, v548, v549) -> (* Error *)
-                                US21_Error(v544, v545, v546, v547, v548, v549)
-                            | US21_Ok(v519, v520, v521, v522, v523, v524) -> (* Ok *)
+                            | US18_Error(v544, v545, v546, v547, v548, v549) -> (* Error *)
+                                US18_Error(v544, v545, v546, v547, v548, v549)
+                            | US18_Ok(v519, v520, v521, v522, v523, v524) -> (* Ok *)
                                 let v525 : bool = v520 >= v524
                                 if v525 then
-                                    let v526 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                                    US21_Error(v526, v520, v521, v522, v523, v524)
+                                    let v526 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                                    US18_Error(v526, v520, v521, v522, v523, v524)
                                 else
-                                    let v528 : char = v0.[int v520]
+                                    let v528 : char = (spiralStringIndex v0 (int v520))
                                     let v529 : bool = v528 = '"'
                                     if v529 then
                                         let v530 : int32 = v520 + 1
@@ -4525,39 +5028,39 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                             else
                                                 let v534 : int32 = v523 + 1
                                                 struct (v521, v522, v534, v524)
-                                        US21_Ok('"', v530, v535, v536, v537, v538)
+                                        US18_Ok('"', v530, v535, v536, v537, v538)
                                     else
-                                        let v540 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                        US21_Error(v540, v520, v521, v522, v523, v524)
-                        let v568 : US21 =
+                                        let v540 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                        US18_Error(v540, v520, v521, v522, v523, v524)
+                        let v568 : US18 =
                             match v552 with
-                            | US21_Error(v560, v561, v562, v563, v564, v565) -> (* Error *)
-                                US21_Error(v560, v561, v562, v563, v564, v565)
-                            | US21_Ok(v553, v554, v555, v556, v557, v558) -> (* Ok *)
-                                US21_Ok('"', v554, v555, v556, v557, v558)
+                            | US18_Error(v560, v561, v562, v563, v564, v565) -> (* Error *)
+                                US18_Error(v560, v561, v562, v563, v564, v565)
+                            | US18_Ok(v553, v554, v555, v556, v557, v558) -> (* Ok *)
+                                US18_Ok('"', v554, v555, v556, v557, v558)
                         match v568 with
-                        | US21_Error(v575, v576, v577, v578, v579, v580) -> (* Error *)
-                            let v581 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                            US21_Error(v581, v415, v416, v417, v418, v419)
-                        | US21_Ok(v569, v570, v571, v572, v573, v574) -> (* Ok *)
+                        | US18_Error(v575, v576, v577, v578, v579, v580) -> (* Error *)
+                            let v581 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                            US18_Error(v581, v415, v416, v417, v418, v419)
+                        | US18_Ok(v569, v570, v571, v572, v573, v574) -> (* Ok *)
                             v568
-                    | US21_Ok(v489, v490, v491, v492, v493, v494) -> (* Ok *)
+                    | US18_Ok(v489, v490, v491, v492, v493, v494) -> (* Ok *)
                         v488
                 match v586 with
-                | US21_Error(v594, v595, v596, v597, v598, v599) -> (* Error *)
-                    let v600 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure46(v176, v415, v594, v595, v596, v597, v598, v599)
-                    US22_Error(v600, v415, v416, v417, v418, v419)
-                | US21_Ok(v587, v588, v589, v590, v591, v592) -> (* Ok *)
-                    US22_Ok(v414, v588, v589, v590, v591, v592)
-    let v1162 : US22 =
+                | US18_Error(v594, v595, v596, v597, v598, v599) -> (* Error *)
+                    let v600 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure40(v176, v415, v594, v595, v596, v597, v598, v599)
+                    US19_Error(v600, v415, v416, v417, v418, v419)
+                | US18_Ok(v587, v588, v589, v590, v591, v592) -> (* Ok *)
+                    US19_Ok(v414, v588, v589, v590, v591, v592)
+    let v1162 : US19 =
         match v805 with
-        | US22_Error(v812, v813, v814, v815, v816, v817) -> (* Error *)
-            let v835 : US21 =
+        | US19_Error(v812, v813, v814, v815, v816, v817) -> (* Error *)
+            let v835 : US18 =
                 if v8 then
-                    let v818 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                    US21_Error(v818, v3, v4, v5, v6, v7)
+                    let v818 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                    US18_Error(v818, v3, v4, v5, v6, v7)
                 else
-                    let v820 : char = v0.[int v3]
+                    let v820 : char = (spiralStringIndex v0 (int v3))
                     let v821 : bool = v820 = '"'
                     if v821 then
                         let v822 : int32 = v3 + 1
@@ -4570,17 +5073,17 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                             else
                                 let v826 : int32 = v6 + 1
                                 struct (v4, v5, v826, v7)
-                        US21_Ok('"', v822, v827, v828, v829, v830)
+                        US18_Ok('"', v822, v827, v828, v829, v830)
                     else
-                        let v832 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                        US21_Error(v832, v3, v4, v5, v6, v7)
+                        let v832 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                        US18_Error(v832, v3, v4, v5, v6, v7)
             match v835 with
-            | US21_Error(v1152, v1153, v1154, v1155, v1156, v1157) -> (* Error *)
-                US22_Error(v1152, v1153, v1154, v1155, v1156, v1157)
-            | US21_Ok(v836, v837, v838, v839, v840, v841) -> (* Ok *)
-                let struct (v842 : int32, v843 : int32, v844 : int32, v845 : int32, v846 : int32) = method127(v838, v839, v840, v841, v0, v837)
+            | US18_Error(v1152, v1153, v1154, v1155, v1156, v1157) -> (* Error *)
+                US19_Error(v1152, v1153, v1154, v1155, v1156, v1157)
+            | US18_Ok(v836, v837, v838, v839, v840, v841) -> (* Ok *)
+                let struct (v842 : int32, v843 : int32, v844 : int32, v845 : int32, v846 : int32) = method88(v838, v839, v840, v841, v0, v837)
                 let v847 : bool = v842 > v837
-                let v857 : US22 =
+                let v857 : US19 =
                     if v847 then
                         let v848 : bool = v837 >= v842
                         let v853 : string =
@@ -4590,22 +5093,22 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                             else
                                 let v850 : bool = v837 = v842
                                 let v851 : int32 = v842 - 1
-                                let v852 : string = v0.[int v837..int v851]
+                                let v852 : string = (spiralStringSlice v0 (int v837) (int v851))
                                 v852
-                        US22_Ok(v853, v842, v843, v844, v845, v846)
+                        US19_Ok(v853, v842, v843, v844, v845, v846)
                     else
-                        let v855 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure60()
-                        US22_Error(v855, v837, v838, v839, v840, v841)
-                let v1042 : US22 =
+                        let v855 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure54()
+                        US19_Error(v855, v837, v838, v839, v840, v841)
+                let v1042 : US19 =
                     match v857 with
-                    | US22_Error(v864, v865, v866, v867, v868, v869) -> (* Error *)
+                    | US19_Error(v864, v865, v866, v867, v868, v869) -> (* Error *)
                         let v870 : bool = v837 >= v841
-                        let v888 : US21 =
+                        let v888 : US18 =
                             if v870 then
-                                let v871 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                                US21_Error(v871, v837, v838, v839, v840, v841)
+                                let v871 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                                US18_Error(v871, v837, v838, v839, v840, v841)
                             else
-                                let v873 : char = v0.[int v837]
+                                let v873 : char = (spiralStringIndex v0 (int v837))
                                 let v874 : bool = v873 = '\\'
                                 if v874 then
                                     let v875 : int32 = v837 + 1
@@ -4618,21 +5121,21 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                         else
                                             let v879 : int32 = v840 + 1
                                             struct (v838, v839, v879, v841)
-                                    US21_Ok('\\', v875, v880, v881, v882, v883)
+                                    US18_Ok('\\', v875, v880, v881, v882, v883)
                                 else
-                                    let v885 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                                    US21_Error(v885, v837, v838, v839, v840, v841)
-                        let v918 : US21 =
+                                    let v885 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                                    US18_Error(v885, v837, v838, v839, v840, v841)
+                        let v918 : US18 =
                             match v888 with
-                            | US21_Error(v910, v911, v912, v913, v914, v915) -> (* Error *)
-                                US21_Error(v910, v911, v912, v913, v914, v915)
-                            | US21_Ok(v889, v890, v891, v892, v893, v894) -> (* Ok *)
+                            | US18_Error(v910, v911, v912, v913, v914, v915) -> (* Error *)
+                                US18_Error(v910, v911, v912, v913, v914, v915)
+                            | US18_Ok(v889, v890, v891, v892, v893, v894) -> (* Ok *)
                                 let v895 : bool = v890 >= v894
                                 if v895 then
-                                    let v896 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure65()
-                                    US21_Error(v896, v890, v891, v892, v893, v894)
+                                    let v896 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
+                                    US18_Error(v896, v890, v891, v892, v893, v894)
                                 else
-                                    let v898 : char = v0.[int v890]
+                                    let v898 : char = (spiralStringIndex v0 (int v890))
                                     let v899 : int32 = v890 + 1
                                     let v900 : bool = '\n' = v898
                                     let struct (v904 : int32, v905 : int32, v906 : int32, v907 : int32) =
@@ -4643,12 +5146,12 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                         else
                                             let v903 : int32 = v893 + 1
                                             struct (v891, v892, v903, v894)
-                                    US21_Ok(v898, v899, v904, v905, v906, v907)
-                        let v940 : US22 =
+                                    US18_Ok(v898, v899, v904, v905, v906, v907)
+                        let v940 : US19 =
                             match v918 with
-                            | US21_Error(v932, v933, v934, v935, v936, v937) -> (* Error *)
-                                US22_Error(v932, v933, v934, v935, v936, v937)
-                            | US21_Ok(v919, v920, v921, v922, v923, v924) -> (* Ok *)
+                            | US18_Error(v932, v933, v934, v935, v936, v937) -> (* Error *)
+                                US19_Error(v932, v933, v934, v935, v936, v937)
+                            | US18_Ok(v919, v920, v921, v922, v923, v924) -> (* Ok *)
                                 let v925 : bool = v837 >= v920
                                 let v930 : string =
                                     if v925 then
@@ -4657,17 +5160,17 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                     else
                                         let v927 : bool = v837 = v920
                                         let v928 : int32 = v920 - 1
-                                        let v929 : string = v0.[int v837..int v928]
+                                        let v929 : string = (spiralStringSlice v0 (int v837) (int v928))
                                         v929
-                                US22_Ok(v930, v920, v921, v922, v923, v924)
+                                US19_Ok(v930, v920, v921, v922, v923, v924)
                         match v940 with
-                        | US22_Error(v947, v948, v949, v950, v951, v952) -> (* Error *)
-                            let v970 : US21 =
+                        | US19_Error(v947, v948, v949, v950, v951, v952) -> (* Error *)
+                            let v970 : US18 =
                                 if v870 then
-                                    let v953 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                                    US21_Error(v953, v837, v838, v839, v840, v841)
+                                    let v953 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                                    US18_Error(v953, v837, v838, v839, v840, v841)
                                 else
-                                    let v955 : char = v0.[int v837]
+                                    let v955 : char = (spiralStringIndex v0 (int v837))
                                     let v956 : bool = v955 = '`'
                                     if v956 then
                                         let v957 : int32 = v837 + 1
@@ -4680,21 +5183,21 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                             else
                                                 let v961 : int32 = v840 + 1
                                                 struct (v838, v839, v961, v841)
-                                        US21_Ok('`', v957, v962, v963, v964, v965)
+                                        US18_Ok('`', v957, v962, v963, v964, v965)
                                     else
-                                        let v967 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                                        US21_Error(v967, v837, v838, v839, v840, v841)
-                            let v1000 : US21 =
+                                        let v967 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                                        US18_Error(v967, v837, v838, v839, v840, v841)
+                            let v1000 : US18 =
                                 match v970 with
-                                | US21_Error(v992, v993, v994, v995, v996, v997) -> (* Error *)
-                                    US21_Error(v992, v993, v994, v995, v996, v997)
-                                | US21_Ok(v971, v972, v973, v974, v975, v976) -> (* Ok *)
+                                | US18_Error(v992, v993, v994, v995, v996, v997) -> (* Error *)
+                                    US18_Error(v992, v993, v994, v995, v996, v997)
+                                | US18_Ok(v971, v972, v973, v974, v975, v976) -> (* Ok *)
                                     let v977 : bool = v972 >= v976
                                     if v977 then
-                                        let v978 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure65()
-                                        US21_Error(v978, v972, v973, v974, v975, v976)
+                                        let v978 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
+                                        US18_Error(v978, v972, v973, v974, v975, v976)
                                     else
-                                        let v980 : char = v0.[int v972]
+                                        let v980 : char = (spiralStringIndex v0 (int v972))
                                         let v981 : int32 = v972 + 1
                                         let v982 : bool = '\n' = v980
                                         let struct (v986 : int32, v987 : int32, v988 : int32, v989 : int32) =
@@ -4705,12 +5208,12 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                             else
                                                 let v985 : int32 = v975 + 1
                                                 struct (v973, v974, v985, v976)
-                                        US21_Ok(v980, v981, v986, v987, v988, v989)
-                            let v1022 : US22 =
+                                        US18_Ok(v980, v981, v986, v987, v988, v989)
+                            let v1022 : US19 =
                                 match v1000 with
-                                | US21_Error(v1014, v1015, v1016, v1017, v1018, v1019) -> (* Error *)
-                                    US22_Error(v1014, v1015, v1016, v1017, v1018, v1019)
-                                | US21_Ok(v1001, v1002, v1003, v1004, v1005, v1006) -> (* Ok *)
+                                | US18_Error(v1014, v1015, v1016, v1017, v1018, v1019) -> (* Error *)
+                                    US19_Error(v1014, v1015, v1016, v1017, v1018, v1019)
+                                | US18_Ok(v1001, v1002, v1003, v1004, v1005, v1006) -> (* Ok *)
                                     let v1007 : bool = v837 >= v1002
                                     let v1012 : string =
                                         if v1007 then
@@ -4719,41 +5222,41 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                         else
                                             let v1009 : bool = v837 = v1002
                                             let v1010 : int32 = v1002 - 1
-                                            let v1011 : string = v0.[int v837..int v1010]
+                                            let v1011 : string = (spiralStringSlice v0 (int v837) (int v1010))
                                             v1011
-                                    US22_Ok(v1012, v1002, v1003, v1004, v1005, v1006)
+                                    US19_Ok(v1012, v1002, v1003, v1004, v1005, v1006)
                             match v1022 with
-                            | US22_Error(v1029, v1030, v1031, v1032, v1033, v1034) -> (* Error *)
-                                let v1035 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                                US22_Error(v1035, v837, v838, v839, v840, v841)
-                            | US22_Ok(v1023, v1024, v1025, v1026, v1027, v1028) -> (* Ok *)
+                            | US19_Error(v1029, v1030, v1031, v1032, v1033, v1034) -> (* Error *)
+                                let v1035 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                                US19_Error(v1035, v837, v838, v839, v840, v841)
+                            | US19_Ok(v1023, v1024, v1025, v1026, v1027, v1028) -> (* Ok *)
                                 v1022
-                        | US22_Ok(v941, v942, v943, v944, v945, v946) -> (* Ok *)
+                        | US19_Ok(v941, v942, v943, v944, v945, v946) -> (* Ok *)
                             v940
-                    | US22_Ok(v858, v859, v860, v861, v862, v863) -> (* Ok *)
+                    | US19_Ok(v858, v859, v860, v861, v862, v863) -> (* Ok *)
                         v857
-                let v1064 : US22 =
+                let v1064 : US19 =
                     match v1042 with
-                    | US22_Error(v1043, v1044, v1045, v1046, v1047, v1048) -> (* Error *)
+                    | US19_Error(v1043, v1044, v1045, v1046, v1047, v1048) -> (* Error *)
                         let v1049 : string = ""
-                        US22_Ok(v1049, v837, v838, v839, v840, v841)
-                    | US22_Ok(v1051, v1052, v1053, v1054, v1055, v1056) -> (* Ok *)
+                        US19_Ok(v1049, v837, v838, v839, v840, v841)
+                    | US19_Ok(v1051, v1052, v1053, v1054, v1055, v1056) -> (* Ok *)
                         let v1057 : bool = v1052 = v837
                         if v1057 then
-                            let v1058 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure63()
-                            US22_Error(v1058, v837, v838, v839, v840, v841)
+                            let v1058 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
+                            US19_Error(v1058, v837, v838, v839, v840, v841)
                         else
                             let v1060 : UH0 = UH0_Nil
-                            method135(v0, v1051, v1060, v1052, v1053, v1054, v1055, v1056)
+                            method93(v0, v1051, v1060, v1052, v1053, v1054, v1055, v1056)
                 match v1064 with
-                | US22_Error(v1107, v1108, v1109, v1110, v1111, v1112) -> (* Error *)
+                | US19_Error(v1107, v1108, v1109, v1110, v1111, v1112) -> (* Error *)
                     let v1113 : bool = v837 >= v841
-                    let v1131 : US21 =
+                    let v1131 : US18 =
                         if v1113 then
-                            let v1114 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                            US21_Error(v1114, v837, v838, v839, v840, v841)
+                            let v1114 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                            US18_Error(v1114, v837, v838, v839, v840, v841)
                         else
-                            let v1116 : char = v0.[int v837]
+                            let v1116 : char = (spiralStringIndex v0 (int v837))
                             let v1117 : bool = v1116 = '"'
                             if v1117 then
                                 let v1118 : int32 = v837 + 1
@@ -4766,25 +5269,25 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                     else
                                         let v1122 : int32 = v840 + 1
                                         struct (v838, v839, v1122, v841)
-                                US21_Ok('"', v1118, v1123, v1124, v1125, v1126)
+                                US18_Ok('"', v1118, v1123, v1124, v1125, v1126)
                             else
-                                let v1128 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                US21_Error(v1128, v837, v838, v839, v840, v841)
+                                let v1128 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                US18_Error(v1128, v837, v838, v839, v840, v841)
                     match v1131 with
-                    | US21_Error(v1140, v1141, v1142, v1143, v1144, v1145) -> (* Error *)
-                        let v1146 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure45()
-                        US22_Error(v1146, v837, v838, v839, v840, v841)
-                    | US21_Ok(v1132, v1133, v1134, v1135, v1136, v1137) -> (* Ok *)
+                    | US18_Error(v1140, v1141, v1142, v1143, v1144, v1145) -> (* Error *)
+                        let v1146 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure39()
+                        US19_Error(v1146, v837, v838, v839, v840, v841)
+                    | US18_Ok(v1132, v1133, v1134, v1135, v1136, v1137) -> (* Ok *)
                         let v1138 : string = ""
-                        US22_Ok(v1138, v1133, v1134, v1135, v1136, v1137)
-                | US22_Ok(v1065, v1066, v1067, v1068, v1069, v1070) -> (* Ok *)
+                        US19_Ok(v1138, v1133, v1134, v1135, v1136, v1137)
+                | US19_Ok(v1065, v1066, v1067, v1068, v1069, v1070) -> (* Ok *)
                     let v1071 : bool = v1066 >= v1070
-                    let v1089 : US21 =
+                    let v1089 : US18 =
                         if v1071 then
-                            let v1072 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                            US21_Error(v1072, v1066, v1067, v1068, v1069, v1070)
+                            let v1072 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                            US18_Error(v1072, v1066, v1067, v1068, v1069, v1070)
                         else
-                            let v1074 : char = v0.[int v1066]
+                            let v1074 : char = (spiralStringIndex v0 (int v1066))
                             let v1075 : bool = v1074 = '"'
                             if v1075 then
                                 let v1076 : int32 = v1066 + 1
@@ -4797,22 +5300,22 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                                     else
                                         let v1080 : int32 = v1069 + 1
                                         struct (v1067, v1068, v1080, v1070)
-                                US21_Ok('"', v1076, v1081, v1082, v1083, v1084)
+                                US18_Ok('"', v1076, v1081, v1082, v1083, v1084)
                             else
-                                let v1086 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                US21_Error(v1086, v1066, v1067, v1068, v1069, v1070)
+                                let v1086 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                US18_Error(v1086, v1066, v1067, v1068, v1069, v1070)
                     match v1089 with
-                    | US21_Error(v1097, v1098, v1099, v1100, v1101, v1102) -> (* Error *)
-                        let v1103 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure46(v837, v1066, v1097, v1098, v1099, v1100, v1101, v1102)
-                        US22_Error(v1103, v1066, v1067, v1068, v1069, v1070)
-                    | US21_Ok(v1090, v1091, v1092, v1093, v1094, v1095) -> (* Ok *)
-                        US22_Ok(v1065, v1091, v1092, v1093, v1094, v1095)
-        | US22_Ok(v806, v807, v808, v809, v810, v811) -> (* Ok *)
+                    | US18_Error(v1097, v1098, v1099, v1100, v1101, v1102) -> (* Error *)
+                        let v1103 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure40(v837, v1066, v1097, v1098, v1099, v1100, v1101, v1102)
+                        US19_Error(v1103, v1066, v1067, v1068, v1069, v1070)
+                    | US18_Ok(v1090, v1091, v1092, v1093, v1094, v1095) -> (* Ok *)
+                        US19_Ok(v1065, v1091, v1092, v1093, v1094, v1095)
+        | US19_Ok(v806, v807, v808, v809, v810, v811) -> (* Ok *)
             v805
-    let v1192 : US22 =
+    let v1192 : US19 =
         match v1162 with
-        | US22_Error(v1169, v1170, v1171, v1172, v1173, v1174) -> (* Error *)
-            let struct (v1175 : int32, v1176 : int32, v1177 : int32, v1178 : int32, v1179 : int32) = method142(v4, v5, v6, v7, v0, v3)
+        | US19_Error(v1169, v1170, v1171, v1172, v1173, v1174) -> (* Error *)
+            let struct (v1175 : int32, v1176 : int32, v1177 : int32, v1178 : int32, v1179 : int32) = method100(v4, v5, v6, v7, v0, v3)
             let v1180 : bool = v1175 > v3
             if v1180 then
                 let v1181 : bool = v3 >= v1175
@@ -4823,70 +5326,70 @@ and method141 (v0 : string, v1 : string, v2 : UH0, v3 : int32, v4 : int32, v5 : 
                     else
                         let v1183 : bool = v3 = v1175
                         let v1184 : int32 = v1175 - 1
-                        let v1185 : string = v0.[int v3..int v1184]
+                        let v1185 : string = (spiralStringSlice v0 (int v3) (int v1184))
                         v1185
-                US22_Ok(v1186, v1175, v1176, v1177, v1178, v1179)
+                US19_Ok(v1186, v1175, v1176, v1177, v1178, v1179)
             else
-                let v1188 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure60()
-                US22_Error(v1188, v3, v4, v5, v6, v7)
-        | US22_Ok(v1163, v1164, v1165, v1166, v1167, v1168) -> (* Ok *)
+                let v1188 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure54()
+                US19_Error(v1188, v3, v4, v5, v6, v7)
+        | US19_Ok(v1163, v1164, v1165, v1166, v1167, v1168) -> (* Ok *)
             v1162
-    let v1227 : US22 =
+    let v1227 : US19 =
         match v1192 with
-        | US22_Error(v1199, v1200, v1201, v1202, v1203, v1204) -> (* Error *)
+        | US19_Error(v1199, v1200, v1201, v1202, v1203, v1204) -> (* Error *)
             let v1205 : UH0 = UH0_Nil
-            let v1206 : US30 = method138(v0, v1205, v3, v4, v5, v6, v7)
+            let v1206 : US27 = method96(v0, v1205, v3, v4, v5, v6, v7)
             match v1206 with
-            | US30_Error(v1217, v1218, v1219, v1220, v1221, v1222) -> (* Error *)
-                US22_Error(v1217, v1218, v1219, v1220, v1221, v1222)
-            | US30_Ok(v1207, v1208, v1209, v1210, v1211, v1212) -> (* Ok *)
+            | US27_Error(v1217, v1218, v1219, v1220, v1221, v1222) -> (* Error *)
+                US19_Error(v1217, v1218, v1219, v1220, v1221, v1222)
+            | US27_Ok(v1207, v1208, v1209, v1210, v1211, v1212) -> (* Ok *)
                 let v1213 : string = ""
-                let struct (v1214 : string, v1215 : string) = method140(v1207, v1213)
-                US22_Ok(v1214, v1208, v1209, v1210, v1211, v1212)
-        | US22_Ok(v1193, v1194, v1195, v1196, v1197, v1198) -> (* Ok *)
+                let struct (v1214 : string, v1215 : string) = method98(v1207, v1213)
+                US19_Ok(v1214, v1208, v1209, v1210, v1211, v1212)
+        | US19_Ok(v1193, v1194, v1195, v1196, v1197, v1198) -> (* Ok *)
             v1192
-    let v1238 : US22 =
+    let v1238 : US19 =
         match v1227 with
-        | US22_Ok(v1228, v1229, v1230, v1231, v1232, v1233) -> (* Ok *)
+        | US19_Ok(v1228, v1229, v1230, v1231, v1232, v1233) -> (* Ok *)
             let v1234 : bool = v1229 = v3
             if v1234 then
-                let v1235 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure69()
-                US22_Error(v1235, v3, v4, v5, v6, v7)
+                let v1235 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure63()
+                US19_Error(v1235, v3, v4, v5, v6, v7)
             else
                 v1227
         | _ ->
             v1227
     match v1238 with
-    | US22_Error(v1239, v1240, v1241, v1242, v1243, v1244) -> (* Error *)
+    | US19_Error(v1239, v1240, v1241, v1242, v1243, v1244) -> (* Error *)
         let v1248 : string =
             match v2 with
             | UH0_Nil -> (* Nil *)
                 v1
             | _ ->
                 let v1245 : bool = true
-                let v1246 : string = method132(v1245, v2)
+                let v1246 : string = method91(v1245, v2)
                 let v1247 : string = v1 + v1246 
                 v1247
-        US22_Ok(v1248, v3, v4, v5, v6, v7)
-    | US22_Ok(v1250, v1251, v1252, v1253, v1254, v1255) -> (* Ok *)
+        US19_Ok(v1248, v3, v4, v5, v6, v7)
+    | US19_Ok(v1250, v1251, v1252, v1253, v1254, v1255) -> (* Ok *)
         let v1256 : bool = v1251 > v3
         if v1256 then
             let v1257 : UH0 = UH0_Cons(v1250, v2)
-            method141(v0, v1, v1257, v1251, v1252, v1253, v1254, v1255)
+            method99(v0, v1, v1257, v1251, v1252, v1253, v1254, v1255)
         else
-            let v1259 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure70()
-            US22_Error(v1259, v3, v4, v5, v6, v7)
-and closure71 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
+            let v1259 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure64()
+            US19_Error(v1259, v3, v4, v5, v6, v7)
+and closure65 () struct (v0 : string, v1 : int32, v2 : int32, v3 : int32, v4 : int32, v5 : int32) : string =
     let v6 : string = "parsing.sep_by / separator consumed no text"
     v6
-and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : int32, v6 : int32) : US30 =
+and method102 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : int32, v6 : int32) : US27 =
     let v7 : bool = v2 >= v6
     let struct (v20 : int32, v21 : int32, v22 : int32, v23 : int32, v24 : int32) =
         if v7 then
             struct (v2, v3, v4, v5, v6)
         else
-            let v8 : int32 = v0.Length
-            let v9 : int32 = method125(v0, v8, v2)
+            let v8 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v0))
+            let v9 : int32 = method86(v0, v8, v2)
             let v10 : bool = v9 > v6
             let v11 : int32 =
                 if v10 then
@@ -4902,30 +5405,30 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                 struct (v11, v3, v4, v14, v6)
     let v25 : bool = v20 = v2
     let v26 : bool = v25 <> true
-    let v30 : US23 =
+    let v30 : US20 =
         if v26 then
-            US23_Ok(v20, v21, v22, v23, v24)
+            US20_Ok(v20, v21, v22, v23, v24)
         else
-            let v28 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
-            US23_Error(v28, v2, v3, v4, v5, v6)
+            let v28 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure45()
+            US20_Error(v28, v2, v3, v4, v5, v6)
     match v30 with
-    | US23_Error(v31, v32, v33, v34, v35, v36) -> (* Error *)
+    | US20_Error(v31, v32, v33, v34, v35, v36) -> (* Error *)
         let v37 : UH0 = UH0_Nil
-        let v38 : UH0 = method139(v1, v37)
-        US30_Ok(v38, v2, v3, v4, v5, v6)
-    | US23_Ok(v40, v41, v42, v43, v44) -> (* Ok *)
+        let v38 : UH0 = method97(v1, v37)
+        US27_Ok(v38, v2, v3, v4, v5, v6)
+    | US20_Ok(v40, v41, v42, v43, v44) -> (* Ok *)
         let v45 : bool = v40 = v2
         if v45 then
-            let v46 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure71()
-            US30_Error(v46, v2, v3, v4, v5, v6)
+            let v46 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure65()
+            US27_Error(v46, v2, v3, v4, v5, v6)
         else
             let v48 : bool = v40 >= v44
-            let v66 : US21 =
+            let v66 : US18 =
                 if v48 then
-                    let v49 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                    US21_Error(v49, v40, v41, v42, v43, v44)
+                    let v49 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                    US18_Error(v49, v40, v41, v42, v43, v44)
                 else
-                    let v51 : char = v0.[int v40]
+                    let v51 : char = (spiralStringIndex v0 (int v40))
                     let v52 : bool = v51 = '\\'
                     if v52 then
                         let v53 : int32 = v40 + 1
@@ -4938,21 +5441,21 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                             else
                                 let v57 : int32 = v43 + 1
                                 struct (v41, v42, v57, v44)
-                        US21_Ok('\\', v53, v58, v59, v60, v61)
+                        US18_Ok('\\', v53, v58, v59, v60, v61)
                     else
-                        let v63 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                        US21_Error(v63, v40, v41, v42, v43, v44)
-            let v100 : US21 =
+                        let v63 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                        US18_Error(v63, v40, v41, v42, v43, v44)
+            let v100 : US18 =
                 match v66 with
-                | US21_Error(v92, v93, v94, v95, v96, v97) -> (* Error *)
-                    US21_Error(v92, v93, v94, v95, v96, v97)
-                | US21_Ok(v67, v68, v69, v70, v71, v72) -> (* Ok *)
+                | US18_Error(v92, v93, v94, v95, v96, v97) -> (* Error *)
+                    US18_Error(v92, v93, v94, v95, v96, v97)
+                | US18_Ok(v67, v68, v69, v70, v71, v72) -> (* Ok *)
                     let v73 : bool = v68 >= v72
                     if v73 then
-                        let v74 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                        US21_Error(v74, v68, v69, v70, v71, v72)
+                        let v74 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                        US18_Error(v74, v68, v69, v70, v71, v72)
                     else
-                        let v76 : char = v0.[int v68]
+                        let v76 : char = (spiralStringIndex v0 (int v68))
                         let v77 : bool = v76 = '"'
                         if v77 then
                             let v78 : int32 = v68 + 1
@@ -4965,25 +5468,25 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                 else
                                     let v82 : int32 = v71 + 1
                                     struct (v69, v70, v82, v72)
-                            US21_Ok('"', v78, v83, v84, v85, v86)
+                            US18_Ok('"', v78, v83, v84, v85, v86)
                         else
-                            let v88 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                            US21_Error(v88, v68, v69, v70, v71, v72)
-            let v116 : US21 =
+                            let v88 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                            US18_Error(v88, v68, v69, v70, v71, v72)
+            let v116 : US18 =
                 match v100 with
-                | US21_Error(v108, v109, v110, v111, v112, v113) -> (* Error *)
-                    US21_Error(v108, v109, v110, v111, v112, v113)
-                | US21_Ok(v101, v102, v103, v104, v105, v106) -> (* Ok *)
-                    US21_Ok('"', v102, v103, v104, v105, v106)
-            let v214 : US21 =
+                | US18_Error(v108, v109, v110, v111, v112, v113) -> (* Error *)
+                    US18_Error(v108, v109, v110, v111, v112, v113)
+                | US18_Ok(v101, v102, v103, v104, v105, v106) -> (* Ok *)
+                    US18_Ok('"', v102, v103, v104, v105, v106)
+            let v214 : US18 =
                 match v116 with
-                | US21_Error(v123, v124, v125, v126, v127, v128) -> (* Error *)
-                    let v146 : US21 =
+                | US18_Error(v123, v124, v125, v126, v127, v128) -> (* Error *)
+                    let v146 : US18 =
                         if v48 then
-                            let v129 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                            US21_Error(v129, v40, v41, v42, v43, v44)
+                            let v129 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                            US18_Error(v129, v40, v41, v42, v43, v44)
                         else
-                            let v131 : char = v0.[int v40]
+                            let v131 : char = (spiralStringIndex v0 (int v40))
                             let v132 : bool = v131 = '`'
                             if v132 then
                                 let v133 : int32 = v40 + 1
@@ -4996,21 +5499,21 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                     else
                                         let v137 : int32 = v43 + 1
                                         struct (v41, v42, v137, v44)
-                                US21_Ok('`', v133, v138, v139, v140, v141)
+                                US18_Ok('`', v133, v138, v139, v140, v141)
                             else
-                                let v143 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                                US21_Error(v143, v40, v41, v42, v43, v44)
-                    let v180 : US21 =
+                                let v143 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                                US18_Error(v143, v40, v41, v42, v43, v44)
+                    let v180 : US18 =
                         match v146 with
-                        | US21_Error(v172, v173, v174, v175, v176, v177) -> (* Error *)
-                            US21_Error(v172, v173, v174, v175, v176, v177)
-                        | US21_Ok(v147, v148, v149, v150, v151, v152) -> (* Ok *)
+                        | US18_Error(v172, v173, v174, v175, v176, v177) -> (* Error *)
+                            US18_Error(v172, v173, v174, v175, v176, v177)
+                        | US18_Ok(v147, v148, v149, v150, v151, v152) -> (* Ok *)
                             let v153 : bool = v148 >= v152
                             if v153 then
-                                let v154 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                                US21_Error(v154, v148, v149, v150, v151, v152)
+                                let v154 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                                US18_Error(v154, v148, v149, v150, v151, v152)
                             else
-                                let v156 : char = v0.[int v148]
+                                let v156 : char = (spiralStringIndex v0 (int v148))
                                 let v157 : bool = v156 = '"'
                                 if v157 then
                                     let v158 : int32 = v148 + 1
@@ -5023,32 +5526,32 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                         else
                                             let v162 : int32 = v151 + 1
                                             struct (v149, v150, v162, v152)
-                                    US21_Ok('"', v158, v163, v164, v165, v166)
+                                    US18_Ok('"', v158, v163, v164, v165, v166)
                                 else
-                                    let v168 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                    US21_Error(v168, v148, v149, v150, v151, v152)
-                    let v196 : US21 =
+                                    let v168 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                    US18_Error(v168, v148, v149, v150, v151, v152)
+                    let v196 : US18 =
                         match v180 with
-                        | US21_Error(v188, v189, v190, v191, v192, v193) -> (* Error *)
-                            US21_Error(v188, v189, v190, v191, v192, v193)
-                        | US21_Ok(v181, v182, v183, v184, v185, v186) -> (* Ok *)
-                            US21_Ok('"', v182, v183, v184, v185, v186)
+                        | US18_Error(v188, v189, v190, v191, v192, v193) -> (* Error *)
+                            US18_Error(v188, v189, v190, v191, v192, v193)
+                        | US18_Ok(v181, v182, v183, v184, v185, v186) -> (* Ok *)
+                            US18_Ok('"', v182, v183, v184, v185, v186)
                     match v196 with
-                    | US21_Error(v203, v204, v205, v206, v207, v208) -> (* Error *)
-                        let v209 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                        US21_Error(v209, v40, v41, v42, v43, v44)
-                    | US21_Ok(v197, v198, v199, v200, v201, v202) -> (* Ok *)
+                    | US18_Error(v203, v204, v205, v206, v207, v208) -> (* Error *)
+                        let v209 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                        US18_Error(v209, v40, v41, v42, v43, v44)
+                    | US18_Ok(v197, v198, v199, v200, v201, v202) -> (* Ok *)
                         v196
-                | US21_Ok(v117, v118, v119, v120, v121, v122) -> (* Ok *)
+                | US18_Ok(v117, v118, v119, v120, v121, v122) -> (* Ok *)
                     v116
-            let v845 : US22 =
+            let v845 : US19 =
                 match v214 with
-                | US21_Error(v837, v838, v839, v840, v841, v842) -> (* Error *)
-                    US22_Error(v837, v838, v839, v840, v841, v842)
-                | US21_Ok(v215, v216, v217, v218, v219, v220) -> (* Ok *)
-                    let struct (v221 : int32, v222 : int32, v223 : int32, v224 : int32, v225 : int32) = method127(v217, v218, v219, v220, v0, v216)
+                | US18_Error(v837, v838, v839, v840, v841, v842) -> (* Error *)
+                    US19_Error(v837, v838, v839, v840, v841, v842)
+                | US18_Ok(v215, v216, v217, v218, v219, v220) -> (* Ok *)
+                    let struct (v221 : int32, v222 : int32, v223 : int32, v224 : int32, v225 : int32) = method88(v217, v218, v219, v220, v0, v216)
                     let v226 : bool = v221 > v216
-                    let v236 : US22 =
+                    let v236 : US19 =
                         if v226 then
                             let v227 : bool = v216 >= v221
                             let v232 : string =
@@ -5058,22 +5561,22 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                 else
                                     let v229 : bool = v216 = v221
                                     let v230 : int32 = v221 - 1
-                                    let v231 : string = v0.[int v216..int v230]
+                                    let v231 : string = (spiralStringSlice v0 (int v216) (int v230))
                                     v231
-                            US22_Ok(v232, v221, v222, v223, v224, v225)
+                            US19_Ok(v232, v221, v222, v223, v224, v225)
                         else
-                            let v234 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure60()
-                            US22_Error(v234, v216, v217, v218, v219, v220)
-                    let v431 : US22 =
+                            let v234 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure54()
+                            US19_Error(v234, v216, v217, v218, v219, v220)
+                    let v431 : US19 =
                         match v236 with
-                        | US22_Error(v243, v244, v245, v246, v247, v248) -> (* Error *)
+                        | US19_Error(v243, v244, v245, v246, v247, v248) -> (* Error *)
                             let v249 : bool = v216 >= v220
-                            let v267 : US21 =
+                            let v267 : US18 =
                                 if v249 then
-                                    let v250 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                                    US21_Error(v250, v216, v217, v218, v219, v220)
+                                    let v250 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                                    US18_Error(v250, v216, v217, v218, v219, v220)
                                 else
-                                    let v252 : char = v0.[int v216]
+                                    let v252 : char = (spiralStringIndex v0 (int v216))
                                     let v253 : bool = v252 = '\\'
                                     if v253 then
                                         let v254 : int32 = v216 + 1
@@ -5086,21 +5589,21 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                             else
                                                 let v258 : int32 = v219 + 1
                                                 struct (v217, v218, v258, v220)
-                                        US21_Ok('\\', v254, v259, v260, v261, v262)
+                                        US18_Ok('\\', v254, v259, v260, v261, v262)
                                     else
-                                        let v264 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                                        US21_Error(v264, v216, v217, v218, v219, v220)
-                            let v302 : US21 =
+                                        let v264 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                                        US18_Error(v264, v216, v217, v218, v219, v220)
+                            let v302 : US18 =
                                 match v267 with
-                                | US21_Error(v294, v295, v296, v297, v298, v299) -> (* Error *)
-                                    US21_Error(v294, v295, v296, v297, v298, v299)
-                                | US21_Ok(v268, v269, v270, v271, v272, v273) -> (* Ok *)
+                                | US18_Error(v294, v295, v296, v297, v298, v299) -> (* Error *)
+                                    US18_Error(v294, v295, v296, v297, v298, v299)
+                                | US18_Ok(v268, v269, v270, v271, v272, v273) -> (* Ok *)
                                     let v274 : bool = v269 >= v273
                                     if v274 then
-                                        let v275 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure61()
-                                        US21_Error(v275, v269, v270, v271, v272, v273)
+                                        let v275 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure55()
+                                        US18_Error(v275, v269, v270, v271, v272, v273)
                                     else
-                                        let v277 : char = v0.[int v269]
+                                        let v277 : char = (spiralStringIndex v0 (int v269))
                                         let v278 : bool = v277 = '"'
                                         let v279 : bool = v278 = false
                                         if v279 then
@@ -5114,15 +5617,15 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                                 else
                                                     let v284 : int32 = v272 + 1
                                                     struct (v270, v271, v284, v273)
-                                            US21_Ok(v277, v280, v285, v286, v287, v288)
+                                            US18_Ok(v277, v280, v285, v286, v287, v288)
                                         else
-                                            let v290 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure62()
-                                            US21_Error(v290, v269, v270, v271, v272, v273)
-                            let v324 : US22 =
+                                            let v290 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
+                                            US18_Error(v290, v269, v270, v271, v272, v273)
+                            let v324 : US19 =
                                 match v302 with
-                                | US21_Error(v316, v317, v318, v319, v320, v321) -> (* Error *)
-                                    US22_Error(v316, v317, v318, v319, v320, v321)
-                                | US21_Ok(v303, v304, v305, v306, v307, v308) -> (* Ok *)
+                                | US18_Error(v316, v317, v318, v319, v320, v321) -> (* Error *)
+                                    US19_Error(v316, v317, v318, v319, v320, v321)
+                                | US18_Ok(v303, v304, v305, v306, v307, v308) -> (* Ok *)
                                     let v309 : bool = v216 >= v304
                                     let v314 : string =
                                         if v309 then
@@ -5131,17 +5634,17 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                         else
                                             let v311 : bool = v216 = v304
                                             let v312 : int32 = v304 - 1
-                                            let v313 : string = v0.[int v216..int v312]
+                                            let v313 : string = (spiralStringSlice v0 (int v216) (int v312))
                                             v313
-                                    US22_Ok(v314, v304, v305, v306, v307, v308)
+                                    US19_Ok(v314, v304, v305, v306, v307, v308)
                             match v324 with
-                            | US22_Error(v331, v332, v333, v334, v335, v336) -> (* Error *)
-                                let v354 : US21 =
+                            | US19_Error(v331, v332, v333, v334, v335, v336) -> (* Error *)
+                                let v354 : US18 =
                                     if v249 then
-                                        let v337 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                                        US21_Error(v337, v216, v217, v218, v219, v220)
+                                        let v337 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                                        US18_Error(v337, v216, v217, v218, v219, v220)
                                     else
-                                        let v339 : char = v0.[int v216]
+                                        let v339 : char = (spiralStringIndex v0 (int v216))
                                         let v340 : bool = v339 = '`'
                                         if v340 then
                                             let v341 : int32 = v216 + 1
@@ -5154,21 +5657,21 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                                 else
                                                     let v345 : int32 = v219 + 1
                                                     struct (v217, v218, v345, v220)
-                                            US21_Ok('`', v341, v346, v347, v348, v349)
+                                            US18_Ok('`', v341, v346, v347, v348, v349)
                                         else
-                                            let v351 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                                            US21_Error(v351, v216, v217, v218, v219, v220)
-                                let v389 : US21 =
+                                            let v351 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                                            US18_Error(v351, v216, v217, v218, v219, v220)
+                                let v389 : US18 =
                                     match v354 with
-                                    | US21_Error(v381, v382, v383, v384, v385, v386) -> (* Error *)
-                                        US21_Error(v381, v382, v383, v384, v385, v386)
-                                    | US21_Ok(v355, v356, v357, v358, v359, v360) -> (* Ok *)
+                                    | US18_Error(v381, v382, v383, v384, v385, v386) -> (* Error *)
+                                        US18_Error(v381, v382, v383, v384, v385, v386)
+                                    | US18_Ok(v355, v356, v357, v358, v359, v360) -> (* Ok *)
                                         let v361 : bool = v356 >= v360
                                         if v361 then
-                                            let v362 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure61()
-                                            US21_Error(v362, v356, v357, v358, v359, v360)
+                                            let v362 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure55()
+                                            US18_Error(v362, v356, v357, v358, v359, v360)
                                         else
-                                            let v364 : char = v0.[int v356]
+                                            let v364 : char = (spiralStringIndex v0 (int v356))
                                             let v365 : bool = v364 = '"'
                                             let v366 : bool = v365 = false
                                             if v366 then
@@ -5182,15 +5685,15 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                                     else
                                                         let v371 : int32 = v359 + 1
                                                         struct (v357, v358, v371, v360)
-                                                US21_Ok(v364, v367, v372, v373, v374, v375)
+                                                US18_Ok(v364, v367, v372, v373, v374, v375)
                                             else
-                                                let v377 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure62()
-                                                US21_Error(v377, v356, v357, v358, v359, v360)
-                                let v411 : US22 =
+                                                let v377 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
+                                                US18_Error(v377, v356, v357, v358, v359, v360)
+                                let v411 : US19 =
                                     match v389 with
-                                    | US21_Error(v403, v404, v405, v406, v407, v408) -> (* Error *)
-                                        US22_Error(v403, v404, v405, v406, v407, v408)
-                                    | US21_Ok(v390, v391, v392, v393, v394, v395) -> (* Ok *)
+                                    | US18_Error(v403, v404, v405, v406, v407, v408) -> (* Error *)
+                                        US19_Error(v403, v404, v405, v406, v407, v408)
+                                    | US18_Ok(v390, v391, v392, v393, v394, v395) -> (* Ok *)
                                         let v396 : bool = v216 >= v391
                                         let v401 : string =
                                             if v396 then
@@ -5199,41 +5702,41 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                             else
                                                 let v398 : bool = v216 = v391
                                                 let v399 : int32 = v391 - 1
-                                                let v400 : string = v0.[int v216..int v399]
+                                                let v400 : string = (spiralStringSlice v0 (int v216) (int v399))
                                                 v400
-                                        US22_Ok(v401, v391, v392, v393, v394, v395)
+                                        US19_Ok(v401, v391, v392, v393, v394, v395)
                                 match v411 with
-                                | US22_Error(v418, v419, v420, v421, v422, v423) -> (* Error *)
-                                    let v424 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                                    US22_Error(v424, v216, v217, v218, v219, v220)
-                                | US22_Ok(v412, v413, v414, v415, v416, v417) -> (* Ok *)
+                                | US19_Error(v418, v419, v420, v421, v422, v423) -> (* Error *)
+                                    let v424 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                                    US19_Error(v424, v216, v217, v218, v219, v220)
+                                | US19_Ok(v412, v413, v414, v415, v416, v417) -> (* Ok *)
                                     v411
-                            | US22_Ok(v325, v326, v327, v328, v329, v330) -> (* Ok *)
+                            | US19_Ok(v325, v326, v327, v328, v329, v330) -> (* Ok *)
                                 v324
-                        | US22_Ok(v237, v238, v239, v240, v241, v242) -> (* Ok *)
+                        | US19_Ok(v237, v238, v239, v240, v241, v242) -> (* Ok *)
                             v236
-                    let v453 : US22 =
+                    let v453 : US19 =
                         match v431 with
-                        | US22_Error(v432, v433, v434, v435, v436, v437) -> (* Error *)
+                        | US19_Error(v432, v433, v434, v435, v436, v437) -> (* Error *)
                             let v438 : string = ""
-                            US22_Ok(v438, v216, v217, v218, v219, v220)
-                        | US22_Ok(v440, v441, v442, v443, v444, v445) -> (* Ok *)
+                            US19_Ok(v438, v216, v217, v218, v219, v220)
+                        | US19_Ok(v440, v441, v442, v443, v444, v445) -> (* Ok *)
                             let v446 : bool = v441 = v216
                             if v446 then
-                                let v447 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure63()
-                                US22_Error(v447, v216, v217, v218, v219, v220)
+                                let v447 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
+                                US19_Error(v447, v216, v217, v218, v219, v220)
                             else
                                 let v449 : UH0 = UH0_Nil
-                                method131(v0, v440, v449, v441, v442, v443, v444, v445)
+                                method90(v0, v440, v449, v441, v442, v443, v444, v445)
                     match v453 with
-                    | US22_Error(v644, v645, v646, v647, v648, v649) -> (* Error *)
+                    | US19_Error(v644, v645, v646, v647, v648, v649) -> (* Error *)
                         let v650 : bool = v216 >= v220
-                        let v668 : US21 =
+                        let v668 : US18 =
                             if v650 then
-                                let v651 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                                US21_Error(v651, v216, v217, v218, v219, v220)
+                                let v651 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                                US18_Error(v651, v216, v217, v218, v219, v220)
                             else
-                                let v653 : char = v0.[int v216]
+                                let v653 : char = (spiralStringIndex v0 (int v216))
                                 let v654 : bool = v653 = '\\'
                                 if v654 then
                                     let v655 : int32 = v216 + 1
@@ -5246,21 +5749,21 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                         else
                                             let v659 : int32 = v219 + 1
                                             struct (v217, v218, v659, v220)
-                                    US21_Ok('\\', v655, v660, v661, v662, v663)
+                                    US18_Ok('\\', v655, v660, v661, v662, v663)
                                 else
-                                    let v665 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                                    US21_Error(v665, v216, v217, v218, v219, v220)
-                        let v702 : US21 =
+                                    let v665 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                                    US18_Error(v665, v216, v217, v218, v219, v220)
+                        let v702 : US18 =
                             match v668 with
-                            | US21_Error(v694, v695, v696, v697, v698, v699) -> (* Error *)
-                                US21_Error(v694, v695, v696, v697, v698, v699)
-                            | US21_Ok(v669, v670, v671, v672, v673, v674) -> (* Ok *)
+                            | US18_Error(v694, v695, v696, v697, v698, v699) -> (* Error *)
+                                US18_Error(v694, v695, v696, v697, v698, v699)
+                            | US18_Ok(v669, v670, v671, v672, v673, v674) -> (* Ok *)
                                 let v675 : bool = v670 >= v674
                                 if v675 then
-                                    let v676 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                                    US21_Error(v676, v670, v671, v672, v673, v674)
+                                    let v676 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                                    US18_Error(v676, v670, v671, v672, v673, v674)
                                 else
-                                    let v678 : char = v0.[int v670]
+                                    let v678 : char = (spiralStringIndex v0 (int v670))
                                     let v679 : bool = v678 = '"'
                                     if v679 then
                                         let v680 : int32 = v670 + 1
@@ -5273,25 +5776,25 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                             else
                                                 let v684 : int32 = v673 + 1
                                                 struct (v671, v672, v684, v674)
-                                        US21_Ok('"', v680, v685, v686, v687, v688)
+                                        US18_Ok('"', v680, v685, v686, v687, v688)
                                     else
-                                        let v690 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                        US21_Error(v690, v670, v671, v672, v673, v674)
-                        let v718 : US21 =
+                                        let v690 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                        US18_Error(v690, v670, v671, v672, v673, v674)
+                        let v718 : US18 =
                             match v702 with
-                            | US21_Error(v710, v711, v712, v713, v714, v715) -> (* Error *)
-                                US21_Error(v710, v711, v712, v713, v714, v715)
-                            | US21_Ok(v703, v704, v705, v706, v707, v708) -> (* Ok *)
-                                US21_Ok('"', v704, v705, v706, v707, v708)
-                        let v816 : US21 =
+                            | US18_Error(v710, v711, v712, v713, v714, v715) -> (* Error *)
+                                US18_Error(v710, v711, v712, v713, v714, v715)
+                            | US18_Ok(v703, v704, v705, v706, v707, v708) -> (* Ok *)
+                                US18_Ok('"', v704, v705, v706, v707, v708)
+                        let v816 : US18 =
                             match v718 with
-                            | US21_Error(v725, v726, v727, v728, v729, v730) -> (* Error *)
-                                let v748 : US21 =
+                            | US18_Error(v725, v726, v727, v728, v729, v730) -> (* Error *)
+                                let v748 : US18 =
                                     if v650 then
-                                        let v731 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                                        US21_Error(v731, v216, v217, v218, v219, v220)
+                                        let v731 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                                        US18_Error(v731, v216, v217, v218, v219, v220)
                                     else
-                                        let v733 : char = v0.[int v216]
+                                        let v733 : char = (spiralStringIndex v0 (int v216))
                                         let v734 : bool = v733 = '`'
                                         if v734 then
                                             let v735 : int32 = v216 + 1
@@ -5304,21 +5807,21 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                                 else
                                                     let v739 : int32 = v219 + 1
                                                     struct (v217, v218, v739, v220)
-                                            US21_Ok('`', v735, v740, v741, v742, v743)
+                                            US18_Ok('`', v735, v740, v741, v742, v743)
                                         else
-                                            let v745 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                                            US21_Error(v745, v216, v217, v218, v219, v220)
-                                let v782 : US21 =
+                                            let v745 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                                            US18_Error(v745, v216, v217, v218, v219, v220)
+                                let v782 : US18 =
                                     match v748 with
-                                    | US21_Error(v774, v775, v776, v777, v778, v779) -> (* Error *)
-                                        US21_Error(v774, v775, v776, v777, v778, v779)
-                                    | US21_Ok(v749, v750, v751, v752, v753, v754) -> (* Ok *)
+                                    | US18_Error(v774, v775, v776, v777, v778, v779) -> (* Error *)
+                                        US18_Error(v774, v775, v776, v777, v778, v779)
+                                    | US18_Ok(v749, v750, v751, v752, v753, v754) -> (* Ok *)
                                         let v755 : bool = v750 >= v754
                                         if v755 then
-                                            let v756 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                                            US21_Error(v756, v750, v751, v752, v753, v754)
+                                            let v756 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                                            US18_Error(v756, v750, v751, v752, v753, v754)
                                         else
-                                            let v758 : char = v0.[int v750]
+                                            let v758 : char = (spiralStringIndex v0 (int v750))
                                             let v759 : bool = v758 = '"'
                                             if v759 then
                                                 let v760 : int32 = v750 + 1
@@ -5331,39 +5834,39 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                                     else
                                                         let v764 : int32 = v753 + 1
                                                         struct (v751, v752, v764, v754)
-                                                US21_Ok('"', v760, v765, v766, v767, v768)
+                                                US18_Ok('"', v760, v765, v766, v767, v768)
                                             else
-                                                let v770 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                                US21_Error(v770, v750, v751, v752, v753, v754)
-                                let v798 : US21 =
+                                                let v770 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                                US18_Error(v770, v750, v751, v752, v753, v754)
+                                let v798 : US18 =
                                     match v782 with
-                                    | US21_Error(v790, v791, v792, v793, v794, v795) -> (* Error *)
-                                        US21_Error(v790, v791, v792, v793, v794, v795)
-                                    | US21_Ok(v783, v784, v785, v786, v787, v788) -> (* Ok *)
-                                        US21_Ok('"', v784, v785, v786, v787, v788)
+                                    | US18_Error(v790, v791, v792, v793, v794, v795) -> (* Error *)
+                                        US18_Error(v790, v791, v792, v793, v794, v795)
+                                    | US18_Ok(v783, v784, v785, v786, v787, v788) -> (* Ok *)
+                                        US18_Ok('"', v784, v785, v786, v787, v788)
                                 match v798 with
-                                | US21_Error(v805, v806, v807, v808, v809, v810) -> (* Error *)
-                                    let v811 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                                    US21_Error(v811, v216, v217, v218, v219, v220)
-                                | US21_Ok(v799, v800, v801, v802, v803, v804) -> (* Ok *)
+                                | US18_Error(v805, v806, v807, v808, v809, v810) -> (* Error *)
+                                    let v811 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                                    US18_Error(v811, v216, v217, v218, v219, v220)
+                                | US18_Ok(v799, v800, v801, v802, v803, v804) -> (* Ok *)
                                     v798
-                            | US21_Ok(v719, v720, v721, v722, v723, v724) -> (* Ok *)
+                            | US18_Ok(v719, v720, v721, v722, v723, v724) -> (* Ok *)
                                 v718
                         match v816 with
-                        | US21_Error(v825, v826, v827, v828, v829, v830) -> (* Error *)
-                            let v831 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure45()
-                            US22_Error(v831, v216, v217, v218, v219, v220)
-                        | US21_Ok(v817, v818, v819, v820, v821, v822) -> (* Ok *)
+                        | US18_Error(v825, v826, v827, v828, v829, v830) -> (* Error *)
+                            let v831 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure39()
+                            US19_Error(v831, v216, v217, v218, v219, v220)
+                        | US18_Ok(v817, v818, v819, v820, v821, v822) -> (* Ok *)
                             let v823 : string = ""
-                            US22_Ok(v823, v818, v819, v820, v821, v822)
-                    | US22_Ok(v454, v455, v456, v457, v458, v459) -> (* Ok *)
+                            US19_Ok(v823, v818, v819, v820, v821, v822)
+                    | US19_Ok(v454, v455, v456, v457, v458, v459) -> (* Ok *)
                         let v460 : bool = v455 >= v459
-                        let v478 : US21 =
+                        let v478 : US18 =
                             if v460 then
-                                let v461 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                                US21_Error(v461, v455, v456, v457, v458, v459)
+                                let v461 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                                US18_Error(v461, v455, v456, v457, v458, v459)
                             else
-                                let v463 : char = v0.[int v455]
+                                let v463 : char = (spiralStringIndex v0 (int v455))
                                 let v464 : bool = v463 = '\\'
                                 if v464 then
                                     let v465 : int32 = v455 + 1
@@ -5376,21 +5879,21 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                         else
                                             let v469 : int32 = v458 + 1
                                             struct (v456, v457, v469, v459)
-                                    US21_Ok('\\', v465, v470, v471, v472, v473)
+                                    US18_Ok('\\', v465, v470, v471, v472, v473)
                                 else
-                                    let v475 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                                    US21_Error(v475, v455, v456, v457, v458, v459)
-                        let v512 : US21 =
+                                    let v475 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                                    US18_Error(v475, v455, v456, v457, v458, v459)
+                        let v512 : US18 =
                             match v478 with
-                            | US21_Error(v504, v505, v506, v507, v508, v509) -> (* Error *)
-                                US21_Error(v504, v505, v506, v507, v508, v509)
-                            | US21_Ok(v479, v480, v481, v482, v483, v484) -> (* Ok *)
+                            | US18_Error(v504, v505, v506, v507, v508, v509) -> (* Error *)
+                                US18_Error(v504, v505, v506, v507, v508, v509)
+                            | US18_Ok(v479, v480, v481, v482, v483, v484) -> (* Ok *)
                                 let v485 : bool = v480 >= v484
                                 if v485 then
-                                    let v486 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                                    US21_Error(v486, v480, v481, v482, v483, v484)
+                                    let v486 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                                    US18_Error(v486, v480, v481, v482, v483, v484)
                                 else
-                                    let v488 : char = v0.[int v480]
+                                    let v488 : char = (spiralStringIndex v0 (int v480))
                                     let v489 : bool = v488 = '"'
                                     if v489 then
                                         let v490 : int32 = v480 + 1
@@ -5403,25 +5906,25 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                             else
                                                 let v494 : int32 = v483 + 1
                                                 struct (v481, v482, v494, v484)
-                                        US21_Ok('"', v490, v495, v496, v497, v498)
+                                        US18_Ok('"', v490, v495, v496, v497, v498)
                                     else
-                                        let v500 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                        US21_Error(v500, v480, v481, v482, v483, v484)
-                        let v528 : US21 =
+                                        let v500 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                        US18_Error(v500, v480, v481, v482, v483, v484)
+                        let v528 : US18 =
                             match v512 with
-                            | US21_Error(v520, v521, v522, v523, v524, v525) -> (* Error *)
-                                US21_Error(v520, v521, v522, v523, v524, v525)
-                            | US21_Ok(v513, v514, v515, v516, v517, v518) -> (* Ok *)
-                                US21_Ok('"', v514, v515, v516, v517, v518)
-                        let v626 : US21 =
+                            | US18_Error(v520, v521, v522, v523, v524, v525) -> (* Error *)
+                                US18_Error(v520, v521, v522, v523, v524, v525)
+                            | US18_Ok(v513, v514, v515, v516, v517, v518) -> (* Ok *)
+                                US18_Ok('"', v514, v515, v516, v517, v518)
+                        let v626 : US18 =
                             match v528 with
-                            | US21_Error(v535, v536, v537, v538, v539, v540) -> (* Error *)
-                                let v558 : US21 =
+                            | US18_Error(v535, v536, v537, v538, v539, v540) -> (* Error *)
+                                let v558 : US18 =
                                     if v460 then
-                                        let v541 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                                        US21_Error(v541, v455, v456, v457, v458, v459)
+                                        let v541 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                                        US18_Error(v541, v455, v456, v457, v458, v459)
                                     else
-                                        let v543 : char = v0.[int v455]
+                                        let v543 : char = (spiralStringIndex v0 (int v455))
                                         let v544 : bool = v543 = '`'
                                         if v544 then
                                             let v545 : int32 = v455 + 1
@@ -5434,21 +5937,21 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                                 else
                                                     let v549 : int32 = v458 + 1
                                                     struct (v456, v457, v549, v459)
-                                            US21_Ok('`', v545, v550, v551, v552, v553)
+                                            US18_Ok('`', v545, v550, v551, v552, v553)
                                         else
-                                            let v555 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                                            US21_Error(v555, v455, v456, v457, v458, v459)
-                                let v592 : US21 =
+                                            let v555 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                                            US18_Error(v555, v455, v456, v457, v458, v459)
+                                let v592 : US18 =
                                     match v558 with
-                                    | US21_Error(v584, v585, v586, v587, v588, v589) -> (* Error *)
-                                        US21_Error(v584, v585, v586, v587, v588, v589)
-                                    | US21_Ok(v559, v560, v561, v562, v563, v564) -> (* Ok *)
+                                    | US18_Error(v584, v585, v586, v587, v588, v589) -> (* Error *)
+                                        US18_Error(v584, v585, v586, v587, v588, v589)
+                                    | US18_Ok(v559, v560, v561, v562, v563, v564) -> (* Ok *)
                                         let v565 : bool = v560 >= v564
                                         if v565 then
-                                            let v566 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                                            US21_Error(v566, v560, v561, v562, v563, v564)
+                                            let v566 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                                            US18_Error(v566, v560, v561, v562, v563, v564)
                                         else
-                                            let v568 : char = v0.[int v560]
+                                            let v568 : char = (spiralStringIndex v0 (int v560))
                                             let v569 : bool = v568 = '"'
                                             if v569 then
                                                 let v570 : int32 = v560 + 1
@@ -5461,39 +5964,39 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                                     else
                                                         let v574 : int32 = v563 + 1
                                                         struct (v561, v562, v574, v564)
-                                                US21_Ok('"', v570, v575, v576, v577, v578)
+                                                US18_Ok('"', v570, v575, v576, v577, v578)
                                             else
-                                                let v580 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                                US21_Error(v580, v560, v561, v562, v563, v564)
-                                let v608 : US21 =
+                                                let v580 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                                US18_Error(v580, v560, v561, v562, v563, v564)
+                                let v608 : US18 =
                                     match v592 with
-                                    | US21_Error(v600, v601, v602, v603, v604, v605) -> (* Error *)
-                                        US21_Error(v600, v601, v602, v603, v604, v605)
-                                    | US21_Ok(v593, v594, v595, v596, v597, v598) -> (* Ok *)
-                                        US21_Ok('"', v594, v595, v596, v597, v598)
+                                    | US18_Error(v600, v601, v602, v603, v604, v605) -> (* Error *)
+                                        US18_Error(v600, v601, v602, v603, v604, v605)
+                                    | US18_Ok(v593, v594, v595, v596, v597, v598) -> (* Ok *)
+                                        US18_Ok('"', v594, v595, v596, v597, v598)
                                 match v608 with
-                                | US21_Error(v615, v616, v617, v618, v619, v620) -> (* Error *)
-                                    let v621 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                                    US21_Error(v621, v455, v456, v457, v458, v459)
-                                | US21_Ok(v609, v610, v611, v612, v613, v614) -> (* Ok *)
+                                | US18_Error(v615, v616, v617, v618, v619, v620) -> (* Error *)
+                                    let v621 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                                    US18_Error(v621, v455, v456, v457, v458, v459)
+                                | US18_Ok(v609, v610, v611, v612, v613, v614) -> (* Ok *)
                                     v608
-                            | US21_Ok(v529, v530, v531, v532, v533, v534) -> (* Ok *)
+                            | US18_Ok(v529, v530, v531, v532, v533, v534) -> (* Ok *)
                                 v528
                         match v626 with
-                        | US21_Error(v634, v635, v636, v637, v638, v639) -> (* Error *)
-                            let v640 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure46(v216, v455, v634, v635, v636, v637, v638, v639)
-                            US22_Error(v640, v455, v456, v457, v458, v459)
-                        | US21_Ok(v627, v628, v629, v630, v631, v632) -> (* Ok *)
-                            US22_Ok(v454, v628, v629, v630, v631, v632)
-            let v1202 : US22 =
+                        | US18_Error(v634, v635, v636, v637, v638, v639) -> (* Error *)
+                            let v640 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure40(v216, v455, v634, v635, v636, v637, v638, v639)
+                            US19_Error(v640, v455, v456, v457, v458, v459)
+                        | US18_Ok(v627, v628, v629, v630, v631, v632) -> (* Ok *)
+                            US19_Ok(v454, v628, v629, v630, v631, v632)
+            let v1202 : US19 =
                 match v845 with
-                | US22_Error(v852, v853, v854, v855, v856, v857) -> (* Error *)
-                    let v875 : US21 =
+                | US19_Error(v852, v853, v854, v855, v856, v857) -> (* Error *)
+                    let v875 : US18 =
                         if v48 then
-                            let v858 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                            US21_Error(v858, v40, v41, v42, v43, v44)
+                            let v858 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                            US18_Error(v858, v40, v41, v42, v43, v44)
                         else
-                            let v860 : char = v0.[int v40]
+                            let v860 : char = (spiralStringIndex v0 (int v40))
                             let v861 : bool = v860 = '"'
                             if v861 then
                                 let v862 : int32 = v40 + 1
@@ -5506,17 +6009,17 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                     else
                                         let v866 : int32 = v43 + 1
                                         struct (v41, v42, v866, v44)
-                                US21_Ok('"', v862, v867, v868, v869, v870)
+                                US18_Ok('"', v862, v867, v868, v869, v870)
                             else
-                                let v872 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                US21_Error(v872, v40, v41, v42, v43, v44)
+                                let v872 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                US18_Error(v872, v40, v41, v42, v43, v44)
                     match v875 with
-                    | US21_Error(v1192, v1193, v1194, v1195, v1196, v1197) -> (* Error *)
-                        US22_Error(v1192, v1193, v1194, v1195, v1196, v1197)
-                    | US21_Ok(v876, v877, v878, v879, v880, v881) -> (* Ok *)
-                        let struct (v882 : int32, v883 : int32, v884 : int32, v885 : int32, v886 : int32) = method127(v878, v879, v880, v881, v0, v877)
+                    | US18_Error(v1192, v1193, v1194, v1195, v1196, v1197) -> (* Error *)
+                        US19_Error(v1192, v1193, v1194, v1195, v1196, v1197)
+                    | US18_Ok(v876, v877, v878, v879, v880, v881) -> (* Ok *)
+                        let struct (v882 : int32, v883 : int32, v884 : int32, v885 : int32, v886 : int32) = method88(v878, v879, v880, v881, v0, v877)
                         let v887 : bool = v882 > v877
-                        let v897 : US22 =
+                        let v897 : US19 =
                             if v887 then
                                 let v888 : bool = v877 >= v882
                                 let v893 : string =
@@ -5526,22 +6029,22 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                     else
                                         let v890 : bool = v877 = v882
                                         let v891 : int32 = v882 - 1
-                                        let v892 : string = v0.[int v877..int v891]
+                                        let v892 : string = (spiralStringSlice v0 (int v877) (int v891))
                                         v892
-                                US22_Ok(v893, v882, v883, v884, v885, v886)
+                                US19_Ok(v893, v882, v883, v884, v885, v886)
                             else
-                                let v895 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure60()
-                                US22_Error(v895, v877, v878, v879, v880, v881)
-                        let v1082 : US22 =
+                                let v895 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure54()
+                                US19_Error(v895, v877, v878, v879, v880, v881)
+                        let v1082 : US19 =
                             match v897 with
-                            | US22_Error(v904, v905, v906, v907, v908, v909) -> (* Error *)
+                            | US19_Error(v904, v905, v906, v907, v908, v909) -> (* Error *)
                                 let v910 : bool = v877 >= v881
-                                let v928 : US21 =
+                                let v928 : US18 =
                                     if v910 then
-                                        let v911 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                                        US21_Error(v911, v877, v878, v879, v880, v881)
+                                        let v911 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                                        US18_Error(v911, v877, v878, v879, v880, v881)
                                     else
-                                        let v913 : char = v0.[int v877]
+                                        let v913 : char = (spiralStringIndex v0 (int v877))
                                         let v914 : bool = v913 = '\\'
                                         if v914 then
                                             let v915 : int32 = v877 + 1
@@ -5554,21 +6057,21 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                                 else
                                                     let v919 : int32 = v880 + 1
                                                     struct (v878, v879, v919, v881)
-                                            US21_Ok('\\', v915, v920, v921, v922, v923)
+                                            US18_Ok('\\', v915, v920, v921, v922, v923)
                                         else
-                                            let v925 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                                            US21_Error(v925, v877, v878, v879, v880, v881)
-                                let v958 : US21 =
+                                            let v925 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                                            US18_Error(v925, v877, v878, v879, v880, v881)
+                                let v958 : US18 =
                                     match v928 with
-                                    | US21_Error(v950, v951, v952, v953, v954, v955) -> (* Error *)
-                                        US21_Error(v950, v951, v952, v953, v954, v955)
-                                    | US21_Ok(v929, v930, v931, v932, v933, v934) -> (* Ok *)
+                                    | US18_Error(v950, v951, v952, v953, v954, v955) -> (* Error *)
+                                        US18_Error(v950, v951, v952, v953, v954, v955)
+                                    | US18_Ok(v929, v930, v931, v932, v933, v934) -> (* Ok *)
                                         let v935 : bool = v930 >= v934
                                         if v935 then
-                                            let v936 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure65()
-                                            US21_Error(v936, v930, v931, v932, v933, v934)
+                                            let v936 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
+                                            US18_Error(v936, v930, v931, v932, v933, v934)
                                         else
-                                            let v938 : char = v0.[int v930]
+                                            let v938 : char = (spiralStringIndex v0 (int v930))
                                             let v939 : int32 = v930 + 1
                                             let v940 : bool = '\n' = v938
                                             let struct (v944 : int32, v945 : int32, v946 : int32, v947 : int32) =
@@ -5579,12 +6082,12 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                                 else
                                                     let v943 : int32 = v933 + 1
                                                     struct (v931, v932, v943, v934)
-                                            US21_Ok(v938, v939, v944, v945, v946, v947)
-                                let v980 : US22 =
+                                            US18_Ok(v938, v939, v944, v945, v946, v947)
+                                let v980 : US19 =
                                     match v958 with
-                                    | US21_Error(v972, v973, v974, v975, v976, v977) -> (* Error *)
-                                        US22_Error(v972, v973, v974, v975, v976, v977)
-                                    | US21_Ok(v959, v960, v961, v962, v963, v964) -> (* Ok *)
+                                    | US18_Error(v972, v973, v974, v975, v976, v977) -> (* Error *)
+                                        US19_Error(v972, v973, v974, v975, v976, v977)
+                                    | US18_Ok(v959, v960, v961, v962, v963, v964) -> (* Ok *)
                                         let v965 : bool = v877 >= v960
                                         let v970 : string =
                                             if v965 then
@@ -5593,17 +6096,17 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                             else
                                                 let v967 : bool = v877 = v960
                                                 let v968 : int32 = v960 - 1
-                                                let v969 : string = v0.[int v877..int v968]
+                                                let v969 : string = (spiralStringSlice v0 (int v877) (int v968))
                                                 v969
-                                        US22_Ok(v970, v960, v961, v962, v963, v964)
+                                        US19_Ok(v970, v960, v961, v962, v963, v964)
                                 match v980 with
-                                | US22_Error(v987, v988, v989, v990, v991, v992) -> (* Error *)
-                                    let v1010 : US21 =
+                                | US19_Error(v987, v988, v989, v990, v991, v992) -> (* Error *)
+                                    let v1010 : US18 =
                                         if v910 then
-                                            let v993 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                                            US21_Error(v993, v877, v878, v879, v880, v881)
+                                            let v993 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                                            US18_Error(v993, v877, v878, v879, v880, v881)
                                         else
-                                            let v995 : char = v0.[int v877]
+                                            let v995 : char = (spiralStringIndex v0 (int v877))
                                             let v996 : bool = v995 = '`'
                                             if v996 then
                                                 let v997 : int32 = v877 + 1
@@ -5616,21 +6119,21 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                                     else
                                                         let v1001 : int32 = v880 + 1
                                                         struct (v878, v879, v1001, v881)
-                                                US21_Ok('`', v997, v1002, v1003, v1004, v1005)
+                                                US18_Ok('`', v997, v1002, v1003, v1004, v1005)
                                             else
-                                                let v1007 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                                                US21_Error(v1007, v877, v878, v879, v880, v881)
-                                    let v1040 : US21 =
+                                                let v1007 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                                                US18_Error(v1007, v877, v878, v879, v880, v881)
+                                    let v1040 : US18 =
                                         match v1010 with
-                                        | US21_Error(v1032, v1033, v1034, v1035, v1036, v1037) -> (* Error *)
-                                            US21_Error(v1032, v1033, v1034, v1035, v1036, v1037)
-                                        | US21_Ok(v1011, v1012, v1013, v1014, v1015, v1016) -> (* Ok *)
+                                        | US18_Error(v1032, v1033, v1034, v1035, v1036, v1037) -> (* Error *)
+                                            US18_Error(v1032, v1033, v1034, v1035, v1036, v1037)
+                                        | US18_Ok(v1011, v1012, v1013, v1014, v1015, v1016) -> (* Ok *)
                                             let v1017 : bool = v1012 >= v1016
                                             if v1017 then
-                                                let v1018 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure65()
-                                                US21_Error(v1018, v1012, v1013, v1014, v1015, v1016)
+                                                let v1018 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
+                                                US18_Error(v1018, v1012, v1013, v1014, v1015, v1016)
                                             else
-                                                let v1020 : char = v0.[int v1012]
+                                                let v1020 : char = (spiralStringIndex v0 (int v1012))
                                                 let v1021 : int32 = v1012 + 1
                                                 let v1022 : bool = '\n' = v1020
                                                 let struct (v1026 : int32, v1027 : int32, v1028 : int32, v1029 : int32) =
@@ -5641,12 +6144,12 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                                     else
                                                         let v1025 : int32 = v1015 + 1
                                                         struct (v1013, v1014, v1025, v1016)
-                                                US21_Ok(v1020, v1021, v1026, v1027, v1028, v1029)
-                                    let v1062 : US22 =
+                                                US18_Ok(v1020, v1021, v1026, v1027, v1028, v1029)
+                                    let v1062 : US19 =
                                         match v1040 with
-                                        | US21_Error(v1054, v1055, v1056, v1057, v1058, v1059) -> (* Error *)
-                                            US22_Error(v1054, v1055, v1056, v1057, v1058, v1059)
-                                        | US21_Ok(v1041, v1042, v1043, v1044, v1045, v1046) -> (* Ok *)
+                                        | US18_Error(v1054, v1055, v1056, v1057, v1058, v1059) -> (* Error *)
+                                            US19_Error(v1054, v1055, v1056, v1057, v1058, v1059)
+                                        | US18_Ok(v1041, v1042, v1043, v1044, v1045, v1046) -> (* Ok *)
                                             let v1047 : bool = v877 >= v1042
                                             let v1052 : string =
                                                 if v1047 then
@@ -5655,41 +6158,41 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                                 else
                                                     let v1049 : bool = v877 = v1042
                                                     let v1050 : int32 = v1042 - 1
-                                                    let v1051 : string = v0.[int v877..int v1050]
+                                                    let v1051 : string = (spiralStringSlice v0 (int v877) (int v1050))
                                                     v1051
-                                            US22_Ok(v1052, v1042, v1043, v1044, v1045, v1046)
+                                            US19_Ok(v1052, v1042, v1043, v1044, v1045, v1046)
                                     match v1062 with
-                                    | US22_Error(v1069, v1070, v1071, v1072, v1073, v1074) -> (* Error *)
-                                        let v1075 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                                        US22_Error(v1075, v877, v878, v879, v880, v881)
-                                    | US22_Ok(v1063, v1064, v1065, v1066, v1067, v1068) -> (* Ok *)
+                                    | US19_Error(v1069, v1070, v1071, v1072, v1073, v1074) -> (* Error *)
+                                        let v1075 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                                        US19_Error(v1075, v877, v878, v879, v880, v881)
+                                    | US19_Ok(v1063, v1064, v1065, v1066, v1067, v1068) -> (* Ok *)
                                         v1062
-                                | US22_Ok(v981, v982, v983, v984, v985, v986) -> (* Ok *)
+                                | US19_Ok(v981, v982, v983, v984, v985, v986) -> (* Ok *)
                                     v980
-                            | US22_Ok(v898, v899, v900, v901, v902, v903) -> (* Ok *)
+                            | US19_Ok(v898, v899, v900, v901, v902, v903) -> (* Ok *)
                                 v897
-                        let v1104 : US22 =
+                        let v1104 : US19 =
                             match v1082 with
-                            | US22_Error(v1083, v1084, v1085, v1086, v1087, v1088) -> (* Error *)
+                            | US19_Error(v1083, v1084, v1085, v1086, v1087, v1088) -> (* Error *)
                                 let v1089 : string = ""
-                                US22_Ok(v1089, v877, v878, v879, v880, v881)
-                            | US22_Ok(v1091, v1092, v1093, v1094, v1095, v1096) -> (* Ok *)
+                                US19_Ok(v1089, v877, v878, v879, v880, v881)
+                            | US19_Ok(v1091, v1092, v1093, v1094, v1095, v1096) -> (* Ok *)
                                 let v1097 : bool = v1092 = v877
                                 if v1097 then
-                                    let v1098 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure63()
-                                    US22_Error(v1098, v877, v878, v879, v880, v881)
+                                    let v1098 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
+                                    US19_Error(v1098, v877, v878, v879, v880, v881)
                                 else
                                     let v1100 : UH0 = UH0_Nil
-                                    method135(v0, v1091, v1100, v1092, v1093, v1094, v1095, v1096)
+                                    method93(v0, v1091, v1100, v1092, v1093, v1094, v1095, v1096)
                         match v1104 with
-                        | US22_Error(v1147, v1148, v1149, v1150, v1151, v1152) -> (* Error *)
+                        | US19_Error(v1147, v1148, v1149, v1150, v1151, v1152) -> (* Error *)
                             let v1153 : bool = v877 >= v881
-                            let v1171 : US21 =
+                            let v1171 : US18 =
                                 if v1153 then
-                                    let v1154 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                                    US21_Error(v1154, v877, v878, v879, v880, v881)
+                                    let v1154 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                                    US18_Error(v1154, v877, v878, v879, v880, v881)
                                 else
-                                    let v1156 : char = v0.[int v877]
+                                    let v1156 : char = (spiralStringIndex v0 (int v877))
                                     let v1157 : bool = v1156 = '"'
                                     if v1157 then
                                         let v1158 : int32 = v877 + 1
@@ -5702,25 +6205,25 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                             else
                                                 let v1162 : int32 = v880 + 1
                                                 struct (v878, v879, v1162, v881)
-                                        US21_Ok('"', v1158, v1163, v1164, v1165, v1166)
+                                        US18_Ok('"', v1158, v1163, v1164, v1165, v1166)
                                     else
-                                        let v1168 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                        US21_Error(v1168, v877, v878, v879, v880, v881)
+                                        let v1168 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                        US18_Error(v1168, v877, v878, v879, v880, v881)
                             match v1171 with
-                            | US21_Error(v1180, v1181, v1182, v1183, v1184, v1185) -> (* Error *)
-                                let v1186 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure45()
-                                US22_Error(v1186, v877, v878, v879, v880, v881)
-                            | US21_Ok(v1172, v1173, v1174, v1175, v1176, v1177) -> (* Ok *)
+                            | US18_Error(v1180, v1181, v1182, v1183, v1184, v1185) -> (* Error *)
+                                let v1186 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure39()
+                                US19_Error(v1186, v877, v878, v879, v880, v881)
+                            | US18_Ok(v1172, v1173, v1174, v1175, v1176, v1177) -> (* Ok *)
                                 let v1178 : string = ""
-                                US22_Ok(v1178, v1173, v1174, v1175, v1176, v1177)
-                        | US22_Ok(v1105, v1106, v1107, v1108, v1109, v1110) -> (* Ok *)
+                                US19_Ok(v1178, v1173, v1174, v1175, v1176, v1177)
+                        | US19_Ok(v1105, v1106, v1107, v1108, v1109, v1110) -> (* Ok *)
                             let v1111 : bool = v1106 >= v1110
-                            let v1129 : US21 =
+                            let v1129 : US18 =
                                 if v1111 then
-                                    let v1112 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                                    US21_Error(v1112, v1106, v1107, v1108, v1109, v1110)
+                                    let v1112 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                                    US18_Error(v1112, v1106, v1107, v1108, v1109, v1110)
                                 else
-                                    let v1114 : char = v0.[int v1106]
+                                    let v1114 : char = (spiralStringIndex v0 (int v1106))
                                     let v1115 : bool = v1114 = '"'
                                     if v1115 then
                                         let v1116 : int32 = v1106 + 1
@@ -5733,22 +6236,22 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                                             else
                                                 let v1120 : int32 = v1109 + 1
                                                 struct (v1107, v1108, v1120, v1110)
-                                        US21_Ok('"', v1116, v1121, v1122, v1123, v1124)
+                                        US18_Ok('"', v1116, v1121, v1122, v1123, v1124)
                                     else
-                                        let v1126 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                        US21_Error(v1126, v1106, v1107, v1108, v1109, v1110)
+                                        let v1126 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                        US18_Error(v1126, v1106, v1107, v1108, v1109, v1110)
                             match v1129 with
-                            | US21_Error(v1137, v1138, v1139, v1140, v1141, v1142) -> (* Error *)
-                                let v1143 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure46(v877, v1106, v1137, v1138, v1139, v1140, v1141, v1142)
-                                US22_Error(v1143, v1106, v1107, v1108, v1109, v1110)
-                            | US21_Ok(v1130, v1131, v1132, v1133, v1134, v1135) -> (* Ok *)
-                                US22_Ok(v1105, v1131, v1132, v1133, v1134, v1135)
-                | US22_Ok(v846, v847, v848, v849, v850, v851) -> (* Ok *)
+                            | US18_Error(v1137, v1138, v1139, v1140, v1141, v1142) -> (* Error *)
+                                let v1143 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure40(v877, v1106, v1137, v1138, v1139, v1140, v1141, v1142)
+                                US19_Error(v1143, v1106, v1107, v1108, v1109, v1110)
+                            | US18_Ok(v1130, v1131, v1132, v1133, v1134, v1135) -> (* Ok *)
+                                US19_Ok(v1105, v1131, v1132, v1133, v1134, v1135)
+                | US19_Ok(v846, v847, v848, v849, v850, v851) -> (* Ok *)
                     v845
-            let v1232 : US22 =
+            let v1232 : US19 =
                 match v1202 with
-                | US22_Error(v1209, v1210, v1211, v1212, v1213, v1214) -> (* Error *)
-                    let struct (v1215 : int32, v1216 : int32, v1217 : int32, v1218 : int32, v1219 : int32) = method142(v41, v42, v43, v44, v0, v40)
+                | US19_Error(v1209, v1210, v1211, v1212, v1213, v1214) -> (* Error *)
+                    let struct (v1215 : int32, v1216 : int32, v1217 : int32, v1218 : int32, v1219 : int32) = method100(v41, v42, v43, v44, v0, v40)
                     let v1220 : bool = v1215 > v40
                     if v1220 then
                         let v1221 : bool = v40 >= v1215
@@ -5759,71 +6262,71 @@ and method144 (v0 : string, v1 : UH0, v2 : int32, v3 : int32, v4 : int32, v5 : i
                             else
                                 let v1223 : bool = v40 = v1215
                                 let v1224 : int32 = v1215 - 1
-                                let v1225 : string = v0.[int v40..int v1224]
+                                let v1225 : string = (spiralStringSlice v0 (int v40) (int v1224))
                                 v1225
-                        US22_Ok(v1226, v1215, v1216, v1217, v1218, v1219)
+                        US19_Ok(v1226, v1215, v1216, v1217, v1218, v1219)
                     else
-                        let v1228 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure60()
-                        US22_Error(v1228, v40, v41, v42, v43, v44)
-                | US22_Ok(v1203, v1204, v1205, v1206, v1207, v1208) -> (* Ok *)
+                        let v1228 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure54()
+                        US19_Error(v1228, v40, v41, v42, v43, v44)
+                | US19_Ok(v1203, v1204, v1205, v1206, v1207, v1208) -> (* Ok *)
                     v1202
-            let v1267 : US22 =
+            let v1267 : US19 =
                 match v1232 with
-                | US22_Error(v1239, v1240, v1241, v1242, v1243, v1244) -> (* Error *)
+                | US19_Error(v1239, v1240, v1241, v1242, v1243, v1244) -> (* Error *)
                     let v1245 : UH0 = UH0_Nil
-                    let v1246 : US30 = method138(v0, v1245, v40, v41, v42, v43, v44)
+                    let v1246 : US27 = method96(v0, v1245, v40, v41, v42, v43, v44)
                     match v1246 with
-                    | US30_Error(v1257, v1258, v1259, v1260, v1261, v1262) -> (* Error *)
-                        US22_Error(v1257, v1258, v1259, v1260, v1261, v1262)
-                    | US30_Ok(v1247, v1248, v1249, v1250, v1251, v1252) -> (* Ok *)
+                    | US27_Error(v1257, v1258, v1259, v1260, v1261, v1262) -> (* Error *)
+                        US19_Error(v1257, v1258, v1259, v1260, v1261, v1262)
+                    | US27_Ok(v1247, v1248, v1249, v1250, v1251, v1252) -> (* Ok *)
                         let v1253 : string = ""
-                        let struct (v1254 : string, v1255 : string) = method140(v1247, v1253)
-                        US22_Ok(v1254, v1248, v1249, v1250, v1251, v1252)
-                | US22_Ok(v1233, v1234, v1235, v1236, v1237, v1238) -> (* Ok *)
+                        let struct (v1254 : string, v1255 : string) = method98(v1247, v1253)
+                        US19_Ok(v1254, v1248, v1249, v1250, v1251, v1252)
+                | US19_Ok(v1233, v1234, v1235, v1236, v1237, v1238) -> (* Ok *)
                     v1232
-            let v1278 : US22 =
+            let v1278 : US19 =
                 match v1267 with
-                | US22_Ok(v1268, v1269, v1270, v1271, v1272, v1273) -> (* Ok *)
+                | US19_Ok(v1268, v1269, v1270, v1271, v1272, v1273) -> (* Ok *)
                     let v1274 : bool = v1269 = v40
                     if v1274 then
-                        let v1275 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure69()
-                        US22_Error(v1275, v40, v41, v42, v43, v44)
+                        let v1275 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure63()
+                        US19_Error(v1275, v40, v41, v42, v43, v44)
                     else
                         v1267
                 | _ ->
                     v1267
-            let v1295 : US22 =
+            let v1295 : US19 =
                 match v1278 with
-                | US22_Error(v1279, v1280, v1281, v1282, v1283, v1284) -> (* Error *)
-                    US22_Error(v1279, v1280, v1281, v1282, v1283, v1284)
-                | US22_Ok(v1286, v1287, v1288, v1289, v1290, v1291) -> (* Ok *)
+                | US19_Error(v1279, v1280, v1281, v1282, v1283, v1284) -> (* Error *)
+                    US19_Error(v1279, v1280, v1281, v1282, v1283, v1284)
+                | US19_Ok(v1286, v1287, v1288, v1289, v1290, v1291) -> (* Ok *)
                     let v1292 : UH0 = UH0_Nil
-                    method141(v0, v1286, v1292, v1287, v1288, v1289, v1290, v1291)
+                    method99(v0, v1286, v1292, v1287, v1288, v1289, v1290, v1291)
             match v1295 with
-            | US22_Error(v1304, v1305, v1306, v1307, v1308, v1309) -> (* Error *)
+            | US19_Error(v1304, v1305, v1306, v1307, v1308, v1309) -> (* Error *)
                 let v1310 : UH0 = UH0_Nil
-                let v1311 : UH0 = method139(v1, v1310)
-                US30_Ok(v1311, v2, v3, v4, v5, v6)
-            | US22_Ok(v1296, v1297, v1298, v1299, v1300, v1301) -> (* Ok *)
+                let v1311 : UH0 = method97(v1, v1310)
+                US27_Ok(v1311, v2, v3, v4, v5, v6)
+            | US19_Ok(v1296, v1297, v1298, v1299, v1300, v1301) -> (* Ok *)
                 let v1302 : UH0 = UH0_Cons(v1296, v1)
-                method144(v0, v1302, v1297, v1298, v1299, v1300, v1301)
-and method145 (v0 : UH0, v1 : string list) : string list =
+                method102(v0, v1302, v1297, v1298, v1299, v1300, v1301)
+and method103 (v0 : UH0, v1 : string list) : string list =
     match v0 with
     | UH0_Cons(v2, v3) -> (* Cons *)
-        let v4 : string list = method145(v3, v1)
+        let v4 : string list = method103(v3, v1)
         let v5 : string list = v2 :: v4 
         v5
     | UH0_Nil -> (* Nil *)
         v1
-and split_args_126 (v0 : string) : US29 =
-    let v1 : int32 = v0.Length
+and split_args_87 (v0 : string) : US26 =
+    let v1 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v0))
     let v2 : bool = 0 >= v1
-    let v16 : US21 =
+    let v16 : US18 =
         if v2 then
-            let v3 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-            US21_Error(v3, 0, 0, 1, 1, v1)
+            let v3 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+            US18_Error(v3, 0, 0, 1, 1, v1)
         else
-            let v5 : char = v0.[int 0]
+            let v5 : char = (spiralStringIndex v0 (int 0))
             let v6 : bool = v5 = '\\'
             if v6 then
                 let v7 : bool = '\n' = v5
@@ -5832,21 +6335,21 @@ and split_args_126 (v0 : string) : US29 =
                         struct (1, 2, 1, v1)
                     else
                         struct (0, 1, 2, v1)
-                US21_Ok('\\', 1, v8, v9, v10, v11)
+                US18_Ok('\\', 1, v8, v9, v10, v11)
             else
-                let v13 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                US21_Error(v13, 0, 0, 1, 1, v1)
-    let v50 : US21 =
+                let v13 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                US18_Error(v13, 0, 0, 1, 1, v1)
+    let v50 : US18 =
         match v16 with
-        | US21_Error(v42, v43, v44, v45, v46, v47) -> (* Error *)
-            US21_Error(v42, v43, v44, v45, v46, v47)
-        | US21_Ok(v17, v18, v19, v20, v21, v22) -> (* Ok *)
+        | US18_Error(v42, v43, v44, v45, v46, v47) -> (* Error *)
+            US18_Error(v42, v43, v44, v45, v46, v47)
+        | US18_Ok(v17, v18, v19, v20, v21, v22) -> (* Ok *)
             let v23 : bool = v18 >= v22
             if v23 then
-                let v24 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                US21_Error(v24, v18, v19, v20, v21, v22)
+                let v24 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                US18_Error(v24, v18, v19, v20, v21, v22)
             else
-                let v26 : char = v0.[int v18]
+                let v26 : char = (spiralStringIndex v0 (int v18))
                 let v27 : bool = v26 = '"'
                 if v27 then
                     let v28 : int32 = v18 + 1
@@ -5859,25 +6362,25 @@ and split_args_126 (v0 : string) : US29 =
                         else
                             let v32 : int32 = v21 + 1
                             struct (v19, v20, v32, v22)
-                    US21_Ok('"', v28, v33, v34, v35, v36)
+                    US18_Ok('"', v28, v33, v34, v35, v36)
                 else
-                    let v38 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                    US21_Error(v38, v18, v19, v20, v21, v22)
-    let v66 : US21 =
+                    let v38 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                    US18_Error(v38, v18, v19, v20, v21, v22)
+    let v66 : US18 =
         match v50 with
-        | US21_Error(v58, v59, v60, v61, v62, v63) -> (* Error *)
-            US21_Error(v58, v59, v60, v61, v62, v63)
-        | US21_Ok(v51, v52, v53, v54, v55, v56) -> (* Ok *)
-            US21_Ok('"', v52, v53, v54, v55, v56)
-    let v160 : US21 =
+        | US18_Error(v58, v59, v60, v61, v62, v63) -> (* Error *)
+            US18_Error(v58, v59, v60, v61, v62, v63)
+        | US18_Ok(v51, v52, v53, v54, v55, v56) -> (* Ok *)
+            US18_Ok('"', v52, v53, v54, v55, v56)
+    let v160 : US18 =
         match v66 with
-        | US21_Error(v73, v74, v75, v76, v77, v78) -> (* Error *)
-            let v92 : US21 =
+        | US18_Error(v73, v74, v75, v76, v77, v78) -> (* Error *)
+            let v92 : US18 =
                 if v2 then
-                    let v79 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                    US21_Error(v79, 0, 0, 1, 1, v1)
+                    let v79 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                    US18_Error(v79, 0, 0, 1, 1, v1)
                 else
-                    let v81 : char = v0.[int 0]
+                    let v81 : char = (spiralStringIndex v0 (int 0))
                     let v82 : bool = v81 = '`'
                     if v82 then
                         let v83 : bool = '\n' = v81
@@ -5886,21 +6389,21 @@ and split_args_126 (v0 : string) : US29 =
                                 struct (1, 2, 1, v1)
                             else
                                 struct (0, 1, 2, v1)
-                        US21_Ok('`', 1, v84, v85, v86, v87)
+                        US18_Ok('`', 1, v84, v85, v86, v87)
                     else
-                        let v89 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                        US21_Error(v89, 0, 0, 1, 1, v1)
-            let v126 : US21 =
+                        let v89 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                        US18_Error(v89, 0, 0, 1, 1, v1)
+            let v126 : US18 =
                 match v92 with
-                | US21_Error(v118, v119, v120, v121, v122, v123) -> (* Error *)
-                    US21_Error(v118, v119, v120, v121, v122, v123)
-                | US21_Ok(v93, v94, v95, v96, v97, v98) -> (* Ok *)
+                | US18_Error(v118, v119, v120, v121, v122, v123) -> (* Error *)
+                    US18_Error(v118, v119, v120, v121, v122, v123)
+                | US18_Ok(v93, v94, v95, v96, v97, v98) -> (* Ok *)
                     let v99 : bool = v94 >= v98
                     if v99 then
-                        let v100 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                        US21_Error(v100, v94, v95, v96, v97, v98)
+                        let v100 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                        US18_Error(v100, v94, v95, v96, v97, v98)
                     else
-                        let v102 : char = v0.[int v94]
+                        let v102 : char = (spiralStringIndex v0 (int v94))
                         let v103 : bool = v102 = '"'
                         if v103 then
                             let v104 : int32 = v94 + 1
@@ -5913,32 +6416,32 @@ and split_args_126 (v0 : string) : US29 =
                                 else
                                     let v108 : int32 = v97 + 1
                                     struct (v95, v96, v108, v98)
-                            US21_Ok('"', v104, v109, v110, v111, v112)
+                            US18_Ok('"', v104, v109, v110, v111, v112)
                         else
-                            let v114 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                            US21_Error(v114, v94, v95, v96, v97, v98)
-            let v142 : US21 =
+                            let v114 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                            US18_Error(v114, v94, v95, v96, v97, v98)
+            let v142 : US18 =
                 match v126 with
-                | US21_Error(v134, v135, v136, v137, v138, v139) -> (* Error *)
-                    US21_Error(v134, v135, v136, v137, v138, v139)
-                | US21_Ok(v127, v128, v129, v130, v131, v132) -> (* Ok *)
-                    US21_Ok('"', v128, v129, v130, v131, v132)
+                | US18_Error(v134, v135, v136, v137, v138, v139) -> (* Error *)
+                    US18_Error(v134, v135, v136, v137, v138, v139)
+                | US18_Ok(v127, v128, v129, v130, v131, v132) -> (* Ok *)
+                    US18_Ok('"', v128, v129, v130, v131, v132)
             match v142 with
-            | US21_Error(v149, v150, v151, v152, v153, v154) -> (* Error *)
-                let v155 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                US21_Error(v155, 0, 0, 1, 1, v1)
-            | US21_Ok(v143, v144, v145, v146, v147, v148) -> (* Ok *)
+            | US18_Error(v149, v150, v151, v152, v153, v154) -> (* Error *)
+                let v155 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                US18_Error(v155, 0, 0, 1, 1, v1)
+            | US18_Ok(v143, v144, v145, v146, v147, v148) -> (* Ok *)
                 v142
-        | US21_Ok(v67, v68, v69, v70, v71, v72) -> (* Ok *)
+        | US18_Ok(v67, v68, v69, v70, v71, v72) -> (* Ok *)
             v66
-    let v791 : US22 =
+    let v791 : US19 =
         match v160 with
-        | US21_Error(v783, v784, v785, v786, v787, v788) -> (* Error *)
-            US22_Error(v783, v784, v785, v786, v787, v788)
-        | US21_Ok(v161, v162, v163, v164, v165, v166) -> (* Ok *)
-            let struct (v167 : int32, v168 : int32, v169 : int32, v170 : int32, v171 : int32) = method127(v163, v164, v165, v166, v0, v162)
+        | US18_Error(v783, v784, v785, v786, v787, v788) -> (* Error *)
+            US19_Error(v783, v784, v785, v786, v787, v788)
+        | US18_Ok(v161, v162, v163, v164, v165, v166) -> (* Ok *)
+            let struct (v167 : int32, v168 : int32, v169 : int32, v170 : int32, v171 : int32) = method88(v163, v164, v165, v166, v0, v162)
             let v172 : bool = v167 > v162
-            let v182 : US22 =
+            let v182 : US19 =
                 if v172 then
                     let v173 : bool = v162 >= v167
                     let v178 : string =
@@ -5948,22 +6451,22 @@ and split_args_126 (v0 : string) : US29 =
                         else
                             let v175 : bool = v162 = v167
                             let v176 : int32 = v167 - 1
-                            let v177 : string = v0.[int v162..int v176]
+                            let v177 : string = (spiralStringSlice v0 (int v162) (int v176))
                             v177
-                    US22_Ok(v178, v167, v168, v169, v170, v171)
+                    US19_Ok(v178, v167, v168, v169, v170, v171)
                 else
-                    let v180 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure60()
-                    US22_Error(v180, v162, v163, v164, v165, v166)
-            let v377 : US22 =
+                    let v180 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure54()
+                    US19_Error(v180, v162, v163, v164, v165, v166)
+            let v377 : US19 =
                 match v182 with
-                | US22_Error(v189, v190, v191, v192, v193, v194) -> (* Error *)
+                | US19_Error(v189, v190, v191, v192, v193, v194) -> (* Error *)
                     let v195 : bool = v162 >= v166
-                    let v213 : US21 =
+                    let v213 : US18 =
                         if v195 then
-                            let v196 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                            US21_Error(v196, v162, v163, v164, v165, v166)
+                            let v196 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                            US18_Error(v196, v162, v163, v164, v165, v166)
                         else
-                            let v198 : char = v0.[int v162]
+                            let v198 : char = (spiralStringIndex v0 (int v162))
                             let v199 : bool = v198 = '\\'
                             if v199 then
                                 let v200 : int32 = v162 + 1
@@ -5976,21 +6479,21 @@ and split_args_126 (v0 : string) : US29 =
                                     else
                                         let v204 : int32 = v165 + 1
                                         struct (v163, v164, v204, v166)
-                                US21_Ok('\\', v200, v205, v206, v207, v208)
+                                US18_Ok('\\', v200, v205, v206, v207, v208)
                             else
-                                let v210 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                                US21_Error(v210, v162, v163, v164, v165, v166)
-                    let v248 : US21 =
+                                let v210 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                                US18_Error(v210, v162, v163, v164, v165, v166)
+                    let v248 : US18 =
                         match v213 with
-                        | US21_Error(v240, v241, v242, v243, v244, v245) -> (* Error *)
-                            US21_Error(v240, v241, v242, v243, v244, v245)
-                        | US21_Ok(v214, v215, v216, v217, v218, v219) -> (* Ok *)
+                        | US18_Error(v240, v241, v242, v243, v244, v245) -> (* Error *)
+                            US18_Error(v240, v241, v242, v243, v244, v245)
+                        | US18_Ok(v214, v215, v216, v217, v218, v219) -> (* Ok *)
                             let v220 : bool = v215 >= v219
                             if v220 then
-                                let v221 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure61()
-                                US21_Error(v221, v215, v216, v217, v218, v219)
+                                let v221 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure55()
+                                US18_Error(v221, v215, v216, v217, v218, v219)
                             else
-                                let v223 : char = v0.[int v215]
+                                let v223 : char = (spiralStringIndex v0 (int v215))
                                 let v224 : bool = v223 = '"'
                                 let v225 : bool = v224 = false
                                 if v225 then
@@ -6004,15 +6507,15 @@ and split_args_126 (v0 : string) : US29 =
                                         else
                                             let v230 : int32 = v218 + 1
                                             struct (v216, v217, v230, v219)
-                                    US21_Ok(v223, v226, v231, v232, v233, v234)
+                                    US18_Ok(v223, v226, v231, v232, v233, v234)
                                 else
-                                    let v236 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure62()
-                                    US21_Error(v236, v215, v216, v217, v218, v219)
-                    let v270 : US22 =
+                                    let v236 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
+                                    US18_Error(v236, v215, v216, v217, v218, v219)
+                    let v270 : US19 =
                         match v248 with
-                        | US21_Error(v262, v263, v264, v265, v266, v267) -> (* Error *)
-                            US22_Error(v262, v263, v264, v265, v266, v267)
-                        | US21_Ok(v249, v250, v251, v252, v253, v254) -> (* Ok *)
+                        | US18_Error(v262, v263, v264, v265, v266, v267) -> (* Error *)
+                            US19_Error(v262, v263, v264, v265, v266, v267)
+                        | US18_Ok(v249, v250, v251, v252, v253, v254) -> (* Ok *)
                             let v255 : bool = v162 >= v250
                             let v260 : string =
                                 if v255 then
@@ -6021,17 +6524,17 @@ and split_args_126 (v0 : string) : US29 =
                                 else
                                     let v257 : bool = v162 = v250
                                     let v258 : int32 = v250 - 1
-                                    let v259 : string = v0.[int v162..int v258]
+                                    let v259 : string = (spiralStringSlice v0 (int v162) (int v258))
                                     v259
-                            US22_Ok(v260, v250, v251, v252, v253, v254)
+                            US19_Ok(v260, v250, v251, v252, v253, v254)
                     match v270 with
-                    | US22_Error(v277, v278, v279, v280, v281, v282) -> (* Error *)
-                        let v300 : US21 =
+                    | US19_Error(v277, v278, v279, v280, v281, v282) -> (* Error *)
+                        let v300 : US18 =
                             if v195 then
-                                let v283 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                                US21_Error(v283, v162, v163, v164, v165, v166)
+                                let v283 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                                US18_Error(v283, v162, v163, v164, v165, v166)
                             else
-                                let v285 : char = v0.[int v162]
+                                let v285 : char = (spiralStringIndex v0 (int v162))
                                 let v286 : bool = v285 = '`'
                                 if v286 then
                                     let v287 : int32 = v162 + 1
@@ -6044,21 +6547,21 @@ and split_args_126 (v0 : string) : US29 =
                                         else
                                             let v291 : int32 = v165 + 1
                                             struct (v163, v164, v291, v166)
-                                    US21_Ok('`', v287, v292, v293, v294, v295)
+                                    US18_Ok('`', v287, v292, v293, v294, v295)
                                 else
-                                    let v297 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                                    US21_Error(v297, v162, v163, v164, v165, v166)
-                        let v335 : US21 =
+                                    let v297 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                                    US18_Error(v297, v162, v163, v164, v165, v166)
+                        let v335 : US18 =
                             match v300 with
-                            | US21_Error(v327, v328, v329, v330, v331, v332) -> (* Error *)
-                                US21_Error(v327, v328, v329, v330, v331, v332)
-                            | US21_Ok(v301, v302, v303, v304, v305, v306) -> (* Ok *)
+                            | US18_Error(v327, v328, v329, v330, v331, v332) -> (* Error *)
+                                US18_Error(v327, v328, v329, v330, v331, v332)
+                            | US18_Ok(v301, v302, v303, v304, v305, v306) -> (* Ok *)
                                 let v307 : bool = v302 >= v306
                                 if v307 then
-                                    let v308 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure61()
-                                    US21_Error(v308, v302, v303, v304, v305, v306)
+                                    let v308 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure55()
+                                    US18_Error(v308, v302, v303, v304, v305, v306)
                                 else
-                                    let v310 : char = v0.[int v302]
+                                    let v310 : char = (spiralStringIndex v0 (int v302))
                                     let v311 : bool = v310 = '"'
                                     let v312 : bool = v311 = false
                                     if v312 then
@@ -6072,15 +6575,15 @@ and split_args_126 (v0 : string) : US29 =
                                             else
                                                 let v317 : int32 = v305 + 1
                                                 struct (v303, v304, v317, v306)
-                                        US21_Ok(v310, v313, v318, v319, v320, v321)
+                                        US18_Ok(v310, v313, v318, v319, v320, v321)
                                     else
-                                        let v323 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure62()
-                                        US21_Error(v323, v302, v303, v304, v305, v306)
-                        let v357 : US22 =
+                                        let v323 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
+                                        US18_Error(v323, v302, v303, v304, v305, v306)
+                        let v357 : US19 =
                             match v335 with
-                            | US21_Error(v349, v350, v351, v352, v353, v354) -> (* Error *)
-                                US22_Error(v349, v350, v351, v352, v353, v354)
-                            | US21_Ok(v336, v337, v338, v339, v340, v341) -> (* Ok *)
+                            | US18_Error(v349, v350, v351, v352, v353, v354) -> (* Error *)
+                                US19_Error(v349, v350, v351, v352, v353, v354)
+                            | US18_Ok(v336, v337, v338, v339, v340, v341) -> (* Ok *)
                                 let v342 : bool = v162 >= v337
                                 let v347 : string =
                                     if v342 then
@@ -6089,41 +6592,41 @@ and split_args_126 (v0 : string) : US29 =
                                     else
                                         let v344 : bool = v162 = v337
                                         let v345 : int32 = v337 - 1
-                                        let v346 : string = v0.[int v162..int v345]
+                                        let v346 : string = (spiralStringSlice v0 (int v162) (int v345))
                                         v346
-                                US22_Ok(v347, v337, v338, v339, v340, v341)
+                                US19_Ok(v347, v337, v338, v339, v340, v341)
                         match v357 with
-                        | US22_Error(v364, v365, v366, v367, v368, v369) -> (* Error *)
-                            let v370 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                            US22_Error(v370, v162, v163, v164, v165, v166)
-                        | US22_Ok(v358, v359, v360, v361, v362, v363) -> (* Ok *)
+                        | US19_Error(v364, v365, v366, v367, v368, v369) -> (* Error *)
+                            let v370 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                            US19_Error(v370, v162, v163, v164, v165, v166)
+                        | US19_Ok(v358, v359, v360, v361, v362, v363) -> (* Ok *)
                             v357
-                    | US22_Ok(v271, v272, v273, v274, v275, v276) -> (* Ok *)
+                    | US19_Ok(v271, v272, v273, v274, v275, v276) -> (* Ok *)
                         v270
-                | US22_Ok(v183, v184, v185, v186, v187, v188) -> (* Ok *)
+                | US19_Ok(v183, v184, v185, v186, v187, v188) -> (* Ok *)
                     v182
-            let v399 : US22 =
+            let v399 : US19 =
                 match v377 with
-                | US22_Error(v378, v379, v380, v381, v382, v383) -> (* Error *)
+                | US19_Error(v378, v379, v380, v381, v382, v383) -> (* Error *)
                     let v384 : string = ""
-                    US22_Ok(v384, v162, v163, v164, v165, v166)
-                | US22_Ok(v386, v387, v388, v389, v390, v391) -> (* Ok *)
+                    US19_Ok(v384, v162, v163, v164, v165, v166)
+                | US19_Ok(v386, v387, v388, v389, v390, v391) -> (* Ok *)
                     let v392 : bool = v387 = v162
                     if v392 then
-                        let v393 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure63()
-                        US22_Error(v393, v162, v163, v164, v165, v166)
+                        let v393 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
+                        US19_Error(v393, v162, v163, v164, v165, v166)
                     else
                         let v395 : UH0 = UH0_Nil
-                        method131(v0, v386, v395, v387, v388, v389, v390, v391)
+                        method90(v0, v386, v395, v387, v388, v389, v390, v391)
             match v399 with
-            | US22_Error(v590, v591, v592, v593, v594, v595) -> (* Error *)
+            | US19_Error(v590, v591, v592, v593, v594, v595) -> (* Error *)
                 let v596 : bool = v162 >= v166
-                let v614 : US21 =
+                let v614 : US18 =
                     if v596 then
-                        let v597 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                        US21_Error(v597, v162, v163, v164, v165, v166)
+                        let v597 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                        US18_Error(v597, v162, v163, v164, v165, v166)
                     else
-                        let v599 : char = v0.[int v162]
+                        let v599 : char = (spiralStringIndex v0 (int v162))
                         let v600 : bool = v599 = '\\'
                         if v600 then
                             let v601 : int32 = v162 + 1
@@ -6136,21 +6639,21 @@ and split_args_126 (v0 : string) : US29 =
                                 else
                                     let v605 : int32 = v165 + 1
                                     struct (v163, v164, v605, v166)
-                            US21_Ok('\\', v601, v606, v607, v608, v609)
+                            US18_Ok('\\', v601, v606, v607, v608, v609)
                         else
-                            let v611 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                            US21_Error(v611, v162, v163, v164, v165, v166)
-                let v648 : US21 =
+                            let v611 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                            US18_Error(v611, v162, v163, v164, v165, v166)
+                let v648 : US18 =
                     match v614 with
-                    | US21_Error(v640, v641, v642, v643, v644, v645) -> (* Error *)
-                        US21_Error(v640, v641, v642, v643, v644, v645)
-                    | US21_Ok(v615, v616, v617, v618, v619, v620) -> (* Ok *)
+                    | US18_Error(v640, v641, v642, v643, v644, v645) -> (* Error *)
+                        US18_Error(v640, v641, v642, v643, v644, v645)
+                    | US18_Ok(v615, v616, v617, v618, v619, v620) -> (* Ok *)
                         let v621 : bool = v616 >= v620
                         if v621 then
-                            let v622 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                            US21_Error(v622, v616, v617, v618, v619, v620)
+                            let v622 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                            US18_Error(v622, v616, v617, v618, v619, v620)
                         else
-                            let v624 : char = v0.[int v616]
+                            let v624 : char = (spiralStringIndex v0 (int v616))
                             let v625 : bool = v624 = '"'
                             if v625 then
                                 let v626 : int32 = v616 + 1
@@ -6163,25 +6666,25 @@ and split_args_126 (v0 : string) : US29 =
                                     else
                                         let v630 : int32 = v619 + 1
                                         struct (v617, v618, v630, v620)
-                                US21_Ok('"', v626, v631, v632, v633, v634)
+                                US18_Ok('"', v626, v631, v632, v633, v634)
                             else
-                                let v636 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                US21_Error(v636, v616, v617, v618, v619, v620)
-                let v664 : US21 =
+                                let v636 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                US18_Error(v636, v616, v617, v618, v619, v620)
+                let v664 : US18 =
                     match v648 with
-                    | US21_Error(v656, v657, v658, v659, v660, v661) -> (* Error *)
-                        US21_Error(v656, v657, v658, v659, v660, v661)
-                    | US21_Ok(v649, v650, v651, v652, v653, v654) -> (* Ok *)
-                        US21_Ok('"', v650, v651, v652, v653, v654)
-                let v762 : US21 =
+                    | US18_Error(v656, v657, v658, v659, v660, v661) -> (* Error *)
+                        US18_Error(v656, v657, v658, v659, v660, v661)
+                    | US18_Ok(v649, v650, v651, v652, v653, v654) -> (* Ok *)
+                        US18_Ok('"', v650, v651, v652, v653, v654)
+                let v762 : US18 =
                     match v664 with
-                    | US21_Error(v671, v672, v673, v674, v675, v676) -> (* Error *)
-                        let v694 : US21 =
+                    | US18_Error(v671, v672, v673, v674, v675, v676) -> (* Error *)
+                        let v694 : US18 =
                             if v596 then
-                                let v677 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                                US21_Error(v677, v162, v163, v164, v165, v166)
+                                let v677 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                                US18_Error(v677, v162, v163, v164, v165, v166)
                             else
-                                let v679 : char = v0.[int v162]
+                                let v679 : char = (spiralStringIndex v0 (int v162))
                                 let v680 : bool = v679 = '`'
                                 if v680 then
                                     let v681 : int32 = v162 + 1
@@ -6194,21 +6697,21 @@ and split_args_126 (v0 : string) : US29 =
                                         else
                                             let v685 : int32 = v165 + 1
                                             struct (v163, v164, v685, v166)
-                                    US21_Ok('`', v681, v686, v687, v688, v689)
+                                    US18_Ok('`', v681, v686, v687, v688, v689)
                                 else
-                                    let v691 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                                    US21_Error(v691, v162, v163, v164, v165, v166)
-                        let v728 : US21 =
+                                    let v691 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                                    US18_Error(v691, v162, v163, v164, v165, v166)
+                        let v728 : US18 =
                             match v694 with
-                            | US21_Error(v720, v721, v722, v723, v724, v725) -> (* Error *)
-                                US21_Error(v720, v721, v722, v723, v724, v725)
-                            | US21_Ok(v695, v696, v697, v698, v699, v700) -> (* Ok *)
+                            | US18_Error(v720, v721, v722, v723, v724, v725) -> (* Error *)
+                                US18_Error(v720, v721, v722, v723, v724, v725)
+                            | US18_Ok(v695, v696, v697, v698, v699, v700) -> (* Ok *)
                                 let v701 : bool = v696 >= v700
                                 if v701 then
-                                    let v702 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                                    US21_Error(v702, v696, v697, v698, v699, v700)
+                                    let v702 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                                    US18_Error(v702, v696, v697, v698, v699, v700)
                                 else
-                                    let v704 : char = v0.[int v696]
+                                    let v704 : char = (spiralStringIndex v0 (int v696))
                                     let v705 : bool = v704 = '"'
                                     if v705 then
                                         let v706 : int32 = v696 + 1
@@ -6221,39 +6724,39 @@ and split_args_126 (v0 : string) : US29 =
                                             else
                                                 let v710 : int32 = v699 + 1
                                                 struct (v697, v698, v710, v700)
-                                        US21_Ok('"', v706, v711, v712, v713, v714)
+                                        US18_Ok('"', v706, v711, v712, v713, v714)
                                     else
-                                        let v716 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                        US21_Error(v716, v696, v697, v698, v699, v700)
-                        let v744 : US21 =
+                                        let v716 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                        US18_Error(v716, v696, v697, v698, v699, v700)
+                        let v744 : US18 =
                             match v728 with
-                            | US21_Error(v736, v737, v738, v739, v740, v741) -> (* Error *)
-                                US21_Error(v736, v737, v738, v739, v740, v741)
-                            | US21_Ok(v729, v730, v731, v732, v733, v734) -> (* Ok *)
-                                US21_Ok('"', v730, v731, v732, v733, v734)
+                            | US18_Error(v736, v737, v738, v739, v740, v741) -> (* Error *)
+                                US18_Error(v736, v737, v738, v739, v740, v741)
+                            | US18_Ok(v729, v730, v731, v732, v733, v734) -> (* Ok *)
+                                US18_Ok('"', v730, v731, v732, v733, v734)
                         match v744 with
-                        | US21_Error(v751, v752, v753, v754, v755, v756) -> (* Error *)
-                            let v757 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                            US21_Error(v757, v162, v163, v164, v165, v166)
-                        | US21_Ok(v745, v746, v747, v748, v749, v750) -> (* Ok *)
+                        | US18_Error(v751, v752, v753, v754, v755, v756) -> (* Error *)
+                            let v757 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                            US18_Error(v757, v162, v163, v164, v165, v166)
+                        | US18_Ok(v745, v746, v747, v748, v749, v750) -> (* Ok *)
                             v744
-                    | US21_Ok(v665, v666, v667, v668, v669, v670) -> (* Ok *)
+                    | US18_Ok(v665, v666, v667, v668, v669, v670) -> (* Ok *)
                         v664
                 match v762 with
-                | US21_Error(v771, v772, v773, v774, v775, v776) -> (* Error *)
-                    let v777 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure45()
-                    US22_Error(v777, v162, v163, v164, v165, v166)
-                | US21_Ok(v763, v764, v765, v766, v767, v768) -> (* Ok *)
+                | US18_Error(v771, v772, v773, v774, v775, v776) -> (* Error *)
+                    let v777 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure39()
+                    US19_Error(v777, v162, v163, v164, v165, v166)
+                | US18_Ok(v763, v764, v765, v766, v767, v768) -> (* Ok *)
                     let v769 : string = ""
-                    US22_Ok(v769, v764, v765, v766, v767, v768)
-            | US22_Ok(v400, v401, v402, v403, v404, v405) -> (* Ok *)
+                    US19_Ok(v769, v764, v765, v766, v767, v768)
+            | US19_Ok(v400, v401, v402, v403, v404, v405) -> (* Ok *)
                 let v406 : bool = v401 >= v405
-                let v424 : US21 =
+                let v424 : US18 =
                     if v406 then
-                        let v407 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                        US21_Error(v407, v401, v402, v403, v404, v405)
+                        let v407 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                        US18_Error(v407, v401, v402, v403, v404, v405)
                     else
-                        let v409 : char = v0.[int v401]
+                        let v409 : char = (spiralStringIndex v0 (int v401))
                         let v410 : bool = v409 = '\\'
                         if v410 then
                             let v411 : int32 = v401 + 1
@@ -6266,21 +6769,21 @@ and split_args_126 (v0 : string) : US29 =
                                 else
                                     let v415 : int32 = v404 + 1
                                     struct (v402, v403, v415, v405)
-                            US21_Ok('\\', v411, v416, v417, v418, v419)
+                            US18_Ok('\\', v411, v416, v417, v418, v419)
                         else
-                            let v421 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                            US21_Error(v421, v401, v402, v403, v404, v405)
-                let v458 : US21 =
+                            let v421 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                            US18_Error(v421, v401, v402, v403, v404, v405)
+                let v458 : US18 =
                     match v424 with
-                    | US21_Error(v450, v451, v452, v453, v454, v455) -> (* Error *)
-                        US21_Error(v450, v451, v452, v453, v454, v455)
-                    | US21_Ok(v425, v426, v427, v428, v429, v430) -> (* Ok *)
+                    | US18_Error(v450, v451, v452, v453, v454, v455) -> (* Error *)
+                        US18_Error(v450, v451, v452, v453, v454, v455)
+                    | US18_Ok(v425, v426, v427, v428, v429, v430) -> (* Ok *)
                         let v431 : bool = v426 >= v430
                         if v431 then
-                            let v432 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                            US21_Error(v432, v426, v427, v428, v429, v430)
+                            let v432 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                            US18_Error(v432, v426, v427, v428, v429, v430)
                         else
-                            let v434 : char = v0.[int v426]
+                            let v434 : char = (spiralStringIndex v0 (int v426))
                             let v435 : bool = v434 = '"'
                             if v435 then
                                 let v436 : int32 = v426 + 1
@@ -6293,25 +6796,25 @@ and split_args_126 (v0 : string) : US29 =
                                     else
                                         let v440 : int32 = v429 + 1
                                         struct (v427, v428, v440, v430)
-                                US21_Ok('"', v436, v441, v442, v443, v444)
+                                US18_Ok('"', v436, v441, v442, v443, v444)
                             else
-                                let v446 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                US21_Error(v446, v426, v427, v428, v429, v430)
-                let v474 : US21 =
+                                let v446 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                US18_Error(v446, v426, v427, v428, v429, v430)
+                let v474 : US18 =
                     match v458 with
-                    | US21_Error(v466, v467, v468, v469, v470, v471) -> (* Error *)
-                        US21_Error(v466, v467, v468, v469, v470, v471)
-                    | US21_Ok(v459, v460, v461, v462, v463, v464) -> (* Ok *)
-                        US21_Ok('"', v460, v461, v462, v463, v464)
-                let v572 : US21 =
+                    | US18_Error(v466, v467, v468, v469, v470, v471) -> (* Error *)
+                        US18_Error(v466, v467, v468, v469, v470, v471)
+                    | US18_Ok(v459, v460, v461, v462, v463, v464) -> (* Ok *)
+                        US18_Ok('"', v460, v461, v462, v463, v464)
+                let v572 : US18 =
                     match v474 with
-                    | US21_Error(v481, v482, v483, v484, v485, v486) -> (* Error *)
-                        let v504 : US21 =
+                    | US18_Error(v481, v482, v483, v484, v485, v486) -> (* Error *)
+                        let v504 : US18 =
                             if v406 then
-                                let v487 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                                US21_Error(v487, v401, v402, v403, v404, v405)
+                                let v487 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                                US18_Error(v487, v401, v402, v403, v404, v405)
                             else
-                                let v489 : char = v0.[int v401]
+                                let v489 : char = (spiralStringIndex v0 (int v401))
                                 let v490 : bool = v489 = '`'
                                 if v490 then
                                     let v491 : int32 = v401 + 1
@@ -6324,21 +6827,21 @@ and split_args_126 (v0 : string) : US29 =
                                         else
                                             let v495 : int32 = v404 + 1
                                             struct (v402, v403, v495, v405)
-                                    US21_Ok('`', v491, v496, v497, v498, v499)
+                                    US18_Ok('`', v491, v496, v497, v498, v499)
                                 else
-                                    let v501 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                                    US21_Error(v501, v401, v402, v403, v404, v405)
-                        let v538 : US21 =
+                                    let v501 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                                    US18_Error(v501, v401, v402, v403, v404, v405)
+                        let v538 : US18 =
                             match v504 with
-                            | US21_Error(v530, v531, v532, v533, v534, v535) -> (* Error *)
-                                US21_Error(v530, v531, v532, v533, v534, v535)
-                            | US21_Ok(v505, v506, v507, v508, v509, v510) -> (* Ok *)
+                            | US18_Error(v530, v531, v532, v533, v534, v535) -> (* Error *)
+                                US18_Error(v530, v531, v532, v533, v534, v535)
+                            | US18_Ok(v505, v506, v507, v508, v509, v510) -> (* Ok *)
                                 let v511 : bool = v506 >= v510
                                 if v511 then
-                                    let v512 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                                    US21_Error(v512, v506, v507, v508, v509, v510)
+                                    let v512 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                                    US18_Error(v512, v506, v507, v508, v509, v510)
                                 else
-                                    let v514 : char = v0.[int v506]
+                                    let v514 : char = (spiralStringIndex v0 (int v506))
                                     let v515 : bool = v514 = '"'
                                     if v515 then
                                         let v516 : int32 = v506 + 1
@@ -6351,39 +6854,39 @@ and split_args_126 (v0 : string) : US29 =
                                             else
                                                 let v520 : int32 = v509 + 1
                                                 struct (v507, v508, v520, v510)
-                                        US21_Ok('"', v516, v521, v522, v523, v524)
+                                        US18_Ok('"', v516, v521, v522, v523, v524)
                                     else
-                                        let v526 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                        US21_Error(v526, v506, v507, v508, v509, v510)
-                        let v554 : US21 =
+                                        let v526 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                        US18_Error(v526, v506, v507, v508, v509, v510)
+                        let v554 : US18 =
                             match v538 with
-                            | US21_Error(v546, v547, v548, v549, v550, v551) -> (* Error *)
-                                US21_Error(v546, v547, v548, v549, v550, v551)
-                            | US21_Ok(v539, v540, v541, v542, v543, v544) -> (* Ok *)
-                                US21_Ok('"', v540, v541, v542, v543, v544)
+                            | US18_Error(v546, v547, v548, v549, v550, v551) -> (* Error *)
+                                US18_Error(v546, v547, v548, v549, v550, v551)
+                            | US18_Ok(v539, v540, v541, v542, v543, v544) -> (* Ok *)
+                                US18_Ok('"', v540, v541, v542, v543, v544)
                         match v554 with
-                        | US21_Error(v561, v562, v563, v564, v565, v566) -> (* Error *)
-                            let v567 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                            US21_Error(v567, v401, v402, v403, v404, v405)
-                        | US21_Ok(v555, v556, v557, v558, v559, v560) -> (* Ok *)
+                        | US18_Error(v561, v562, v563, v564, v565, v566) -> (* Error *)
+                            let v567 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                            US18_Error(v567, v401, v402, v403, v404, v405)
+                        | US18_Ok(v555, v556, v557, v558, v559, v560) -> (* Ok *)
                             v554
-                    | US21_Ok(v475, v476, v477, v478, v479, v480) -> (* Ok *)
+                    | US18_Ok(v475, v476, v477, v478, v479, v480) -> (* Ok *)
                         v474
                 match v572 with
-                | US21_Error(v580, v581, v582, v583, v584, v585) -> (* Error *)
-                    let v586 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure46(v162, v401, v580, v581, v582, v583, v584, v585)
-                    US22_Error(v586, v401, v402, v403, v404, v405)
-                | US21_Ok(v573, v574, v575, v576, v577, v578) -> (* Ok *)
-                    US22_Ok(v400, v574, v575, v576, v577, v578)
-    let v1144 : US22 =
+                | US18_Error(v580, v581, v582, v583, v584, v585) -> (* Error *)
+                    let v586 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure40(v162, v401, v580, v581, v582, v583, v584, v585)
+                    US19_Error(v586, v401, v402, v403, v404, v405)
+                | US18_Ok(v573, v574, v575, v576, v577, v578) -> (* Ok *)
+                    US19_Ok(v400, v574, v575, v576, v577, v578)
+    let v1144 : US19 =
         match v791 with
-        | US22_Error(v798, v799, v800, v801, v802, v803) -> (* Error *)
-            let v817 : US21 =
+        | US19_Error(v798, v799, v800, v801, v802, v803) -> (* Error *)
+            let v817 : US18 =
                 if v2 then
-                    let v804 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                    US21_Error(v804, 0, 0, 1, 1, v1)
+                    let v804 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                    US18_Error(v804, 0, 0, 1, 1, v1)
                 else
-                    let v806 : char = v0.[int 0]
+                    let v806 : char = (spiralStringIndex v0 (int 0))
                     let v807 : bool = v806 = '"'
                     if v807 then
                         let v808 : bool = '\n' = v806
@@ -6392,17 +6895,17 @@ and split_args_126 (v0 : string) : US29 =
                                 struct (1, 2, 1, v1)
                             else
                                 struct (0, 1, 2, v1)
-                        US21_Ok('"', 1, v809, v810, v811, v812)
+                        US18_Ok('"', 1, v809, v810, v811, v812)
                     else
-                        let v814 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                        US21_Error(v814, 0, 0, 1, 1, v1)
+                        let v814 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                        US18_Error(v814, 0, 0, 1, 1, v1)
             match v817 with
-            | US21_Error(v1134, v1135, v1136, v1137, v1138, v1139) -> (* Error *)
-                US22_Error(v1134, v1135, v1136, v1137, v1138, v1139)
-            | US21_Ok(v818, v819, v820, v821, v822, v823) -> (* Ok *)
-                let struct (v824 : int32, v825 : int32, v826 : int32, v827 : int32, v828 : int32) = method127(v820, v821, v822, v823, v0, v819)
+            | US18_Error(v1134, v1135, v1136, v1137, v1138, v1139) -> (* Error *)
+                US19_Error(v1134, v1135, v1136, v1137, v1138, v1139)
+            | US18_Ok(v818, v819, v820, v821, v822, v823) -> (* Ok *)
+                let struct (v824 : int32, v825 : int32, v826 : int32, v827 : int32, v828 : int32) = method88(v820, v821, v822, v823, v0, v819)
                 let v829 : bool = v824 > v819
-                let v839 : US22 =
+                let v839 : US19 =
                     if v829 then
                         let v830 : bool = v819 >= v824
                         let v835 : string =
@@ -6412,22 +6915,22 @@ and split_args_126 (v0 : string) : US29 =
                             else
                                 let v832 : bool = v819 = v824
                                 let v833 : int32 = v824 - 1
-                                let v834 : string = v0.[int v819..int v833]
+                                let v834 : string = (spiralStringSlice v0 (int v819) (int v833))
                                 v834
-                        US22_Ok(v835, v824, v825, v826, v827, v828)
+                        US19_Ok(v835, v824, v825, v826, v827, v828)
                     else
-                        let v837 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure60()
-                        US22_Error(v837, v819, v820, v821, v822, v823)
-                let v1024 : US22 =
+                        let v837 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure54()
+                        US19_Error(v837, v819, v820, v821, v822, v823)
+                let v1024 : US19 =
                     match v839 with
-                    | US22_Error(v846, v847, v848, v849, v850, v851) -> (* Error *)
+                    | US19_Error(v846, v847, v848, v849, v850, v851) -> (* Error *)
                         let v852 : bool = v819 >= v823
-                        let v870 : US21 =
+                        let v870 : US18 =
                             if v852 then
-                                let v853 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure56()
-                                US21_Error(v853, v819, v820, v821, v822, v823)
+                                let v853 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure50()
+                                US18_Error(v853, v819, v820, v821, v822, v823)
                             else
-                                let v855 : char = v0.[int v819]
+                                let v855 : char = (spiralStringIndex v0 (int v819))
                                 let v856 : bool = v855 = '\\'
                                 if v856 then
                                     let v857 : int32 = v819 + 1
@@ -6440,21 +6943,21 @@ and split_args_126 (v0 : string) : US29 =
                                         else
                                             let v861 : int32 = v822 + 1
                                             struct (v820, v821, v861, v823)
-                                    US21_Ok('\\', v857, v862, v863, v864, v865)
+                                    US18_Ok('\\', v857, v862, v863, v864, v865)
                                 else
-                                    let v867 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
-                                    US21_Error(v867, v819, v820, v821, v822, v823)
-                        let v900 : US21 =
+                                    let v867 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure51()
+                                    US18_Error(v867, v819, v820, v821, v822, v823)
+                        let v900 : US18 =
                             match v870 with
-                            | US21_Error(v892, v893, v894, v895, v896, v897) -> (* Error *)
-                                US21_Error(v892, v893, v894, v895, v896, v897)
-                            | US21_Ok(v871, v872, v873, v874, v875, v876) -> (* Ok *)
+                            | US18_Error(v892, v893, v894, v895, v896, v897) -> (* Error *)
+                                US18_Error(v892, v893, v894, v895, v896, v897)
+                            | US18_Ok(v871, v872, v873, v874, v875, v876) -> (* Ok *)
                                 let v877 : bool = v872 >= v876
                                 if v877 then
-                                    let v878 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure65()
-                                    US21_Error(v878, v872, v873, v874, v875, v876)
+                                    let v878 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
+                                    US18_Error(v878, v872, v873, v874, v875, v876)
                                 else
-                                    let v880 : char = v0.[int v872]
+                                    let v880 : char = (spiralStringIndex v0 (int v872))
                                     let v881 : int32 = v872 + 1
                                     let v882 : bool = '\n' = v880
                                     let struct (v886 : int32, v887 : int32, v888 : int32, v889 : int32) =
@@ -6465,12 +6968,12 @@ and split_args_126 (v0 : string) : US29 =
                                         else
                                             let v885 : int32 = v875 + 1
                                             struct (v873, v874, v885, v876)
-                                    US21_Ok(v880, v881, v886, v887, v888, v889)
-                        let v922 : US22 =
+                                    US18_Ok(v880, v881, v886, v887, v888, v889)
+                        let v922 : US19 =
                             match v900 with
-                            | US21_Error(v914, v915, v916, v917, v918, v919) -> (* Error *)
-                                US22_Error(v914, v915, v916, v917, v918, v919)
-                            | US21_Ok(v901, v902, v903, v904, v905, v906) -> (* Ok *)
+                            | US18_Error(v914, v915, v916, v917, v918, v919) -> (* Error *)
+                                US19_Error(v914, v915, v916, v917, v918, v919)
+                            | US18_Ok(v901, v902, v903, v904, v905, v906) -> (* Ok *)
                                 let v907 : bool = v819 >= v902
                                 let v912 : string =
                                     if v907 then
@@ -6479,17 +6982,17 @@ and split_args_126 (v0 : string) : US29 =
                                     else
                                         let v909 : bool = v819 = v902
                                         let v910 : int32 = v902 - 1
-                                        let v911 : string = v0.[int v819..int v910]
+                                        let v911 : string = (spiralStringSlice v0 (int v819) (int v910))
                                         v911
-                                US22_Ok(v912, v902, v903, v904, v905, v906)
+                                US19_Ok(v912, v902, v903, v904, v905, v906)
                         match v922 with
-                        | US22_Error(v929, v930, v931, v932, v933, v934) -> (* Error *)
-                            let v952 : US21 =
+                        | US19_Error(v929, v930, v931, v932, v933, v934) -> (* Error *)
+                            let v952 : US18 =
                                 if v852 then
-                                    let v935 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure58()
-                                    US21_Error(v935, v819, v820, v821, v822, v823)
+                                    let v935 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure52()
+                                    US18_Error(v935, v819, v820, v821, v822, v823)
                                 else
-                                    let v937 : char = v0.[int v819]
+                                    let v937 : char = (spiralStringIndex v0 (int v819))
                                     let v938 : bool = v937 = '`'
                                     if v938 then
                                         let v939 : int32 = v819 + 1
@@ -6502,21 +7005,21 @@ and split_args_126 (v0 : string) : US29 =
                                             else
                                                 let v943 : int32 = v822 + 1
                                                 struct (v820, v821, v943, v823)
-                                        US21_Ok('`', v939, v944, v945, v946, v947)
+                                        US18_Ok('`', v939, v944, v945, v946, v947)
                                     else
-                                        let v949 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
-                                        US21_Error(v949, v819, v820, v821, v822, v823)
-                            let v982 : US21 =
+                                        let v949 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure53()
+                                        US18_Error(v949, v819, v820, v821, v822, v823)
+                            let v982 : US18 =
                                 match v952 with
-                                | US21_Error(v974, v975, v976, v977, v978, v979) -> (* Error *)
-                                    US21_Error(v974, v975, v976, v977, v978, v979)
-                                | US21_Ok(v953, v954, v955, v956, v957, v958) -> (* Ok *)
+                                | US18_Error(v974, v975, v976, v977, v978, v979) -> (* Error *)
+                                    US18_Error(v974, v975, v976, v977, v978, v979)
+                                | US18_Ok(v953, v954, v955, v956, v957, v958) -> (* Ok *)
                                     let v959 : bool = v954 >= v958
                                     if v959 then
-                                        let v960 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure65()
-                                        US21_Error(v960, v954, v955, v956, v957, v958)
+                                        let v960 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure59()
+                                        US18_Error(v960, v954, v955, v956, v957, v958)
                                     else
-                                        let v962 : char = v0.[int v954]
+                                        let v962 : char = (spiralStringIndex v0 (int v954))
                                         let v963 : int32 = v954 + 1
                                         let v964 : bool = '\n' = v962
                                         let struct (v968 : int32, v969 : int32, v970 : int32, v971 : int32) =
@@ -6527,12 +7030,12 @@ and split_args_126 (v0 : string) : US29 =
                                             else
                                                 let v967 : int32 = v957 + 1
                                                 struct (v955, v956, v967, v958)
-                                        US21_Ok(v962, v963, v968, v969, v970, v971)
-                            let v1004 : US22 =
+                                        US18_Ok(v962, v963, v968, v969, v970, v971)
+                            let v1004 : US19 =
                                 match v982 with
-                                | US21_Error(v996, v997, v998, v999, v1000, v1001) -> (* Error *)
-                                    US22_Error(v996, v997, v998, v999, v1000, v1001)
-                                | US21_Ok(v983, v984, v985, v986, v987, v988) -> (* Ok *)
+                                | US18_Error(v996, v997, v998, v999, v1000, v1001) -> (* Error *)
+                                    US19_Error(v996, v997, v998, v999, v1000, v1001)
+                                | US18_Ok(v983, v984, v985, v986, v987, v988) -> (* Ok *)
                                     let v989 : bool = v819 >= v984
                                     let v994 : string =
                                         if v989 then
@@ -6541,41 +7044,41 @@ and split_args_126 (v0 : string) : US29 =
                                         else
                                             let v991 : bool = v819 = v984
                                             let v992 : int32 = v984 - 1
-                                            let v993 : string = v0.[int v819..int v992]
+                                            let v993 : string = (spiralStringSlice v0 (int v819) (int v992))
                                             v993
-                                    US22_Ok(v994, v984, v985, v986, v987, v988)
+                                    US19_Ok(v994, v984, v985, v986, v987, v988)
                             match v1004 with
-                            | US22_Error(v1011, v1012, v1013, v1014, v1015, v1016) -> (* Error *)
-                                let v1017 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure41()
-                                US22_Error(v1017, v819, v820, v821, v822, v823)
-                            | US22_Ok(v1005, v1006, v1007, v1008, v1009, v1010) -> (* Ok *)
+                            | US19_Error(v1011, v1012, v1013, v1014, v1015, v1016) -> (* Error *)
+                                let v1017 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure35()
+                                US19_Error(v1017, v819, v820, v821, v822, v823)
+                            | US19_Ok(v1005, v1006, v1007, v1008, v1009, v1010) -> (* Ok *)
                                 v1004
-                        | US22_Ok(v923, v924, v925, v926, v927, v928) -> (* Ok *)
+                        | US19_Ok(v923, v924, v925, v926, v927, v928) -> (* Ok *)
                             v922
-                    | US22_Ok(v840, v841, v842, v843, v844, v845) -> (* Ok *)
+                    | US19_Ok(v840, v841, v842, v843, v844, v845) -> (* Ok *)
                         v839
-                let v1046 : US22 =
+                let v1046 : US19 =
                     match v1024 with
-                    | US22_Error(v1025, v1026, v1027, v1028, v1029, v1030) -> (* Error *)
+                    | US19_Error(v1025, v1026, v1027, v1028, v1029, v1030) -> (* Error *)
                         let v1031 : string = ""
-                        US22_Ok(v1031, v819, v820, v821, v822, v823)
-                    | US22_Ok(v1033, v1034, v1035, v1036, v1037, v1038) -> (* Ok *)
+                        US19_Ok(v1031, v819, v820, v821, v822, v823)
+                    | US19_Ok(v1033, v1034, v1035, v1036, v1037, v1038) -> (* Ok *)
                         let v1039 : bool = v1034 = v819
                         if v1039 then
-                            let v1040 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure63()
-                            US22_Error(v1040, v819, v820, v821, v822, v823)
+                            let v1040 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure57()
+                            US19_Error(v1040, v819, v820, v821, v822, v823)
                         else
                             let v1042 : UH0 = UH0_Nil
-                            method135(v0, v1033, v1042, v1034, v1035, v1036, v1037, v1038)
+                            method93(v0, v1033, v1042, v1034, v1035, v1036, v1037, v1038)
                 match v1046 with
-                | US22_Error(v1089, v1090, v1091, v1092, v1093, v1094) -> (* Error *)
+                | US19_Error(v1089, v1090, v1091, v1092, v1093, v1094) -> (* Error *)
                     let v1095 : bool = v819 >= v823
-                    let v1113 : US21 =
+                    let v1113 : US18 =
                         if v1095 then
-                            let v1096 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                            US21_Error(v1096, v819, v820, v821, v822, v823)
+                            let v1096 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                            US18_Error(v1096, v819, v820, v821, v822, v823)
                         else
-                            let v1098 : char = v0.[int v819]
+                            let v1098 : char = (spiralStringIndex v0 (int v819))
                             let v1099 : bool = v1098 = '"'
                             if v1099 then
                                 let v1100 : int32 = v819 + 1
@@ -6588,25 +7091,25 @@ and split_args_126 (v0 : string) : US29 =
                                     else
                                         let v1104 : int32 = v822 + 1
                                         struct (v820, v821, v1104, v823)
-                                US21_Ok('"', v1100, v1105, v1106, v1107, v1108)
+                                US18_Ok('"', v1100, v1105, v1106, v1107, v1108)
                             else
-                                let v1110 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                US21_Error(v1110, v819, v820, v821, v822, v823)
+                                let v1110 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                US18_Error(v1110, v819, v820, v821, v822, v823)
                     match v1113 with
-                    | US21_Error(v1122, v1123, v1124, v1125, v1126, v1127) -> (* Error *)
-                        let v1128 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure45()
-                        US22_Error(v1128, v819, v820, v821, v822, v823)
-                    | US21_Ok(v1114, v1115, v1116, v1117, v1118, v1119) -> (* Ok *)
+                    | US18_Error(v1122, v1123, v1124, v1125, v1126, v1127) -> (* Error *)
+                        let v1128 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure39()
+                        US19_Error(v1128, v819, v820, v821, v822, v823)
+                    | US18_Ok(v1114, v1115, v1116, v1117, v1118, v1119) -> (* Ok *)
                         let v1120 : string = ""
-                        US22_Ok(v1120, v1115, v1116, v1117, v1118, v1119)
-                | US22_Ok(v1047, v1048, v1049, v1050, v1051, v1052) -> (* Ok *)
+                        US19_Ok(v1120, v1115, v1116, v1117, v1118, v1119)
+                | US19_Ok(v1047, v1048, v1049, v1050, v1051, v1052) -> (* Ok *)
                     let v1053 : bool = v1048 >= v1052
-                    let v1071 : US21 =
+                    let v1071 : US18 =
                         if v1053 then
-                            let v1054 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure36()
-                            US21_Error(v1054, v1048, v1049, v1050, v1051, v1052)
+                            let v1054 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure30()
+                            US18_Error(v1054, v1048, v1049, v1050, v1051, v1052)
                         else
-                            let v1056 : char = v0.[int v1048]
+                            let v1056 : char = (spiralStringIndex v0 (int v1048))
                             let v1057 : bool = v1056 = '"'
                             if v1057 then
                                 let v1058 : int32 = v1048 + 1
@@ -6619,26 +7122,26 @@ and split_args_126 (v0 : string) : US29 =
                                     else
                                         let v1062 : int32 = v1051 + 1
                                         struct (v1049, v1050, v1062, v1052)
-                                US21_Ok('"', v1058, v1063, v1064, v1065, v1066)
+                                US18_Ok('"', v1058, v1063, v1064, v1065, v1066)
                             else
-                                let v1068 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure37()
-                                US21_Error(v1068, v1048, v1049, v1050, v1051, v1052)
+                                let v1068 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure31()
+                                US18_Error(v1068, v1048, v1049, v1050, v1051, v1052)
                     match v1071 with
-                    | US21_Error(v1079, v1080, v1081, v1082, v1083, v1084) -> (* Error *)
-                        let v1085 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure46(v819, v1048, v1079, v1080, v1081, v1082, v1083, v1084)
-                        US22_Error(v1085, v1048, v1049, v1050, v1051, v1052)
-                    | US21_Ok(v1072, v1073, v1074, v1075, v1076, v1077) -> (* Ok *)
-                        US22_Ok(v1047, v1073, v1074, v1075, v1076, v1077)
-        | US22_Ok(v792, v793, v794, v795, v796, v797) -> (* Ok *)
+                    | US18_Error(v1079, v1080, v1081, v1082, v1083, v1084) -> (* Error *)
+                        let v1085 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure40(v819, v1048, v1079, v1080, v1081, v1082, v1083, v1084)
+                        US19_Error(v1085, v1048, v1049, v1050, v1051, v1052)
+                    | US18_Ok(v1072, v1073, v1074, v1075, v1076, v1077) -> (* Ok *)
+                        US19_Ok(v1047, v1073, v1074, v1075, v1076, v1077)
+        | US19_Ok(v792, v793, v794, v795, v796, v797) -> (* Ok *)
             v791
-    let v1178 : US22 =
+    let v1178 : US19 =
         match v1144 with
-        | US22_Error(v1151, v1152, v1153, v1154, v1155, v1156) -> (* Error *)
+        | US19_Error(v1151, v1152, v1153, v1154, v1155, v1156) -> (* Error *)
             let v1157 : int32 = 0
             let v1158 : int32 = 0
             let v1159 : int32 = 1
             let v1160 : int32 = 1
-            let struct (v1161 : int32, v1162 : int32, v1163 : int32, v1164 : int32, v1165 : int32) = method136(v1, v0, v1157, v1158, v1159, v1160)
+            let struct (v1161 : int32, v1162 : int32, v1163 : int32, v1164 : int32, v1165 : int32) = method94(v1, v0, v1157, v1158, v1159, v1160)
             let v1166 : bool = v1161 > 0
             if v1166 then
                 let v1167 : bool = 0 >= v1161
@@ -6649,65 +7152,65 @@ and split_args_126 (v0 : string) : US29 =
                     else
                         let v1169 : bool = 0 = v1161
                         let v1170 : int32 = v1161 - 1
-                        let v1171 : string = v0.[int 0..int v1170]
+                        let v1171 : string = (spiralStringSlice v0 (int 0) (int v1170))
                         v1171
-                US22_Ok(v1172, v1161, v1162, v1163, v1164, v1165)
+                US19_Ok(v1172, v1161, v1162, v1163, v1164, v1165)
             else
-                let v1174 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure60()
-                US22_Error(v1174, 0, 0, 1, 1, v1)
-        | US22_Ok(v1145, v1146, v1147, v1148, v1149, v1150) -> (* Ok *)
+                let v1174 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure54()
+                US19_Error(v1174, 0, 0, 1, 1, v1)
+        | US19_Ok(v1145, v1146, v1147, v1148, v1149, v1150) -> (* Ok *)
             v1144
-    let v1217 : US22 =
+    let v1217 : US19 =
         match v1178 with
-        | US22_Error(v1185, v1186, v1187, v1188, v1189, v1190) -> (* Error *)
+        | US19_Error(v1185, v1186, v1187, v1188, v1189, v1190) -> (* Error *)
             let v1191 : UH0 = UH0_Nil
             let v1192 : int32 = 0
             let v1193 : int32 = 0
             let v1194 : int32 = 1
             let v1195 : int32 = 1
-            let v1196 : US30 = method138(v0, v1191, v1192, v1193, v1194, v1195, v1)
+            let v1196 : US27 = method96(v0, v1191, v1192, v1193, v1194, v1195, v1)
             match v1196 with
-            | US30_Error(v1207, v1208, v1209, v1210, v1211, v1212) -> (* Error *)
-                US22_Error(v1207, v1208, v1209, v1210, v1211, v1212)
-            | US30_Ok(v1197, v1198, v1199, v1200, v1201, v1202) -> (* Ok *)
+            | US27_Error(v1207, v1208, v1209, v1210, v1211, v1212) -> (* Error *)
+                US19_Error(v1207, v1208, v1209, v1210, v1211, v1212)
+            | US27_Ok(v1197, v1198, v1199, v1200, v1201, v1202) -> (* Ok *)
                 let v1203 : string = ""
-                let struct (v1204 : string, v1205 : string) = method140(v1197, v1203)
-                US22_Ok(v1204, v1198, v1199, v1200, v1201, v1202)
-        | US22_Ok(v1179, v1180, v1181, v1182, v1183, v1184) -> (* Ok *)
+                let struct (v1204 : string, v1205 : string) = method98(v1197, v1203)
+                US19_Ok(v1204, v1198, v1199, v1200, v1201, v1202)
+        | US19_Ok(v1179, v1180, v1181, v1182, v1183, v1184) -> (* Ok *)
             v1178
-    let v1228 : US22 =
+    let v1228 : US19 =
         match v1217 with
-        | US22_Ok(v1218, v1219, v1220, v1221, v1222, v1223) -> (* Ok *)
+        | US19_Ok(v1218, v1219, v1220, v1221, v1222, v1223) -> (* Ok *)
             let v1224 : bool = v1219 = 0
             if v1224 then
-                let v1225 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure69()
-                US22_Error(v1225, 0, 0, 1, 1, v1)
+                let v1225 : (struct (string * int32 * int32 * int32 * int32 * int32) -> string) = closure63()
+                US19_Error(v1225, 0, 0, 1, 1, v1)
             else
                 v1217
         | _ ->
             v1217
-    let v1245 : US22 =
+    let v1245 : US19 =
         match v1228 with
-        | US22_Error(v1229, v1230, v1231, v1232, v1233, v1234) -> (* Error *)
-            US22_Error(v1229, v1230, v1231, v1232, v1233, v1234)
-        | US22_Ok(v1236, v1237, v1238, v1239, v1240, v1241) -> (* Ok *)
+        | US19_Error(v1229, v1230, v1231, v1232, v1233, v1234) -> (* Error *)
+            US19_Error(v1229, v1230, v1231, v1232, v1233, v1234)
+        | US19_Ok(v1236, v1237, v1238, v1239, v1240, v1241) -> (* Ok *)
             let v1242 : UH0 = UH0_Nil
-            method141(v0, v1236, v1242, v1237, v1238, v1239, v1240, v1241)
-    let v1264 : US30 =
+            method99(v0, v1236, v1242, v1237, v1238, v1239, v1240, v1241)
+    let v1264 : US27 =
         match v1245 with
-        | US22_Error(v1246, v1247, v1248, v1249, v1250, v1251) -> (* Error *)
+        | US19_Error(v1246, v1247, v1248, v1249, v1250, v1251) -> (* Error *)
             let v1252 : UH0 = UH0_Nil
-            US30_Ok(v1252, 0, 0, 1, 1, v1)
-        | US22_Ok(v1254, v1255, v1256, v1257, v1258, v1259) -> (* Ok *)
+            US27_Ok(v1252, 0, 0, 1, 1, v1)
+        | US19_Ok(v1254, v1255, v1256, v1257, v1258, v1259) -> (* Ok *)
             let v1260 : UH0 = UH0_Nil
             let v1261 : UH0 = UH0_Cons(v1254, v1260)
-            method144(v0, v1261, v1255, v1256, v1257, v1258, v1259)
-    let v1287 : US31 =
+            method102(v0, v1261, v1255, v1256, v1257, v1258, v1259)
+    let v1287 : US28 =
         match v1264 with
-        | US30_Error(v1278, v1279, v1280, v1281, v1282, v1283) -> (* Error *)
-            let v1284 : (unit -> string) = closure55(v0, v1278, v1279, v1280, v1281, v1282, v1283)
-            US31_Error(v1284)
-        | US30_Ok(v1265, v1266, v1267, v1268, v1269, v1270) -> (* Ok *)
+        | US27_Error(v1278, v1279, v1280, v1281, v1282, v1283) -> (* Error *)
+            let v1284 : (unit -> string) = closure49(v0, v1278, v1279, v1280, v1281, v1282, v1283)
+            US28_Error(v1284)
+        | US27_Ok(v1265, v1266, v1267, v1268, v1269, v1270) -> (* Ok *)
             let v1271 : bool = v1266 >= v1270
             let v1276 : string =
                 if v1271 then
@@ -6716,170 +7219,70 @@ and split_args_126 (v0 : string) : US29 =
                 else
                     let v1273 : bool = v1266 = v1270
                     let v1274 : int32 = v1270 - 1
-                    let v1275 : string = v0.[int v1266..int v1274]
+                    let v1275 : string = (spiralStringSlice v0 (int v1266) (int v1274))
                     v1275
-            US31_Ok(v1265, v1276, v1267, v1268, v1269, v1270)
-    let v1302 : US32 =
+            US28_Ok(v1265, v1276, v1267, v1268, v1269, v1270)
+    let v1302 : US29 =
         match v1287 with
-        | US31_Error(v1299) -> (* Error *)
-            US32_Error(v1299)
-        | US31_Ok(v1288, v1289, v1290, v1291, v1292, v1293) -> (* Ok *)
+        | US28_Error(v1299) -> (* Error *)
+            US29_Error(v1299)
+        | US28_Ok(v1288, v1289, v1290, v1291, v1292, v1293) -> (* Ok *)
             let v1294 : string list = []
-            let v1295 : string list = method145(v1288, v1294)
+            let v1295 : string list = method103(v1288, v1294)
             let v1296 : (string list -> (string [])) = List.toArray
             let v1297 : (string []) = v1296 v1295
-            US32_Ok(v1297)
+            US29_Ok(v1297)
     match v1302 with
-    | US32_Error(v1305) -> (* Error *)
+    | US29_Error(v1305) -> (* Error *)
         let v1306 : string = v1305 ()
-        US29_Error(v1306)
-    | US32_Ok(v1303) -> (* Ok *)
-        US29_Ok(v1303)
-and closure72 () (v0 : (string)) : std_string_String =
+        US26_Error(v1306)
+    | US29_Ok(v1303) -> (* Ok *)
+        US26_Ok(v1303)
+and closure66 () (v0 : (string)) : std_string_String =
     let v1 : string = (v0)
     let v2 : Ref<Str> = v1 |> unbox<Ref<Str>>
     let v3 : std_string_String = v2 |> unbox<std_string_String>
     v3
-and method148 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "file_name"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method149 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "arguments"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method150 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "options"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method151 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "command"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method152 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "cancellation_token"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method153 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "environment_variables"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method154 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "on_line"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method155 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "stdin"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method156 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "trace"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method157 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "working_directory"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method158 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "stderr"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_147 (v0 : string, v1 : string, v2 : string, v3 : System.Threading.CancellationToken option, v4 : (struct (string * string) []), v5 : (struct (int32 * string * bool) -> Async<unit>) option, v6 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option, v7 : bool, v8 : string option, v9 : bool) : string =
-    let v10 : string = method13()
-    let v11 : Mut3 = {l0 = v10} : Mut3
-    method18(v11)
-    method148(v11)
-    method20(v11)
-    method14(v11, v0)
-    method64(v11)
-    method149(v11)
-    method20(v11)
-    method14(v11, v1)
-    method64(v11)
-    method150(v11)
-    method20(v11)
-    method18(v11)
-    method151(v11)
-    method20(v11)
-    method14(v11, v2)
-    method64(v11)
-    method152(v11)
-    method20(v11)
-    let v12 : string = $"%A{v3}"
-    method14(v11, v12)
-    method64(v11)
-    method153(v11)
-    method20(v11)
-    let v13 : string = $"%A{v4}"
-    method14(v11, v13)
-    method64(v11)
-    method154(v11)
-    method20(v11)
-    let v14 : string = $"%A{v5}"
-    method14(v11, v14)
-    method64(v11)
-    method155(v11)
-    method20(v11)
-    let v15 : string = $"%A{v6}"
-    method14(v11, v15)
-    method64(v11)
-    method156(v11)
-    method20(v11)
-    let v18 : string =
-        if v7 then
-            let v16 : string = "true"
-            v16
-        else
-            let v17 : string = "false"
-            v17
-    method14(v11, v18)
-    method64(v11)
-    method157(v11)
-    method20(v11)
-    let v19 : string = $"%A{v8}"
-    method14(v11, v19)
-    method64(v11)
-    method158(v11)
-    method20(v11)
-    let v22 : string =
-        if v9 then
-            let v20 : string = "true"
-            v20
-        else
-            let v21 : string = "false"
-            v21
-    method14(v11, v22)
-    method21(v11)
-    method21(v11)
-    let v23 : string = v11.l0
-    v23
-and method146 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : string, v9 : string, v10 : string, v11 : System.Threading.CancellationToken option, v12 : (struct (string * string) []), v13 : (struct (int32 * string * bool) -> Async<unit>) option, v14 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option, v15 : bool, v16 : string option, v17 : bool) : string =
+and method105 (v0 : (struct (string * string) [])) : string =
+    let v1 : uint64 = System.Convert.ToUInt64 v0.Length
+    let v2 : uint64 = 0UL
+    let v3 : Mut6 = {l0 = v2} : Mut6
+    let v4 : string = ""
+    let v5 : Mut3 = {l0 = v4} : Mut3
+    while method16(v1, v3) do
+        let v7 : uint64 = v3.l0
+        let struct (v8 : string, v9 : string) = v0.[int v7]
+        let v10 : string = ", "
+        let v11 : string = v8 + v10 
+        let v12 : string = v11 + v9 
+        let v13 : string = "("
+        let v14 : string = v13 + v12 
+        let v15 : string = ")"
+        let v16 : string = v14 + v15 
+        let v17 : bool = v7 = 0UL
+        let v21 : string =
+            if v17 then
+                v16
+            else
+                let v18 : string = v5.l0
+                let v19 : string = v18 + v10 
+                let v20 : string = v19 + v16 
+                v20
+        v5.l0 <- v21
+        let v22 : uint64 = v7 + 1UL
+        v3.l0 <- v22
+        ()
+    let v23 : string = v5.l0
+    let v24 : string = "["
+    let v25 : string = v24 + v23 
+    let v26 : string = "]"
+    let v27 : string = v25 + v26 
+    v27
+and method104 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : string, v9 : string, v10 : string, v11 : System.Threading.CancellationToken option, v12 : (struct (string * string) []), v13 : (struct (int32 * string * bool) -> Async<unit>) option, v14 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option, v15 : bool, v16 : string option, v17 : bool) : string =
     let v18 : int64 = v0.l0
     let v19 : string = " "
     let v20 : string = v6 + v19 
-    let v21 : string = format_real_16(v18)
+    let v21 : string = format_real_14(v18)
     let v22 : string = v20 + v21 
     let v23 : string = v22 + v7 
     let v24 : string = v23 + v19 
@@ -6887,96 +7290,92 @@ and method146 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64
     let v26 : string = v24 + v25 
     let v27 : string = " / "
     let v28 : string = v26 + v27 
-    let v29 : string = format_real_147(v8, v9, v10, v11, v12, v13, v14, v15, v16, v17)
-    let v30 : string = v28 + v29 
-    method22(v30)
-and ok_c73 () (v0 : std_sync_Arc<std_sync_Mutex<std_process_Child option>>) : US33 =
-    US33_Ok(v0)
-and method159 () : (std_sync_Arc<std_sync_Mutex<std_process_Child option>> -> US33) =
-    ok_c73()
-and error_c74 () (v0 : std_string_String) : US33 =
-    US33_Error(v0)
-and method160 () : (std_string_String -> US33) =
-    error_c74()
-and format_real_162 (v0 : std_string_String, v1 : string, v2 : string, v3 : string, v4 : System.Threading.CancellationToken option, v5 : (struct (string * string) []), v6 : (struct (int32 * string * bool) -> Async<unit>) option, v7 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option, v8 : bool, v9 : string option, v10 : bool) : string =
-    let v11 : string = method13()
-    let v12 : Mut3 = {l0 = v11} : Mut3
-    method18(v12)
-    method65(v12)
-    method20(v12)
-    let v13 : string = $"%A{v0}"
-    method14(v12, v13)
-    method64(v12)
-    method148(v12)
-    method20(v12)
-    method14(v12, v1)
-    method64(v12)
-    method149(v12)
-    method20(v12)
-    method14(v12, v2)
-    method64(v12)
-    method150(v12)
-    method20(v12)
-    method18(v12)
-    method151(v12)
-    method20(v12)
-    method14(v12, v3)
-    method64(v12)
-    method152(v12)
-    method20(v12)
-    let v14 : string = $"%A{v4}"
-    method14(v12, v14)
-    method64(v12)
-    method153(v12)
-    method20(v12)
-    let v15 : string = $"%A{v5}"
-    method14(v12, v15)
-    method64(v12)
-    method154(v12)
-    method20(v12)
-    let v16 : string = $"%A{v6}"
-    method14(v12, v16)
-    method64(v12)
-    method155(v12)
-    method20(v12)
-    let v17 : string = $"%A{v7}"
-    method14(v12, v17)
-    method64(v12)
-    method156(v12)
-    method20(v12)
-    let v20 : string =
-        if v8 then
-            let v18 : string = "true"
-            v18
-        else
-            let v19 : string = "false"
-            v19
-    method14(v12, v20)
-    method64(v12)
-    method157(v12)
-    method20(v12)
-    let v21 : string = $"%A{v9}"
-    method14(v12, v21)
-    method64(v12)
-    method158(v12)
-    method20(v12)
-    let v24 : string =
-        if v10 then
-            let v22 : string = "true"
-            v22
-        else
-            let v23 : string = "false"
-            v23
-    method14(v12, v24)
-    method21(v12)
-    method21(v12)
-    let v25 : string = v12.l0
-    v25
-and method161 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : std_string_String, v9 : string, v10 : string, v11 : string, v12 : System.Threading.CancellationToken option, v13 : (struct (string * string) []), v14 : (struct (int32 * string * bool) -> Async<unit>) option, v15 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option, v16 : bool, v17 : string option, v18 : bool) : string =
+    let v29 : string = ""
+    let v30 : string = v29 + v29 
+    let v31 : string = "file_name"
+    let v32 : string = v30 + v31 
+    let v33 : string = " = "
+    let v34 : string = v32 + v33 
+    let v35 : string = v34 + v8 
+    let v36 : string = "; "
+    let v37 : string = v35 + v36 
+    let v38 : string = "arguments"
+    let v39 : string = v37 + v38 
+    let v40 : string = v39 + v33 
+    let v41 : string = v40 + v9 
+    let v42 : string = v41 + v36 
+    let v43 : string = "options"
+    let v44 : string = v42 + v43 
+    let v45 : string = v44 + v33 
+    let v46 : string = v29 + v29 
+    let v47 : string = "command"
+    let v48 : string = v46 + v47 
+    let v49 : string = v48 + v33 
+    let v50 : string = v49 + v10 
+    let v51 : string = v50 + v36 
+    let v52 : string = "cancellation_token"
+    let v53 : string = v51 + v52 
+    let v54 : string = v53 + v33 
+    let v55 : string = $"%A{v11}"
+    let v56 : string = v54 + v55 
+    let v57 : string = v56 + v36 
+    let v58 : string = "environment_variables"
+    let v59 : string = v57 + v58 
+    let v60 : string = v59 + v33 
+    let v61 : string = method105(v12)
+    let v62 : string = v60 + v61 
+    let v63 : string = v62 + v36 
+    let v64 : string = "on_line"
+    let v65 : string = v63 + v64 
+    let v66 : string = v65 + v33 
+    let v67 : string = $"%A{v13}"
+    let v68 : string = v66 + v67 
+    let v69 : string = v68 + v36 
+    let v70 : string = "stdin"
+    let v71 : string = v69 + v70 
+    let v72 : string = v71 + v33 
+    let v73 : string = $"%A{v14}"
+    let v74 : string = v72 + v73 
+    let v75 : string = v74 + v36 
+    let v76 : string = "trace"
+    let v77 : string = v75 + v76 
+    let v78 : string = v77 + v33 
+    let v79 : string = format_real_60(v15)
+    let v80 : string = v78 + v79 
+    let v81 : string = v80 + v36 
+    let v82 : string = "working_directory"
+    let v83 : string = v81 + v82 
+    let v84 : string = v83 + v33 
+    let v85 : string = $"%A{v16}"
+    let v86 : string = v84 + v85 
+    let v87 : string = v86 + v36 
+    let v88 : string = "stderr"
+    let v89 : string = v87 + v88 
+    let v90 : string = v89 + v33 
+    let v91 : string = format_real_60(v17)
+    let v92 : string = v90 + v91 
+    let v93 : string = "{ "
+    let v94 : string = v93 + v92 
+    let v95 : string = " }"
+    let v96 : string = v94 + v95 
+    let v97 : string = v45 + v96 
+    let v98 : string = v93 + v97 
+    let v99 : string = v98 + v95 
+    let v100 : string = v28 + v99 
+    method17(v100)
+and ok_c67 () (v0 : std_sync_Arc<std_sync_Mutex<std_process_Child option>>) : US30 =
+    US30_Ok(v0)
+and method106 () : (std_sync_Arc<std_sync_Mutex<std_process_Child option>> -> US30) =
+    ok_c67()
+and error_c68 () (v0 : std_string_String) : US30 =
+    US30_Error(v0)
+and method107 () : (std_string_String -> US30) =
+    error_c68()
+and method108 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : std_string_String, v9 : string, v10 : string, v11 : string, v12 : System.Threading.CancellationToken option, v13 : (struct (string * string) []), v14 : (struct (int32 * string * bool) -> Async<unit>) option, v15 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option, v16 : bool, v17 : string option, v18 : bool) : string =
     let v19 : int64 = v0.l0
     let v20 : string = " "
     let v21 : string = v6 + v20 
-    let v22 : string = format_real_16(v19)
+    let v22 : string = format_real_14(v19)
     let v23 : string = v21 + v22 
     let v24 : string = v23 + v7 
     let v25 : string = v24 + v20 
@@ -6984,50 +7383,98 @@ and method161 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64
     let v27 : string = v25 + v26 
     let v28 : string = " / "
     let v29 : string = v27 + v28 
-    let v30 : string = format_real_162(v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18)
-    let v31 : string = v29 + v30 
-    method22(v31)
-and ok_c75 () (v0 : std_string_String) : US35 =
-    US35_Ok(v0)
-and method163 () : (std_string_String -> US35) =
-    ok_c75()
-and error_c76 () (v0 : std_string_String) : US35 =
-    US35_Error(v0)
-and method164 () : (std_string_String -> US35) =
-    error_c76()
-and method167 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "trace'"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_166 (v0 : bool, v1 : std_string_String) : string =
-    let v2 : string = method13()
-    let v3 : Mut3 = {l0 = v2} : Mut3
-    method18(v3)
-    method167(v3)
-    method20(v3)
-    let v6 : string =
-        if v0 then
-            let v4 : string = "true"
-            v4
-        else
-            let v5 : string = "false"
-            v5
-    method14(v3, v6)
-    method64(v3)
-    method119(v3)
-    method20(v3)
-    let v7 : string = $"%A{v1}"
-    method14(v3, v7)
-    method21(v3)
-    let v8 : string = v3.l0
-    v8
-and method165 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : bool, v9 : std_string_String) : string =
+    let v30 : string = ""
+    let v31 : string = v30 + v30 
+    let v32 : string = "error"
+    let v33 : string = v31 + v32 
+    let v34 : string = " = "
+    let v35 : string = v33 + v34 
+    let v36 : string = $"%A{v8}"
+    let v37 : string = v35 + v36 
+    let v38 : string = "; "
+    let v39 : string = v37 + v38 
+    let v40 : string = "file_name"
+    let v41 : string = v39 + v40 
+    let v42 : string = v41 + v34 
+    let v43 : string = v42 + v9 
+    let v44 : string = v43 + v38 
+    let v45 : string = "arguments"
+    let v46 : string = v44 + v45 
+    let v47 : string = v46 + v34 
+    let v48 : string = v47 + v10 
+    let v49 : string = v48 + v38 
+    let v50 : string = "options"
+    let v51 : string = v49 + v50 
+    let v52 : string = v51 + v34 
+    let v53 : string = v30 + v30 
+    let v54 : string = "command"
+    let v55 : string = v53 + v54 
+    let v56 : string = v55 + v34 
+    let v57 : string = v56 + v11 
+    let v58 : string = v57 + v38 
+    let v59 : string = "cancellation_token"
+    let v60 : string = v58 + v59 
+    let v61 : string = v60 + v34 
+    let v62 : string = $"%A{v12}"
+    let v63 : string = v61 + v62 
+    let v64 : string = v63 + v38 
+    let v65 : string = "environment_variables"
+    let v66 : string = v64 + v65 
+    let v67 : string = v66 + v34 
+    let v68 : string = method105(v13)
+    let v69 : string = v67 + v68 
+    let v70 : string = v69 + v38 
+    let v71 : string = "on_line"
+    let v72 : string = v70 + v71 
+    let v73 : string = v72 + v34 
+    let v74 : string = $"%A{v14}"
+    let v75 : string = v73 + v74 
+    let v76 : string = v75 + v38 
+    let v77 : string = "stdin"
+    let v78 : string = v76 + v77 
+    let v79 : string = v78 + v34 
+    let v80 : string = $"%A{v15}"
+    let v81 : string = v79 + v80 
+    let v82 : string = v81 + v38 
+    let v83 : string = "trace"
+    let v84 : string = v82 + v83 
+    let v85 : string = v84 + v34 
+    let v86 : string = format_real_60(v16)
+    let v87 : string = v85 + v86 
+    let v88 : string = v87 + v38 
+    let v89 : string = "working_directory"
+    let v90 : string = v88 + v89 
+    let v91 : string = v90 + v34 
+    let v92 : string = $"%A{v17}"
+    let v93 : string = v91 + v92 
+    let v94 : string = v93 + v38 
+    let v95 : string = "stderr"
+    let v96 : string = v94 + v95 
+    let v97 : string = v96 + v34 
+    let v98 : string = format_real_60(v18)
+    let v99 : string = v97 + v98 
+    let v100 : string = "{ "
+    let v101 : string = v100 + v99 
+    let v102 : string = " }"
+    let v103 : string = v101 + v102 
+    let v104 : string = v52 + v103 
+    let v105 : string = v100 + v104 
+    let v106 : string = v105 + v102 
+    let v107 : string = v29 + v106 
+    method17(v107)
+and ok_c69 () (v0 : std_string_String) : US32 =
+    US32_Ok(v0)
+and method109 () : (std_string_String -> US32) =
+    ok_c69()
+and error_c70 () (v0 : std_string_String) : US32 =
+    US32_Error(v0)
+and method110 () : (std_string_String -> US32) =
+    error_c70()
+and method111 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : bool, v9 : std_string_String) : string =
     let v10 : int64 = v0.l0
     let v11 : string = " "
     let v12 : string = v6 + v11 
-    let v13 : string = format_real_16(v10)
+    let v13 : string = format_real_14(v10)
     let v14 : string = v12 + v13 
     let v15 : string = v14 + v7 
     let v16 : string = v15 + v11 
@@ -7035,10 +7482,28 @@ and method165 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64
     let v18 : string = v16 + v17 
     let v19 : string = " / "
     let v20 : string = v18 + v19 
-    let v21 : string = format_real_166(v8, v9)
-    let v22 : string = v20 + v21 
-    method22(v22)
-and method168 () : string =
+    let v21 : string = ""
+    let v22 : string = v21 + v21 
+    let v23 : string = "trace'"
+    let v24 : string = v22 + v23 
+    let v25 : string = " = "
+    let v26 : string = v24 + v25 
+    let v27 : string = format_real_60(v8)
+    let v28 : string = v26 + v27 
+    let v29 : string = "; "
+    let v30 : string = v28 + v29 
+    let v31 : string = "e"
+    let v32 : string = v30 + v31 
+    let v33 : string = v32 + v25 
+    let v34 : string = $"%A{v9}"
+    let v35 : string = v33 + v34 
+    let v36 : string = "{ "
+    let v37 : string = v36 + v35 
+    let v38 : string = " }"
+    let v39 : string = v37 + v38 
+    let v40 : string = v20 + v39 
+    method17(v40)
+and method112 () : string =
     let v0 : string = "\u001b[90m"
     
     
@@ -7048,56 +7513,56 @@ and method168 () : string =
     let v1 : string = "Verbose"
     let v2 : (unit -> string) = v1.ToLower
     let v3 : string = v2 ()
-    let v4 : char = v3.[int 0]
-    let v5 : string = format_real_12(v4)
+    let v4 : char = (spiralStringIndex v3 (int 0))
+    let v5 : string = format_real_10(v4)
     let v6 : string = v0 + v5 
     let v7 : string = "\u001b[0m"
     let v8 : string = v6 + v7 
     v8
-and format_real_170 () : string =
-    let v0 : string = method13()
+and format_real_114 () : string =
+    let v0 : string = method11()
     let v1 : Mut3 = {l0 = v0} : Mut3
     let v2 : string = v1.l0
     v2
-and method169 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : string) : string =
+and method113 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : string) : string =
     let v9 : int64 = v0.l0
     let v10 : string = " "
     let v11 : string = v6 + v10 
-    let v12 : string = format_real_16(v9)
+    let v12 : string = format_real_14(v9)
     let v13 : string = v11 + v12 
     let v14 : string = v13 + v7 
     let v15 : string = v14 + v10 
     let v16 : string = v15 + v8 
     let v17 : string = " / "
     let v18 : string = v16 + v17 
-    let v19 : string = format_real_170()
+    let v19 : string = format_real_114()
     let v20 : string = v18 + v19 
-    method22(v20)
-and method171 (v0 : Result<unit, string>) : Result<unit, string> =
+    method17(v20)
+and method115 (v0 : Result<unit, string>) : Result<unit, string> =
     v0
-and closure77 () (v0 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit)) : US36 =
-    US36_Some(v0)
-and method172 () : ((std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) -> US36) =
-    closure77()
-and closure78 () (v0 : std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>>) : US37 =
-    US37_Some(v0)
-and method173 () : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> US37) =
-    closure78()
-and method174 (v0 : std_sync_MutexGuard<std_process_ChildStdin>) : std_sync_MutexGuard<std_process_ChildStdin> =
+and closure71 () (v0 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit)) : US33 =
+    US33_Some(v0)
+and method116 () : ((std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) -> US33) =
+    closure71()
+and closure72 () (v0 : std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>>) : US34 =
+    US34_Some(v0)
+and method117 () : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> US34) =
+    closure72()
+and method118 (v0 : std_sync_MutexGuard<std_process_ChildStdin>) : std_sync_MutexGuard<std_process_ChildStdin> =
     v0
-and ok_c79 () (v0 : std_process_Output) : US38 =
-    US38_Ok(v0)
-and method175 () : (std_process_Output -> US38) =
-    ok_c79()
-and error_c80 () (v0 : std_string_String) : US38 =
-    US38_Error(v0)
-and method176 () : (std_string_String -> US38) =
-    error_c80()
-and method177 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : std_string_String, v9 : string, v10 : string, v11 : string, v12 : System.Threading.CancellationToken option, v13 : (struct (string * string) []), v14 : (struct (int32 * string * bool) -> Async<unit>) option, v15 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option, v16 : bool, v17 : string option, v18 : bool) : string =
+and ok_c73 () (v0 : std_process_Output) : US35 =
+    US35_Ok(v0)
+and method119 () : (std_process_Output -> US35) =
+    ok_c73()
+and error_c74 () (v0 : std_string_String) : US35 =
+    US35_Error(v0)
+and method120 () : (std_string_String -> US35) =
+    error_c74()
+and method121 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : std_string_String, v9 : string, v10 : string, v11 : string, v12 : System.Threading.CancellationToken option, v13 : (struct (string * string) []), v14 : (struct (int32 * string * bool) -> Async<unit>) option, v15 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option, v16 : bool, v17 : string option, v18 : bool) : string =
     let v19 : int64 = v0.l0
     let v20 : string = " "
     let v21 : string = v6 + v20 
-    let v22 : string = format_real_16(v19)
+    let v22 : string = format_real_14(v19)
     let v23 : string = v21 + v22 
     let v24 : string = v23 + v7 
     let v25 : string = v24 + v20 
@@ -7105,22 +7570,98 @@ and method177 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64
     let v27 : string = v25 + v26 
     let v28 : string = " / "
     let v29 : string = v27 + v28 
-    let v30 : string = format_real_162(v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18)
-    let v31 : string = v29 + v30 
-    method22(v31)
-and closure81 () (v0 : int32) : US39 =
-    US39_Some(v0)
-and method178 () : (int32 -> US39) =
-    closure81()
-and method179 (v0 : Vec<uint8>) : Vec<uint8> =
+    let v30 : string = ""
+    let v31 : string = v30 + v30 
+    let v32 : string = "error"
+    let v33 : string = v31 + v32 
+    let v34 : string = " = "
+    let v35 : string = v33 + v34 
+    let v36 : string = $"%A{v8}"
+    let v37 : string = v35 + v36 
+    let v38 : string = "; "
+    let v39 : string = v37 + v38 
+    let v40 : string = "file_name"
+    let v41 : string = v39 + v40 
+    let v42 : string = v41 + v34 
+    let v43 : string = v42 + v9 
+    let v44 : string = v43 + v38 
+    let v45 : string = "arguments"
+    let v46 : string = v44 + v45 
+    let v47 : string = v46 + v34 
+    let v48 : string = v47 + v10 
+    let v49 : string = v48 + v38 
+    let v50 : string = "options"
+    let v51 : string = v49 + v50 
+    let v52 : string = v51 + v34 
+    let v53 : string = v30 + v30 
+    let v54 : string = "command"
+    let v55 : string = v53 + v54 
+    let v56 : string = v55 + v34 
+    let v57 : string = v56 + v11 
+    let v58 : string = v57 + v38 
+    let v59 : string = "cancellation_token"
+    let v60 : string = v58 + v59 
+    let v61 : string = v60 + v34 
+    let v62 : string = $"%A{v12}"
+    let v63 : string = v61 + v62 
+    let v64 : string = v63 + v38 
+    let v65 : string = "environment_variables"
+    let v66 : string = v64 + v65 
+    let v67 : string = v66 + v34 
+    let v68 : string = method105(v13)
+    let v69 : string = v67 + v68 
+    let v70 : string = v69 + v38 
+    let v71 : string = "on_line"
+    let v72 : string = v70 + v71 
+    let v73 : string = v72 + v34 
+    let v74 : string = $"%A{v14}"
+    let v75 : string = v73 + v74 
+    let v76 : string = v75 + v38 
+    let v77 : string = "stdin"
+    let v78 : string = v76 + v77 
+    let v79 : string = v78 + v34 
+    let v80 : string = $"%A{v15}"
+    let v81 : string = v79 + v80 
+    let v82 : string = v81 + v38 
+    let v83 : string = "trace"
+    let v84 : string = v82 + v83 
+    let v85 : string = v84 + v34 
+    let v86 : string = format_real_60(v16)
+    let v87 : string = v85 + v86 
+    let v88 : string = v87 + v38 
+    let v89 : string = "working_directory"
+    let v90 : string = v88 + v89 
+    let v91 : string = v90 + v34 
+    let v92 : string = $"%A{v17}"
+    let v93 : string = v91 + v92 
+    let v94 : string = v93 + v38 
+    let v95 : string = "stderr"
+    let v96 : string = v94 + v95 
+    let v97 : string = v96 + v34 
+    let v98 : string = format_real_60(v18)
+    let v99 : string = v97 + v98 
+    let v100 : string = "{ "
+    let v101 : string = v100 + v99 
+    let v102 : string = " }"
+    let v103 : string = v101 + v102 
+    let v104 : string = v52 + v103 
+    let v105 : string = v100 + v104 
+    let v106 : string = v105 + v102 
+    let v107 : string = v29 + v106 
+    method17(v107)
+and closure75 () (v0 : int32) : US36 =
+    US36_Some(v0)
+and method122 () : (int32 -> US36) =
+    closure75()
+and method123 (v0 : Vec<uint8>) : Vec<uint8> =
     v0
-and method180 (v0 : string, v1 : int32) : int32 =
+and method124 (v0 : string, v1 : int32) : int32 =
     let v2 : bool = v1 <= 0
     if v2 then
         -1
     else
         let v3 : int32 = v1 - 1
-        let v4 : char = v0.[int v3]
+        let v4 : char = (spiralStringIndex v0 (int v3))
         let v5 : bool = v4 = ' '
         let v11 : bool =
             if v5 then
@@ -7137,14 +7678,14 @@ and method180 (v0 : string, v1 : int32) : int32 =
                         let v8 : bool = v4 = '\n'
                         v8
         if v11 then
-            method180(v0, v3)
+            method124(v0, v3)
         else
             v3
-and method181 (v0 : UH0, v1 : string) : struct (string * string) =
+and method125 (v0 : UH0, v1 : string) : struct (string * string) =
     let struct (v11 : string, v12 : string) =
         match v0 with
         | UH0_Cons(v2, v3) -> (* Cons *)
-            let struct (v4 : string, v5 : string) = method181(v3, v1)
+            let struct (v4 : string, v5 : string) = method125(v3, v1)
             let v6 : string = v2 + v5 
             let v7 : string = v6 + v4 
             let v8 : string = "\n"
@@ -7156,51 +7697,19 @@ and method181 (v0 : UH0, v1 : string) : struct (string * string) =
                     struct (v1, v1)
             struct (v9, v10)
     struct (v11, v12)
-and closure82 () (v0 : (std_string_String)) : string =
+and closure76 () (v0 : (std_string_String)) : string =
     let v1 : std_string_String = (v0)
     let v2 : string = "Fsharp"
     let v3 : string = () // backend.backend_switch / record_type_try_find / key: v2 
     v3
-and method182 () : string =
+and method126 () : string =
     let v0 : string = "\n"
     v0
-and method185 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "exit_code"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method186 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "std_trace_len"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_184 (v0 : string, v1 : int32, v2 : int32) : string =
-    let v3 : string = method13()
-    let v4 : Mut3 = {l0 = v3} : Mut3
-    method18(v4)
-    method148(v4)
-    method20(v4)
-    method14(v4, v0)
-    method64(v4)
-    method185(v4)
-    method20(v4)
-    let v5 : string = $"{v1}"
-    method14(v4, v5)
-    method64(v4)
-    method186(v4)
-    method20(v4)
-    let v6 : string = $"{v2}"
-    method14(v4, v6)
-    method21(v4)
-    let v7 : string = v4.l0
-    v7
-and method183 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : string, v9 : int32, v10 : int32) : string =
+and method127 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : string, v9 : int32, v10 : int32) : string =
     let v11 : int64 = v0.l0
     let v12 : string = " "
     let v13 : string = v6 + v12 
-    let v14 : string = format_real_16(v11)
+    let v14 : string = format_real_14(v11)
     let v15 : string = v13 + v14 
     let v16 : string = v15 + v7 
     let v17 : string = v16 + v12 
@@ -7208,18 +7717,41 @@ and method183 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64
     let v19 : string = v17 + v18 
     let v20 : string = " / "
     let v21 : string = v19 + v20 
-    let v22 : string = format_real_184(v8, v9, v10)
-    let v23 : string = v21 + v22 
-    method22(v23)
-and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToken option, v2 : (struct (string * string) []), v3 : (struct (int32 * string * bool) -> Async<unit>) option, v4 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option, v5 : bool, v6 : string option, v7 : bool) : struct (int32 * string) =
-    let v8 : string = method95(v0, v1, v2, v3, v4, v5, v6, v7)
-    let v9 : US20 = split_command_96(v8)
+    let v22 : string = ""
+    let v23 : string = v22 + v22 
+    let v24 : string = "file_name"
+    let v25 : string = v23 + v24 
+    let v26 : string = " = "
+    let v27 : string = v25 + v26 
+    let v28 : string = v27 + v8 
+    let v29 : string = "; "
+    let v30 : string = v28 + v29 
+    let v31 : string = "exit_code"
+    let v32 : string = v30 + v31 
+    let v33 : string = v32 + v26 
+    let v34 : string = format_real_79(v9)
+    let v35 : string = v33 + v34 
+    let v36 : string = v35 + v29 
+    let v37 : string = "std_trace_len"
+    let v38 : string = v36 + v37 
+    let v39 : string = v38 + v26 
+    let v40 : string = format_real_79(v10)
+    let v41 : string = v39 + v40 
+    let v42 : string = "{ "
+    let v43 : string = v42 + v41 
+    let v44 : string = " }"
+    let v45 : string = v43 + v44 
+    let v46 : string = v21 + v45 
+    method17(v46)
+and execute_with_options_76 (v0 : string, v1 : System.Threading.CancellationToken option, v2 : (struct (string * string) []), v3 : (struct (int32 * string * bool) -> Async<unit>) option, v4 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option, v5 : bool, v6 : string option, v7 : bool) : struct (int32 * string) =
+    let v8 : string = method77(v0, v1, v2, v3, v4, v5, v6, v7)
+    let v9 : US17 = split_command_78(v8)
     let struct (v18 : string, v19 : US3) =
         match v9 with
-        | US20_Error(v12) -> (* Error *)
+        | US17_Error(v12) -> (* Error *)
             let v13 : string = $"resultm.get / Error x: {v12}"
             failwith<struct (string * US3)> v13
-        | US20_Ok(v10, v11) -> (* Ok *)
+        | US17_Ok(v10, v11) -> (* Ok *)
             struct (v10, v11)
     let v23 : string =
         match v19 with
@@ -7228,18 +7760,18 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
             v21
         | US3_Some(v20) -> (* Some *)
             v20
-    let v24 : US29 = split_args_126(v23)
+    let v24 : US26 = split_args_87(v23)
     let v30 : (string []) =
         match v24 with
-        | US29_Error(v26) -> (* Error *)
+        | US26_Error(v26) -> (* Error *)
             let v27 : string = $"resultm.get / Error x: {v26}"
             failwith<(string [])> v27
-        | US29_Ok(v25) -> (* Ok *)
+        | US26_Ok(v25) -> (* Ok *)
             v25
     let v31 : string = "Fsharp"
     let v32 : Vec<string> = () // backend.backend_switch / record_type_try_find / key: v31 
     let v33 : string = "$0.iter().map(|x| $1(x.clone())).collect::<Vec<_>>()"
-    let v34 : ((string) -> std_string_String) = closure72()
+    let v34 : ((string) -> std_string_String) = closure66()
     let v35 : Vec<std_string_String> = __spiral_emit_rust struct (v32, v34) v33 
     let v36 : bool = TraceState.trace_state.IsNone
     if v36 then
@@ -7271,9 +7803,9 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
             let v59 : bool = 20 >= v56
             v59
     let v61 : bool = v60 = false
-    let v102 : US7 =
+    let v102 : US4 =
         if v61 then
-            US7_None
+            US4_None
         else
             let v63 : bool = TraceState.trace_state.IsNone
             if v63 then
@@ -7283,10 +7815,10 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                 TraceState.trace_state <- v71 
                 ()
             let struct (v72 : Mut0, v73 : Mut1, v74 : Mut2, v75 : Mut3, v76 : Mut4, v77 : int64 option) = TraceState.trace_state.Value
-            let v78 : string = method8(v72, v73, v74, v75, v76, v77)
-            let v79 : string = method67()
+            let v78 : string = method6(v72, v73, v74, v75, v76, v77)
+            let v79 : string = method57()
             let v80 : string = $"%A{v35}"
-            let v81 : string = method146(v72, v73, v74, v75, v76, v77, v78, v79, v18, v80, v0, v1, v2, v3, v4, v5, v6, v7)
+            let v81 : string = method104(v72, v73, v74, v75, v76, v77, v78, v79, v18, v80, v0, v1, v2, v3, v4, v5, v6, v7)
             let v82 : bool = TraceState.trace_state.IsNone
             if v82 then
                 let v83 : US0 = US0_Verbose
@@ -7298,12 +7830,12 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
             let v97 : int64 = v91.l0
             let v98 : int64 = v97 + 1L
             v91.l0 <- v98
-            let v99 : (string -> unit) = closure12()
+            let v99 : (string -> unit) = closure5()
             v99 v81
             let v100 : (string -> unit) = v92.l0
             v100 v81
-            US7_Some(v91, v92, v93, v94, v95, v96)
-    let v103 : bool = true
+            US4_Some(v91, v92, v93, v94, v95, v96)
+    let mutable v103 : bool = true
     let mutable _capture_v103 : (int32 * string) option = None 
     (
     (fun () ->
@@ -7414,12 +7946,12 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
     let v201 : bool = __spiral_emit_rust v199 v200 
     let v202 : string = "_result_map_"
     let v203 : Result<std_sync_Arc<std_sync_Mutex<std_process_Child option>>, std_string_String> = __spiral_emit_rust () v202 
-    let v204 : (std_sync_Arc<std_sync_Mutex<std_process_Child option>> -> US33) = method159()
-    let v205 : (std_string_String -> US33) = method160()
-    let v206 : US33 = match v203 with Ok x -> v204 x | Error x -> v205 x
-    let struct (v1056 : int32, v1057 : US8, v1058 : US34) =
+    let v204 : (std_sync_Arc<std_sync_Mutex<std_process_Child option>> -> US30) = method106()
+    let v205 : (std_string_String -> US30) = method107()
+    let v206 : US30 = match v203 with Ok x -> v204 x | Error x -> v205 x
+    let struct (v1056 : int32, v1057 : US5, v1058 : US31) =
         match v206 with
-        | US33_Error(v983) -> (* Error *)
+        | US30_Error(v983) -> (* Error *)
             let v984 : bool = TraceState.trace_state.IsNone
             if v984 then
                 let v985 : US0 = US0_Verbose
@@ -7450,9 +7982,9 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                     let v1007 : bool = 50 >= v1004
                     v1007
             let v1009 : bool = v1008 = false
-            let v1050 : US7 =
+            let v1050 : US4 =
                 if v1009 then
-                    US7_None
+                    US4_None
                 else
                     let v1011 : bool = TraceState.trace_state.IsNone
                     if v1011 then
@@ -7462,10 +7994,10 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                         TraceState.trace_state <- v1019 
                         ()
                     let struct (v1020 : Mut0, v1021 : Mut1, v1022 : Mut2, v1023 : Mut3, v1024 : Mut4, v1025 : int64 option) = TraceState.trace_state.Value
-                    let v1026 : string = method8(v1020, v1021, v1022, v1023, v1024, v1025)
-                    let v1027 : string = method85()
+                    let v1026 : string = method6(v1020, v1021, v1022, v1023, v1024, v1025)
+                    let v1027 : string = method70()
                     let v1028 : string = $"%A{v35}"
-                    let v1029 : string = method161(v1020, v1021, v1022, v1023, v1024, v1025, v1026, v1027, v983, v18, v1028, v0, v1, v2, v3, v4, v5, v6, v7)
+                    let v1029 : string = method108(v1020, v1021, v1022, v1023, v1024, v1025, v1026, v1027, v983, v18, v1028, v0, v1, v2, v3, v4, v5, v6, v7)
                     let v1030 : bool = TraceState.trace_state.IsNone
                     if v1030 then
                         let v1031 : US0 = US0_Verbose
@@ -7477,15 +8009,15 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                     let v1045 : int64 = v1039.l0
                     let v1046 : int64 = v1045 + 1L
                     v1039.l0 <- v1046
-                    let v1047 : (string -> unit) = closure12()
+                    let v1047 : (string -> unit) = closure5()
                     v1047 v1029
                     let v1048 : (string -> unit) = v1040.l0
                     v1048 v1029
-                    US7_Some(v1039, v1040, v1041, v1042, v1043, v1044)
-            let v1051 : US8 = US8_Some(v983)
-            let v1052 : US34 = US34_None
+                    US4_Some(v1039, v1040, v1041, v1042, v1043, v1044)
+            let v1051 : US5 = US5_Some(v983)
+            let v1052 : US31 = US31_None
             struct (-1, v1051, v1052)
-        | US33_Ok(v207) -> (* Ok *)
+        | US30_Ok(v207) -> (* Ok *)
             let v208 : string = "true; let _capture = (|| { //"
             let v209 : bool = __spiral_emit_rust () v208 
             let v210 : string = "$0"
@@ -7620,12 +8152,12 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
             let v340 : bool = __spiral_emit_rust v338 v339 
             let v341 : string = "_result_map_error__"
             let v342 : Result<std_string_String, std_string_String> = __spiral_emit_rust () v341 
-            let v343 : (std_string_String -> US35) = method163()
-            let v344 : (std_string_String -> US35) = method164()
-            let v345 : US35 = match v342 with Ok x -> v343 x | Error x -> v344 x
+            let v343 : (std_string_String -> US32) = method109()
+            let v344 : (std_string_String -> US32) = method110()
+            let v345 : US32 = match v342 with Ok x -> v343 x | Error x -> v344 x
             let v502 : std_string_String =
                 match v345 with
-                | US35_Error(v431) -> (* Error *)
+                | US32_Error(v431) -> (* Error *)
                     let v432 : bool = TraceState.trace_state.IsNone
                     if v432 then
                         let v433 : US0 = US0_Verbose
@@ -7656,9 +8188,9 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                             let v455 : bool = 50 >= v452
                             v455
                     let v457 : bool = v456 = false
-                    let v497 : US7 =
+                    let v497 : US4 =
                         if v457 then
-                            US7_None
+                            US4_None
                         else
                             let v459 : bool = TraceState.trace_state.IsNone
                             if v459 then
@@ -7668,9 +8200,9 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                                 TraceState.trace_state <- v467 
                                 ()
                             let struct (v468 : Mut0, v469 : Mut1, v470 : Mut2, v471 : Mut3, v472 : Mut4, v473 : int64 option) = TraceState.trace_state.Value
-                            let v474 : string = method8(v468, v469, v470, v471, v472, v473)
-                            let v475 : string = method85()
-                            let v476 : string = method165(v468, v469, v470, v471, v472, v473, v474, v475, v5, v431)
+                            let v474 : string = method6(v468, v469, v470, v471, v472, v473)
+                            let v475 : string = method70()
+                            let v476 : string = method111(v468, v469, v470, v471, v472, v473, v474, v475, v5, v431)
                             let v477 : bool = TraceState.trace_state.IsNone
                             if v477 then
                                 let v478 : US0 = US0_Verbose
@@ -7682,16 +8214,16 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                             let v492 : int64 = v486.l0
                             let v493 : int64 = v492 + 1L
                             v486.l0 <- v493
-                            let v494 : (string -> unit) = closure12()
+                            let v494 : (string -> unit) = closure5()
                             v494 v476
                             let v495 : (string -> unit) = v487.l0
                             v495 v476
-                            US7_Some(v486, v487, v488, v489, v490, v491)
+                            US4_Some(v486, v487, v488, v489, v490, v491)
                     let v498 : string = $"\u001b[4;7m{v431}\u001b[0m"
                     let v499 : Ref<Str> = v498 |> unbox<Ref<Str>>
                     let v500 : std_string_String = v499 |> unbox<std_string_String>
                     v500
-                | US35_Ok(v346) -> (* Ok *)
+                | US32_Ok(v346) -> (* Ok *)
                     let v347 : string = () // backend.backend_switch / record_type_try_find / key: v31 
                     let v348 : string = "encoding_rs::UTF_8"
                     let v349 : Ref<encoding_rs_Encoding> = __spiral_emit_rust () v348 
@@ -7737,9 +8269,9 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                                 let v384 : bool = 10 >= v381
                                 v384
                         let v386 : bool = v385 = false
-                        let v429 : US7 =
+                        let v429 : US4 =
                             if v386 then
-                                US7_None
+                                US4_None
                             else
                                 let v388 : bool = TraceState.trace_state.IsNone
                                 if v388 then
@@ -7749,15 +8281,15 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                                     TraceState.trace_state <- v396 
                                     ()
                                 let struct (v397 : Mut0, v398 : Mut1, v399 : Mut2, v400 : Mut3, v401 : Mut4, v402 : int64 option) = TraceState.trace_state.Value
-                                let v403 : string = method8(v397, v398, v399, v400, v401, v402)
-                                let v404 : string = method168()
+                                let v403 : string = method6(v397, v398, v399, v400, v401, v402)
+                                let v404 : string = method112()
                                 let v405 : bool = v360 = ""
                                 let v408 : string =
                                     if v405 then
                                         let v406 : string = ""
                                         v406
                                     else
-                                        method169(v397, v398, v399, v400, v401, v402, v403, v404, v360)
+                                        method113(v397, v398, v399, v400, v401, v402, v403, v404, v360)
                                 let v409 : bool = TraceState.trace_state.IsNone
                                 if v409 then
                                     let v410 : US0 = US0_Verbose
@@ -7769,11 +8301,11 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                                 let v424 : int64 = v418.l0
                                 let v425 : int64 = v424 + 1L
                                 v418.l0 <- v425
-                                let v426 : (string -> unit) = closure12()
+                                let v426 : (string -> unit) = closure5()
                                 v426 v408
                                 let v427 : (string -> unit) = v419.l0
                                 v427 v408
-                                US7_Some(v418, v419, v420, v421, v422, v423)
+                                US4_Some(v418, v419, v420, v421, v422, v423)
                         ()
                     else
                         let v430 : (string -> unit) = System.Console.WriteLine
@@ -7804,7 +8336,7 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
             let v525 : bool = __spiral_emit_rust v523 v524 
             let v526 : string = "_iter_try_for_each.map_err(|x| x.into())"
             let v527 : Result<unit, string> = __spiral_emit_rust () v526 
-            let v528 : Result<unit, string> = method171(v527)
+            let v528 : Result<unit, string> = method115(v527)
             () // backend.backend_switch / record_type_try_find / key: v31 
             let v529 : string = "__spawn"
             let v530 : std_thread_JoinHandle<Result<unit, string>> = __spiral_emit_rust () v529 
@@ -7837,12 +8369,12 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                     let v553 : bool = __spiral_emit_rust v551 v552 
                     let v554 : string = "_result_map_error__"
                     let v555 : Result<std_string_String, std_string_String> = __spiral_emit_rust () v554 
-                    let v556 : (std_string_String -> US35) = method163()
-                    let v557 : (std_string_String -> US35) = method164()
-                    let v558 : US35 = match v555 with Ok x -> v556 x | Error x -> v557 x
+                    let v556 : (std_string_String -> US32) = method109()
+                    let v557 : (std_string_String -> US32) = method110()
+                    let v558 : US32 = match v555 with Ok x -> v556 x | Error x -> v557 x
                     let v718 : std_string_String =
                         match v558 with
-                        | US35_Error(v647) -> (* Error *)
+                        | US32_Error(v647) -> (* Error *)
                             let v648 : bool = TraceState.trace_state.IsNone
                             if v648 then
                                 let v649 : US0 = US0_Verbose
@@ -7873,9 +8405,9 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                                     let v671 : bool = 50 >= v668
                                     v671
                             let v673 : bool = v672 = false
-                            let v713 : US7 =
+                            let v713 : US4 =
                                 if v673 then
-                                    US7_None
+                                    US4_None
                                 else
                                     let v675 : bool = TraceState.trace_state.IsNone
                                     if v675 then
@@ -7885,9 +8417,9 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                                         TraceState.trace_state <- v683 
                                         ()
                                     let struct (v684 : Mut0, v685 : Mut1, v686 : Mut2, v687 : Mut3, v688 : Mut4, v689 : int64 option) = TraceState.trace_state.Value
-                                    let v690 : string = method8(v684, v685, v686, v687, v688, v689)
-                                    let v691 : string = method85()
-                                    let v692 : string = method165(v684, v685, v686, v687, v688, v689, v690, v691, v5, v647)
+                                    let v690 : string = method6(v684, v685, v686, v687, v688, v689)
+                                    let v691 : string = method70()
+                                    let v692 : string = method111(v684, v685, v686, v687, v688, v689, v690, v691, v5, v647)
                                     let v693 : bool = TraceState.trace_state.IsNone
                                     if v693 then
                                         let v694 : US0 = US0_Verbose
@@ -7899,16 +8431,16 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                                     let v708 : int64 = v702.l0
                                     let v709 : int64 = v708 + 1L
                                     v702.l0 <- v709
-                                    let v710 : (string -> unit) = closure12()
+                                    let v710 : (string -> unit) = closure5()
                                     v710 v692
                                     let v711 : (string -> unit) = v703.l0
                                     v711 v692
-                                    US7_Some(v702, v703, v704, v705, v706, v707)
+                                    US4_Some(v702, v703, v704, v705, v706, v707)
                             let v714 : string = $"\u001b[4;7m{v647}\u001b[0m"
                             let v715 : Ref<Str> = v714 |> unbox<Ref<Str>>
                             let v716 : std_string_String = v715 |> unbox<std_string_String>
                             v716
-                        | US35_Ok(v559) -> (* Ok *)
+                        | US32_Ok(v559) -> (* Ok *)
                             let v560 : string = () // backend.backend_switch / record_type_try_find / key: v31 
                             let v561 : string = "encoding_rs::UTF_8"
                             let v562 : Ref<encoding_rs_Encoding> = __spiral_emit_rust () v561 
@@ -7954,9 +8486,9 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                                         let v597 : bool = 10 >= v594
                                         v597
                                 let v599 : bool = v598 = false
-                                let v642 : US7 =
+                                let v642 : US4 =
                                     if v599 then
-                                        US7_None
+                                        US4_None
                                     else
                                         let v601 : bool = TraceState.trace_state.IsNone
                                         if v601 then
@@ -7966,15 +8498,15 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                                             TraceState.trace_state <- v609 
                                             ()
                                         let struct (v610 : Mut0, v611 : Mut1, v612 : Mut2, v613 : Mut3, v614 : Mut4, v615 : int64 option) = TraceState.trace_state.Value
-                                        let v616 : string = method8(v610, v611, v612, v613, v614, v615)
-                                        let v617 : string = method168()
+                                        let v616 : string = method6(v610, v611, v612, v613, v614, v615)
+                                        let v617 : string = method112()
                                         let v618 : bool = v573 = ""
                                         let v621 : string =
                                             if v618 then
                                                 let v619 : string = ""
                                                 v619
                                             else
-                                                method169(v610, v611, v612, v613, v614, v615, v616, v617, v573)
+                                                method113(v610, v611, v612, v613, v614, v615, v616, v617, v573)
                                         let v622 : bool = TraceState.trace_state.IsNone
                                         if v622 then
                                             let v623 : US0 = US0_Verbose
@@ -7986,11 +8518,11 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                                         let v637 : int64 = v631.l0
                                         let v638 : int64 = v637 + 1L
                                         v631.l0 <- v638
-                                        let v639 : (string -> unit) = closure12()
+                                        let v639 : (string -> unit) = closure5()
                                         v639 v621
                                         let v640 : (string -> unit) = v632.l0
                                         v640 v621
-                                        US7_Some(v631, v632, v633, v634, v635, v636)
+                                        US4_Some(v631, v632, v633, v634, v635, v636)
                                 ()
                             else
                                 let v643 : (string -> unit) = System.Console.WriteLine
@@ -8025,18 +8557,18 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
             let v742 : bool = __spiral_emit_rust v740 v741 
             let v743 : string = "_iter_try_for_each.map_err(|x| x.into())"
             let v744 : Result<unit, string> = __spiral_emit_rust () v743 
-            let v745 : Result<unit, string> = method171(v744)
+            let v745 : Result<unit, string> = method115(v744)
             () // backend.backend_switch / record_type_try_find / key: v31 
             let v746 : string = "__spawn"
             let v747 : std_thread_JoinHandle<Result<unit, string>> = __spiral_emit_rust () v746 
-            let v748 : ((std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) -> US36) = method172()
-            let v749 : US36 option = v4 |> Option.map v748 
-            let v750 : US36 = US36_None
-            let v751 : US36 = v749 |> Option.defaultValue v750 
+            let v748 : ((std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) -> US33) = method116()
+            let v749 : US33 option = v4 |> Option.map v748 
+            let v750 : US33 = US33_None
+            let v751 : US33 = v749 |> Option.defaultValue v750 
             match v751 with
-            | US36_None -> (* None *)
+            | US33_None -> (* None *)
                 ()
-            | US36_Some(v752) -> (* Some *)
+            | US33_Some(v752) -> (* Some *)
                 let v753 : string = "$0"
                 let v754 : std_sync_Arc<std_sync_Mutex<std_process_ChildStdin option>> = __spiral_emit_rust v298 v753 
                 let v755 : string = "v754.lock()"
@@ -8063,20 +8595,20 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                 let v776 : bool = __spiral_emit_rust v774 v775 
                 let v777 : string = "_optionm_map_"
                 let v778 : std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> option = __spiral_emit_rust () v777 
-                let v779 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> US37) = method173()
-                let v780 : US37 option = v778 |> Option.map v779 
-                let v781 : US37 = US37_None
-                let v782 : US37 = v780 |> Option.defaultValue v781 
+                let v779 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> US34) = method117()
+                let v780 : US34 option = v778 |> Option.map v779 
+                let v781 : US34 = US34_None
+                let v782 : US34 = v780 |> Option.defaultValue v781 
                 match v782 with
-                | US37_None -> (* None *)
+                | US34_None -> (* None *)
                     ()
-                | US37_Some(v783) -> (* Some *)
+                | US34_Some(v783) -> (* Some *)
                     v752 v783
                     let v784 : string = "$0.lock()"
                     let v785 : Result<std_sync_MutexGuard<std_process_ChildStdin>, std_sync_PoisonError<std_sync_MutexGuard<std_process_ChildStdin>>> = __spiral_emit_rust v783 v784 
                     let v786 : string = "$0.unwrap()"
                     let v787 : std_sync_MutexGuard<std_process_ChildStdin> = __spiral_emit_rust v785 v786 
-                    let v788 : std_sync_MutexGuard<std_process_ChildStdin> = method174(v787)
+                    let v788 : std_sync_MutexGuard<std_process_ChildStdin> = method118(v787)
                     let v789 : string = "true; let mut v788 = v788"
                     let v790 : bool = __spiral_emit_rust () v789 
                     let v791 : string = "true; std::io::Write::flush(&mut *$0).unwrap()"
@@ -8122,11 +8654,11 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
             let v829 : bool = __spiral_emit_rust () v828 
             let v830 : string = "true; }}); //"
             let v831 : bool = __spiral_emit_rust () v830 
-            let v832 : (std_process_Output -> US38) = method175()
-            let v833 : (std_string_String -> US38) = method176()
-            let v834 : US38 = match v817 with Ok x -> v832 x | Error x -> v833 x
+            let v832 : (std_process_Output -> US35) = method119()
+            let v833 : (std_string_String -> US35) = method120()
+            let v834 : US35 = match v817 with Ok x -> v832 x | Error x -> v833 x
             match v834 with
-            | US38_Error(v907) -> (* Error *)
+            | US35_Error(v907) -> (* Error *)
                 let v908 : bool = TraceState.trace_state.IsNone
                 if v908 then
                     let v909 : US0 = US0_Verbose
@@ -8157,9 +8689,9 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                         let v931 : bool = 50 >= v928
                         v931
                 let v933 : bool = v932 = false
-                let v974 : US7 =
+                let v974 : US4 =
                     if v933 then
-                        US7_None
+                        US4_None
                     else
                         let v935 : bool = TraceState.trace_state.IsNone
                         if v935 then
@@ -8169,10 +8701,10 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                             TraceState.trace_state <- v943 
                             ()
                         let struct (v944 : Mut0, v945 : Mut1, v946 : Mut2, v947 : Mut3, v948 : Mut4, v949 : int64 option) = TraceState.trace_state.Value
-                        let v950 : string = method8(v944, v945, v946, v947, v948, v949)
-                        let v951 : string = method85()
+                        let v950 : string = method6(v944, v945, v946, v947, v948, v949)
+                        let v951 : string = method70()
                         let v952 : string = $"%A{v35}"
-                        let v953 : string = method177(v944, v945, v946, v947, v948, v949, v950, v951, v907, v18, v952, v0, v1, v2, v3, v4, v5, v6, v7)
+                        let v953 : string = method121(v944, v945, v946, v947, v948, v949, v950, v951, v907, v18, v952, v0, v1, v2, v3, v4, v5, v6, v7)
                         let v954 : bool = TraceState.trace_state.IsNone
                         if v954 then
                             let v955 : US0 = US0_Verbose
@@ -8184,65 +8716,65 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                         let v969 : int64 = v963.l0
                         let v970 : int64 = v969 + 1L
                         v963.l0 <- v970
-                        let v971 : (string -> unit) = closure12()
+                        let v971 : (string -> unit) = closure5()
                         v971 v953
                         let v972 : (string -> unit) = v964.l0
                         v972 v953
-                        US7_Some(v963, v964, v965, v966, v967, v968)
-                let v975 : US8 = US8_Some(v907)
-                let v976 : US34 = US34_None
+                        US4_Some(v963, v964, v965, v966, v967, v968)
+                let v975 : US5 = US5_Some(v907)
+                let v976 : US31 = US31_None
                 struct (-2, v975, v976)
-            | US38_Ok(v835) -> (* Ok *)
+            | US35_Ok(v835) -> (* Ok *)
                 let v836 : string = "$0.status"
                 let v837 : std_process_ExitStatus = __spiral_emit_rust v835 v836 
                 let v838 : string = "$0.code()"
                 let v839 : int32 option = __spiral_emit_rust v837 v838 
-                let v840 : (int32 -> US39) = method178()
-                let v841 : US39 option = v839 |> Option.map v840 
-                let v842 : US39 = US39_None
-                let v843 : US39 = v841 |> Option.defaultValue v842 
+                let v840 : (int32 -> US36) = method122()
+                let v841 : US36 option = v839 |> Option.map v840 
+                let v842 : US36 = US36_None
+                let v843 : US36 = v841 |> Option.defaultValue v842 
                 match v843 with
-                | US39_None -> (* None *)
+                | US36_None -> (* None *)
                     let v896 : string = "runtime.execute_with_options / exit_code=None"
                     let v897 : Ref<Str> = v896 |> unbox<Ref<Str>>
                     let v898 : std_string_String = v897 |> unbox<std_string_String>
-                    let v899 : US8 = US8_Some(v898)
-                    let v900 : US34 = US34_Some(v319)
+                    let v899 : US5 = US5_Some(v898)
+                    let v900 : US31 = US31_Some(v319)
                     struct (-1, v899, v900)
-                | US39_Some(v844) -> (* Some *)
+                | US36_Some(v844) -> (* Some *)
                     let v845 : string = "$0.stdout"
                     let v846 : Vec<uint8> = __spiral_emit_rust v835 v845 
-                    let v847 : Vec<uint8> = method179(v846)
+                    let v847 : Vec<uint8> = method123(v846)
                     let v848 : string = "std::string::String::from_utf8($0)"
                     let v849 : Result<std_string_String, std_string_FromUtf8Error> = __spiral_emit_rust v847 v848 
                     let v850 : string = "$0.unwrap()"
                     let v851 : std_string_String = __spiral_emit_rust v849 v850 
                     let v852 : string = "$0.stderr"
                     let v853 : Vec<uint8> = __spiral_emit_rust v835 v852 
-                    let v854 : Vec<uint8> = method179(v853)
+                    let v854 : Vec<uint8> = method123(v853)
                     let v855 : string = "std::string::String::from_utf8($0)"
                     let v856 : Result<std_string_String, std_string_FromUtf8Error> = __spiral_emit_rust v854 v855 
                     let v857 : string = "$0.unwrap()"
                     let v858 : std_string_String = __spiral_emit_rust v856 v857 
                     let v859 : string = () // backend.backend_switch / record_type_try_find / key: v31 
-                    let v860 : int32 = v859.Length
+                    let v860 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v859))
                     let v861 : int32 = 0
-                    let v862 : int32 = method23(v859, v860, v861)
+                    let v862 : int32 = method18(v859, v860, v861)
                     let v863 : int32 = v860 - 1
-                    let v864 : string = v859.[int v862..int v863]
-                    let v865 : int32 = v864.Length
-                    let v866 : int32 = method180(v864, v865)
-                    let v867 : string = v864.[int 0..int v866]
+                    let v864 : string = (spiralStringSlice v859 (int v862) (int v863))
+                    let v865 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v864))
+                    let v866 : int32 = method124(v864, v865)
+                    let v867 : string = (spiralStringSlice v864 (int 0) (int v866))
                     let v868 : string = () // backend.backend_switch / record_type_try_find / key: v31 
-                    let v869 : int32 = v868.Length
+                    let v869 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v868))
                     let v870 : int32 = 0
-                    let v871 : int32 = method23(v868, v869, v870)
+                    let v871 : int32 = method18(v868, v869, v870)
                     let v872 : int32 = v869 - 1
-                    let v873 : string = v868.[int v871..int v872]
-                    let v874 : int32 = v873.Length
-                    let v875 : int32 = method180(v873, v874)
-                    let v876 : string = v873.[int 0..int v875]
-                    let v877 : int32 = v867.Length
+                    let v873 : string = (spiralStringSlice v868 (int v871) (int v872))
+                    let v874 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v873))
+                    let v875 : int32 = method124(v873, v874)
+                    let v876 : string = (spiralStringSlice v873 (int 0) (int v875))
+                    let v877 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v867))
                     let v878 : bool = v877 = 0
                     let v879 : bool = v878 = false
                     let v883 : UH0 =
@@ -8251,7 +8783,7 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                             UH0_Cons(v867, v880)
                         else
                             UH0_Nil
-                    let v884 : int32 = v876.Length
+                    let v884 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v876))
                     let v885 : bool = v884 = 0
                     let v886 : bool = v885 = false
                     let v888 : UH0 =
@@ -8260,18 +8792,18 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                         else
                             v883
                     let v889 : string = ""
-                    let struct (v890 : string, v891 : string) = method181(v888, v889)
+                    let struct (v890 : string, v891 : string) = method125(v888, v889)
                     let v892 : Ref<Str> = v890 |> unbox<Ref<Str>>
                     let v893 : std_string_String = v892 |> unbox<std_string_String>
-                    let v894 : US8 = US8_Some(v893)
-                    let v895 : US34 = US34_Some(v319)
+                    let v894 : US5 = US5_Some(v893)
+                    let v895 : US31 = US31_Some(v319)
                     struct (v844, v894, v895)
     let v1063 : std_sync_Arc<std_sync_Mutex<std_sync_Arc<std_sync_mpsc_Receiver<std_string_String>>>> option =
         match v1058 with
-        | US34_None -> (* None *)
+        | US31_None -> (* None *)
             let v1061 : std_sync_Arc<std_sync_Mutex<std_sync_Arc<std_sync_mpsc_Receiver<std_string_String>>>> option = None
             v1061
-        | US34_Some(v1059) -> (* Some *)
+        | US31_Some(v1059) -> (* Some *)
             let v1060 : std_sync_Arc<std_sync_Mutex<std_sync_Arc<std_sync_mpsc_Receiver<std_string_String>>>> option = Some v1059 
             v1060
     let v1064 : string = "true; let _optionm_map_ = $0.map(|x| { //"
@@ -8287,11 +8819,11 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
     let v1074 : string = "$0.collect::<Vec<_>>()"
     let v1075 : Vec<std_string_String> = __spiral_emit_rust v1073 v1074 
     let v1076 : string = "$0.iter().map(|x| $1(x.clone())).collect::<Vec<_>>()"
-    let v1077 : ((std_string_String) -> string) = closure82()
+    let v1077 : ((std_string_String) -> string) = closure76()
     let v1078 : Vec<string> = __spiral_emit_rust struct (v1075, v1077) v1076 
     let v1079 : (string []) = () // backend.backend_switch / record_type_try_find / key: v31 
     let v1080 : string seq = v1079 |> Seq.ofArray
-    let v1081 : string = method182()
+    let v1081 : string = method126()
     let v1082 : (string -> (string seq -> string)) = String.concat
     let v1083 : (string seq -> string) = v1082 v1081
     let v1084 : string = v1083 v1080
@@ -8303,30 +8835,30 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
     let v1090 : US3 option = v1088 |> Option.map v1089 
     let v1091 : US3 = US3_None
     let v1092 : US3 = v1090 |> Option.defaultValue v1091 
-    let v1110 : US40 =
+    let v1110 : US37 =
         match v1092 with
         | US3_None -> (* None *)
-            US40_None
+            US37_None
         | US3_Some(v1093) -> (* Some *)
-            let v1094 : int32 = v1093.Length
+            let v1094 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v1093))
             let v1095 : int32 = 0
-            let v1096 : int32 = method23(v1093, v1094, v1095)
+            let v1096 : int32 = method18(v1093, v1094, v1095)
             let v1097 : int32 = v1094 - 1
-            let v1098 : string = v1093.[int v1096..int v1097]
-            let v1099 : int32 = v1098.Length
-            let v1100 : int32 = method180(v1098, v1099)
-            let v1101 : string = v1098.[int 0..int v1100]
-            let v1102 : int32 = v1101.Length
+            let v1098 : string = (spiralStringSlice v1093 (int v1096) (int v1097))
+            let v1099 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v1098))
+            let v1100 : int32 = method124(v1098, v1099)
+            let v1101 : string = (spiralStringSlice v1098 (int 0) (int v1100))
+            let v1102 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v1101))
             let v1103 : bool = v1102 = 0
             let v1106 : US3 =
                 if v1103 then
                     US3_None
                 else
                     US3_Some(v1101)
-            US40_Some(v1106)
+            US37_Some(v1106)
     let v1117 : US3 =
         match v1110 with
-        | US40_Some(v1111) -> (* Some *)
+        | US37_Some(v1111) -> (* Some *)
             match v1111 with
             | US3_Some(v1112) -> (* Some *)
                 US3_Some(v1112)
@@ -8336,9 +8868,9 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
             US3_None
     let v1123 : US3 =
         match v1057 with
-        | US8_None -> (* None *)
+        | US5_None -> (* None *)
             US3_None
-        | US8_Some(v1118) -> (* Some *)
+        | US5_Some(v1118) -> (* Some *)
             let v1119 : string = () // backend.backend_switch / record_type_try_find / key: v31 
             US3_Some(v1119)
     let v1127 : string =
@@ -8384,9 +8916,9 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
             let v1154 : bool = 10 >= v1151
             v1154
     let v1156 : bool = v1155 = false
-    let v1197 : US7 =
+    let v1197 : US4 =
         if v1156 then
-            US7_None
+            US4_None
         else
             let v1158 : bool = TraceState.trace_state.IsNone
             if v1158 then
@@ -8396,10 +8928,10 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
                 TraceState.trace_state <- v1166 
                 ()
             let struct (v1167 : Mut0, v1168 : Mut1, v1169 : Mut2, v1170 : Mut3, v1171 : Mut4, v1172 : int64 option) = TraceState.trace_state.Value
-            let v1173 : string = method8(v1167, v1168, v1169, v1170, v1171, v1172)
-            let v1174 : string = method168()
-            let v1175 : int32 = v1130.Length
-            let v1176 : string = method183(v1167, v1168, v1169, v1170, v1171, v1172, v1173, v1174, v18, v1056, v1175)
+            let v1173 : string = method6(v1167, v1168, v1169, v1170, v1171, v1172)
+            let v1174 : string = method112()
+            let v1175 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v1130))
+            let v1176 : string = method127(v1167, v1168, v1169, v1170, v1171, v1172, v1173, v1174, v18, v1056, v1175)
             let v1177 : bool = TraceState.trace_state.IsNone
             if v1177 then
                 let v1178 : US0 = US0_Verbose
@@ -8411,11 +8943,11 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
             let v1192 : int64 = v1186.l0
             let v1193 : int64 = v1192 + 1L
             v1186.l0 <- v1193
-            let v1194 : (string -> unit) = closure12()
+            let v1194 : (string -> unit) = closure5()
             v1194 v1176
             let v1195 : (string -> unit) = v1187.l0
             v1195 v1176
-            US7_Some(v1186, v1187, v1188, v1189, v1190, v1191)
+            US4_Some(v1186, v1187, v1188, v1189, v1190, v1191)
     let v1198 : (int32 * string) = v1056, v1130 
     v1198 
     )
@@ -8423,20 +8955,19 @@ and execute_with_options_94 (v0 : string, v1 : System.Threading.CancellationToke
     ) () )
     |> fun x -> _capture_v103 <- Some x
     let v1199 : (int32 * string) = match _capture_v103 with Some x -> x | None -> failwith "base.capture / _capture_v103=None"
-    let (a, b) = v1199 
-    let v1200 : int32 = a
-    let v1201 : string = b
+    let v1200 : int32 = fst v1199 
+    let v1201 : string = snd v1199 
     struct (v1200, v1201)
-and fix_paths_187 (v0 : string, v1 : string, v2 : string) : struct (string * string) =
-    let v3 : string = get_file_name_41(v1)
-    let v4 : string = method49(v2, v3)
+and fix_paths_128 (v0 : string, v1 : string, v2 : string) : struct (string * string) =
+    let v3 : string = get_file_name_36(v1)
+    let v4 : string = method43(v2, v3)
     let v5 : string = "."
     let v6 : int32 = v1.LastIndexOf v5 
     let v7 : int32 = v6 - 1
-    let v8 : string = v1.[int 0..int v7]
+    let v8 : string = (spiralStringSlice v1 (int 0) (int v7))
     let v9 : int32 = v4.LastIndexOf v5 
     let v10 : int32 = v9 - 1
-    let v11 : string = v4.[int 0..int v10]
+    let v11 : string = (spiralStringSlice v4 (int 0) (int v10))
     let v12 : string = ".md"
     let v13 : bool = v0.EndsWith (v12, false, null)
     let v14 : bool = v13 = false
@@ -8455,51 +8986,51 @@ and fix_paths_187 (v0 : string, v1 : string, v2 : string) : struct (string * str
             let v19 : string = $"{v11}.{v0}"
             v19
     struct (v17, v20)
-and closure83 () () : unativeint =
+and closure77 () () : unativeint =
     let v0 : unativeint = 0 |> unativeint 
     v0
-and ok_c84 () (v0 : unativeint) : US42 =
-    US42_Ok(v0)
-and error_c85 () (v0 : exn) : US42 =
-    US42_Error(v0)
-and method188 () : US42 =
-    let v0 : (unit -> unativeint) = closure83()
-    let v1 : (unativeint -> US42) = ok_c84()
-    let v2 : ((unit -> exn) -> exn) = closure5()
-    let v3 : (exn -> US42) = error_c85()
-    let v4 : US42 = try v0 () |> v1 with ex -> (fun () -> ex) |> v2 |> v3 
+and ok_c78 () (v0 : unativeint) : US39 =
+    US39_Ok(v0)
+and error_c79 () (v0 : exn) : US39 =
+    US39_Error(v0)
+and method129 () : US39 =
+    let v0 : (unit -> unativeint) = closure77()
+    let v1 : (unativeint -> US39) = ok_c78()
+    let v2 : ((unit -> exn) -> exn) = closure15()
+    let v3 : (exn -> US39) = error_c79()
+    let v4 : US39 = try v0 () |> v1 with ex -> (fun () -> ex) |> v2 |> v3 
     v4
-and closure86 (v0 : unativeint) () : unativeint =
+and closure80 (v0 : unativeint) () : unativeint =
     let v1 : unativeint = v0 |> unativeint 
     v1
-and method189 (v0 : unativeint) : US42 =
-    let v1 : (unit -> unativeint) = closure86(v0)
-    let v2 : (unativeint -> US42) = ok_c84()
-    let v3 : ((unit -> exn) -> exn) = closure5()
-    let v4 : (exn -> US42) = error_c85()
-    let v5 : US42 = try v1 () |> v2 with ex -> (fun () -> ex) |> v3 |> v4 
+and method130 (v0 : unativeint) : US39 =
+    let v1 : (unit -> unativeint) = closure80(v0)
+    let v2 : (unativeint -> US39) = ok_c78()
+    let v3 : ((unit -> exn) -> exn) = closure15()
+    let v4 : (exn -> US39) = error_c79()
+    let v5 : US39 = try v1 () |> v2 with ex -> (fun () -> ex) |> v3 |> v4 
     v5
-and closure87 () (v0 : (uint8)) : string =
+and closure81 () (v0 : (uint8)) : string =
     let v1 : uint8 = (v0)
     let v2 : string = "format!(\"{:02x}\", $0)"
     let v3 : std_string_String = __spiral_emit_rust v1 v2 
     let v4 : string = "Fsharp"
     let v5 : string = () // backend.backend_switch / record_type_try_find / key: v4 
     v5
-and closure89 (v0 : string) (v1 : UH0) : UH0 =
+and closure83 (v0 : string) (v1 : UH0) : UH0 =
     UH0_Cons(v0, v1)
-and closure88 () (v0 : string) : (UH0 -> UH0) =
-    closure89(v0)
-and method190 () : (string -> (UH0 -> UH0)) =
-    closure88()
-and method191 () : string =
+and closure82 () (v0 : string) : (UH0 -> UH0) =
+    closure83(v0)
+and method131 () : (string -> (UH0 -> UH0)) =
+    closure82()
+and method132 () : string =
     let v0 : string = ""
     v0
-and method192 (v0 : string, v1 : UH0, v2 : string) : struct (string * string) =
+and method133 (v0 : string, v1 : UH0, v2 : string) : struct (string * string) =
     let struct (v11 : string, v12 : string) =
         match v1 with
         | UH0_Cons(v3, v4) -> (* Cons *)
-            let struct (v5 : string, v6 : string) = method192(v0, v4, v2)
+            let struct (v5 : string, v6 : string) = method133(v0, v4, v2)
             let v7 : string = v3 + v6 
             let v8 : string = v7 + v5 
             struct (v8, v0)
@@ -8510,227 +9041,140 @@ and method192 (v0 : string, v1 : UH0, v2 : string) : struct (string * string) =
                     struct (v2, v2)
             struct (v9, v10)
     struct (v11, v12)
-and ok_c90 () (v0 : string) : US44 =
-    US44_Ok(v0)
-and method193 () : (string -> US44) =
-    ok_c90()
-and error_c91 () (v0 : std_io_Error) : US44 =
-    US44_Error(v0)
-and method194 () : (std_io_Error -> US44) =
-    error_c91()
-and ok_c92 () (v0 : string) : US45 =
-    US45_Ok(v0)
-and method195 () : (string -> US45) =
-    ok_c92()
-and error_c93 () (v0 : std_string_String) : US45 =
-    US45_Error(v0)
-and method196 () : (std_string_String -> US45) =
-    error_c93()
-and method199 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "file"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method200 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "real_path"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method201 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "relative_path"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method202 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "origin_hash_exit_code"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method203 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "origin_hash"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method204 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "local_git_hash_exit_code"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method205 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "local_git_hash"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method206 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "hash1"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method207 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "hash2"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method208 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "dist_path"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method209 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "cache_path"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_198 (v0 : string, v1 : string, v2 : string, v3 : int32, v4 : string, v5 : int32, v6 : string, v7 : string, v8 : US3, v9 : string, v10 : string) : string =
-    let v11 : string = method13()
-    let v12 : Mut3 = {l0 = v11} : Mut3
-    method18(v12)
-    method199(v12)
-    method20(v12)
-    method14(v12, v0)
-    method64(v12)
-    method200(v12)
-    method20(v12)
-    method14(v12, v1)
-    method64(v12)
-    method201(v12)
-    method20(v12)
-    method14(v12, v2)
-    method64(v12)
-    method202(v12)
-    method20(v12)
-    let v13 : string = $"{v3}"
-    method14(v12, v13)
-    method64(v12)
-    method203(v12)
-    method20(v12)
-    method14(v12, v4)
-    method64(v12)
-    method204(v12)
-    method20(v12)
-    let v14 : string = $"{v5}"
-    method14(v12, v14)
-    method64(v12)
-    method205(v12)
-    method20(v12)
-    method14(v12, v6)
-    method64(v12)
-    method206(v12)
-    method20(v12)
-    method14(v12, v7)
-    method64(v12)
-    method207(v12)
-    method20(v12)
-    let v15 : string = $"%A{v8}"
-    method14(v12, v15)
-    method64(v12)
-    method208(v12)
-    method20(v12)
-    method14(v12, v9)
-    method64(v12)
-    method209(v12)
-    method20(v12)
-    method14(v12, v10)
-    method21(v12)
-    let v16 : string = v12.l0
-    v16
-and method197 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : string, v9 : string, v10 : string, v11 : string, v12 : int32, v13 : string, v14 : int32, v15 : string, v16 : string, v17 : US3, v18 : string, v19 : string) : string =
+and ok_c84 () (v0 : string) : US41 =
+    US41_Ok(v0)
+and method134 () : (string -> US41) =
+    ok_c84()
+and error_c85 () (v0 : std_io_Error) : US41 =
+    US41_Error(v0)
+and method135 () : (std_io_Error -> US41) =
+    error_c85()
+and ok_c86 () (v0 : string) : US42 =
+    US42_Ok(v0)
+and method136 () : (string -> US42) =
+    ok_c86()
+and error_c87 () (v0 : std_string_String) : US42 =
+    US42_Error(v0)
+and method137 () : (std_string_String -> US42) =
+    error_c87()
+and method138 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : string, v9 : string, v10 : string, v11 : string, v12 : int32, v13 : string, v14 : int32, v15 : string, v16 : string, v17 : US3, v18 : string, v19 : string) : string =
     let v20 : int64 = v0.l0
     let v21 : string = " "
     let v22 : string = v6 + v21 
-    let v23 : string = format_real_16(v20)
+    let v23 : string = format_real_14(v20)
     let v24 : string = v22 + v23 
     let v25 : string = v24 + v7 
     let v26 : string = v25 + v21 
     let v27 : string = v26 + v8 
     let v28 : string = " / "
     let v29 : string = v27 + v28 
-    let v30 : string = format_real_198(v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19)
-    let v31 : string = v29 + v30 
-    method22(v31)
-and file_copy_210 (v0 : string, v1 : string) : unit =
+    let v30 : string = ""
+    let v31 : string = v30 + v30 
+    let v32 : string = "file"
+    let v33 : string = v31 + v32 
+    let v34 : string = " = "
+    let v35 : string = v33 + v34 
+    let v36 : string = v35 + v9 
+    let v37 : string = "; "
+    let v38 : string = v36 + v37 
+    let v39 : string = "real_path"
+    let v40 : string = v38 + v39 
+    let v41 : string = v40 + v34 
+    let v42 : string = v41 + v10 
+    let v43 : string = v42 + v37 
+    let v44 : string = "relative_path"
+    let v45 : string = v43 + v44 
+    let v46 : string = v45 + v34 
+    let v47 : string = v46 + v11 
+    let v48 : string = v47 + v37 
+    let v49 : string = "origin_hash_exit_code"
+    let v50 : string = v48 + v49 
+    let v51 : string = v50 + v34 
+    let v52 : string = format_real_79(v12)
+    let v53 : string = v51 + v52 
+    let v54 : string = v53 + v37 
+    let v55 : string = "origin_hash"
+    let v56 : string = v54 + v55 
+    let v57 : string = v56 + v34 
+    let v58 : string = v57 + v13 
+    let v59 : string = v58 + v37 
+    let v60 : string = "local_git_hash_exit_code"
+    let v61 : string = v59 + v60 
+    let v62 : string = v61 + v34 
+    let v63 : string = format_real_79(v14)
+    let v64 : string = v62 + v63 
+    let v65 : string = v64 + v37 
+    let v66 : string = "local_git_hash"
+    let v67 : string = v65 + v66 
+    let v68 : string = v67 + v34 
+    let v69 : string = v68 + v15 
+    let v70 : string = v69 + v37 
+    let v71 : string = "hash1"
+    let v72 : string = v70 + v71 
+    let v73 : string = v72 + v34 
+    let v74 : string = v73 + v16 
+    let v75 : string = v74 + v37 
+    let v76 : string = "hash2"
+    let v77 : string = v75 + v76 
+    let v78 : string = v77 + v34 
+    let v79 : string = method59(v17)
+    let v80 : string = v78 + v79 
+    let v81 : string = v80 + v37 
+    let v82 : string = "dist_path"
+    let v83 : string = v81 + v82 
+    let v84 : string = v83 + v34 
+    let v85 : string = v84 + v18 
+    let v86 : string = v85 + v37 
+    let v87 : string = "cache_path"
+    let v88 : string = v86 + v87 
+    let v89 : string = v88 + v34 
+    let v90 : string = v89 + v19 
+    let v91 : string = "{ "
+    let v92 : string = v91 + v90 
+    let v93 : string = " }"
+    let v94 : string = v92 + v93 
+    let v95 : string = v29 + v94 
+    method17(v95)
+and file_copy_139 (v0 : string, v1 : string) : unit =
     System.IO.File.Copy (v1, v0, true)
     ()
-and method212 (v0 : int32, v1 : Mut6) : bool =
+and method141 (v0 : int32, v1 : Mut7) : bool =
     let v2 : int32 = v1.l0
     let v3 : bool = v2 < v0
     v3
-and method213 (v0 : int32, v1 : Mut7) : bool =
+and method142 (v0 : int32, v1 : Mut8) : bool =
     let v2 : int32 = v1.l0
     let v3 : bool = v2 < v0
     v3
-and method214 (v0 : string) : string =
+and method143 (v0 : string) : string =
     v0
-and method215 (v0 : std_sync_MutexGuard<std_process_ChildStdin>) : std_sync_MutexGuard<std_process_ChildStdin> =
+and method144 (v0 : std_sync_MutexGuard<std_process_ChildStdin>) : std_sync_MutexGuard<std_process_ChildStdin> =
     v0
-and closure96 (v0 : string) (v1 : std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>>) : unit =
+and closure90 (v0 : string) (v1 : std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>>) : unit =
     let v2 : string = "$0"
     let v3 : std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> = __spiral_emit_rust v1 v2 
     let v4 : string = "v3.lock()"
     let v5 : Result<std_sync_MutexGuard<std_process_ChildStdin>, std_sync_PoisonError<std_sync_MutexGuard<std_process_ChildStdin>>> = __spiral_emit_rust () v4 
     let v6 : string = "$0.unwrap()"
     let v7 : std_sync_MutexGuard<std_process_ChildStdin> = __spiral_emit_rust v5 v6 
-    let v8 : string = method214(v0)
+    let v8 : string = method143(v0)
     let v9 : string = "v8.as_bytes()"
     let v10 : Ref<Slice<uint8>> = __spiral_emit_rust () v9 
-    let v11 : std_sync_MutexGuard<std_process_ChildStdin> = method215(v7)
+    let v11 : std_sync_MutexGuard<std_process_ChildStdin> = method144(v7)
     let v12 : string = "true; let mut v11 = v11"
     let v13 : bool = __spiral_emit_rust () v12 
     let v14 : string = "true; std::io::Write::write_all(&mut *$0, v10).unwrap()"
     let v15 : bool = __spiral_emit_rust v11 v14 
     ()
-and method216 (v0 : int32, v1 : Mut8) : bool =
+and method145 (v0 : int32, v1 : Mut9) : bool =
     let v2 : int32 = v1.l0
     let v3 : bool = v2 < v0
     v3
-and method219 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "result_len"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and method220 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "output_path"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_218 (v0 : int32, v1 : int32, v2 : string) : string =
-    let v3 : string = method13()
-    let v4 : Mut3 = {l0 = v3} : Mut3
-    method18(v4)
-    method185(v4)
-    method20(v4)
-    let v5 : string = $"{v0}"
-    method14(v4, v5)
-    method64(v4)
-    method219(v4)
-    method20(v4)
-    let v6 : string = $"{v1}"
-    method14(v4, v6)
-    method64(v4)
-    method220(v4)
-    method20(v4)
-    method14(v4, v2)
-    method21(v4)
-    let v7 : string = v4.l0
-    v7
-and method217 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : int32, v9 : int32, v10 : string) : string =
+and method146 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : int32, v9 : int32, v10 : string) : string =
     let v11 : int64 = v0.l0
     let v12 : string = " "
     let v13 : string = v6 + v12 
-    let v14 : string = format_real_16(v11)
+    let v14 : string = format_real_14(v11)
     let v15 : string = v13 + v14 
     let v16 : string = v15 + v7 
     let v17 : string = v16 + v12 
@@ -8738,35 +9182,58 @@ and method217 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64
     let v19 : string = v17 + v18 
     let v20 : string = " / "
     let v21 : string = v19 + v20 
-    let v22 : string = format_real_218(v8, v9, v10)
-    let v23 : string = v21 + v22 
-    method22(v23)
-and hangul_211 (v0 : string, v1 : string, v2 : bool, v3 : string, v4 : string) : US46 =
+    let v22 : string = ""
+    let v23 : string = v22 + v22 
+    let v24 : string = "exit_code"
+    let v25 : string = v23 + v24 
+    let v26 : string = " = "
+    let v27 : string = v25 + v26 
+    let v28 : string = format_real_79(v8)
+    let v29 : string = v27 + v28 
+    let v30 : string = "; "
+    let v31 : string = v29 + v30 
+    let v32 : string = "result_len"
+    let v33 : string = v31 + v32 
+    let v34 : string = v33 + v26 
+    let v35 : string = format_real_79(v9)
+    let v36 : string = v34 + v35 
+    let v37 : string = v36 + v30 
+    let v38 : string = "output_path"
+    let v39 : string = v37 + v38 
+    let v40 : string = v39 + v26 
+    let v41 : string = v40 + v10 
+    let v42 : string = "{ "
+    let v43 : string = v42 + v41 
+    let v44 : string = " }"
+    let v45 : string = v43 + v44 
+    let v46 : string = v21 + v45 
+    method17(v46)
+and hangul_140 (v0 : string, v1 : string, v2 : bool, v3 : string, v4 : string) : US43 =
     let v5 : string = v4 |> System.IO.File.ReadAllText
     let v6 : string = "\n"
     let v7 : (string []) = v5.Split v6 
     let v8 : int32 = v7.Length
     let v9 : (string []) = Array.zeroCreate<string> (v8)
-    let v10 : Mut6 = {l0 = 0} : Mut6
-    while method212(v8, v10) do
+    let v10 : Mut7 = {l0 = 0} : Mut7
+    while method141(v8, v10) do
         let v12 : int32 = v10.l0
         let v13 : string = v7.[int v12]
-        let v14 : int32 = v13.Length
+        let v14 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v13))
         let v15 : int32 = 0
-        let v16 : int32 = method23(v13, v14, v15)
+        let v16 : int32 = method18(v13, v14, v15)
         let v17 : int32 = v14 - 1
-        let v18 : string = v13.[int v16..int v17]
-        let v19 : int32 = v18.Length
-        let v20 : int32 = method180(v18, v19)
-        let v21 : string = v18.[int 0..int v20]
+        let v18 : string = (spiralStringSlice v13 (int v16) (int v17))
+        let v19 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v18))
+        let v20 : int32 = method124(v18, v19)
+        let v21 : string = (spiralStringSlice v18 (int 0) (int v20))
         v9.[int v12] <- v21
         let v22 : int32 = v12 + 1
         v10.l0 <- v22
         ()
     let v23 : int32 = v9.Length
     let v24 : (string []) = Array.zeroCreate<string> (v23)
-    let v25 : Mut7 = {l0 = 0; l1 = 0} : Mut7
-    while method213(v23, v25) do
+    let v25 : Mut8 = {l0 = 0; l1 = 0} : Mut8
+    while method142(v23, v25) do
         let v27 : int32 = v25.l0
         let v28 : int32 = v25.l1
         let v29 : string = v9.[int v27]
@@ -8785,8 +9252,8 @@ and hangul_211 (v0 : string, v1 : string, v2 : bool, v3 : string, v4 : string) :
         ()
     let v35 : int32 = v25.l1
     let v36 : (string []) = Array.zeroCreate<string> (v35)
-    let v37 : Mut6 = {l0 = 0} : Mut6
-    while method212(v35, v37) do
+    let v37 : Mut7 = {l0 = 0} : Mut7
+    while method141(v35, v37) do
         let v39 : int32 = v37.l0
         let v40 : string = v24.[int v39]
         v36.[int v39] <- v40
@@ -8805,7 +9272,7 @@ and hangul_211 (v0 : string, v1 : string, v2 : bool, v3 : string, v4 : string) :
         ()
     indent *)
     let v43 : string seq = _let'_v42 
-    let v44 : string = method182()
+    let v44 : string = method126()
     let v45 : (string -> (string seq -> string)) = String.concat
     let v46 : (string seq -> string) = v45 v44
     let v47 : string = v46 v43
@@ -8843,79 +9310,99 @@ and hangul_211 (v0 : string, v1 : string, v2 : bool, v3 : string, v4 : string) :
             let v65 : string = ""
             v65
     let v67 : string = $"../alphabet/deps/hangulize/cmd/hangulize/hangulize{v66}"
-    let v68 : string = method49(v0, v67)
+    let v68 : string = method43(v0, v67)
     let v69 : string = $"{v68} {v55}"
-    let v70 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) = closure96(v48)
+    let v70 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) = closure90(v48)
     let v71 : (std_sync_Arc<std_sync_Mutex<std_process_ChildStdin>> -> unit) option = Some v70 
     let v72 : bool = true
     let v73 : bool = true
-    let struct (v74 : int32, v75 : string) = execute_with_options_94(v69, v56, v57, v58, v71, v72, v60, v73)
+    let struct (v74 : int32, v75 : string) = execute_with_options_76(v69, v56, v57, v58, v71, v72, v60, v73)
     let v76 : (string []) = v75.Split v6 
     let v77 : int32 = v76.Length
     let v78 : string = ""
-    let v79 : Mut8 = {l0 = 0; l1 = v78; l2 = 0; l3 = 0} : Mut8
-    while method216(v23, v79) do
+    let v79 : Mut9 = {l0 = 0; l1 = v78; l2 = 0; l3 = 0; l4 = false} : Mut9
+    while method145(v23, v79) do
         let v81 : int32 = v79.l0
-        let struct (v82 : string, v83 : int32, v84 : int32) = v79.l1, v79.l2, v79.l3
-        let v85 : string = v9.[int v81]
-        let v86 : bool = v85 = ""
-        let struct (v106 : string, v107 : int32, v108 : int32) =
-            if v86 then
-                let v87 : string = v82 + v6 
-                let v88 : int32 = v83 + 1
-                let v89 : int32 = v84 + 1
-                struct (v87, v88, v89)
+        let struct (v82 : string, v83 : int32, v84 : int32, v85 : bool) = v79.l1, v79.l2, v79.l3, v79.l4
+        let v86 : string = v9.[int v81]
+        let v87 : bool = v86 = ""
+        let struct (v118 : string, v119 : int32, v120 : int32, v121 : bool) =
+            if v87 then
+                let v88 : string = v82 + v6 
+                let v89 : int32 = v83 + 1
+                let v90 : int32 = v84 + 1
+                struct (v88, v89, v90, v85)
             else
-                let v90 : int32 = v83 - v84
-                let v91 : bool = v90 >= v77
-                let v104 : string =
-                    if v91 then
+                let v91 : string = "```"
+                let v92 : bool = v86.StartsWith (v91, false, null)
+                let v93 : int32 = v83 - v84
+                let v94 : bool = v93 >= v77
+                let v114 : string =
+                    if v94 then
                         v82
                     else
-                        let v92 : string = v76.[int v90]
-                        let v93 : string = "://"
-                        let v94 : bool = v92.Contains v93 
-                        let v95 : string =
-                            if v94 then
-                                v85
-                            else
-                                v92
-                        let v96 : string = v82 + v95 
-                        let v99 : string =
-                            if v2 then
+                        let v95 : bool = v92 || v85
+                        if v95 then
+                            let v96 : string = v82 + v86 
+                            let v97 : int32 = v77 - 1
+                            let v98 : bool = v93 = v97
+                            if v98 then
                                 v96
                             else
-                                let v97 : string = v96 + v6 
-                                let v98 : string = v97 + v85 
-                                v98
-                        let v100 : int32 = v77 - 1
-                        let v101 : bool = v90 = v100
-                        if v101 then
-                            v99
+                                let v99 : string = v96 + v6 
+                                v99
                         else
-                            let v102 : string = v99 + v6 
-                            v102
-                let v105 : int32 = v83 + 1
-                struct (v104, v105, v84)
-        let v109 : int32 = v81 + 1
-        v79.l0 <- v109
-        v79.l1 <- v106
-        v79.l2 <- v107
-        v79.l3 <- v108
+                            let v101 : string = v76.[int v93]
+                            let v102 : string = "://"
+                            let v103 : bool = v101.Contains v102 
+                            let v104 : string =
+                                if v103 then
+                                    v86
+                                else
+                                    v101
+                            let v105 : string = v82 + v104 
+                            let v108 : string =
+                                if v2 then
+                                    v105
+                                else
+                                    let v106 : string = v105 + v6 
+                                    let v107 : string = v106 + v86 
+                                    v107
+                            let v109 : int32 = v77 - 1
+                            let v110 : bool = v93 = v109
+                            if v110 then
+                                v108
+                            else
+                                let v111 : string = v108 + v6 
+                                v111
+                let v115 : int32 = v83 + 1
+                let v117 : bool =
+                    if v92 then
+                        let v116 : bool = v85 = false
+                        v116
+                    else
+                        v85
+                struct (v114, v115, v84, v117)
+        let v122 : int32 = v81 + 1
+        v79.l0 <- v122
+        v79.l1 <- v118
+        v79.l2 <- v119
+        v79.l3 <- v120
+        v79.l4 <- v121
         ()
-    let struct (v110 : string, v111 : int32, v112 : int32) = v79.l1, v79.l2, v79.l3
-    System.IO.File.WriteAllText (v3, v110)
-    let v113 : bool = TraceState.trace_state.IsNone
-    if v113 then
-        let v114 : US0 = US0_Verbose
-        let struct (v115 : Mut0, v116 : Mut1, v117 : Mut2, v118 : Mut3, v119 : Mut4, v120 : int64 option) = new_trace_state_1(v114)
-        let v121 : struct (Mut0 * Mut1 * Mut2 * Mut3 * Mut4 * int64 option) option = Some struct (v115, v116, v117, v118, v119, v120) 
-        TraceState.trace_state <- v121 
+    let struct (v123 : string, v124 : int32, v125 : int32, v126 : bool) = v79.l1, v79.l2, v79.l3, v79.l4
+    System.IO.File.WriteAllText (v3, v123)
+    let v127 : bool = TraceState.trace_state.IsNone
+    if v127 then
+        let v128 : US0 = US0_Verbose
+        let struct (v129 : Mut0, v130 : Mut1, v131 : Mut2, v132 : Mut3, v133 : Mut4, v134 : int64 option) = new_trace_state_1(v128)
+        let v135 : struct (Mut0 * Mut1 * Mut2 * Mut3 * Mut4 * int64 option) option = Some struct (v129, v130, v131, v132, v133, v134) 
+        TraceState.trace_state <- v135 
         ()
-    let struct (v122 : Mut0, v123 : Mut1, v124 : Mut2, v125 : Mut3, v126 : Mut4, v127 : int64 option) = TraceState.trace_state.Value
-    let v128 : US0 = v126.l0
-    let v133 : int32 =
-        match v128 with
+    let struct (v136 : Mut0, v137 : Mut1, v138 : Mut2, v139 : Mut3, v140 : Mut4, v141 : int64 option) = TraceState.trace_state.Value
+    let v142 : US0 = v140.l0
+    let v147 : int32 =
+        match v142 with
         | US0_Critical -> (* Critical *)
             50
         | US0_Debug -> (* Debug *)
@@ -8926,74 +9413,53 @@ and hangul_211 (v0 : string, v1 : string, v2 : bool, v3 : string, v4 : string) :
             10
         | US0_Warning -> (* Warning *)
             40
-    let v134 : bool = v124.l0
-    let v135 : bool = v134 = false
-    let v137 : bool =
-        if v135 then
+    let v148 : bool = v138.l0
+    let v149 : bool = v148 = false
+    let v151 : bool =
+        if v149 then
             false
         else
-            let v136 : bool = 30 >= v133
-            v136
-    let v138 : bool = v137 = false
-    let v179 : US7 =
-        if v138 then
-            US7_None
+            let v150 : bool = 30 >= v147
+            v150
+    let v152 : bool = v151 = false
+    let v193 : US4 =
+        if v152 then
+            US4_None
         else
-            let v140 : bool = TraceState.trace_state.IsNone
-            if v140 then
-                let v141 : US0 = US0_Verbose
-                let struct (v142 : Mut0, v143 : Mut1, v144 : Mut2, v145 : Mut3, v146 : Mut4, v147 : int64 option) = new_trace_state_1(v141)
-                let v148 : struct (Mut0 * Mut1 * Mut2 * Mut3 * Mut4 * int64 option) option = Some struct (v142, v143, v144, v145, v146, v147) 
-                TraceState.trace_state <- v148 
+            let v154 : bool = TraceState.trace_state.IsNone
+            if v154 then
+                let v155 : US0 = US0_Verbose
+                let struct (v156 : Mut0, v157 : Mut1, v158 : Mut2, v159 : Mut3, v160 : Mut4, v161 : int64 option) = new_trace_state_1(v155)
+                let v162 : struct (Mut0 * Mut1 * Mut2 * Mut3 * Mut4 * int64 option) option = Some struct (v156, v157, v158, v159, v160, v161) 
+                TraceState.trace_state <- v162 
                 ()
-            let struct (v149 : Mut0, v150 : Mut1, v151 : Mut2, v152 : Mut3, v153 : Mut4, v154 : int64 option) = TraceState.trace_state.Value
-            let v155 : string = method8(v149, v150, v151, v152, v153, v154)
-            let v156 : string = method11()
-            let v157 : int32 = v110.Length
-            let v158 : string = method217(v149, v150, v151, v152, v153, v154, v155, v156, v74, v157, v3)
-            let v159 : bool = TraceState.trace_state.IsNone
-            if v159 then
-                let v160 : US0 = US0_Verbose
-                let struct (v161 : Mut0, v162 : Mut1, v163 : Mut2, v164 : Mut3, v165 : Mut4, v166 : int64 option) = new_trace_state_1(v160)
-                let v167 : struct (Mut0 * Mut1 * Mut2 * Mut3 * Mut4 * int64 option) option = Some struct (v161, v162, v163, v164, v165, v166) 
-                TraceState.trace_state <- v167 
+            let struct (v163 : Mut0, v164 : Mut1, v165 : Mut2, v166 : Mut3, v167 : Mut4, v168 : int64 option) = TraceState.trace_state.Value
+            let v169 : string = method6(v163, v164, v165, v166, v167, v168)
+            let v170 : string = method9()
+            let v171 : int32 = (System.Text.Encoding.UTF8.GetByteCount(v123))
+            let v172 : string = method146(v163, v164, v165, v166, v167, v168, v169, v170, v74, v171, v3)
+            let v173 : bool = TraceState.trace_state.IsNone
+            if v173 then
+                let v174 : US0 = US0_Verbose
+                let struct (v175 : Mut0, v176 : Mut1, v177 : Mut2, v178 : Mut3, v179 : Mut4, v180 : int64 option) = new_trace_state_1(v174)
+                let v181 : struct (Mut0 * Mut1 * Mut2 * Mut3 * Mut4 * int64 option) option = Some struct (v175, v176, v177, v178, v179, v180) 
+                TraceState.trace_state <- v181 
                 ()
-            let struct (v168 : Mut0, v169 : Mut1, v170 : Mut2, v171 : Mut3, v172 : Mut4, v173 : int64 option) = TraceState.trace_state.Value
-            let v174 : int64 = v168.l0
-            let v175 : int64 = v174 + 1L
-            v168.l0 <- v175
-            let v176 : (string -> unit) = closure12()
-            v176 v158
-            let v177 : (string -> unit) = v169.l0
-            v177 v158
-            US7_Some(v168, v169, v170, v171, v172, v173)
-    US46_Ok(v74, v110)
-and method223 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "result"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_222 (v0 : int32, v1 : string) : string =
-    let v2 : string = method13()
-    let v3 : Mut3 = {l0 = v2} : Mut3
-    method18(v3)
-    method185(v3)
-    method20(v3)
-    let v4 : string = $"{v0}"
-    method14(v3, v4)
-    method64(v3)
-    method223(v3)
-    method20(v3)
-    method14(v3, v1)
-    method21(v3)
-    let v5 : string = v3.l0
-    v5
-and method221 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : int32, v9 : string) : string =
+            let struct (v182 : Mut0, v183 : Mut1, v184 : Mut2, v185 : Mut3, v186 : Mut4, v187 : int64 option) = TraceState.trace_state.Value
+            let v188 : int64 = v182.l0
+            let v189 : int64 = v188 + 1L
+            v182.l0 <- v189
+            let v190 : (string -> unit) = closure5()
+            v190 v172
+            let v191 : (string -> unit) = v183.l0
+            v191 v172
+            US4_Some(v182, v183, v184, v185, v186, v187)
+    US43_Ok(v74, v123)
+and method147 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : int32, v9 : string) : string =
     let v10 : int64 = v0.l0
     let v11 : string = " "
     let v12 : string = v6 + v11 
-    let v13 : string = format_real_16(v10)
+    let v13 : string = format_real_14(v10)
     let v14 : string = v12 + v13 
     let v15 : string = v14 + v7 
     let v16 : string = v15 + v11 
@@ -9001,25 +9467,42 @@ and method221 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64
     let v18 : string = v16 + v17 
     let v19 : string = " / "
     let v20 : string = v18 + v19 
-    let v21 : string = format_real_222(v8, v9)
-    let v22 : string = v20 + v21 
-    method22(v22)
-and closure95 (v0 : string, v1 : string, v2 : string, v3 : string, v4 : bool, v5 : string) (v6 : string) : US41 =
-    let struct (v7 : string, v8 : string) = fix_paths_187(v6, v5, v0)
-    let v9 : bool = file_exists_56(v7)
+    let v21 : string = ""
+    let v22 : string = v21 + v21 
+    let v23 : string = "exit_code"
+    let v24 : string = v22 + v23 
+    let v25 : string = " = "
+    let v26 : string = v24 + v25 
+    let v27 : string = format_real_79(v8)
+    let v28 : string = v26 + v27 
+    let v29 : string = "; "
+    let v30 : string = v28 + v29 
+    let v31 : string = "result"
+    let v32 : string = v30 + v31 
+    let v33 : string = v32 + v25 
+    let v34 : string = v33 + v9 
+    let v35 : string = "{ "
+    let v36 : string = v35 + v34 
+    let v37 : string = " }"
+    let v38 : string = v36 + v37 
+    let v39 : string = v20 + v38 
+    method17(v39)
+and closure89 (v0 : string, v1 : string, v2 : string, v3 : string, v4 : bool, v5 : string) (v6 : string) : US38 =
+    let struct (v7 : string, v8 : string) = fix_paths_128(v6, v5, v0)
+    let v9 : bool = file_exists_50(v7)
     let v10 : bool = v9 = false
     let v13 : bool =
         if v10 then
             true
         else
-            let v11 : bool = file_exists_56(v8)
+            let v11 : bool = file_exists_50(v8)
             let v12 : bool = v11 = false
             v12
     let v236 : bool =
         if v13 then
             false
         else
-            let v14 : string = normalize_path_33(v7)
+            let v14 : string = normalize_path_28(v7)
             let v15 : string = "std::fs::File::open(&*v14)"
             let v16 : Result<std_fs_File, std_io_Error> = __spiral_emit_rust () v15 
             let v17 : string = "$0.unwrap()"
@@ -9036,18 +9519,18 @@ and closure95 (v0 : string, v1 : string, v2 : string, v3 : string, v4 : bool, v5
             let v28 : sha2_Sha256 = __spiral_emit_rust () v27 
             let v29 : string = "true; let mut v28 = v28"
             let v30 : bool = __spiral_emit_rust () v29 
-            let v31 : US42 = method188()
-            let v37 : US43 =
+            let v31 : US39 = method129()
+            let v37 : US40 =
                 match v31 with
-                | US42_Error(v34) -> (* Error *)
-                    US43_None
-                | US42_Ok(v32) -> (* Ok *)
-                    US43_Some(v32)
+                | US39_Error(v34) -> (* Error *)
+                    US40_None
+                | US39_Ok(v32) -> (* Ok *)
+                    US40_Some(v32)
             let v41 : unativeint =
                 match v37 with
-                | US43_None -> (* None *)
+                | US40_None -> (* None *)
                     failwith<unativeint> "Option does not have a value."
-                | US43_Some(v38) -> (* Some *)
+                | US40_Some(v38) -> (* Some *)
                     v38
             let v42 : string = "[$0; 1024 as usize]"
             let v43 : Slice'<uint8> = __spiral_emit_rust 0uy v42 
@@ -9067,18 +9550,18 @@ and closure95 (v0 : string, v1 : string, v2 : string, v3 : string, v4 : bool, v5
                     true
                 else
                     false
-            let v56 : US42 = method189(v51)
-            let v62 : US43 =
+            let v56 : US39 = method130(v51)
+            let v62 : US40 =
                 match v56 with
-                | US42_Error(v59) -> (* Error *)
-                    US43_None
-                | US42_Ok(v57) -> (* Ok *)
-                    US43_Some(v57)
+                | US39_Error(v59) -> (* Error *)
+                    US40_None
+                | US39_Ok(v57) -> (* Ok *)
+                    US40_Some(v57)
             let v66 : unativeint =
                 match v62 with
-                | US43_None -> (* None *)
+                | US40_None -> (* None *)
                     failwith<unativeint> "Option does not have a value."
-                | US43_Some(v63) -> (* Some *)
+                | US40_Some(v63) -> (* Some *)
                     v63
             let v67 : unativeint = v66 |> unbox<unativeint>
             let v68 : string = "v43.len()"
@@ -9102,50 +9585,50 @@ and closure95 (v0 : string, v1 : string, v2 : string, v3 : string, v4 : bool, v5
             let v82 : string = "$0.iter().map(|x| *x).collect::<Vec<_>>()"
             let v83 : Vec<uint8> = __spiral_emit_rust v81 v82 
             let v84 : string = "$0.iter().map(|x| $1(x.clone())).collect::<Vec<_>>()"
-            let v85 : ((uint8) -> string) = closure87()
+            let v85 : ((uint8) -> string) = closure81()
             let v86 : Vec<string> = __spiral_emit_rust struct (v83, v85) v84 
             let v87 : string = "Fsharp"
             let v88 : (string []) = () // backend.backend_switch / record_type_try_find / key: v87 
             let v89 : string list = v88 |> Array.toList
             let v90 : ((string -> (UH0 -> UH0)) -> (string list -> (UH0 -> UH0))) = List.foldBack
-            let v91 : (string -> (UH0 -> UH0)) = method190()
+            let v91 : (string -> (UH0 -> UH0)) = method131()
             let v92 : (string list -> (UH0 -> UH0)) = v90 v91
             let v93 : (UH0 -> UH0) = v92 v89
             let v94 : UH0 = UH0_Nil
             let v95 : UH0 = v93 v94
-            let v96 : string = method191()
+            let v96 : string = method132()
             let v97 : string = ""
-            let struct (v98 : string, v99 : string) = method192(v96, v95, v97)
+            let struct (v98 : string, v99 : string) = method133(v96, v95, v97)
             let v100 : Result<string, std_io_Error> = Ok v98 
-            let v101 : (string -> US44) = method193()
-            let v102 : (std_io_Error -> US44) = method194()
-            let v103 : US44 = match v100 with Ok x -> v101 x | Error x -> v102 x
-            let v110 : US45 =
+            let v101 : (string -> US41) = method134()
+            let v102 : (std_io_Error -> US41) = method135()
+            let v103 : US41 = match v100 with Ok x -> v101 x | Error x -> v102 x
+            let v110 : US42 =
                 match v103 with
-                | US44_Error(v106) -> (* Error *)
+                | US41_Error(v106) -> (* Error *)
                     let v107 : std_string_String = null |> unbox<std_string_String>
-                    US45_Error(v107)
-                | US44_Ok(v104) -> (* Ok *)
-                    US45_Ok(v104)
+                    US42_Error(v107)
+                | US41_Ok(v104) -> (* Ok *)
+                    US42_Ok(v104)
             let v116 : Result<string, std_string_String> =
                 match v110 with
-                | US45_Error(v113) -> (* Error *)
+                | US42_Error(v113) -> (* Error *)
                     let v114 : Result<string, std_string_String> = Error v113 
                     v114
-                | US45_Ok(v111) -> (* Ok *)
+                | US42_Ok(v111) -> (* Ok *)
                     let v112 : Result<string, std_string_String> = Ok v111 
                     v112
-            let v117 : (string -> US45) = method195()
-            let v118 : (std_string_String -> US45) = method196()
-            let v119 : US45 = match v116 with Ok x -> v117 x | Error x -> v118 x
+            let v117 : (string -> US42) = method136()
+            let v118 : (std_string_String -> US42) = method137()
+            let v119 : US42 = match v116 with Ok x -> v117 x | Error x -> v118 x
             let v125 : string =
                 match v119 with
-                | US45_Error(v121) -> (* Error *)
+                | US42_Error(v121) -> (* Error *)
                     let v122 : string = $"resultm.get / Error x: {v121}"
                     failwith<string> v122
-                | US45_Ok(v120) -> (* Ok *)
+                | US42_Ok(v120) -> (* Ok *)
                     v120
-            let v126 : string = normalize_path_33(v8)
+            let v126 : string = normalize_path_28(v8)
             let v127 : string = "std::fs::File::open(&*v126)"
             let v128 : Result<std_fs_File, std_io_Error> = __spiral_emit_rust () v127 
             let v129 : string = "$0.unwrap()"
@@ -9162,18 +9645,18 @@ and closure95 (v0 : string, v1 : string, v2 : string, v3 : string, v4 : bool, v5
             let v140 : sha2_Sha256 = __spiral_emit_rust () v139 
             let v141 : string = "true; let mut v140 = v140"
             let v142 : bool = __spiral_emit_rust () v141 
-            let v143 : US42 = method188()
-            let v149 : US43 =
+            let v143 : US39 = method129()
+            let v149 : US40 =
                 match v143 with
-                | US42_Error(v146) -> (* Error *)
-                    US43_None
-                | US42_Ok(v144) -> (* Ok *)
-                    US43_Some(v144)
+                | US39_Error(v146) -> (* Error *)
+                    US40_None
+                | US39_Ok(v144) -> (* Ok *)
+                    US40_Some(v144)
             let v153 : unativeint =
                 match v149 with
-                | US43_None -> (* None *)
+                | US40_None -> (* None *)
                     failwith<unativeint> "Option does not have a value."
-                | US43_Some(v150) -> (* Some *)
+                | US40_Some(v150) -> (* Some *)
                     v150
             let v154 : string = "[$0; 1024 as usize]"
             let v155 : Slice'<uint8> = __spiral_emit_rust 0uy v154 
@@ -9193,18 +9676,18 @@ and closure95 (v0 : string, v1 : string, v2 : string, v3 : string, v4 : bool, v5
                     true
                 else
                     false
-            let v168 : US42 = method189(v163)
-            let v174 : US43 =
+            let v168 : US39 = method130(v163)
+            let v174 : US40 =
                 match v168 with
-                | US42_Error(v171) -> (* Error *)
-                    US43_None
-                | US42_Ok(v169) -> (* Ok *)
-                    US43_Some(v169)
+                | US39_Error(v171) -> (* Error *)
+                    US40_None
+                | US39_Ok(v169) -> (* Ok *)
+                    US40_Some(v169)
             let v178 : unativeint =
                 match v174 with
-                | US43_None -> (* None *)
+                | US40_None -> (* None *)
                     failwith<unativeint> "Option does not have a value."
-                | US43_Some(v175) -> (* Some *)
+                | US40_Some(v175) -> (* Some *)
                     v175
             let v179 : unativeint = v178 |> unbox<unativeint>
             let v180 : string = "v155.len()"
@@ -9232,54 +9715,54 @@ and closure95 (v0 : string, v1 : string, v2 : string, v3 : string, v4 : bool, v5
             let v198 : (string []) = () // backend.backend_switch / record_type_try_find / key: v87 
             let v199 : string list = v198 |> Array.toList
             let v200 : ((string -> (UH0 -> UH0)) -> (string list -> (UH0 -> UH0))) = List.foldBack
-            let v201 : (string -> (UH0 -> UH0)) = method190()
+            let v201 : (string -> (UH0 -> UH0)) = method131()
             let v202 : (string list -> (UH0 -> UH0)) = v200 v201
             let v203 : (UH0 -> UH0) = v202 v199
             let v204 : UH0 = UH0_Nil
             let v205 : UH0 = v203 v204
-            let v206 : string = method191()
-            let struct (v207 : string, v208 : string) = method192(v206, v205, v97)
+            let v206 : string = method132()
+            let struct (v207 : string, v208 : string) = method133(v206, v205, v97)
             let v209 : Result<string, std_io_Error> = Ok v207 
-            let v210 : (string -> US44) = method193()
-            let v211 : (std_io_Error -> US44) = method194()
-            let v212 : US44 = match v209 with Ok x -> v210 x | Error x -> v211 x
-            let v219 : US45 =
+            let v210 : (string -> US41) = method134()
+            let v211 : (std_io_Error -> US41) = method135()
+            let v212 : US41 = match v209 with Ok x -> v210 x | Error x -> v211 x
+            let v219 : US42 =
                 match v212 with
-                | US44_Error(v215) -> (* Error *)
+                | US41_Error(v215) -> (* Error *)
                     let v216 : std_string_String = null |> unbox<std_string_String>
-                    US45_Error(v216)
-                | US44_Ok(v213) -> (* Ok *)
-                    US45_Ok(v213)
+                    US42_Error(v216)
+                | US41_Ok(v213) -> (* Ok *)
+                    US42_Ok(v213)
             let v225 : Result<string, std_string_String> =
                 match v219 with
-                | US45_Error(v222) -> (* Error *)
+                | US42_Error(v222) -> (* Error *)
                     let v223 : Result<string, std_string_String> = Error v222 
                     v223
-                | US45_Ok(v220) -> (* Ok *)
+                | US42_Ok(v220) -> (* Ok *)
                     let v221 : Result<string, std_string_String> = Ok v220 
                     v221
-            let v226 : (string -> US45) = method195()
-            let v227 : (std_string_String -> US45) = method196()
-            let v228 : US45 = match v225 with Ok x -> v226 x | Error x -> v227 x
+            let v226 : (string -> US42) = method136()
+            let v227 : (std_string_String -> US42) = method137()
+            let v228 : US42 = match v225 with Ok x -> v226 x | Error x -> v227 x
             let v234 : string =
                 match v228 with
-                | US45_Error(v230) -> (* Error *)
+                | US42_Error(v230) -> (* Error *)
                     let v231 : string = $"resultm.get / Error x: {v230}"
                     failwith<string> v231
-                | US45_Ok(v229) -> (* Ok *)
+                | US42_Ok(v229) -> (* Ok *)
                     v229
             let v235 : bool = v125 = v234
             v235
     if v236 then
-        US41_None
+        US38_None
     else
-        let v238 : US46 = hangul_211(v2, v3, v4, v7, v5)
+        let v238 : US43 = hangul_140(v2, v3, v4, v7, v5)
         match v238 with
-        | US46_Error(v316, v317) -> (* Error *)
+        | US43_Error(v316, v317) -> (* Error *)
             let v318 : (string * string) = v7, v317 
             let v319 : Result<string, (string * string)> = Error v318 
-            US41_Some(v319)
-        | US46_Ok(v239, v240) -> (* Ok *)
+            US38_Some(v319)
+        | US43_Ok(v239, v240) -> (* Ok *)
             let v241 : bool = v239 <> 0 
             if v241 then
                 let v242 : bool = TraceState.trace_state.IsNone
@@ -9312,9 +9795,9 @@ and closure95 (v0 : string, v1 : string, v2 : string, v3 : string, v4 : bool, v5
                         let v265 : bool = 30 >= v262
                         v265
                 let v267 : bool = v266 = false
-                let v307 : US7 =
+                let v307 : US4 =
                     if v267 then
-                        US7_None
+                        US4_None
                     else
                         let v269 : bool = TraceState.trace_state.IsNone
                         if v269 then
@@ -9324,9 +9807,9 @@ and closure95 (v0 : string, v1 : string, v2 : string, v3 : string, v4 : bool, v5
                             TraceState.trace_state <- v277 
                             ()
                         let struct (v278 : Mut0, v279 : Mut1, v280 : Mut2, v281 : Mut3, v282 : Mut4, v283 : int64 option) = TraceState.trace_state.Value
-                        let v284 : string = method8(v278, v279, v280, v281, v282, v283)
-                        let v285 : string = method11()
-                        let v286 : string = method221(v278, v279, v280, v281, v282, v283, v284, v285, v239, v240)
+                        let v284 : string = method6(v278, v279, v280, v281, v282, v283)
+                        let v285 : string = method9()
+                        let v286 : string = method147(v278, v279, v280, v281, v282, v283, v284, v285, v239, v240)
                         let v287 : bool = TraceState.trace_state.IsNone
                         if v287 then
                             let v288 : US0 = US0_Verbose
@@ -9338,49 +9821,30 @@ and closure95 (v0 : string, v1 : string, v2 : string, v3 : string, v4 : bool, v5
                         let v302 : int64 = v296.l0
                         let v303 : int64 = v302 + 1L
                         v296.l0 <- v303
-                        let v304 : (string -> unit) = closure12()
+                        let v304 : (string -> unit) = closure5()
                         v304 v286
                         let v305 : (string -> unit) = v297.l0
                         v305 v286
-                        US7_Some(v296, v297, v298, v299, v300, v301)
+                        US4_Some(v296, v297, v298, v299, v300, v301)
                 let v308 : (string * string) = v7, v240 
                 let v309 : Result<string, (string * string)> = Error v308 
-                US41_Some(v309)
+                US38_Some(v309)
             else
-                let v311 : bool = file_exists_56(v7)
+                let v311 : bool = file_exists_50(v7)
                 if v311 then
-                    file_copy_210(v8, v7)
+                    file_copy_139(v8, v7)
                 else
                     let v312 : string = $"documents.files_fn / {v7} should exist"
                     failwith<unit> v312
                 let v313 : Result<string, (string * string)> = Ok v7 
-                US41_Some(v313)
-and closure94 (v0 : string, v1 : string, v2 : string, v3 : string, v4 : bool) (v5 : string) : (string -> US41) =
-    closure95(v0, v1, v2, v3, v4, v5)
-and format_real_226 (v0 : int32, v1 : string, v2 : string) : string =
-    let v3 : string = method13()
-    let v4 : Mut3 = {l0 = v3} : Mut3
-    method18(v4)
-    method185(v4)
-    method20(v4)
-    let v5 : string = $"{v0}"
-    method14(v4, v5)
-    method64(v4)
-    method220(v4)
-    method20(v4)
-    method14(v4, v1)
-    method64(v4)
-    method223(v4)
-    method20(v4)
-    method14(v4, v2)
-    method21(v4)
-    let v6 : string = v4.l0
-    v6
-and method225 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : int32, v9 : string, v10 : string) : string =
+                US38_Some(v313)
+and closure88 (v0 : string, v1 : string, v2 : string, v3 : string, v4 : bool) (v5 : string) : (string -> US38) =
+    closure89(v0, v1, v2, v3, v4, v5)
+and method149 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : int32, v9 : string, v10 : string) : string =
     let v11 : int64 = v0.l0
     let v12 : string = " "
     let v13 : string = v6 + v12 
-    let v14 : string = format_real_16(v11)
+    let v14 : string = format_real_14(v11)
     let v15 : string = v13 + v14 
     let v16 : string = v15 + v7 
     let v17 : string = v16 + v12 
@@ -9388,14 +9852,36 @@ and method225 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64
     let v19 : string = v17 + v18 
     let v20 : string = " / "
     let v21 : string = v19 + v20 
-    let v22 : string = format_real_226(v8, v9, v10)
-    let v23 : string = v21 + v22 
-    method22(v23)
-and method227 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : int32, v9 : string, v10 : string) : string =
+    let v22 : string = ""
+    let v23 : string = v22 + v22 
+    let v24 : string = "exit_code"
+    let v25 : string = v23 + v24 
+    let v26 : string = " = "
+    let v27 : string = v25 + v26 
+    let v28 : string = format_real_79(v8)
+    let v29 : string = v27 + v28 
+    let v30 : string = "; "
+    let v31 : string = v29 + v30 
+    let v32 : string = "output_path"
+    let v33 : string = v31 + v32 
+    let v34 : string = v33 + v26 
+    let v35 : string = v34 + v9 
+    let v36 : string = v35 + v30 
+    let v37 : string = "result"
+    let v38 : string = v36 + v37 
+    let v39 : string = v38 + v26 
+    let v40 : string = v39 + v10 
+    let v41 : string = "{ "
+    let v42 : string = v41 + v40 
+    let v43 : string = " }"
+    let v44 : string = v42 + v43 
+    let v45 : string = v21 + v44 
+    method17(v45)
+and method150 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : int32, v9 : string, v10 : string) : string =
     let v11 : int64 = v0.l0
     let v12 : string = " "
     let v13 : string = v6 + v12 
-    let v14 : string = format_real_16(v11)
+    let v14 : string = format_real_14(v11)
     let v15 : string = v13 + v14 
     let v16 : string = v15 + v7 
     let v17 : string = v16 + v12 
@@ -9403,10 +9889,32 @@ and method227 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64
     let v19 : string = v17 + v18 
     let v20 : string = " / "
     let v21 : string = v19 + v20 
-    let v22 : string = format_real_226(v8, v9, v10)
-    let v23 : string = v21 + v22 
-    method22(v23)
-and crowbook_224 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string) : US46 =
+    let v22 : string = ""
+    let v23 : string = v22 + v22 
+    let v24 : string = "exit_code"
+    let v25 : string = v23 + v24 
+    let v26 : string = " = "
+    let v27 : string = v25 + v26 
+    let v28 : string = format_real_79(v8)
+    let v29 : string = v27 + v28 
+    let v30 : string = "; "
+    let v31 : string = v29 + v30 
+    let v32 : string = "output_path"
+    let v33 : string = v31 + v32 
+    let v34 : string = v33 + v26 
+    let v35 : string = v34 + v9 
+    let v36 : string = v35 + v30 
+    let v37 : string = "result"
+    let v38 : string = v36 + v37 
+    let v39 : string = v38 + v26 
+    let v40 : string = v39 + v10 
+    let v41 : string = "{ "
+    let v42 : string = v41 + v40 
+    let v43 : string = " }"
+    let v44 : string = v42 + v43 
+    let v45 : string = v21 + v44 
+    method17(v45)
+and crowbook_148 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string) : US43 =
     let v5 : bool = "html" = v4
     let v63 : string =
         if v5 then
@@ -9489,7 +9997,7 @@ and crowbook_224 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string)
     let v72 : string option = Some v3 
     let v73 : bool = true
     let v74 : bool = true
-    let struct (v75 : int32, v76 : string) = execute_with_options_94(v71, v64, v65, v66, v67, v73, v72, v74)
+    let struct (v75 : int32, v76 : string) = execute_with_options_76(v71, v64, v65, v66, v67, v73, v72, v74)
     let v77 : bool = v75 = 0
     let struct (v162 : int32, v163 : string) =
         if v77 then
@@ -9525,9 +10033,9 @@ and crowbook_224 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string)
                     let v101 : bool = 40 >= v98
                     v101
             let v103 : bool = v102 = false
-            let v143 : US7 =
+            let v143 : US4 =
                 if v103 then
-                    US7_None
+                    US4_None
                 else
                     let v105 : bool = TraceState.trace_state.IsNone
                     if v105 then
@@ -9537,9 +10045,9 @@ and crowbook_224 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string)
                         TraceState.trace_state <- v113 
                         ()
                     let struct (v114 : Mut0, v115 : Mut1, v116 : Mut2, v117 : Mut3, v118 : Mut4, v119 : int64 option) = TraceState.trace_state.Value
-                    let v120 : string = method8(v114, v115, v116, v117, v118, v119)
-                    let v121 : string = method60()
-                    let v122 : string = method225(v114, v115, v116, v117, v118, v119, v120, v121, v75, v1, v76)
+                    let v120 : string = method6(v114, v115, v116, v117, v118, v119)
+                    let v121 : string = method54()
+                    let v122 : string = method149(v114, v115, v116, v117, v118, v119, v120, v121, v75, v1, v76)
                     let v123 : bool = TraceState.trace_state.IsNone
                     if v123 then
                         let v124 : US0 = US0_Verbose
@@ -9551,11 +10059,11 @@ and crowbook_224 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string)
                     let v138 : int64 = v132.l0
                     let v139 : int64 = v138 + 1L
                     v132.l0 <- v139
-                    let v140 : (string -> unit) = closure12()
+                    let v140 : (string -> unit) = closure5()
                     v140 v122
                     let v141 : (string -> unit) = v133.l0
                     v141 v122
-                    US7_Some(v132, v133, v134, v135, v136, v137)
+                    US4_Some(v132, v133, v134, v135, v136, v137)
             let v144 : System.Threading.CancellationToken option = None
             let v145 : (struct (string * string) []) = [||]
             let v146 : (struct (int32 * string * bool) -> Async<unit>) option = None
@@ -9576,12 +10084,12 @@ and crowbook_224 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string)
             let v157 : string option = Some v3 
             let v158 : bool = true
             let v159 : bool = true
-            execute_with_options_94(v156, v144, v145, v146, v147, v158, v157, v159)
+            execute_with_options_76(v156, v144, v145, v146, v147, v158, v157, v159)
     let v164 : string = "ERROR"
     let v165 : bool = v163.Contains v164 
     let v166 : bool = v165 = false
     if v166 then
-        US46_Ok(v162, v163)
+        US43_Ok(v162, v163)
     else
         let v168 : bool = TraceState.trace_state.IsNone
         if v168 then
@@ -9613,9 +10121,9 @@ and crowbook_224 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string)
                 let v191 : bool = 40 >= v188
                 v191
         let v193 : bool = v192 = false
-        let v233 : US7 =
+        let v233 : US4 =
             if v193 then
-                US7_None
+                US4_None
             else
                 let v195 : bool = TraceState.trace_state.IsNone
                 if v195 then
@@ -9625,9 +10133,9 @@ and crowbook_224 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string)
                     TraceState.trace_state <- v203 
                     ()
                 let struct (v204 : Mut0, v205 : Mut1, v206 : Mut2, v207 : Mut3, v208 : Mut4, v209 : int64 option) = TraceState.trace_state.Value
-                let v210 : string = method8(v204, v205, v206, v207, v208, v209)
-                let v211 : string = method60()
-                let v212 : string = method227(v204, v205, v206, v207, v208, v209, v210, v211, v162, v1, v163)
+                let v210 : string = method6(v204, v205, v206, v207, v208, v209)
+                let v211 : string = method54()
+                let v212 : string = method150(v204, v205, v206, v207, v208, v209, v210, v211, v162, v1, v163)
                 let v213 : bool = TraceState.trace_state.IsNone
                 if v213 then
                     let v214 : US0 = US0_Verbose
@@ -9639,28 +10147,28 @@ and crowbook_224 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string)
                 let v228 : int64 = v222.l0
                 let v229 : int64 = v228 + 1L
                 v222.l0 <- v229
-                let v230 : (string -> unit) = closure12()
+                let v230 : (string -> unit) = closure5()
                 v230 v212
                 let v231 : (string -> unit) = v223.l0
                 v231 v212
-                US7_Some(v222, v223, v224, v225, v226, v227)
-        US46_Error(v162, v163)
-and closure98 (v0 : string, v1 : string, v2 : bool, v3 : string) (v4 : string) : US41 =
-    let struct (v5 : string, v6 : string) = fix_paths_187(v4, v3, v0)
-    let v7 : bool = file_exists_56(v5)
+                US4_Some(v222, v223, v224, v225, v226, v227)
+        US43_Error(v162, v163)
+and closure92 (v0 : string, v1 : string, v2 : bool, v3 : string) (v4 : string) : US38 =
+    let struct (v5 : string, v6 : string) = fix_paths_128(v4, v3, v0)
+    let v7 : bool = file_exists_50(v5)
     let v8 : bool = v7 = false
     let v11 : bool =
         if v8 then
             true
         else
-            let v9 : bool = file_exists_56(v6)
+            let v9 : bool = file_exists_50(v6)
             let v10 : bool = v9 = false
             v10
     let v234 : bool =
         if v11 then
             false
         else
-            let v12 : string = normalize_path_33(v5)
+            let v12 : string = normalize_path_28(v5)
             let v13 : string = "std::fs::File::open(&*v12)"
             let v14 : Result<std_fs_File, std_io_Error> = __spiral_emit_rust () v13 
             let v15 : string = "$0.unwrap()"
@@ -9677,18 +10185,18 @@ and closure98 (v0 : string, v1 : string, v2 : bool, v3 : string) (v4 : string) :
             let v26 : sha2_Sha256 = __spiral_emit_rust () v25 
             let v27 : string = "true; let mut v26 = v26"
             let v28 : bool = __spiral_emit_rust () v27 
-            let v29 : US42 = method188()
-            let v35 : US43 =
+            let v29 : US39 = method129()
+            let v35 : US40 =
                 match v29 with
-                | US42_Error(v32) -> (* Error *)
-                    US43_None
-                | US42_Ok(v30) -> (* Ok *)
-                    US43_Some(v30)
+                | US39_Error(v32) -> (* Error *)
+                    US40_None
+                | US39_Ok(v30) -> (* Ok *)
+                    US40_Some(v30)
             let v39 : unativeint =
                 match v35 with
-                | US43_None -> (* None *)
+                | US40_None -> (* None *)
                     failwith<unativeint> "Option does not have a value."
-                | US43_Some(v36) -> (* Some *)
+                | US40_Some(v36) -> (* Some *)
                     v36
             let v40 : string = "[$0; 1024 as usize]"
             let v41 : Slice'<uint8> = __spiral_emit_rust 0uy v40 
@@ -9708,18 +10216,18 @@ and closure98 (v0 : string, v1 : string, v2 : bool, v3 : string) (v4 : string) :
                     true
                 else
                     false
-            let v54 : US42 = method189(v49)
-            let v60 : US43 =
+            let v54 : US39 = method130(v49)
+            let v60 : US40 =
                 match v54 with
-                | US42_Error(v57) -> (* Error *)
-                    US43_None
-                | US42_Ok(v55) -> (* Ok *)
-                    US43_Some(v55)
+                | US39_Error(v57) -> (* Error *)
+                    US40_None
+                | US39_Ok(v55) -> (* Ok *)
+                    US40_Some(v55)
             let v64 : unativeint =
                 match v60 with
-                | US43_None -> (* None *)
+                | US40_None -> (* None *)
                     failwith<unativeint> "Option does not have a value."
-                | US43_Some(v61) -> (* Some *)
+                | US40_Some(v61) -> (* Some *)
                     v61
             let v65 : unativeint = v64 |> unbox<unativeint>
             let v66 : string = "v41.len()"
@@ -9743,50 +10251,50 @@ and closure98 (v0 : string, v1 : string, v2 : bool, v3 : string) (v4 : string) :
             let v80 : string = "$0.iter().map(|x| *x).collect::<Vec<_>>()"
             let v81 : Vec<uint8> = __spiral_emit_rust v79 v80 
             let v82 : string = "$0.iter().map(|x| $1(x.clone())).collect::<Vec<_>>()"
-            let v83 : ((uint8) -> string) = closure87()
+            let v83 : ((uint8) -> string) = closure81()
             let v84 : Vec<string> = __spiral_emit_rust struct (v81, v83) v82 
             let v85 : string = "Fsharp"
             let v86 : (string []) = () // backend.backend_switch / record_type_try_find / key: v85 
             let v87 : string list = v86 |> Array.toList
             let v88 : ((string -> (UH0 -> UH0)) -> (string list -> (UH0 -> UH0))) = List.foldBack
-            let v89 : (string -> (UH0 -> UH0)) = method190()
+            let v89 : (string -> (UH0 -> UH0)) = method131()
             let v90 : (string list -> (UH0 -> UH0)) = v88 v89
             let v91 : (UH0 -> UH0) = v90 v87
             let v92 : UH0 = UH0_Nil
             let v93 : UH0 = v91 v92
-            let v94 : string = method191()
+            let v94 : string = method132()
             let v95 : string = ""
-            let struct (v96 : string, v97 : string) = method192(v94, v93, v95)
+            let struct (v96 : string, v97 : string) = method133(v94, v93, v95)
             let v98 : Result<string, std_io_Error> = Ok v96 
-            let v99 : (string -> US44) = method193()
-            let v100 : (std_io_Error -> US44) = method194()
-            let v101 : US44 = match v98 with Ok x -> v99 x | Error x -> v100 x
-            let v108 : US45 =
+            let v99 : (string -> US41) = method134()
+            let v100 : (std_io_Error -> US41) = method135()
+            let v101 : US41 = match v98 with Ok x -> v99 x | Error x -> v100 x
+            let v108 : US42 =
                 match v101 with
-                | US44_Error(v104) -> (* Error *)
+                | US41_Error(v104) -> (* Error *)
                     let v105 : std_string_String = null |> unbox<std_string_String>
-                    US45_Error(v105)
-                | US44_Ok(v102) -> (* Ok *)
-                    US45_Ok(v102)
+                    US42_Error(v105)
+                | US41_Ok(v102) -> (* Ok *)
+                    US42_Ok(v102)
             let v114 : Result<string, std_string_String> =
                 match v108 with
-                | US45_Error(v111) -> (* Error *)
+                | US42_Error(v111) -> (* Error *)
                     let v112 : Result<string, std_string_String> = Error v111 
                     v112
-                | US45_Ok(v109) -> (* Ok *)
+                | US42_Ok(v109) -> (* Ok *)
                     let v110 : Result<string, std_string_String> = Ok v109 
                     v110
-            let v115 : (string -> US45) = method195()
-            let v116 : (std_string_String -> US45) = method196()
-            let v117 : US45 = match v114 with Ok x -> v115 x | Error x -> v116 x
+            let v115 : (string -> US42) = method136()
+            let v116 : (std_string_String -> US42) = method137()
+            let v117 : US42 = match v114 with Ok x -> v115 x | Error x -> v116 x
             let v123 : string =
                 match v117 with
-                | US45_Error(v119) -> (* Error *)
+                | US42_Error(v119) -> (* Error *)
                     let v120 : string = $"resultm.get / Error x: {v119}"
                     failwith<string> v120
-                | US45_Ok(v118) -> (* Ok *)
+                | US42_Ok(v118) -> (* Ok *)
                     v118
-            let v124 : string = normalize_path_33(v6)
+            let v124 : string = normalize_path_28(v6)
             let v125 : string = "std::fs::File::open(&*v124)"
             let v126 : Result<std_fs_File, std_io_Error> = __spiral_emit_rust () v125 
             let v127 : string = "$0.unwrap()"
@@ -9803,18 +10311,18 @@ and closure98 (v0 : string, v1 : string, v2 : bool, v3 : string) (v4 : string) :
             let v138 : sha2_Sha256 = __spiral_emit_rust () v137 
             let v139 : string = "true; let mut v138 = v138"
             let v140 : bool = __spiral_emit_rust () v139 
-            let v141 : US42 = method188()
-            let v147 : US43 =
+            let v141 : US39 = method129()
+            let v147 : US40 =
                 match v141 with
-                | US42_Error(v144) -> (* Error *)
-                    US43_None
-                | US42_Ok(v142) -> (* Ok *)
-                    US43_Some(v142)
+                | US39_Error(v144) -> (* Error *)
+                    US40_None
+                | US39_Ok(v142) -> (* Ok *)
+                    US40_Some(v142)
             let v151 : unativeint =
                 match v147 with
-                | US43_None -> (* None *)
+                | US40_None -> (* None *)
                     failwith<unativeint> "Option does not have a value."
-                | US43_Some(v148) -> (* Some *)
+                | US40_Some(v148) -> (* Some *)
                     v148
             let v152 : string = "[$0; 1024 as usize]"
             let v153 : Slice'<uint8> = __spiral_emit_rust 0uy v152 
@@ -9834,18 +10342,18 @@ and closure98 (v0 : string, v1 : string, v2 : bool, v3 : string) (v4 : string) :
                     true
                 else
                     false
-            let v166 : US42 = method189(v161)
-            let v172 : US43 =
+            let v166 : US39 = method130(v161)
+            let v172 : US40 =
                 match v166 with
-                | US42_Error(v169) -> (* Error *)
-                    US43_None
-                | US42_Ok(v167) -> (* Ok *)
-                    US43_Some(v167)
+                | US39_Error(v169) -> (* Error *)
+                    US40_None
+                | US39_Ok(v167) -> (* Ok *)
+                    US40_Some(v167)
             let v176 : unativeint =
                 match v172 with
-                | US43_None -> (* None *)
+                | US40_None -> (* None *)
                     failwith<unativeint> "Option does not have a value."
-                | US43_Some(v173) -> (* Some *)
+                | US40_Some(v173) -> (* Some *)
                     v173
             let v177 : unativeint = v176 |> unbox<unativeint>
             let v178 : string = "v153.len()"
@@ -9873,54 +10381,54 @@ and closure98 (v0 : string, v1 : string, v2 : bool, v3 : string) (v4 : string) :
             let v196 : (string []) = () // backend.backend_switch / record_type_try_find / key: v85 
             let v197 : string list = v196 |> Array.toList
             let v198 : ((string -> (UH0 -> UH0)) -> (string list -> (UH0 -> UH0))) = List.foldBack
-            let v199 : (string -> (UH0 -> UH0)) = method190()
+            let v199 : (string -> (UH0 -> UH0)) = method131()
             let v200 : (string list -> (UH0 -> UH0)) = v198 v199
             let v201 : (UH0 -> UH0) = v200 v197
             let v202 : UH0 = UH0_Nil
             let v203 : UH0 = v201 v202
-            let v204 : string = method191()
-            let struct (v205 : string, v206 : string) = method192(v204, v203, v95)
+            let v204 : string = method132()
+            let struct (v205 : string, v206 : string) = method133(v204, v203, v95)
             let v207 : Result<string, std_io_Error> = Ok v205 
-            let v208 : (string -> US44) = method193()
-            let v209 : (std_io_Error -> US44) = method194()
-            let v210 : US44 = match v207 with Ok x -> v208 x | Error x -> v209 x
-            let v217 : US45 =
+            let v208 : (string -> US41) = method134()
+            let v209 : (std_io_Error -> US41) = method135()
+            let v210 : US41 = match v207 with Ok x -> v208 x | Error x -> v209 x
+            let v217 : US42 =
                 match v210 with
-                | US44_Error(v213) -> (* Error *)
+                | US41_Error(v213) -> (* Error *)
                     let v214 : std_string_String = null |> unbox<std_string_String>
-                    US45_Error(v214)
-                | US44_Ok(v211) -> (* Ok *)
-                    US45_Ok(v211)
+                    US42_Error(v214)
+                | US41_Ok(v211) -> (* Ok *)
+                    US42_Ok(v211)
             let v223 : Result<string, std_string_String> =
                 match v217 with
-                | US45_Error(v220) -> (* Error *)
+                | US42_Error(v220) -> (* Error *)
                     let v221 : Result<string, std_string_String> = Error v220 
                     v221
-                | US45_Ok(v218) -> (* Ok *)
+                | US42_Ok(v218) -> (* Ok *)
                     let v219 : Result<string, std_string_String> = Ok v218 
                     v219
-            let v224 : (string -> US45) = method195()
-            let v225 : (std_string_String -> US45) = method196()
-            let v226 : US45 = match v223 with Ok x -> v224 x | Error x -> v225 x
+            let v224 : (string -> US42) = method136()
+            let v225 : (std_string_String -> US42) = method137()
+            let v226 : US42 = match v223 with Ok x -> v224 x | Error x -> v225 x
             let v232 : string =
                 match v226 with
-                | US45_Error(v228) -> (* Error *)
+                | US42_Error(v228) -> (* Error *)
                     let v229 : string = $"resultm.get / Error x: {v228}"
                     failwith<string> v229
-                | US45_Ok(v227) -> (* Ok *)
+                | US42_Ok(v227) -> (* Ok *)
                     v227
             let v233 : bool = v123 = v232
             v233
     if v234 then
-        US41_None
+        US38_None
     else
-        let v236 : US46 = crowbook_224(v2, v5, v3, v1, v4)
+        let v236 : US43 = crowbook_148(v2, v5, v3, v1, v4)
         match v236 with
-        | US46_Error(v314, v315) -> (* Error *)
+        | US43_Error(v314, v315) -> (* Error *)
             let v316 : (string * string) = v5, v315 
             let v317 : Result<string, (string * string)> = Error v316 
-            US41_Some(v317)
-        | US46_Ok(v237, v238) -> (* Ok *)
+            US38_Some(v317)
+        | US43_Ok(v237, v238) -> (* Ok *)
             let v239 : bool = v237 <> 0 
             if v239 then
                 let v240 : bool = TraceState.trace_state.IsNone
@@ -9953,9 +10461,9 @@ and closure98 (v0 : string, v1 : string, v2 : bool, v3 : string) (v4 : string) :
                         let v263 : bool = 30 >= v260
                         v263
                 let v265 : bool = v264 = false
-                let v305 : US7 =
+                let v305 : US4 =
                     if v265 then
-                        US7_None
+                        US4_None
                     else
                         let v267 : bool = TraceState.trace_state.IsNone
                         if v267 then
@@ -9965,9 +10473,9 @@ and closure98 (v0 : string, v1 : string, v2 : bool, v3 : string) (v4 : string) :
                             TraceState.trace_state <- v275 
                             ()
                         let struct (v276 : Mut0, v277 : Mut1, v278 : Mut2, v279 : Mut3, v280 : Mut4, v281 : int64 option) = TraceState.trace_state.Value
-                        let v282 : string = method8(v276, v277, v278, v279, v280, v281)
-                        let v283 : string = method11()
-                        let v284 : string = method221(v276, v277, v278, v279, v280, v281, v282, v283, v237, v238)
+                        let v282 : string = method6(v276, v277, v278, v279, v280, v281)
+                        let v283 : string = method9()
+                        let v284 : string = method147(v276, v277, v278, v279, v280, v281, v282, v283, v237, v238)
                         let v285 : bool = TraceState.trace_state.IsNone
                         if v285 then
                             let v286 : US0 = US0_Verbose
@@ -9979,50 +10487,30 @@ and closure98 (v0 : string, v1 : string, v2 : bool, v3 : string) (v4 : string) :
                         let v300 : int64 = v294.l0
                         let v301 : int64 = v300 + 1L
                         v294.l0 <- v301
-                        let v302 : (string -> unit) = closure12()
+                        let v302 : (string -> unit) = closure5()
                         v302 v284
                         let v303 : (string -> unit) = v295.l0
                         v303 v284
-                        US7_Some(v294, v295, v296, v297, v298, v299)
+                        US4_Some(v294, v295, v296, v297, v298, v299)
                 let v306 : (string * string) = v5, v238 
                 let v307 : Result<string, (string * string)> = Error v306 
-                US41_Some(v307)
+                US38_Some(v307)
             else
-                let v309 : bool = file_exists_56(v5)
+                let v309 : bool = file_exists_50(v5)
                 if v309 then
-                    file_copy_210(v6, v5)
+                    file_copy_139(v6, v5)
                 else
                     let v310 : string = $"documents.files_fn / {v5} should exist"
                     failwith<unit> v310
                 let v311 : Result<string, (string * string)> = Ok v5 
-                US41_Some(v311)
-and closure97 (v0 : string, v1 : string, v2 : bool) (v3 : string) : (string -> US41) =
-    closure98(v0, v1, v2, v3)
-and method230 (v0 : Mut3) : unit =
-    let v1 : string = v0.l0
-    let v2 : string = "output_cache_path"
-    let v3 : string = v1 + v2 
-    v0.l0 <- v3
-    ()
-and format_real_229 (v0 : string, v1 : string) : string =
-    let v2 : string = method13()
-    let v3 : Mut3 = {l0 = v2} : Mut3
-    method18(v3)
-    method220(v3)
-    method20(v3)
-    method14(v3, v0)
-    method64(v3)
-    method230(v3)
-    method20(v3)
-    method14(v3, v1)
-    method21(v3)
-    let v4 : string = v3.l0
-    v4
-and method228 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : string, v9 : string) : string =
+                US38_Some(v311)
+and closure91 (v0 : string, v1 : string, v2 : bool) (v3 : string) : (string -> US38) =
+    closure92(v0, v1, v2, v3)
+and method151 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : string, v9 : string) : string =
     let v10 : int64 = v0.l0
     let v11 : string = " "
     let v12 : string = v6 + v11 
-    let v13 : string = format_real_16(v10)
+    let v13 : string = format_real_14(v10)
     let v14 : string = v12 + v13 
     let v15 : string = v14 + v7 
     let v16 : string = v15 + v11 
@@ -10030,102 +10518,118 @@ and method228 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64
     let v18 : string = v16 + v17 
     let v19 : string = " / "
     let v20 : string = v18 + v19 
-    let v21 : string = format_real_229(v8, v9)
-    let v22 : string = v20 + v21 
-    method22(v22)
-and method231 (v0 : UH1, v1 : UH2 list) : UH2 list =
+    let v21 : string = ""
+    let v22 : string = v21 + v21 
+    let v23 : string = "output_path"
+    let v24 : string = v22 + v23 
+    let v25 : string = " = "
+    let v26 : string = v24 + v25 
+    let v27 : string = v26 + v8 
+    let v28 : string = "; "
+    let v29 : string = v27 + v28 
+    let v30 : string = "output_cache_path"
+    let v31 : string = v29 + v30 
+    let v32 : string = v31 + v25 
+    let v33 : string = v32 + v9 
+    let v34 : string = "{ "
+    let v35 : string = v34 + v33 
+    let v36 : string = " }"
+    let v37 : string = v35 + v36 
+    let v38 : string = v20 + v37 
+    method17(v38)
+and method152 (v0 : UH1, v1 : UH2 list) : UH2 list =
     match v0 with
     | UH1_Cons(v2, v3) -> (* Cons *)
-        let v4 : UH2 list = method231(v3, v1)
+        let v4 : UH2 list = method152(v3, v1)
         let v5 : UH2 list = v2 :: v4 
         v5
     | UH1_Nil -> (* Nil *)
         v1
-and closure100 (v0 : UH2) (v1 : UH1) : UH1 =
+and closure94 (v0 : UH2) (v1 : UH1) : UH1 =
     UH1_Cons(v0, v1)
-and closure99 () (v0 : UH2) : (UH1 -> UH1) =
-    closure100(v0)
-and method232 () : (UH2 -> (UH1 -> UH1)) =
-    closure99()
-and method234 (v0 : UH2, v1 : struct (string * string * (string -> (string -> US41))) list) : struct (string * string * (string -> (string -> US41))) list =
+and closure93 () (v0 : UH2) : (UH1 -> UH1) =
+    closure94(v0)
+and method153 () : (UH2 -> (UH1 -> UH1)) =
+    closure93()
+and method155 (v0 : UH2, v1 : struct (string * string * (string -> (string -> US38))) list) : struct (string * string * (string -> (string -> US38))) list =
     match v0 with
     | UH2_Cons(v2, v3, v4, v5) -> (* Cons *)
-        let v6 : struct (string * string * (string -> (string -> US41))) list = method234(v5, v1)
-        let v7 : struct (string * string * (string -> (string -> US41))) list = struct (v2, v3, v4) :: v6 
+        let v6 : struct (string * string * (string -> (string -> US38))) list = method155(v5, v1)
+        let v7 : struct (string * string * (string -> (string -> US38))) list = struct (v2, v3, v4) :: v6 
         v7
     | UH2_Nil -> (* Nil *)
         v1
-and method236 (v0 : Result<string, (string * string)> option) : Result<string, (string * string)> option =
+and method157 (v0 : Result<string, (string * string)> option) : Result<string, (string * string)> option =
     v0
-and method237 (v0 : Vec<Result<string, (string * string)> option>) : Vec<Result<string, (string * string)> option> =
+and method158 (v0 : Vec<Result<string, (string * string)> option>) : Vec<Result<string, (string * string)> option> =
     v0
-and loop_235 (v0 : (struct (string * string * (string -> (string -> US41))) []), v1 : int32, v2 : int32, v3 : Vec<Result<string, (string * string)> option>) : Vec<Result<string, (string * string)> option> =
+and loop_156 (v0 : (struct (string * string * (string -> (string -> US38))) []), v1 : int32, v2 : int32, v3 : Vec<Result<string, (string * string)> option>) : Vec<Result<string, (string * string)> option> =
     let v4 : bool = v2 < v1
     if v4 then
         let v5 : int32 = v2 + 1
-        let struct (v6 : string, v7 : string, v8 : (string -> (string -> US41))) = v0.[int v2]
-        let v9 : (string -> US41) = v8 v7
-        let v10 : US41 = v9 v6
+        let struct (v6 : string, v7 : string, v8 : (string -> (string -> US38))) = v0.[int v2]
+        let v9 : (string -> US38) = v8 v7
+        let v10 : US38 = v9 v6
         let v15 : Result<string, (string * string)> option =
             match v10 with
-            | US41_None -> (* None *)
+            | US38_None -> (* None *)
                 let v13 : Result<string, (string * string)> option = None
                 v13
-            | US41_Some(v11) -> (* Some *)
+            | US38_Some(v11) -> (* Some *)
                 let v12 : Result<string, (string * string)> option = Some v11 
                 v12
-        let v16 : Result<string, (string * string)> option = method236(v15)
-        let v17 : Vec<Result<string, (string * string)> option> = method237(v3)
+        let v16 : Result<string, (string * string)> option = method157(v15)
+        let v17 : Vec<Result<string, (string * string)> option> = method158(v3)
         let v18 : string = "true; let mut v17 = v17"
         let v19 : bool = __spiral_emit_rust () v18 
         let v20 : string = "true; v17.push(v16)"
         let v21 : bool = __spiral_emit_rust () v20 
         let v22 : string = "v17"
         let v23 : Vec<Result<string, (string * string)> option> = __spiral_emit_rust () v22 
-        loop_235(v0, v1, v5, v23)
+        loop_156(v0, v1, v5, v23)
     else
         v3
-and method238 (v0 : Vec<Result<string, (string * string)> option>) : Vec<Result<string, (string * string)> option> =
+and method159 (v0 : Vec<Result<string, (string * string)> option>) : Vec<Result<string, (string * string)> option> =
     v0
-and method239 (v0 : Vec<Result<string, (string * string)> option>) : Vec<Result<string, (string * string)> option> =
+and method160 (v0 : Vec<Result<string, (string * string)> option>) : Vec<Result<string, (string * string)> option> =
     v0
-and method233 (v0 : UH1, v1 : Vec<Result<string, (string * string)> option>) : Vec<Result<string, (string * string)> option> =
+and method154 (v0 : UH1, v1 : Vec<Result<string, (string * string)> option>) : Vec<Result<string, (string * string)> option> =
     match v0 with
     | UH1_Cons(v2, v3) -> (* Cons *)
-        let v4 : struct (string * string * (string -> (string -> US41))) list = []
-        let v5 : struct (string * string * (string -> (string -> US41))) list = method234(v2, v4)
-        let v6 : (struct (string * string * (string -> (string -> US41))) list -> (struct (string * string * (string -> (string -> US41))) [])) = List.toArray
-        let v7 : (struct (string * string * (string -> (string -> US41))) []) = v6 v5
+        let v4 : struct (string * string * (string -> (string -> US38))) list = []
+        let v5 : struct (string * string * (string -> (string -> US38))) list = method155(v2, v4)
+        let v6 : (struct (string * string * (string -> (string -> US38))) list -> (struct (string * string * (string -> (string -> US38))) [])) = List.toArray
+        let v7 : (struct (string * string * (string -> (string -> US38))) []) = v6 v5
         let v8 : string = "Fsharp"
-        let v9 : Vec<struct (string * string * (string -> (string -> US41)))> = () // backend.backend_switch / record_type_try_find / key: v8 
-        let v10 : (struct (string * string * (string -> (string -> US41))) []) = () // backend.backend_switch / record_type_try_find / key: v8 
+        let v9 : Vec<struct (string * string * (string -> (string -> US38)))> = () // backend.backend_switch / record_type_try_find / key: v8 
+        let v10 : (struct (string * string * (string -> (string -> US38))) []) = () // backend.backend_switch / record_type_try_find / key: v8 
         let v11 : int32 = (v10.borrow().len() as i32)
         let v12 : int32 = 0
         let v13 : Vec<Result<string, (string * string)> option> = () // backend.backend_switch / record_type_try_find / key: v8 
-        let v14 : Vec<Result<string, (string * string)> option> = loop_235(v10, v11, v12, v13)
+        let v14 : Vec<Result<string, (string * string)> option> = loop_156(v10, v11, v12, v13)
         let v15 : (Result<string, (string * string)> option []) = () // backend.backend_switch / record_type_try_find / key: v8 
         let v16 : Vec<Result<string, (string * string)> option> = () // backend.backend_switch / record_type_try_find / key: v8 
-        let v17 : Vec<Result<string, (string * string)> option> = method238(v16)
-        let v18 : Vec<Result<string, (string * string)> option> = method239(v1)
+        let v17 : Vec<Result<string, (string * string)> option> = method159(v16)
+        let v18 : Vec<Result<string, (string * string)> option> = method160(v1)
         let v19 : string = "true; let mut v18 = v18"
         let v20 : bool = __spiral_emit_rust () v19 
         let v21 : string = "true; v18.extend(v17)"
         let v22 : bool = __spiral_emit_rust () v21 
         let v23 : string = "v18"
         let v24 : Vec<Result<string, (string * string)> option> = __spiral_emit_rust () v23 
-        method233(v3, v24)
+        method154(v3, v24)
     | UH1_Nil -> (* Nil *)
         v1
-and method240 (v0 : Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>) : Result<(string * Vec<Result<string, (string * string)> option>), std_string_String> =
+and method161 (v0 : Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>) : Result<(string * Vec<Result<string, (string * string)> option>), std_string_String> =
     v0
-and method241 (v0 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>) : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> =
+and method162 (v0 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>) : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> =
     v0
-and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 : string, v6 : (string []), v7 : int32, v8 : int32, v9 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>) : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> =
+and loop_73 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 : string, v6 : (string []), v7 : int32, v8 : int32, v9 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>) : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> =
     let v10 : bool = v8 < v7
     if v10 then
         let v11 : int32 = v8 + 1
         let v12 : string = v6.[int v8]
-        let v13 : string = get_full_path_66(v12)
+        let v13 : string = get_full_path_56(v12)
         let v14 : Ref<Str> = v13 |> unbox<Ref<Str>>
         let v15 : std_string_String = v14 |> unbox<std_string_String>
         let v16 : std_path_PathBuf = v15 |> unbox<std_path_PathBuf>
@@ -10133,15 +10637,15 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
         let v18 : std_string_String = null |> unbox<std_string_String>
         let v19 : string = "Fsharp"
         let v20 : string = () // backend.backend_switch / record_type_try_find / key: v19 
-        let v21 : string = method92()
+        let v21 : string = method74()
         let v22 : string = v20.Replace (v4, v21)
         let v23 : string = "\\"
         let v24 : string = "/"
         let v25 : string = v22.Replace (v23, v24)
         let v26 : string = $".{v25}"
-        let v27 : string = normalize_path_33(v13)
-        let v28 : string = method49(v3, v26)
-        let v29 : string = standardize_path_93(v28)
+        let v27 : string = normalize_path_28(v13)
+        let v28 : string = method43(v3, v26)
+        let v29 : string = standardize_path_75(v28)
         let v30 : System.Threading.CancellationToken option = None
         let v31 : (struct (string * string) []) = [||]
         let v32 : (struct (int32 * string * bool) -> Async<unit>) option = None
@@ -10151,9 +10655,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
         let v36 : string option = Some v3 
         let v37 : bool = true
         let v38 : bool = true
-        let struct (v39 : int32, v40 : string) = execute_with_options_94(v35, v30, v31, v32, v33, v37, v36, v38)
-        let v41 : string = method49(v4, v26)
-        let v42 : string = standardize_path_93(v41)
+        let struct (v39 : int32, v40 : string) = execute_with_options_76(v35, v30, v31, v32, v33, v37, v36, v38)
+        let v41 : string = method43(v4, v26)
+        let v42 : string = standardize_path_75(v41)
         let v43 : System.Threading.CancellationToken option = None
         let v44 : (struct (string * string) []) = [||]
         let v45 : (struct (int32 * string * bool) -> Async<unit>) option = None
@@ -10163,11 +10667,11 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
         let v49 : string option = Some v4 
         let v50 : bool = true
         let v51 : bool = true
-        let struct (v52 : int32, v53 : string) = execute_with_options_94(v48, v43, v44, v45, v46, v50, v49, v51)
-        let v54 : string = method49(v5, v26)
-        let v55 : string = standardize_path_93(v54)
+        let struct (v52 : int32, v53 : string) = execute_with_options_76(v48, v43, v44, v45, v46, v50, v49, v51)
+        let v54 : string = method43(v5, v26)
+        let v55 : string = standardize_path_75(v54)
         let v56 : string = "hangul.md"
-        let struct (v57 : string, v58 : string) = fix_paths_187(v56, v42, v5)
+        let struct (v57 : string, v58 : string) = fix_paths_128(v56, v42, v5)
         let v59 : bool = false
         let v60 : bool = false
         let v61 : bool = false
@@ -10179,7 +10683,7 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
             if v65 then
                 UH1_Nil
             else
-                let v67 : string = normalize_path_33(v42)
+                let v67 : string = normalize_path_28(v42)
                 let v68 : string = "std::fs::File::open(&*v67)"
                 let v69 : Result<std_fs_File, std_io_Error> = __spiral_emit_rust () v68 
                 let v70 : string = "$0.unwrap()"
@@ -10196,18 +10700,18 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                 let v81 : sha2_Sha256 = __spiral_emit_rust () v80 
                 let v82 : string = "true; let mut v81 = v81"
                 let v83 : bool = __spiral_emit_rust () v82 
-                let v84 : US42 = method188()
-                let v90 : US43 =
+                let v84 : US39 = method129()
+                let v90 : US40 =
                     match v84 with
-                    | US42_Error(v87) -> (* Error *)
-                        US43_None
-                    | US42_Ok(v85) -> (* Ok *)
-                        US43_Some(v85)
+                    | US39_Error(v87) -> (* Error *)
+                        US40_None
+                    | US39_Ok(v85) -> (* Ok *)
+                        US40_Some(v85)
                 let v94 : unativeint =
                     match v90 with
-                    | US43_None -> (* None *)
+                    | US40_None -> (* None *)
                         failwith<unativeint> "Option does not have a value."
-                    | US43_Some(v91) -> (* Some *)
+                    | US40_Some(v91) -> (* Some *)
                         v91
                 let v95 : string = "[$0; 1024 as usize]"
                 let v96 : Slice'<uint8> = __spiral_emit_rust 0uy v95 
@@ -10227,18 +10731,18 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                         true
                     else
                         false
-                let v109 : US42 = method189(v104)
-                let v115 : US43 =
+                let v109 : US39 = method130(v104)
+                let v115 : US40 =
                     match v109 with
-                    | US42_Error(v112) -> (* Error *)
-                        US43_None
-                    | US42_Ok(v110) -> (* Ok *)
-                        US43_Some(v110)
+                    | US39_Error(v112) -> (* Error *)
+                        US40_None
+                    | US39_Ok(v110) -> (* Ok *)
+                        US40_Some(v110)
                 let v119 : unativeint =
                     match v115 with
-                    | US43_None -> (* None *)
+                    | US40_None -> (* None *)
                         failwith<unativeint> "Option does not have a value."
-                    | US43_Some(v116) -> (* Some *)
+                    | US40_Some(v116) -> (* Some *)
                         v116
                 let v120 : unativeint = v119 |> unbox<unativeint>
                 let v121 : string = "v96.len()"
@@ -10262,55 +10766,55 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                 let v135 : string = "$0.iter().map(|x| *x).collect::<Vec<_>>()"
                 let v136 : Vec<uint8> = __spiral_emit_rust v134 v135 
                 let v137 : string = "$0.iter().map(|x| $1(x.clone())).collect::<Vec<_>>()"
-                let v138 : ((uint8) -> string) = closure87()
+                let v138 : ((uint8) -> string) = closure81()
                 let v139 : Vec<string> = __spiral_emit_rust struct (v136, v138) v137 
                 let v140 : (string []) = () // backend.backend_switch / record_type_try_find / key: v19 
                 let v141 : string list = v140 |> Array.toList
                 let v142 : ((string -> (UH0 -> UH0)) -> (string list -> (UH0 -> UH0))) = List.foldBack
-                let v143 : (string -> (UH0 -> UH0)) = method190()
+                let v143 : (string -> (UH0 -> UH0)) = method131()
                 let v144 : (string list -> (UH0 -> UH0)) = v142 v143
                 let v145 : (UH0 -> UH0) = v144 v141
                 let v146 : UH0 = UH0_Nil
                 let v147 : UH0 = v145 v146
-                let v148 : string = method191()
+                let v148 : string = method132()
                 let v149 : string = ""
-                let struct (v150 : string, v151 : string) = method192(v148, v147, v149)
+                let struct (v150 : string, v151 : string) = method133(v148, v147, v149)
                 let v152 : Result<string, std_io_Error> = Ok v150 
-                let v153 : (string -> US44) = method193()
-                let v154 : (std_io_Error -> US44) = method194()
-                let v155 : US44 = match v152 with Ok x -> v153 x | Error x -> v154 x
-                let v162 : US45 =
+                let v153 : (string -> US41) = method134()
+                let v154 : (std_io_Error -> US41) = method135()
+                let v155 : US41 = match v152 with Ok x -> v153 x | Error x -> v154 x
+                let v162 : US42 =
                     match v155 with
-                    | US44_Error(v158) -> (* Error *)
+                    | US41_Error(v158) -> (* Error *)
                         let v159 : std_string_String = null |> unbox<std_string_String>
-                        US45_Error(v159)
-                    | US44_Ok(v156) -> (* Ok *)
-                        US45_Ok(v156)
+                        US42_Error(v159)
+                    | US41_Ok(v156) -> (* Ok *)
+                        US42_Ok(v156)
                 let v168 : Result<string, std_string_String> =
                     match v162 with
-                    | US45_Error(v165) -> (* Error *)
+                    | US42_Error(v165) -> (* Error *)
                         let v166 : Result<string, std_string_String> = Error v165 
                         v166
-                    | US45_Ok(v163) -> (* Ok *)
+                    | US42_Ok(v163) -> (* Ok *)
                         let v164 : Result<string, std_string_String> = Ok v163 
                         v164
-                let v169 : (string -> US45) = method195()
-                let v170 : (std_string_String -> US45) = method196()
-                let v171 : US45 = match v168 with Ok x -> v169 x | Error x -> v170 x
+                let v169 : (string -> US42) = method136()
+                let v170 : (std_string_String -> US42) = method137()
+                let v171 : US42 = match v168 with Ok x -> v169 x | Error x -> v170 x
                 let v177 : string =
                     match v171 with
-                    | US45_Error(v173) -> (* Error *)
+                    | US42_Error(v173) -> (* Error *)
                         let v174 : string = $"resultm.get / Error x: {v173}"
                         failwith<string> v174
-                    | US45_Ok(v172) -> (* Ok *)
+                    | US42_Ok(v172) -> (* Ok *)
                         v172
-                let v178 : bool = file_exists_56(v55)
+                let v178 : bool = file_exists_50(v55)
                 let v179 : bool = v178 = false
                 let v290 : US3 =
                     if v179 then
                         US3_None
                     else
-                        let v181 : string = normalize_path_33(v55)
+                        let v181 : string = normalize_path_28(v55)
                         let v182 : string = "std::fs::File::open(&*v181)"
                         let v183 : Result<std_fs_File, std_io_Error> = __spiral_emit_rust () v182 
                         let v184 : string = "$0.unwrap()"
@@ -10327,18 +10831,18 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                         let v195 : sha2_Sha256 = __spiral_emit_rust () v194 
                         let v196 : string = "true; let mut v195 = v195"
                         let v197 : bool = __spiral_emit_rust () v196 
-                        let v198 : US42 = method188()
-                        let v204 : US43 =
+                        let v198 : US39 = method129()
+                        let v204 : US40 =
                             match v198 with
-                            | US42_Error(v201) -> (* Error *)
-                                US43_None
-                            | US42_Ok(v199) -> (* Ok *)
-                                US43_Some(v199)
+                            | US39_Error(v201) -> (* Error *)
+                                US40_None
+                            | US39_Ok(v199) -> (* Ok *)
+                                US40_Some(v199)
                         let v208 : unativeint =
                             match v204 with
-                            | US43_None -> (* None *)
+                            | US40_None -> (* None *)
                                 failwith<unativeint> "Option does not have a value."
-                            | US43_Some(v205) -> (* Some *)
+                            | US40_Some(v205) -> (* Some *)
                                 v205
                         let v209 : string = "[$0; 1024 as usize]"
                         let v210 : Slice'<uint8> = __spiral_emit_rust 0uy v209 
@@ -10358,18 +10862,18 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                 true
                             else
                                 false
-                        let v223 : US42 = method189(v218)
-                        let v229 : US43 =
+                        let v223 : US39 = method130(v218)
+                        let v229 : US40 =
                             match v223 with
-                            | US42_Error(v226) -> (* Error *)
-                                US43_None
-                            | US42_Ok(v224) -> (* Ok *)
-                                US43_Some(v224)
+                            | US39_Error(v226) -> (* Error *)
+                                US40_None
+                            | US39_Ok(v224) -> (* Ok *)
+                                US40_Some(v224)
                         let v233 : unativeint =
                             match v229 with
-                            | US43_None -> (* None *)
+                            | US40_None -> (* None *)
                                 failwith<unativeint> "Option does not have a value."
-                            | US43_Some(v230) -> (* Some *)
+                            | US40_Some(v230) -> (* Some *)
                                 v230
                         let v234 : unativeint = v233 |> unbox<unativeint>
                         let v235 : string = "v210.len()"
@@ -10397,39 +10901,39 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                         let v253 : (string []) = () // backend.backend_switch / record_type_try_find / key: v19 
                         let v254 : string list = v253 |> Array.toList
                         let v255 : ((string -> (UH0 -> UH0)) -> (string list -> (UH0 -> UH0))) = List.foldBack
-                        let v256 : (string -> (UH0 -> UH0)) = method190()
+                        let v256 : (string -> (UH0 -> UH0)) = method131()
                         let v257 : (string list -> (UH0 -> UH0)) = v255 v256
                         let v258 : (UH0 -> UH0) = v257 v254
                         let v259 : UH0 = UH0_Nil
                         let v260 : UH0 = v258 v259
-                        let v261 : string = method191()
-                        let struct (v262 : string, v263 : string) = method192(v261, v260, v149)
+                        let v261 : string = method132()
+                        let struct (v262 : string, v263 : string) = method133(v261, v260, v149)
                         let v264 : Result<string, std_io_Error> = Ok v262 
-                        let v265 : (string -> US44) = method193()
-                        let v266 : (std_io_Error -> US44) = method194()
-                        let v267 : US44 = match v264 with Ok x -> v265 x | Error x -> v266 x
-                        let v274 : US45 =
+                        let v265 : (string -> US41) = method134()
+                        let v266 : (std_io_Error -> US41) = method135()
+                        let v267 : US41 = match v264 with Ok x -> v265 x | Error x -> v266 x
+                        let v274 : US42 =
                             match v267 with
-                            | US44_Error(v270) -> (* Error *)
+                            | US41_Error(v270) -> (* Error *)
                                 let v271 : std_string_String = null |> unbox<std_string_String>
-                                US45_Error(v271)
-                            | US44_Ok(v268) -> (* Ok *)
-                                US45_Ok(v268)
+                                US42_Error(v271)
+                            | US41_Ok(v268) -> (* Ok *)
+                                US42_Ok(v268)
                         let v280 : Result<string, std_string_String> =
                             match v274 with
-                            | US45_Error(v277) -> (* Error *)
+                            | US42_Error(v277) -> (* Error *)
                                 let v278 : Result<string, std_string_String> = Error v277 
                                 v278
-                            | US45_Ok(v275) -> (* Ok *)
+                            | US42_Ok(v275) -> (* Ok *)
                                 let v276 : Result<string, std_string_String> = Ok v275 
                                 v276
-                        let v281 : (string -> US45) = method195()
-                        let v282 : (std_string_String -> US45) = method196()
-                        let v283 : US45 = match v280 with Ok x -> v281 x | Error x -> v282 x
+                        let v281 : (string -> US42) = method136()
+                        let v282 : (std_string_String -> US42) = method137()
+                        let v283 : US42 = match v280 with Ok x -> v281 x | Error x -> v282 x
                         match v283 with
-                        | US45_Error(v286) -> (* Error *)
+                        | US42_Error(v286) -> (* Error *)
                             US3_None
-                        | US45_Ok(v284) -> (* Ok *)
+                        | US42_Ok(v284) -> (* Ok *)
                             US3_Some(v284)
                 match v290 with
                 | US3_Some(v291) -> (* Some *)
@@ -10467,9 +10971,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                 let v317 : bool = 30 >= v314
                                 v317
                         let v319 : bool = v318 = false
-                        let v366 : US7 =
+                        let v366 : US4 =
                             if v319 then
-                                US7_None
+                                US4_None
                             else
                                 let v321 : bool = TraceState.trace_state.IsNone
                                 if v321 then
@@ -10479,8 +10983,8 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     TraceState.trace_state <- v329 
                                     ()
                                 let struct (v330 : Mut0, v331 : Mut1, v332 : Mut2, v333 : Mut3, v334 : Mut4, v335 : int64 option) = TraceState.trace_state.Value
-                                let v336 : string = method8(v330, v331, v332, v333, v334, v335)
-                                let v337 : string = method11()
+                                let v336 : string = method6(v330, v331, v332, v333, v334, v335)
+                                let v337 : string = method9()
                                 let v338 : string = "documents.run / par_map"
                                 let v339 : string = " / origin_hash |> sm'.contains local_git_hash |> not"
                                 let v340 : string = v338 + v339 
@@ -10491,7 +10995,7 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     if v343 then
                                         v149
                                     else
-                                        method197(v330, v331, v332, v333, v334, v335, v336, v337, v342, v27, v29, v26, v39, v40, v52, v53, v177, v290, v42, v55)
+                                        method138(v330, v331, v332, v333, v334, v335, v336, v337, v342, v27, v29, v26, v39, v40, v52, v53, v177, v290, v42, v55)
                                 let v346 : bool = TraceState.trace_state.IsNone
                                 if v346 then
                                     let v347 : US0 = US0_Verbose
@@ -10503,24 +11007,24 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                 let v361 : int64 = v355.l0
                                 let v362 : int64 = v361 + 1L
                                 v355.l0 <- v362
-                                let v363 : (string -> unit) = closure12()
+                                let v363 : (string -> unit) = closure5()
                                 v363 v345
                                 let v364 : (string -> unit) = v356.l0
                                 v364 v345
-                                US7_Some(v355, v356, v357, v358, v359, v360)
-                        file_copy_210(v55, v42)
-                        let v367 : (string -> (string -> US41)) = closure94(v5, v4, v2, v1, v0)
+                                US4_Some(v355, v356, v357, v358, v359, v360)
+                        file_copy_139(v55, v42)
+                        let v367 : (string -> (string -> US38)) = closure88(v5, v4, v2, v1, v0)
                         let v368 : UH2 = UH2_Nil
                         let v369 : UH2 = UH2_Cons(v56, v42, v367, v368)
                         let v370 : string = "html"
-                        let v371 : (string -> (string -> US41)) = closure97(v5, v4, v59)
+                        let v371 : (string -> (string -> US38)) = closure91(v5, v4, v59)
                         let v372 : string = "pdf"
-                        let v373 : (string -> (string -> US41)) = closure97(v5, v4, v60)
+                        let v373 : (string -> (string -> US38)) = closure91(v5, v4, v60)
                         let v374 : string = "epub"
-                        let v375 : (string -> (string -> US41)) = closure97(v5, v4, v61)
-                        let v376 : (string -> (string -> US41)) = closure97(v5, v4, v62)
-                        let v377 : (string -> (string -> US41)) = closure97(v5, v4, v63)
-                        let v378 : (string -> (string -> US41)) = closure97(v5, v4, v64)
+                        let v375 : (string -> (string -> US38)) = closure91(v5, v4, v61)
+                        let v376 : (string -> (string -> US38)) = closure91(v5, v4, v62)
+                        let v377 : (string -> (string -> US38)) = closure91(v5, v4, v63)
+                        let v378 : (string -> (string -> US38)) = closure91(v5, v4, v64)
                         let v379 : UH2 = UH2_Nil
                         let v380 : UH2 = UH2_Cons(v374, v57, v378, v379)
                         let v381 : UH2 = UH2_Cons(v372, v57, v377, v380)
@@ -10562,9 +11066,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                             let v413 : bool = 30 >= v410
                             v413
                     let v415 : bool = v414 = false
-                    let v462 : US7 =
+                    let v462 : US4 =
                         if v415 then
-                            US7_None
+                            US4_None
                         else
                             let v417 : bool = TraceState.trace_state.IsNone
                             if v417 then
@@ -10574,8 +11078,8 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                 TraceState.trace_state <- v425 
                                 ()
                             let struct (v426 : Mut0, v427 : Mut1, v428 : Mut2, v429 : Mut3, v430 : Mut4, v431 : int64 option) = TraceState.trace_state.Value
-                            let v432 : string = method8(v426, v427, v428, v429, v430, v431)
-                            let v433 : string = method11()
+                            let v432 : string = method6(v426, v427, v428, v429, v430, v431)
+                            let v433 : string = method9()
                             let v434 : string = "documents.run / par_map"
                             let v435 : string = " / origin_hash |> sm'.contains local_git_hash |> not"
                             let v436 : string = v434 + v435 
@@ -10586,7 +11090,7 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                 if v439 then
                                     v149
                                 else
-                                    method197(v426, v427, v428, v429, v430, v431, v432, v433, v438, v27, v29, v26, v39, v40, v52, v53, v177, v290, v42, v55)
+                                    method138(v426, v427, v428, v429, v430, v431, v432, v433, v438, v27, v29, v26, v39, v40, v52, v53, v177, v290, v42, v55)
                             let v442 : bool = TraceState.trace_state.IsNone
                             if v442 then
                                 let v443 : US0 = US0_Verbose
@@ -10598,24 +11102,24 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                             let v457 : int64 = v451.l0
                             let v458 : int64 = v457 + 1L
                             v451.l0 <- v458
-                            let v459 : (string -> unit) = closure12()
+                            let v459 : (string -> unit) = closure5()
                             v459 v441
                             let v460 : (string -> unit) = v452.l0
                             v460 v441
-                            US7_Some(v451, v452, v453, v454, v455, v456)
-                    file_copy_210(v55, v42)
-                    let v463 : (string -> (string -> US41)) = closure94(v5, v4, v2, v1, v0)
+                            US4_Some(v451, v452, v453, v454, v455, v456)
+                    file_copy_139(v55, v42)
+                    let v463 : (string -> (string -> US38)) = closure88(v5, v4, v2, v1, v0)
                     let v464 : UH2 = UH2_Nil
                     let v465 : UH2 = UH2_Cons(v56, v42, v463, v464)
                     let v466 : string = "html"
-                    let v467 : (string -> (string -> US41)) = closure97(v5, v4, v59)
+                    let v467 : (string -> (string -> US38)) = closure91(v5, v4, v59)
                     let v468 : string = "pdf"
-                    let v469 : (string -> (string -> US41)) = closure97(v5, v4, v60)
+                    let v469 : (string -> (string -> US38)) = closure91(v5, v4, v60)
                     let v470 : string = "epub"
-                    let v471 : (string -> (string -> US41)) = closure97(v5, v4, v61)
-                    let v472 : (string -> (string -> US41)) = closure97(v5, v4, v62)
-                    let v473 : (string -> (string -> US41)) = closure97(v5, v4, v63)
-                    let v474 : (string -> (string -> US41)) = closure97(v5, v4, v64)
+                    let v471 : (string -> (string -> US38)) = closure91(v5, v4, v61)
+                    let v472 : (string -> (string -> US38)) = closure91(v5, v4, v62)
+                    let v473 : (string -> (string -> US38)) = closure91(v5, v4, v63)
+                    let v474 : (string -> (string -> US38)) = closure91(v5, v4, v64)
                     let v475 : UH2 = UH2_Nil
                     let v476 : UH2 = UH2_Cons(v470, v57, v474, v475)
                     let v477 : UH2 = UH2_Cons(v468, v57, v473, v476)
@@ -10638,13 +11142,13 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                 v486
             else
                 let v489 : string = "epub"
-                let struct (v490 : string, v491 : string) = fix_paths_187(v489, v57, v5)
-                let v492 : bool = file_exists_56(v490)
+                let struct (v490 : string, v491 : string) = fix_paths_128(v489, v57, v5)
+                let v492 : bool = file_exists_50(v490)
                 let v562 : bool =
                     if v492 then
                         true
                     else
-                        let v493 : bool = file_exists_56(v491)
+                        let v493 : bool = file_exists_50(v491)
                         let v494 : bool = v493 = false
                         if v494 then
                             true
@@ -10679,9 +11183,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     let v518 : bool = 30 >= v515
                                     v518
                             let v520 : bool = v519 = false
-                            let v560 : US7 =
+                            let v560 : US4 =
                                 if v520 then
-                                    US7_None
+                                    US4_None
                                 else
                                     let v522 : bool = TraceState.trace_state.IsNone
                                     if v522 then
@@ -10691,9 +11195,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                         TraceState.trace_state <- v530 
                                         ()
                                     let struct (v531 : Mut0, v532 : Mut1, v533 : Mut2, v534 : Mut3, v535 : Mut4, v536 : int64 option) = TraceState.trace_state.Value
-                                    let v537 : string = method8(v531, v532, v533, v534, v535, v536)
-                                    let v538 : string = method11()
-                                    let v539 : string = method228(v531, v532, v533, v534, v535, v536, v537, v538, v490, v491)
+                                    let v537 : string = method6(v531, v532, v533, v534, v535, v536)
+                                    let v538 : string = method9()
+                                    let v539 : string = method151(v531, v532, v533, v534, v535, v536, v537, v538, v490, v491)
                                     let v540 : bool = TraceState.trace_state.IsNone
                                     if v540 then
                                         let v541 : US0 = US0_Verbose
@@ -10705,28 +11209,28 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     let v555 : int64 = v549.l0
                                     let v556 : int64 = v555 + 1L
                                     v549.l0 <- v556
-                                    let v557 : (string -> unit) = closure12()
+                                    let v557 : (string -> unit) = closure5()
                                     v557 v539
                                     let v558 : (string -> unit) = v550.l0
                                     v558 v539
-                                    US7_Some(v549, v550, v551, v552, v553, v554)
-                            file_copy_210(v490, v491)
+                                    US4_Some(v549, v550, v551, v552, v553, v554)
+                            file_copy_139(v490, v491)
                             false
                 let v567 : UH2 =
                     if v562 then
-                        let v563 : (string -> (string -> US41)) = closure97(v5, v4, v64)
+                        let v563 : (string -> (string -> US38)) = closure91(v5, v4, v64)
                         let v564 : UH2 = UH2_Nil
                         UH2_Cons(v489, v57, v563, v564)
                     else
                         UH2_Nil
                 let v568 : string = "pdf"
-                let struct (v569 : string, v570 : string) = fix_paths_187(v568, v57, v5)
-                let v571 : bool = file_exists_56(v569)
+                let struct (v569 : string, v570 : string) = fix_paths_128(v568, v57, v5)
+                let v571 : bool = file_exists_50(v569)
                 let v641 : bool =
                     if v571 then
                         true
                     else
-                        let v572 : bool = file_exists_56(v570)
+                        let v572 : bool = file_exists_50(v570)
                         let v573 : bool = v572 = false
                         if v573 then
                             true
@@ -10761,9 +11265,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     let v597 : bool = 30 >= v594
                                     v597
                             let v599 : bool = v598 = false
-                            let v639 : US7 =
+                            let v639 : US4 =
                                 if v599 then
-                                    US7_None
+                                    US4_None
                                 else
                                     let v601 : bool = TraceState.trace_state.IsNone
                                     if v601 then
@@ -10773,9 +11277,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                         TraceState.trace_state <- v609 
                                         ()
                                     let struct (v610 : Mut0, v611 : Mut1, v612 : Mut2, v613 : Mut3, v614 : Mut4, v615 : int64 option) = TraceState.trace_state.Value
-                                    let v616 : string = method8(v610, v611, v612, v613, v614, v615)
-                                    let v617 : string = method11()
-                                    let v618 : string = method228(v610, v611, v612, v613, v614, v615, v616, v617, v569, v570)
+                                    let v616 : string = method6(v610, v611, v612, v613, v614, v615)
+                                    let v617 : string = method9()
+                                    let v618 : string = method151(v610, v611, v612, v613, v614, v615, v616, v617, v569, v570)
                                     let v619 : bool = TraceState.trace_state.IsNone
                                     if v619 then
                                         let v620 : US0 = US0_Verbose
@@ -10787,27 +11291,27 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     let v634 : int64 = v628.l0
                                     let v635 : int64 = v634 + 1L
                                     v628.l0 <- v635
-                                    let v636 : (string -> unit) = closure12()
+                                    let v636 : (string -> unit) = closure5()
                                     v636 v618
                                     let v637 : (string -> unit) = v629.l0
                                     v637 v618
-                                    US7_Some(v628, v629, v630, v631, v632, v633)
-                            file_copy_210(v569, v570)
+                                    US4_Some(v628, v629, v630, v631, v632, v633)
+                            file_copy_139(v569, v570)
                             false
                 let v644 : UH2 =
                     if v641 then
-                        let v642 : (string -> (string -> US41)) = closure97(v5, v4, v63)
+                        let v642 : (string -> (string -> US38)) = closure91(v5, v4, v63)
                         UH2_Cons(v568, v57, v642, v567)
                     else
                         v567
                 let v645 : string = "html"
-                let struct (v646 : string, v647 : string) = fix_paths_187(v645, v57, v5)
-                let v648 : bool = file_exists_56(v646)
+                let struct (v646 : string, v647 : string) = fix_paths_128(v645, v57, v5)
+                let v648 : bool = file_exists_50(v646)
                 let v718 : bool =
                     if v648 then
                         true
                     else
-                        let v649 : bool = file_exists_56(v647)
+                        let v649 : bool = file_exists_50(v647)
                         let v650 : bool = v649 = false
                         if v650 then
                             true
@@ -10842,9 +11346,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     let v674 : bool = 30 >= v671
                                     v674
                             let v676 : bool = v675 = false
-                            let v716 : US7 =
+                            let v716 : US4 =
                                 if v676 then
-                                    US7_None
+                                    US4_None
                                 else
                                     let v678 : bool = TraceState.trace_state.IsNone
                                     if v678 then
@@ -10854,9 +11358,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                         TraceState.trace_state <- v686 
                                         ()
                                     let struct (v687 : Mut0, v688 : Mut1, v689 : Mut2, v690 : Mut3, v691 : Mut4, v692 : int64 option) = TraceState.trace_state.Value
-                                    let v693 : string = method8(v687, v688, v689, v690, v691, v692)
-                                    let v694 : string = method11()
-                                    let v695 : string = method228(v687, v688, v689, v690, v691, v692, v693, v694, v646, v647)
+                                    let v693 : string = method6(v687, v688, v689, v690, v691, v692)
+                                    let v694 : string = method9()
+                                    let v695 : string = method151(v687, v688, v689, v690, v691, v692, v693, v694, v646, v647)
                                     let v696 : bool = TraceState.trace_state.IsNone
                                     if v696 then
                                         let v697 : US0 = US0_Verbose
@@ -10868,26 +11372,26 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     let v711 : int64 = v705.l0
                                     let v712 : int64 = v711 + 1L
                                     v705.l0 <- v712
-                                    let v713 : (string -> unit) = closure12()
+                                    let v713 : (string -> unit) = closure5()
                                     v713 v695
                                     let v714 : (string -> unit) = v706.l0
                                     v714 v695
-                                    US7_Some(v705, v706, v707, v708, v709, v710)
-                            file_copy_210(v646, v647)
+                                    US4_Some(v705, v706, v707, v708, v709, v710)
+                            file_copy_139(v646, v647)
                             false
                 let v721 : UH2 =
                     if v718 then
-                        let v719 : (string -> (string -> US41)) = closure97(v5, v4, v62)
+                        let v719 : (string -> (string -> US38)) = closure91(v5, v4, v62)
                         UH2_Cons(v645, v57, v719, v644)
                     else
                         v644
-                let struct (v722 : string, v723 : string) = fix_paths_187(v489, v42, v5)
-                let v724 : bool = file_exists_56(v722)
+                let struct (v722 : string, v723 : string) = fix_paths_128(v489, v42, v5)
+                let v724 : bool = file_exists_50(v722)
                 let v794 : bool =
                     if v724 then
                         true
                     else
-                        let v725 : bool = file_exists_56(v723)
+                        let v725 : bool = file_exists_50(v723)
                         let v726 : bool = v725 = false
                         if v726 then
                             true
@@ -10922,9 +11426,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     let v750 : bool = 30 >= v747
                                     v750
                             let v752 : bool = v751 = false
-                            let v792 : US7 =
+                            let v792 : US4 =
                                 if v752 then
-                                    US7_None
+                                    US4_None
                                 else
                                     let v754 : bool = TraceState.trace_state.IsNone
                                     if v754 then
@@ -10934,9 +11438,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                         TraceState.trace_state <- v762 
                                         ()
                                     let struct (v763 : Mut0, v764 : Mut1, v765 : Mut2, v766 : Mut3, v767 : Mut4, v768 : int64 option) = TraceState.trace_state.Value
-                                    let v769 : string = method8(v763, v764, v765, v766, v767, v768)
-                                    let v770 : string = method11()
-                                    let v771 : string = method228(v763, v764, v765, v766, v767, v768, v769, v770, v722, v723)
+                                    let v769 : string = method6(v763, v764, v765, v766, v767, v768)
+                                    let v770 : string = method9()
+                                    let v771 : string = method151(v763, v764, v765, v766, v767, v768, v769, v770, v722, v723)
                                     let v772 : bool = TraceState.trace_state.IsNone
                                     if v772 then
                                         let v773 : US0 = US0_Verbose
@@ -10948,26 +11452,26 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     let v787 : int64 = v781.l0
                                     let v788 : int64 = v787 + 1L
                                     v781.l0 <- v788
-                                    let v789 : (string -> unit) = closure12()
+                                    let v789 : (string -> unit) = closure5()
                                     v789 v771
                                     let v790 : (string -> unit) = v782.l0
                                     v790 v771
-                                    US7_Some(v781, v782, v783, v784, v785, v786)
-                            file_copy_210(v722, v723)
+                                    US4_Some(v781, v782, v783, v784, v785, v786)
+                            file_copy_139(v722, v723)
                             false
                 let v797 : UH2 =
                     if v794 then
-                        let v795 : (string -> (string -> US41)) = closure97(v5, v4, v61)
+                        let v795 : (string -> (string -> US38)) = closure91(v5, v4, v61)
                         UH2_Cons(v489, v42, v795, v721)
                     else
                         v721
-                let struct (v798 : string, v799 : string) = fix_paths_187(v568, v42, v5)
-                let v800 : bool = file_exists_56(v798)
+                let struct (v798 : string, v799 : string) = fix_paths_128(v568, v42, v5)
+                let v800 : bool = file_exists_50(v798)
                 let v870 : bool =
                     if v800 then
                         true
                     else
-                        let v801 : bool = file_exists_56(v799)
+                        let v801 : bool = file_exists_50(v799)
                         let v802 : bool = v801 = false
                         if v802 then
                             true
@@ -11002,9 +11506,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     let v826 : bool = 30 >= v823
                                     v826
                             let v828 : bool = v827 = false
-                            let v868 : US7 =
+                            let v868 : US4 =
                                 if v828 then
-                                    US7_None
+                                    US4_None
                                 else
                                     let v830 : bool = TraceState.trace_state.IsNone
                                     if v830 then
@@ -11014,9 +11518,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                         TraceState.trace_state <- v838 
                                         ()
                                     let struct (v839 : Mut0, v840 : Mut1, v841 : Mut2, v842 : Mut3, v843 : Mut4, v844 : int64 option) = TraceState.trace_state.Value
-                                    let v845 : string = method8(v839, v840, v841, v842, v843, v844)
-                                    let v846 : string = method11()
-                                    let v847 : string = method228(v839, v840, v841, v842, v843, v844, v845, v846, v798, v799)
+                                    let v845 : string = method6(v839, v840, v841, v842, v843, v844)
+                                    let v846 : string = method9()
+                                    let v847 : string = method151(v839, v840, v841, v842, v843, v844, v845, v846, v798, v799)
                                     let v848 : bool = TraceState.trace_state.IsNone
                                     if v848 then
                                         let v849 : US0 = US0_Verbose
@@ -11028,26 +11532,26 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     let v863 : int64 = v857.l0
                                     let v864 : int64 = v863 + 1L
                                     v857.l0 <- v864
-                                    let v865 : (string -> unit) = closure12()
+                                    let v865 : (string -> unit) = closure5()
                                     v865 v847
                                     let v866 : (string -> unit) = v858.l0
                                     v866 v847
-                                    US7_Some(v857, v858, v859, v860, v861, v862)
-                            file_copy_210(v798, v799)
+                                    US4_Some(v857, v858, v859, v860, v861, v862)
+                            file_copy_139(v798, v799)
                             false
                 let v873 : UH2 =
                     if v870 then
-                        let v871 : (string -> (string -> US41)) = closure97(v5, v4, v60)
+                        let v871 : (string -> (string -> US38)) = closure91(v5, v4, v60)
                         UH2_Cons(v568, v42, v871, v797)
                     else
                         v797
-                let struct (v874 : string, v875 : string) = fix_paths_187(v645, v42, v5)
-                let v876 : bool = file_exists_56(v874)
+                let struct (v874 : string, v875 : string) = fix_paths_128(v645, v42, v5)
+                let v876 : bool = file_exists_50(v874)
                 let v946 : bool =
                     if v876 then
                         true
                     else
-                        let v877 : bool = file_exists_56(v875)
+                        let v877 : bool = file_exists_50(v875)
                         let v878 : bool = v877 = false
                         if v878 then
                             true
@@ -11082,9 +11586,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     let v902 : bool = 30 >= v899
                                     v902
                             let v904 : bool = v903 = false
-                            let v944 : US7 =
+                            let v944 : US4 =
                                 if v904 then
-                                    US7_None
+                                    US4_None
                                 else
                                     let v906 : bool = TraceState.trace_state.IsNone
                                     if v906 then
@@ -11094,9 +11598,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                         TraceState.trace_state <- v914 
                                         ()
                                     let struct (v915 : Mut0, v916 : Mut1, v917 : Mut2, v918 : Mut3, v919 : Mut4, v920 : int64 option) = TraceState.trace_state.Value
-                                    let v921 : string = method8(v915, v916, v917, v918, v919, v920)
-                                    let v922 : string = method11()
-                                    let v923 : string = method228(v915, v916, v917, v918, v919, v920, v921, v922, v874, v875)
+                                    let v921 : string = method6(v915, v916, v917, v918, v919, v920)
+                                    let v922 : string = method9()
+                                    let v923 : string = method151(v915, v916, v917, v918, v919, v920, v921, v922, v874, v875)
                                     let v924 : bool = TraceState.trace_state.IsNone
                                     if v924 then
                                         let v925 : US0 = US0_Verbose
@@ -11108,26 +11612,26 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     let v939 : int64 = v933.l0
                                     let v940 : int64 = v939 + 1L
                                     v933.l0 <- v940
-                                    let v941 : (string -> unit) = closure12()
+                                    let v941 : (string -> unit) = closure5()
                                     v941 v923
                                     let v942 : (string -> unit) = v934.l0
                                     v942 v923
-                                    US7_Some(v933, v934, v935, v936, v937, v938)
-                            file_copy_210(v874, v875)
+                                    US4_Some(v933, v934, v935, v936, v937, v938)
+                            file_copy_139(v874, v875)
                             false
                 let v949 : UH2 =
                     if v946 then
-                        let v947 : (string -> (string -> US41)) = closure97(v5, v4, v59)
+                        let v947 : (string -> (string -> US38)) = closure91(v5, v4, v59)
                         UH2_Cons(v645, v42, v947, v873)
                     else
                         v873
-                let struct (v950 : string, v951 : string) = fix_paths_187(v56, v42, v5)
-                let v952 : bool = file_exists_56(v950)
+                let struct (v950 : string, v951 : string) = fix_paths_128(v56, v42, v5)
+                let v952 : bool = file_exists_50(v950)
                 let v1022 : bool =
                     if v952 then
                         true
                     else
-                        let v953 : bool = file_exists_56(v951)
+                        let v953 : bool = file_exists_50(v951)
                         let v954 : bool = v953 = false
                         if v954 then
                             true
@@ -11162,9 +11666,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     let v978 : bool = 30 >= v975
                                     v978
                             let v980 : bool = v979 = false
-                            let v1020 : US7 =
+                            let v1020 : US4 =
                                 if v980 then
-                                    US7_None
+                                    US4_None
                                 else
                                     let v982 : bool = TraceState.trace_state.IsNone
                                     if v982 then
@@ -11174,9 +11678,9 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                         TraceState.trace_state <- v990 
                                         ()
                                     let struct (v991 : Mut0, v992 : Mut1, v993 : Mut2, v994 : Mut3, v995 : Mut4, v996 : int64 option) = TraceState.trace_state.Value
-                                    let v997 : string = method8(v991, v992, v993, v994, v995, v996)
-                                    let v998 : string = method11()
-                                    let v999 : string = method228(v991, v992, v993, v994, v995, v996, v997, v998, v950, v951)
+                                    let v997 : string = method6(v991, v992, v993, v994, v995, v996)
+                                    let v998 : string = method9()
+                                    let v999 : string = method151(v991, v992, v993, v994, v995, v996, v997, v998, v950, v951)
                                     let v1000 : bool = TraceState.trace_state.IsNone
                                     if v1000 then
                                         let v1001 : US0 = US0_Verbose
@@ -11188,16 +11692,16 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                                     let v1015 : int64 = v1009.l0
                                     let v1016 : int64 = v1015 + 1L
                                     v1009.l0 <- v1016
-                                    let v1017 : (string -> unit) = closure12()
+                                    let v1017 : (string -> unit) = closure5()
                                     v1017 v999
                                     let v1018 : (string -> unit) = v1010.l0
                                     v1018 v999
-                                    US7_Some(v1009, v1010, v1011, v1012, v1013, v1014)
-                            file_copy_210(v950, v951)
+                                    US4_Some(v1009, v1010, v1011, v1012, v1013, v1014)
+                            file_copy_139(v950, v951)
                             false
                 let v1027 : UH2 =
                     if v1022 then
-                        let v1023 : (string -> (string -> US41)) = closure94(v5, v4, v2, v1, v0)
+                        let v1023 : (string -> (string -> US38)) = closure88(v5, v4, v2, v1, v0)
                         let v1024 : UH2 = UH2_Nil
                         UH2_Cons(v56, v42, v1023, v1024)
                     else
@@ -11206,7 +11710,7 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
                 let v1029 : UH1 = UH1_Cons(v949, v1028)
                 UH1_Cons(v1027, v1029)
         let v1032 : UH2 list = []
-        let v1033 : UH2 list = method231(v1031, v1032)
+        let v1033 : UH2 list = method152(v1031, v1032)
         let v1034 : (UH2 list -> (UH2 [])) = List.toArray
         let v1035 : (UH2 []) = v1034 v1033
         let v1036 : Vec<UH2> = () // backend.backend_switch / record_type_try_find / key: v19 
@@ -11215,48 +11719,48 @@ and loop_91 (v0 : bool, v1 : string, v2 : string, v3 : string, v4 : string, v5 :
         let v1039 : (UH2 []) = () // backend.backend_switch / record_type_try_find / key: v19 
         let v1040 : UH2 list = v1039 |> Array.toList
         let v1041 : ((UH2 -> (UH1 -> UH1)) -> (UH2 list -> (UH1 -> UH1))) = List.foldBack
-        let v1042 : (UH2 -> (UH1 -> UH1)) = method232()
+        let v1042 : (UH2 -> (UH1 -> UH1)) = method153()
         let v1043 : (UH2 list -> (UH1 -> UH1)) = v1041 v1042
         let v1044 : (UH1 -> UH1) = v1043 v1040
         let v1045 : UH1 = UH1_Nil
         let v1046 : UH1 = v1044 v1045
-        let v1047 : Vec<Result<string, (string * string)> option> = method233(v1046, v1038)
+        let v1047 : Vec<Result<string, (string * string)> option> = method154(v1046, v1038)
         let v1048 : (string * Vec<Result<string, (string * string)> option>) = v27, v1047 
         let v1049 : Result<(string * Vec<Result<string, (string * string)> option>), std_string_String> = Ok v1048 
-        let v1050 : Result<(string * Vec<Result<string, (string * string)> option>), std_string_String> = method240(v1049)
-        let v1051 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> = method241(v9)
+        let v1050 : Result<(string * Vec<Result<string, (string * string)> option>), std_string_String> = method161(v1049)
+        let v1051 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> = method162(v9)
         let v1052 : string = "true; let mut v1051 = v1051"
         let v1053 : bool = __spiral_emit_rust () v1052 
         let v1054 : string = "true; v1051.push(v1050)"
         let v1055 : bool = __spiral_emit_rust () v1054 
         let v1056 : string = "v1051"
         let v1057 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> = __spiral_emit_rust () v1056 
-        loop_91(v0, v1, v2, v3, v4, v5, v6, v7, v11, v1057)
+        loop_73(v0, v1, v2, v3, v4, v5, v6, v7, v11, v1057)
     else
         v9
-and run_32 (v0 : bool, v1 : US3, v2 : string, v3 : string, v4 : string, v5 : string) : std_pin_Pin<Box<Dyn<std_future_Future<Result<Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>, std_string_String>>>>> =
+and run_27 (v0 : bool, v1 : US3, v2 : string, v3 : string, v4 : string, v5 : string) : std_pin_Pin<Box<Dyn<std_future_Future<Result<Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>, std_string_String>>>>> =
     let v6 : string = "SPIRAL_REPO_ROOT"
     let v7 : string = get_environment_variable_3(v6)
     let v8 : bool = v7 = ""
     let v9 : bool = v8 <> true
     let v41 : string =
         if v9 then
-            normalize_path_33(v7)
+            normalize_path_28(v7)
         else
-            let v11 : string = get_current_directory_53()
-            let v12 : US3 = run_54(v11)
+            let v11 : string = get_current_directory_47()
+            let v12 : US3 = run_48(v11)
             let v18 : US3 =
                 match v12 with
                 | US3_None -> (* None *)
                     let v15 : string = __SOURCE_DIRECTORY__
-                    run_54(v15)
+                    run_48(v15)
                 | US3_Some(v13) -> (* Some *)
                     US3_Some(v13)
             let v24 : US3 =
                 match v18 with
                 | US3_None -> (* None *)
                     let v21 : string = "/workspaces"
-                    run_54(v21)
+                    run_48(v21)
                 | US3_Some(v19) -> (* Some *)
                     US3_Some(v19)
             let v28 : string =
@@ -11265,13 +11769,13 @@ and run_32 (v0 : bool, v1 : US3, v2 : string, v3 : string, v4 : string, v5 : str
                     failwith<string> "Option does not have a value."
                 | US3_Some(v25) -> (* Some *)
                     v25
-            let v29 : string = get_file_name_41(v28)
+            let v29 : string = get_file_name_36(v28)
             let v30 : bool = "deps" = v29
             let v38 : string =
                 if v30 then
-                    let v31 : string option = directory_get_parent_42(v28)
+                    let v31 : string option = directory_get_parent_37(v28)
                     let v32 : string = v31 |> Option.get
-                    let v33 : US3 = run_54(v32)
+                    let v33 : US3 = run_48(v32)
                     match v33 with
                     | US3_None -> (* None *)
                         failwith<string> "Option does not have a value."
@@ -11280,10 +11784,10 @@ and run_32 (v0 : bool, v1 : US3, v2 : string, v3 : string, v4 : string, v5 : str
                 else
                     v28
             let v39 : string = "spiral"
-            method49(v38, v39)
-    let v42 : string = get_full_path_66(v5)
-    let v43 : string = get_full_path_66(v4)
-    let v44 : string = get_full_path_66(v3)
+            method43(v38, v39)
+    let v42 : string = get_full_path_56(v5)
+    let v43 : string = get_full_path_56(v4)
+    let v44 : string = get_full_path_56(v3)
     let v45 : bool = TraceState.trace_state.IsNone
     if v45 then
         let v46 : US0 = US0_Verbose
@@ -11314,9 +11818,9 @@ and run_32 (v0 : bool, v1 : US3, v2 : string, v3 : string, v4 : string, v5 : str
             let v68 : bool = 20 >= v65
             v68
     let v70 : bool = v69 = false
-    let v110 : US7 =
+    let v110 : US4 =
         if v70 then
-            US7_None
+            US4_None
         else
             let v72 : bool = TraceState.trace_state.IsNone
             if v72 then
@@ -11326,9 +11830,9 @@ and run_32 (v0 : bool, v1 : US3, v2 : string, v3 : string, v4 : string, v5 : str
                 TraceState.trace_state <- v80 
                 ()
             let struct (v81 : Mut0, v82 : Mut1, v83 : Mut2, v84 : Mut3, v85 : Mut4, v86 : int64 option) = TraceState.trace_state.Value
-            let v87 : string = method8(v81, v82, v83, v84, v85, v86)
-            let v88 : string = method67()
-            let v89 : string = method68(v81, v82, v83, v84, v85, v86, v87, v88, v42, v43, v44, v2, v1, v0)
+            let v87 : string = method6(v81, v82, v83, v84, v85, v86)
+            let v88 : string = method57()
+            let v89 : string = method58(v81, v82, v83, v84, v85, v86, v87, v88, v42, v43, v44, v2, v1, v0)
             let v90 : bool = TraceState.trace_state.IsNone
             if v90 then
                 let v91 : US0 = US0_Verbose
@@ -11340,11 +11844,11 @@ and run_32 (v0 : bool, v1 : US3, v2 : string, v3 : string, v4 : string, v5 : str
             let v105 : int64 = v99.l0
             let v106 : int64 = v105 + 1L
             v99.l0 <- v106
-            let v107 : (string -> unit) = closure12()
+            let v107 : (string -> unit) = closure5()
             v107 v89
             let v108 : (string -> unit) = v100.l0
             v108 v89
-            US7_Some(v99, v100, v101, v102, v103, v104)
+            US4_Some(v99, v100, v101, v102, v103, v104)
     let v111 : string = "true; let __future_init = Box::pin(/*"
     let v112 : bool = __spiral_emit_rust () v111 
     let v113 : string = "*/ async move { /*"
@@ -11354,9 +11858,9 @@ and run_32 (v0 : bool, v1 : US3, v2 : string, v3 : string, v4 : string, v5 : str
     let v117 : string = "async_walkdir::WalkDir::new(&*$0)"
     let v118 : async_walkdir_WalkDir = __spiral_emit_rust v43 v117 
     let v119 : string = "async_walkdir::WalkDir::filter($0, move |x| $1(x))"
-    let v120 : (async_walkdir_DirEntry -> std_pin_Pin<Box<Dyn<std_future_Future<async_walkdir_Filtering>>>>) = fn_c26(v1)
+    let v120 : (async_walkdir_DirEntry -> std_pin_Pin<Box<Dyn<std_future_Future<async_walkdir_Filtering>>>>) = fn_c20(v1)
     let v121 : async_walkdir_WalkDir = __spiral_emit_rust struct (v118, v120) v119 
-    let v122 : (Result<async_walkdir_DirEntry, async_walkdir_Error> -> string option) = method80()
+    let v122 : (Result<async_walkdir_DirEntry, async_walkdir_Error> -> string option) = method65()
     let v123 : string = "futures::stream::StreamExt::filter_map(v121, |x| async { v122(x) })"
     let v124 : _ = __spiral_emit_rust () v123 
     let v125 : string = "Box::pin(futures::stream::StreamExt::collect(v124))"
@@ -11393,9 +11897,9 @@ and run_32 (v0 : bool, v1 : US3, v2 : string, v3 : string, v4 : string, v5 : str
             let v152 : bool = 20 >= v149
             v152
     let v154 : bool = v153 = false
-    let v196 : US7 =
+    let v196 : US4 =
         if v154 then
-            US7_None
+            US4_None
         else
             let v156 : bool = TraceState.trace_state.IsNone
             if v156 then
@@ -11405,11 +11909,11 @@ and run_32 (v0 : bool, v1 : US3, v2 : string, v3 : string, v4 : string, v5 : str
                 TraceState.trace_state <- v164 
                 ()
             let struct (v165 : Mut0, v166 : Mut1, v167 : Mut2, v168 : Mut3, v169 : Mut4, v170 : int64 option) = TraceState.trace_state.Value
-            let v171 : string = method8(v165, v166, v167, v168, v169, v170)
-            let v172 : string = method67()
+            let v171 : string = method6(v165, v166, v167, v168, v169, v170)
+            let v172 : string = method57()
             let v173 : string = "Fsharp"
             let v174 : unativeint = () // backend.backend_switch / record_type_try_find / key: v173 
-            let v175 : string = method88(v165, v166, v167, v168, v169, v170, v171, v172, v174)
+            let v175 : string = method72(v165, v166, v167, v168, v169, v170, v171, v172, v174)
             let v176 : bool = TraceState.trace_state.IsNone
             if v176 then
                 let v177 : US0 = US0_Verbose
@@ -11421,17 +11925,17 @@ and run_32 (v0 : bool, v1 : US3, v2 : string, v3 : string, v4 : string, v5 : str
             let v191 : int64 = v185.l0
             let v192 : int64 = v191 + 1L
             v185.l0 <- v192
-            let v193 : (string -> unit) = closure12()
+            let v193 : (string -> unit) = closure5()
             v193 v175
             let v194 : (string -> unit) = v186.l0
             v194 v175
-            US7_Some(v185, v186, v187, v188, v189, v190)
+            US4_Some(v185, v186, v187, v188, v189, v190)
     let v197 : string = "Fsharp"
     let v198 : (string []) = () // backend.backend_switch / record_type_try_find / key: v197 
     let v199 : int32 = (v198.borrow().len() as i32)
     let v200 : int32 = 0
     let v201 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> = () // backend.backend_switch / record_type_try_find / key: v197 
-    let v202 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> = loop_91(v0, v2, v41, v42, v43, v44, v198, v199, v200, v201)
+    let v202 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> = loop_73(v0, v2, v41, v42, v43, v44, v198, v199, v200, v201)
     let v203 : (Result<(string * Vec<Result<string, (string * string)> option>), std_string_String> []) = () // backend.backend_switch / record_type_try_find / key: v197 
     let v204 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> = () // backend.backend_switch / record_type_try_find / key: v197 
     let v205 : Result<Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>, std_string_String> = Ok v204 
@@ -11441,19 +11945,19 @@ and run_32 (v0 : bool, v1 : US3, v2 : string, v3 : string, v4 : string, v5 : str
     let v208 : string = "v207"
     let v209 : std_pin_Pin<Box<Dyn<std_future_Future<Result<Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>, std_string_String>>>>> = __spiral_emit_rust () v208 
     v209
-and ok_c101 () (v0 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>) : US47 =
-    US47_Ok(v0)
-and method242 () : (Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> -> US47) =
-    ok_c101()
-and error_c102 () (v0 : std_string_String) : US47 =
-    US47_Error(v0)
-and method243 () : (std_string_String -> US47) =
-    error_c102()
-and method244 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : std_string_String) : string =
+and ok_c95 () (v0 : Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>) : US44 =
+    US44_Ok(v0)
+and method163 () : (Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> -> US44) =
+    ok_c95()
+and error_c96 () (v0 : std_string_String) : US44 =
+    US44_Error(v0)
+and method164 () : (std_string_String -> US44) =
+    error_c96()
+and method165 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : std_string_String) : string =
     let v9 : int64 = v0.l0
     let v10 : string = " "
     let v11 : string = v6 + v10 
-    let v12 : string = format_real_16(v9)
+    let v12 : string = format_real_14(v9)
     let v13 : string = v11 + v12 
     let v14 : string = v13 + v7 
     let v15 : string = v14 + v10 
@@ -11461,25 +11965,25 @@ and method244 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64
     let v17 : string = v15 + v16 
     let v18 : string = " / "
     let v19 : string = v17 + v18 
-    let v20 : string = format_real_87(v8)
-    let v21 : string = v19 + v20 
-    method22(v21)
-and format_real_246 (v0 : unativeint) : string =
-    let v1 : string = method13()
-    let v2 : Mut3 = {l0 = v1} : Mut3
-    method18(v2)
-    method219(v2)
-    method20(v2)
-    let v3 : string = $"%A{v0}"
-    method14(v2, v3)
-    method21(v2)
-    let v4 : string = v2.l0
-    v4
-and method245 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : unativeint) : string =
+    let v20 : string = ""
+    let v21 : string = v20 + v20 
+    let v22 : string = "error"
+    let v23 : string = v21 + v22 
+    let v24 : string = " = "
+    let v25 : string = v23 + v24 
+    let v26 : string = $"%A{v8}"
+    let v27 : string = v25 + v26 
+    let v28 : string = "{ "
+    let v29 : string = v28 + v27 
+    let v30 : string = " }"
+    let v31 : string = v29 + v30 
+    let v32 : string = v19 + v31 
+    method17(v32)
+and method166 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64 option, v6 : string, v7 : string, v8 : unativeint) : string =
     let v9 : int64 = v0.l0
     let v10 : string = " "
     let v11 : string = v6 + v10 
-    let v12 : string = format_real_16(v9)
+    let v12 : string = format_real_14(v9)
     let v13 : string = v11 + v12 
     let v14 : string = v13 + v7 
     let v15 : string = v14 + v10 
@@ -11487,9 +11991,20 @@ and method245 (v0 : Mut0, v1 : Mut1, v2 : Mut2, v3 : Mut3, v4 : Mut4, v5 : int64
     let v17 : string = v15 + v16 
     let v18 : string = " / "
     let v19 : string = v17 + v18 
-    let v20 : string = format_real_246(v8)
-    let v21 : string = v19 + v20 
-    method22(v21)
+    let v20 : string = ""
+    let v21 : string = v20 + v20 
+    let v22 : string = "result_len"
+    let v23 : string = v21 + v22 
+    let v24 : string = " = "
+    let v25 : string = v23 + v24 
+    let v26 : string = $"%A{v8}"
+    let v27 : string = v25 + v26 
+    let v28 : string = "{ "
+    let v29 : string = v28 + v27 
+    let v30 : string = " }"
+    let v31 : string = v29 + v30 
+    let v32 : string = v19 + v31 
+    method17(v32)
 and closure1 () (v0 : (string [])) : int32 =
     let v1 : bool = TraceState.trace_state.IsNone
     if v1 then
@@ -11528,9 +12043,9 @@ and closure1 () (v0 : (string [])) : int32 =
             let v33 : bool = 30 >= v30
             v33
     let v35 : bool = v34 = false
-    let v75 : US7 =
+    let v75 : US4 =
         if v35 then
-            US7_None
+            US4_None
         else
             let v37 : bool = TraceState.trace_state.IsNone
             if v37 then
@@ -11540,9 +12055,9 @@ and closure1 () (v0 : (string [])) : int32 =
                 TraceState.trace_state <- v45 
                 ()
             let struct (v46 : Mut0, v47 : Mut1, v48 : Mut2, v49 : Mut3, v50 : Mut4, v51 : int64 option) = TraceState.trace_state.Value
-            let v52 : string = method8(v46, v47, v48, v49, v50, v51)
-            let v53 : string = method11()
-            let v54 : string = method15(v46, v47, v48, v49, v50, v51, v52, v53, v0)
+            let v52 : string = method6(v46, v47, v48, v49, v50, v51)
+            let v53 : string = method9()
+            let v54 : string = method13(v46, v47, v48, v49, v50, v51, v52, v53, v0)
             let v55 : bool = TraceState.trace_state.IsNone
             if v55 then
                 let v56 : US0 = US0_Verbose
@@ -11554,73 +12069,73 @@ and closure1 () (v0 : (string [])) : int32 =
             let v70 : int64 = v64.l0
             let v71 : int64 = v70 + 1L
             v64.l0 <- v71
-            let v72 : (string -> unit) = closure12()
+            let v72 : (string -> unit) = closure5()
             v72 v54
             let v73 : (string -> unit) = v65.l0
             v73 v54
-            US7_Some(v64, v65, v66, v67, v68, v69)
+            US4_Some(v64, v65, v66, v67, v68, v69)
     let v76 : clap_Command = get_command_0()
     let v77 : string = "clap::Command::get_matches($0)"
     let v78 : clap_ArgMatches = __spiral_emit_rust v76 v77 
-    let v79 : string = method25()
+    let v79 : string = method20()
     let v80 : Ref<Str> = v79 |> unbox<Ref<Str>>
     let v81 : string = "clap::ArgMatches::get_one(&$0, $1).cloned()"
     let v82 : std_string_String option = __spiral_emit_rust struct (v78, v80) v81 
-    let v83 : (std_string_String -> US8) = method26()
-    let v84 : US8 option = v82 |> Option.map v83 
-    let v85 : US8 = US8_None
-    let v86 : US8 = v84 |> Option.defaultValue v85 
+    let v83 : (std_string_String -> US5) = method21()
+    let v84 : US5 option = v82 |> Option.map v83 
+    let v85 : US5 = US5_None
+    let v86 : US5 = v84 |> Option.defaultValue v85 
     let v90 : std_string_String =
         match v86 with
-        | US8_None -> (* None *)
+        | US5_None -> (* None *)
             failwith<std_string_String> "Option does not have a value."
-        | US8_Some(v87) -> (* Some *)
+        | US5_Some(v87) -> (* Some *)
             v87
     let v91 : string = "Fsharp"
     let v92 : string = () // backend.backend_switch / record_type_try_find / key: v91 
-    let v93 : string = method27()
+    let v93 : string = method22()
     let v94 : Ref<Str> = v93 |> unbox<Ref<Str>>
     let v95 : string = "clap::ArgMatches::get_one(&$0, $1).cloned()"
     let v96 : std_string_String option = __spiral_emit_rust struct (v78, v94) v95 
-    let v97 : (std_string_String -> US8) = method26()
-    let v98 : US8 option = v96 |> Option.map v97 
-    let v99 : US8 = US8_None
-    let v100 : US8 = v98 |> Option.defaultValue v99 
+    let v97 : (std_string_String -> US5) = method21()
+    let v98 : US5 option = v96 |> Option.map v97 
+    let v99 : US5 = US5_None
+    let v100 : US5 = v98 |> Option.defaultValue v99 
     let v104 : std_string_String =
         match v100 with
-        | US8_None -> (* None *)
+        | US5_None -> (* None *)
             failwith<std_string_String> "Option does not have a value."
-        | US8_Some(v101) -> (* Some *)
+        | US5_Some(v101) -> (* Some *)
             v101
     let v105 : string = () // backend.backend_switch / record_type_try_find / key: v91 
-    let v106 : string = method28()
+    let v106 : string = method23()
     let v107 : Ref<Str> = v106 |> unbox<Ref<Str>>
     let v108 : string = "clap::ArgMatches::get_one(&$0, $1).cloned()"
     let v109 : std_string_String option = __spiral_emit_rust struct (v78, v107) v108 
-    let v110 : (std_string_String -> US8) = method26()
-    let v111 : US8 option = v109 |> Option.map v110 
-    let v112 : US8 = US8_None
-    let v113 : US8 = v111 |> Option.defaultValue v112 
+    let v110 : (std_string_String -> US5) = method21()
+    let v111 : US5 option = v109 |> Option.map v110 
+    let v112 : US5 = US5_None
+    let v113 : US5 = v111 |> Option.defaultValue v112 
     let v117 : std_string_String =
         match v113 with
-        | US8_None -> (* None *)
+        | US5_None -> (* None *)
             failwith<std_string_String> "Option does not have a value."
-        | US8_Some(v114) -> (* Some *)
+        | US5_Some(v114) -> (* Some *)
             v114
     let v118 : string = () // backend.backend_switch / record_type_try_find / key: v91 
-    let v119 : string = method29()
+    let v119 : string = method24()
     let v120 : Ref<Str> = v119 |> unbox<Ref<Str>>
     let v121 : string = "clap::ArgMatches::get_one(&$0, $1).cloned()"
     let v122 : std_string_String option = __spiral_emit_rust struct (v78, v120) v121 
-    let v123 : (std_string_String -> US8) = method26()
-    let v124 : US8 option = v122 |> Option.map v123 
-    let v125 : US8 = US8_None
-    let v126 : US8 = v124 |> Option.defaultValue v125 
+    let v123 : (std_string_String -> US5) = method21()
+    let v124 : US5 option = v122 |> Option.map v123 
+    let v125 : US5 = US5_None
+    let v126 : US5 = v124 |> Option.defaultValue v125 
     let v132 : US3 =
         match v126 with
-        | US8_None -> (* None *)
+        | US5_None -> (* None *)
             US3_None
-        | US8_Some(v127) -> (* Some *)
+        | US5_Some(v127) -> (* Some *)
             let v128 : string = () // backend.backend_switch / record_type_try_find / key: v91 
             US3_Some(v128)
     let v136 : string =
@@ -11630,33 +12145,33 @@ and closure1 () (v0 : (string [])) : int32 =
             v134
         | US3_Some(v133) -> (* Some *)
             v133
-    let v137 : string = method30()
+    let v137 : string = method25()
     let v138 : Ref<Str> = v137 |> unbox<Ref<Str>>
     let v139 : string = "clap::ArgMatches::get_one(&$0, $1).cloned()"
     let v140 : std_string_String option = __spiral_emit_rust struct (v78, v138) v139 
-    let v141 : (std_string_String -> US8) = method26()
-    let v142 : US8 option = v140 |> Option.map v141 
-    let v143 : US8 = US8_None
-    let v144 : US8 = v142 |> Option.defaultValue v143 
+    let v141 : (std_string_String -> US5) = method21()
+    let v142 : US5 option = v140 |> Option.map v141 
+    let v143 : US5 = US5_None
+    let v144 : US5 = v142 |> Option.defaultValue v143 
     let v150 : US3 =
         match v144 with
-        | US8_None -> (* None *)
+        | US5_None -> (* None *)
             US3_None
-        | US8_Some(v145) -> (* Some *)
+        | US5_Some(v145) -> (* Some *)
             let v146 : string = () // backend.backend_switch / record_type_try_find / key: v91 
             US3_Some(v146)
-    let v151 : string = method31()
+    let v151 : string = method26()
     let v152 : Ref<Str> = v151 |> unbox<Ref<Str>>
     let v153 : string = "clap::ArgMatches::get_flag(&$0, $1)"
     let v154 : bool = __spiral_emit_rust struct (v78, v152) v153 
-    let v155 : std_pin_Pin<Box<Dyn<std_future_Future<Result<Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>, std_string_String>>>>> = run_32(v154, v150, v136, v118, v105, v92)
+    let v155 : std_pin_Pin<Box<Dyn<std_future_Future<Result<Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>, std_string_String>>>>> = run_27(v154, v150, v136, v118, v105, v92)
     let v156 : string = "futures::executor::block_on($0)"
     let v157 : Result<Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>>, std_string_String> = __spiral_emit_rust v155 v156 
-    let v158 : (Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> -> US47) = method242()
-    let v159 : (std_string_String -> US47) = method243()
-    let v160 : US47 = match v157 with Ok x -> v158 x | Error x -> v159 x
+    let v158 : (Vec<Result<(string * Vec<Result<string, (string * string)> option>), std_string_String>> -> US44) = method163()
+    let v159 : (std_string_String -> US44) = method164()
+    let v160 : US44 = match v157 with Ok x -> v158 x | Error x -> v159 x
     match v160 with
-    | US47_Error(v229) -> (* Error *)
+    | US44_Error(v229) -> (* Error *)
         let v230 : bool = TraceState.trace_state.IsNone
         if v230 then
             let v231 : US0 = US0_Verbose
@@ -11687,9 +12202,9 @@ and closure1 () (v0 : (string [])) : int32 =
                 let v253 : bool = 50 >= v250
                 v253
         let v255 : bool = v254 = false
-        let v295 : US7 =
+        let v295 : US4 =
             if v255 then
-                US7_None
+                US4_None
             else
                 let v257 : bool = TraceState.trace_state.IsNone
                 if v257 then
@@ -11699,9 +12214,9 @@ and closure1 () (v0 : (string [])) : int32 =
                     TraceState.trace_state <- v265 
                     ()
                 let struct (v266 : Mut0, v267 : Mut1, v268 : Mut2, v269 : Mut3, v270 : Mut4, v271 : int64 option) = TraceState.trace_state.Value
-                let v272 : string = method8(v266, v267, v268, v269, v270, v271)
-                let v273 : string = method85()
-                let v274 : string = method244(v266, v267, v268, v269, v270, v271, v272, v273, v229)
+                let v272 : string = method6(v266, v267, v268, v269, v270, v271)
+                let v273 : string = method70()
+                let v274 : string = method165(v266, v267, v268, v269, v270, v271, v272, v273, v229)
                 let v275 : bool = TraceState.trace_state.IsNone
                 if v275 then
                     let v276 : US0 = US0_Verbose
@@ -11713,13 +12228,13 @@ and closure1 () (v0 : (string [])) : int32 =
                 let v290 : int64 = v284.l0
                 let v291 : int64 = v290 + 1L
                 v284.l0 <- v291
-                let v292 : (string -> unit) = closure12()
+                let v292 : (string -> unit) = closure5()
                 v292 v274
                 let v293 : (string -> unit) = v285.l0
                 v293 v274
-                US7_Some(v284, v285, v286, v287, v288, v289)
+                US4_Some(v284, v285, v286, v287, v288, v289)
         1
-    | US47_Ok(v161) -> (* Ok *)
+    | US44_Ok(v161) -> (* Ok *)
         let v162 : bool = TraceState.trace_state.IsNone
         if v162 then
             let v163 : US0 = US0_Verbose
@@ -11750,9 +12265,9 @@ and closure1 () (v0 : (string [])) : int32 =
                 let v185 : bool = 30 >= v182
                 v185
         let v187 : bool = v186 = false
-        let v228 : US7 =
+        let v228 : US4 =
             if v187 then
-                US7_None
+                US4_None
             else
                 let v189 : bool = TraceState.trace_state.IsNone
                 if v189 then
@@ -11762,10 +12277,10 @@ and closure1 () (v0 : (string [])) : int32 =
                     TraceState.trace_state <- v197 
                     ()
                 let struct (v198 : Mut0, v199 : Mut1, v200 : Mut2, v201 : Mut3, v202 : Mut4, v203 : int64 option) = TraceState.trace_state.Value
-                let v204 : string = method8(v198, v199, v200, v201, v202, v203)
-                let v205 : string = method11()
+                let v204 : string = method6(v198, v199, v200, v201, v202, v203)
+                let v205 : string = method9()
                 let v206 : unativeint = () // backend.backend_switch / record_type_try_find / key: v91 
-                let v207 : string = method245(v198, v199, v200, v201, v202, v203, v204, v205, v206)
+                let v207 : string = method166(v198, v199, v200, v201, v202, v203, v204, v205, v206)
                 let v208 : bool = TraceState.trace_state.IsNone
                 if v208 then
                     let v209 : US0 = US0_Verbose
@@ -11777,11 +12292,11 @@ and closure1 () (v0 : (string [])) : int32 =
                 let v223 : int64 = v217.l0
                 let v224 : int64 = v223 + 1L
                 v217.l0 <- v224
-                let v225 : (string -> unit) = closure12()
+                let v225 : (string -> unit) = closure5()
                 v225 v207
                 let v226 : (string -> unit) = v218.l0
                 v226 v207
-                US7_Some(v217, v218, v219, v220, v221, v222)
+                US4_Some(v217, v218, v219, v220, v221, v222)
         0
 let v0 : (unit -> unit) = closure0()
 let tests () = v0 ()
