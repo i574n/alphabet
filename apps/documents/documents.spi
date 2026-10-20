@@ -525,7 +525,7 @@ test run =
                     hangul_pdf_path
                     hangul_epub_path
                 ]
-                |> am'.to_vec |> am'.vec_map (Ok >> resultm.box >> Some >> optionm'.box)
+                |> am'.base |> am'.to_vec |> am'.vec_map (Ok >> resultm.box >> Some >> optionm'.box)
                 |> fun x => x : _ (_ (_ _ sm'.std_string))
             )
         ]
@@ -558,7 +558,7 @@ test run =
             Ok (
                 (dist_dir </> file_name |> file_system.absolute_path),
                 ;[]
-                |> am'.to_vec |> am'.vec_map ((optionm.map resultm.box) >> optionm'.box)
+                |> am'.base |> am'.to_vec |> am'.vec_map ((optionm.map resultm.box) >> optionm'.box)
             )
         ]
         |> am'.to_vec
