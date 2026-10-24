@@ -138,7 +138,8 @@ let hangul workspace_root hangul_spec transcribe_only { ext dist_dir dist_path o
         runtime.execution_options fun x => { x with
             command =
                 inl hangulize_path =
-                    workspace_root </> $'$"../alphabet/deps/hangulize/cmd/hangulize/hangulize{!(platform.get_executable_suffix ())}"'
+                    workspace_root
+                    </> $'$"../alphabet/deps/hangulize/cmd/hangulize/hangulize{!(platform.get_executable_suffix ())}"'
                 $'$"{!hangulize_path} {!hangul_spec}"'
             stdin =
                 fun stdin =>
@@ -192,7 +193,8 @@ let hangul workspace_root hangul_spec transcribe_only { ext dist_dir dist_path o
     trace Info
         fun () => "documents.hangul"
         fun () => { exit_code result_len = ##result; output_path }
-    (exit_code, result) |> Ok
+    (exit_code, result)
+    |> Ok
     |> fun x => x : result (int * string) (int * string)
 
 /// ## fix_paths
@@ -278,7 +280,13 @@ let run { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
             run_target function
                 | Rust => fun () =>
                     inl filter, has_filter = match filter with Some filter => filter, true | None => "", false
-                    $'{ let mut out: Vec<Rc<str>> = Vec::new(); let mut stack = vec\![std::path::PathBuf::from(&*!dist_dir)]; while let Some(dir) = stack.pop() { if let Ok(entries) = std::fs::read_dir(&dir) { for entry in entries.flatten() { let path = entry.path(); if path.is_dir() { stack.push(path) } else { let s = path.display().to_string(); if s.ends_with(".md") && \!s.ends_with(".hangul.md") && (\!!has_filter || s.contains(&*!filter)) { out.push(Rc::from(s.as_str())) } } } } } out }' : am'.vec string
+                    $'{ let mut out: Vec<Rc<str>> = Vec::new(); let mut stack = \
+                        vec\![std::path::PathBuf::from(&*!dist_dir)]; while let Some(dir) = stack.pop() { if let \
+                        Ok(entries) = std::fs::read_dir(&dir) { for entry in entries.flatten() { let path = \
+                        entry.path(); if path.is_dir() { stack.push(path) } else { let s = \
+                        path.display().to_string(); if s.ends_with(".md") && \!s.ends_with(".hangul.md") && \
+                        (\!!has_filter || s.contains(&*!filter)) { out.push(Rc::from(s.as_str())) } } } } } out }'
+                    : am'.vec string
                 | _ => fun () =>
                     dist_dir
                     |> file_system.new_walk_dir
