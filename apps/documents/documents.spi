@@ -279,14 +279,26 @@ test documents static =
         := files =
             run_target \|
                 | Rust => \ () =>
-                    := filter, has_filter = ?= filter ?| Some filter => filter, !+ | None => "", !-
-                    $'{ let mut out: Vec<Rc<str>> = Vec::new(); let mut stack = \
-                        vec\![std::path::PathBuf::from(&*!dist_dir)]; while let Some(dir) = stack.pop() { if let \
-                        Ok(entries) = std::fs::read_dir(&dir) { for entry in entries.flatten() { let path = \
-                        entry.path(); if path.is_dir() { stack.push(path) } else { let s = \
-                        path.display().to_string(); if s.ends_with(".md") && \!s.ends_with(".hangul.md") && \
-                        (\!!has_filter || s.contains(&*!filter)) { out.push(Rc::from(s.as_str())) } } } } } out }'
-                    : am'.vec string
+                    := keep (path : string) : bool =
+                        sm'.ends_with ".md" path
+                        && (sm'.ends_with ".hangul.md" path |> not)
+                        && (?= filter ?| | Some text => sm'.contains text path | None => !+)
+                    :~ ^ walk (dirs : list string) (found : list string) : list string =
+                        ?= dirs ?|
+                        | [] => found
+                        | dir :: rest =>
+                            ?= dir |> file_system.read_dir_names |> resultm.unbox ?|
+                            | Ok names =>
+                                := step (acc : list string * list string) (name : sm'.std_string) : list string * list string =
+                                    := pending, matched = acc
+                                    := path = dir </> sm'.from_std_string name
+                                    ? file_system.directory_exists path ?> (path :: pending, matched)
+                                    |? keep path ?> (pending, path :: matched)
+                                    |: (pending, matched)
+                                := pending, matched = names |> am'.vec_fold' step (rest, found)
+                                walk pending matched
+                            | Error _ => walk rest found
+                    walk [dist_dir] [] |> am'.new_vec
                 | _ => \ () =>
                     dist_dir
                     |> file_system.new_walk_dir
@@ -739,9 +751,7 @@ test run =
             $'let tests () = !tests ()' : ()
             $'let main args = !main args' : ()
         Rust = \ () =>
-            := args =
-                $'Rc::new(RefCell::new(std::env::args().skip(1).map(|x| Rc::<str>::from(x)).collect::<Vec<Rc<str>>>()))'
-                : array_base string
+            := args : array_base string = env.command_line_arguments () |> listm'.box |> listm'.to_array'
             := exit_code = main args
             $'if !exit_code \!= 0 { std::process::exit(!exit_code) }' : ()
     } : ()
