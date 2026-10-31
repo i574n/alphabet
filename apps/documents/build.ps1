@@ -18,10 +18,6 @@ if (!$fast -and !$SkipNotebook) {
     { pwsh -NoProfile -File $livebook --path $spi --output-path $ipynb } | Invoke-Block -Retries $($env:CI ? 3 : 1)
 }
 
-if (!(BuildSpiral "$projectName.spi" "$projectName.fsx" "alphabet/apps/documents" -Backend Fsharp)) {
-    throw "FSHARP-FAILED alphabet/apps/documents / compile"
-}
-
 $targetDir = GetTargetDir $projectName
 
 if (!(BuildSpiral "$ScriptDir/$projectName.spi" "$ScriptDir/$projectName.rs" "alphabet/apps/documents")) {

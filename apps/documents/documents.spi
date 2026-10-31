@@ -21,25 +21,25 @@ test documents static =
 /// ## get_command
 :~ get_command () =
     ###"command"
-    |> runtime.new_command
-    |> runtime.command_init_arg (get_args () .source_dir) (
-        runtime.arg_required !+
+    |> clap.new_command
+    |> clap.command_init_arg (get_args () .source_dir) (
+        clap.arg_required !+
     )
-    |> runtime.command_init_arg (get_args () .dist_dir) (
-        runtime.arg_required !+
+    |> clap.command_init_arg (get_args () .dist_dir) (
+        clap.arg_required !+
     )
-    |> runtime.command_init_arg (get_args () .cache_dir) (
-        runtime.arg_required !+
+    |> clap.command_init_arg (get_args () .cache_dir) (
+        clap.arg_required !+
     )
-    |> runtime.command_init_arg (get_args () .hangul_spec) (
+    |> clap.command_init_arg (get_args () .hangul_spec) (
         id
     )
-    |> runtime.command_init_arg (get_args () .filter) (
+    |> clap.command_init_arg (get_args () .filter) (
         id
     )
-    |> runtime.command_init_arg (get_args () .transcribe_only) (
-        runtime.arg_default_value "false"
-        >> runtime.arg_action runtime.SetTrue
+    |> clap.command_init_arg (get_args () .transcribe_only) (
+        clap.arg_default_value "false"
+        >> clap.arg_action clap.SetTrue
     )
 
 /// ## crowbook
@@ -83,13 +83,13 @@ test documents static =
                 ++# default ext
             | _ => ""
         := exit_code, result =
-            runtime.execution_options \ x => { x ?|
+            process.execution_options \ x => { x ?|
                 command =
                     "crowbook --verbose --to " ++# ext
                     ++# " --single \"" ++# dist_path ++# "\" --output \"" ++# output_path ++# "\" " ++# args
                 working_directory = dist_dir |> Some |> optionm'.box
             }
-            |> runtime.execute_with_options
+            |> process.execute_with_options
 
         ? exit_code = 0
         ?> exit_code, result
@@ -97,14 +97,14 @@ test documents static =
             trace Warning
                 \ () => "documents.crowbook / attempt error"
                 \ () => { exit_code output_path result }
-            runtime.execution_options \ x => { x ?|
+            process.execution_options \ x => { x ?|
                 command =
                     "crowbook --verbose --to " ++# ext
                     ++# " --single \"" ++# dist_path ++# "\" --output \"" ++# output_path ++# "\""
                     ++# (? ext = "pdf" ?> " --set tex.command tectonic" |: "")
                 working_directory = dist_dir |> Some |> optionm'.box
             }
-            |> runtime.execute_with_options
+            |> process.execute_with_options
 
 
     ? result |> sm'.contains "ERROR" |> not
@@ -135,7 +135,7 @@ test documents static =
         ?> "eng"
         |: hangul_spec
     := exit_code, result =
-        runtime.execution_options \ x => { x ?|
+        process.execution_options \ x => { x ?|
             command =
                 := hangulize_path =
                     workspace_root
@@ -147,10 +147,10 @@ test documents static =
                         stdin
                         |> threading.arc_mutex_lock
                         |> resultm.unwrap'
-                    text |> runtime.stdin_write_all stdin
+                    text |> process.stdin_write_all stdin
                 |> Some |> optionm'.box
         }
-        |> runtime.execute_with_options
+        |> process.execute_with_options
     := result =
         := result =
             result
@@ -364,19 +364,19 @@ test documents static =
             := file = file |> file_system.normalize_path
             := real_path = source_dir </> relative_path |> file_system.standardize_path
             := origin_hash_exit_code, origin_hash =
-                runtime.execution_options \ x => { x ?|
+                process.execution_options \ x => { x ?|
                     command =
                         "git ls-tree --format='%(objectname)' origin/gh-pages \"" ++# real_path ++# "\""
                     working_directory = source_dir |> Some |> optionm'.box
                 }
-                |> runtime.execute_with_options
+                |> process.execute_with_options
             := dist_path = dist_dir </> relative_path |> file_system.standardize_path
             := local_git_hash_exit_code, local_git_hash =
-                runtime.execution_options \ x => { x ?|
+                process.execution_options \ x => { x ?|
                     command = "git hash-object \"" ++# dist_path ++# "\""
                     working_directory = dist_dir |> Some |> optionm'.box
                 }
-                |> runtime.execute_with_options
+                |> process.execute_with_options
             := cache_path = cache_dir </> relative_path |> file_system.standardize_path
             := files =
                 := files_fn = files_fn { dist_dir cache_dir }
@@ -685,7 +685,7 @@ test run =
 /// ## tests
 := tests () =
     testing.run_tests {
-        verify_app = get_command >> runtime.command_debug_assert
+        verify_app = get_command >> clap.command_debug_assert
     }
 
 /// ## main
@@ -697,39 +697,39 @@ test run =
         \ () => "documents.main"
         \ () => { args }
     := command = get_command ()
-    := arg_matches = command |> runtime.command_get_matches
+    := arg_matches = command |> clap.command_get_matches
     := source_dir =
         arg_matches
-        |> runtime.matches_get_one (get_args () .source_dir |> fst)
+        |> clap.matches_get_one (get_args () .source_dir |> fst)
         |> optionm'.unbox
         |> optionm.value
         |> sm'.from_std_string
     := dist_dir =
         arg_matches
-        |> runtime.matches_get_one (get_args () .dist_dir |> fst)
+        |> clap.matches_get_one (get_args () .dist_dir |> fst)
         |> optionm'.unbox
         |> optionm.value
         |> sm'.from_std_string
     := cache_dir =
         arg_matches
-        |> runtime.matches_get_one (get_args () .cache_dir |> fst)
+        |> clap.matches_get_one (get_args () .cache_dir |> fst)
         |> optionm'.unbox
         |> optionm.value
         |> sm'.from_std_string
     := hangul_spec =
         arg_matches
-        |> runtime.matches_get_one (get_args () .hangul_spec |> fst)
+        |> clap.matches_get_one (get_args () .hangul_spec |> fst)
         |> optionm'.unbox
         |> optionm.map sm'.from_std_string
         |> optionm'.default_value "por-br"
     := filter =
         arg_matches
-        |> runtime.matches_get_one (get_args () .filter |> fst)
+        |> clap.matches_get_one (get_args () .filter |> fst)
         |> optionm'.unbox
         |> optionm.map sm'.from_std_string
     := transcribe_only =
         arg_matches
-        |> runtime.matches_get_flag (get_args () .transcribe_only |> fst)
+        |> clap.matches_get_flag (get_args () .transcribe_only |> fst)
     := result =
         run { source_dir dist_dir cache_dir hangul_spec filter transcribe_only }
         |> async.block_on_futures
