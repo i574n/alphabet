@@ -752,5 +752,5 @@ test run =
         Rust = \ () =>
             := args : array_base string = env.command_line_arguments () |> listm'.box |> listm'.to_array'
             := exit_code = main args
-            $'if !exit_code \!= 0 { std::process::exit(!exit_code) }' : ()
+            ? exit_code <> 0i32 ?> env.exit_with exit_code |: ()
     } : ()
