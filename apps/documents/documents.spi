@@ -1,7 +1,6 @@
 :< file_system_operators
 :< sm'_operators
-:< rust.rust_operators
-:< rust
+:< rust_operators
 
 test documents static =
     :< testing
@@ -683,7 +682,7 @@ test run =
 
 /// ## tests
 := tests () =
-    testing.run_tests {
+    rust_testing.run_tests {
         verify_app = get_command >> clap.command_debug_assert
     }
 
