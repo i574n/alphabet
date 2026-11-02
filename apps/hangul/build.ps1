@@ -5,7 +5,7 @@ param(
 )
 Set-Location $ScriptDir
 $ErrorActionPreference = "Stop"
-. ../../../polyglot/scripts/core.ps1
+. ../../../spiral/scripts/core.ps1
 . ../../../spiral/lib/spiral/lib.ps1
 
 

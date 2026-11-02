@@ -16,17 +16,19 @@ if (!$fast) {
     git clone --recurse-submodules https://$domain/$owner/polyglot.git
     Set-Location polyglot
     git pull
+    Set-Location ..
+    git clone --recurse-submodules https://$domain/$owner/spiral.git
+    Set-Location spiral
+    git pull
     Set-Location $ScriptDir
     pwsh ../../polyglot/scripts/init.ps1
 }
 
-. ../../polyglot/scripts/core.ps1
+. ../../spiral/scripts/core.ps1
 
-EnsureSymbolicLink -Path "../deps/polyglot" -Target "../../polyglot"
 EnsureSymbolicLink -Path "../deps/spiral" -Target "../../spiral"
 
-{ pwsh ../deps/polyglot/apps/parser/build.ps1 -fast 1 } | Invoke-Block
-{ pwsh ../deps/polyglot/deps/spiral/apps/spiral/build.ps1 -fast 1 } | Invoke-Block
+{ pwsh ../deps/spiral/apps/spiral/build.ps1 -fast 1 } | Invoke-Block
 { pwsh ../deps/spiral/scripts/dir-tree-html.ps1 } | Invoke-Block
 
 { sudo apt-get update } | Invoke-Block -Linux -Distro ubuntu -OnError Continue

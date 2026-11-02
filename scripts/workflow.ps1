@@ -8,7 +8,7 @@ $ErrorActionPreference = "Stop"
 
 pwsh init.ps1
 
-. ../deps/polyglot/scripts/core.ps1
+. ../deps/spiral/scripts/core.ps1
 
 { pwsh build.ps1 } | Invoke-Block
 

@@ -5,13 +5,13 @@ param(
 )
 Set-Location $ScriptDir
 $ErrorActionPreference = "Stop"
-. ../../deps/polyglot/scripts/core.ps1
-. ../../deps/polyglot/deps/spiral/lib/spiral/lib.ps1
+. ../../deps/spiral/scripts/core.ps1
+. ../../deps/spiral/lib/spiral/lib.ps1
 
 
 $projectName = "documents"
 
-$livebook = Join-Path $ScriptDir "../../deps/polyglot/deps/spiral/apps/cells/spi/run_notebook.ps1"
+$livebook = Join-Path $ScriptDir "../../deps/spiral/apps/cells/spi/run_notebook.ps1"
 $spi = Join-Path $ScriptDir "$projectName.spi"
 $ipynb = Join-Path $ScriptDir "$projectName.spi.ipynb"
 if (!$fast -and !$SkipNotebook) {

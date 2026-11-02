@@ -3,7 +3,7 @@ param(
 )
 Set-Location $ScriptDir
 $ErrorActionPreference = "Stop"
-. ../deps/polyglot/scripts/core.ps1
+. ../deps/spiral/scripts/core.ps1
 
 
 { pwsh ../deps/spiral/scripts/publish-tree.ps1 -Root .. } | Invoke-Block
