@@ -13,15 +13,11 @@ Write-Output "init.ps1 / url: $url / owner: $owner / domain: $domain"
 
 if (!$fast) {
     Set-Location (New-Item -ItemType Directory -Path "../.." -Force)
-    git clone --recurse-submodules https://$domain/$owner/polyglot.git
-    Set-Location polyglot
-    git pull
-    Set-Location ..
     git clone --recurse-submodules https://$domain/$owner/spiral.git
     Set-Location spiral
     git pull
     Set-Location $ScriptDir
-    pwsh ../../polyglot/scripts/init.ps1
+    pwsh ../../spiral/scripts/init.ps1
 }
 
 . ../../spiral/scripts/core.ps1

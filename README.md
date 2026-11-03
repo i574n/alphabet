@@ -4,111 +4,33 @@
 
 [![깃허브 코드스페이스](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=919742788)
 
----
+Writing-system tools in Spiral: render markdown documents as books, each with a Korean (hangul) transcription alongside it.
 
-**\* Temporary README drafted with ChatGPT.**
+## Apps
 
-- [Features](#features)
-- [Use Cases](#use-cases)
-- [Getting Started](#getting-started)
-  - [Installation](#installation)
-  - [Usage](#usage)
-- [Links](#links)
-- [Contributing](#contributing)
-- [License](#license)
+| App | What it does |
+| --- | --- |
+| `apps/documents` | Walks a source tree of `.md` files and renders each to HTML, PDF and EPUB with [crowbook](https://github.com/crowdagger/crowbook). It also writes a hangul transcription (`.hangul.md`) through [hangulize](https://github.com/i574n/hangulize), with the spec chosen per document (`--hangul-spec`, default `por-br`; English text uses `eng`), and renders that too. Unchanged files are skipped by content hash against a cache dir. `--transcribe-only` keeps only the transcribed lines, and `--filter` limits the run to matching paths. [vault](https://github.com/i574n/vault) publishes with it. |
+| `apps/hangul` | Hangul utilities: hanja-to-hangul conversion over a full hanja table, and CP949 code tables. |
 
-**Alphabet** is a universal tool for transcribing words across languages and writing systems (TODO). Whether you're converting phonetic sounds into scripts, handling multilingual text, or standardizing transliterations, Alphabet bridges linguistic gaps with precision and scalability.
-
-## Features
-
-- **Multilingual Support**: Handle a wide range of languages and scripts, from alphabets to syllabaries and logographic systems.
-- **Rule-Based and AI-Enhanced**: Combines linguistic rules with AI capabilities for adaptability and accuracy.
-- **Extensible Framework**: Easily add new languages, rules, or custom transcription systems.
-- **Developer-Friendly**: Accessible via a simple API or command-line interface.
-
-## Use Cases
-
-- Transliterate names, places, or foreign terms into local scripts.
-- Standardize linguistic data for research or localization.
-- Bridge gaps between phonetics and writing systems in diverse languages.
-
-## Getting Started
-
-### Installation
-
-Clone the repository:
+## Getting started
 
 ```powershell
 git clone https://github.com/i574n/alphabet.git
-```
-
-Navigate to the directory, initialize dependencies and build the project:
-
-```powershell
 cd alphabet
 pwsh scripts/workflow.ps1
 ```
 
-### Usage
-
-Basic transcription:
-
-```powershell
-pwsh scripts/run.ps1 "foreign_word" --language target_language
-```
-
-Example:
-
-```powershell
-pwsh scripts/run.ps1 "Bonjour" --language hangul
-```
-
-Output:
-
-```text
-봉쥬르
-```
+`scripts/init.ps1` clones [spiral](https://github.com/i574n/spiral) next to this repository and runs its toolchain setup, then installs pandoc, crowbook, tectonic, the NanumGothicCoding font and hangulize.
 
 ## Links
 
-<table>
-
-<tr>
-<td>
-
-Documentation
-
-</td>
-<td>
-
-- Repository file tree (HTML)  
-<https://i574n.github.io/alphabet>
-
-</td>
-</tr>
-
-<tr>
-<td>
-
-Documents Sample
-
-</td>
-<td>
-
-- Documents notebook  
-<https://i574n.github.io/alphabet/apps/documents/documents.spi.html>
-
-</td>
-</tr>
-
-</table>
+- Repository file tree: <https://i574n.github.io/alphabet>
 
 ## Contributing
 
-Contributions are welcome! Please see the [CONTRIBUTING.md](https://github.com/i574n/.github/blob/main/CONTRIBUTING.md) for guidelines.
+See [CONTRIBUTING.md](https://github.com/i574n/.github/blob/main/CONTRIBUTING.md).
 
 ## License
 
-This project is licensed under the AGPLv3 License. See the [LICENSE](https://github.com/i574n/alphabet/blob/main/LICENSE) file for details.
-
-Built with ❤️ for linguists, developers, and anyone passionate about languages.
+AGPL v3; see [LICENSE](LICENSE).
