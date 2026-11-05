@@ -4,3 +4,9 @@ packages:
     spiral-
 modules:
     hanja
+    syllables
+    convert
+    particles
+    strokes
+    cp949_codes
+    cp949

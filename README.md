@@ -11,7 +11,7 @@ Writing-system tools in Spiral: render markdown documents as books, each with a 
 | App | What it does |
 | --- | --- |
 | `apps/documents` | Walks a source tree of `.md` files and renders each to HTML, PDF and EPUB with [crowbook](https://github.com/crowdagger/crowbook). It also writes a hangul transcription (`.hangul.md`) through [hangulize](https://github.com/i574n/hangulize), with the spec chosen per document (`--hangul-spec`, default `por-br`; English text uses `eng`), and renders that too. Unchanged files are skipped by content hash against a cache dir. `--transcribe-only` keeps only the transcribed lines, and `--filter` limits the run to matching paths. [vault](https://github.com/i574n/vault) publishes with it. |
-| `apps/hangul` | Hangul utilities: hanja-to-hangul conversion over a full hanja table, and CP949 code tables. |
+| `apps/hangul` | Hangul in Spiral: syllable composition and decomposition, jamo and compatibility letters, hanja-to-hangul readings over a full hanja table, particle selection, stroke counts, and CP949 decoding and encoding with typed failures. |
 
 ## Getting started
 

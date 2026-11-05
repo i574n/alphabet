@@ -1,23 +1,17 @@
 param(
     $fast,
-    $SkipNotebook,
     $ScriptDir = $PSScriptRoot
 )
 Set-Location $ScriptDir
 $ErrorActionPreference = "Stop"
 . ../../../spiral/scripts/core.ps1
-. ../../../spiral/lib/spiral/lib.ps1
 
-
-$projectName = "hangul"
-
-$livebook = Join-Path $ScriptDir "../../deps/spiral/apps/cells/spi/run_notebook.ps1"
-$notebook = Join-Path $ScriptDir "$projectName.livemd"
-$ipynb = Join-Path $ScriptDir "$projectName.livemd.ipynb"
-if (!$fast -and !$SkipNotebook) {
-    { pwsh -NoProfile -File $livebook --path $notebook --output-path $ipynb --no-spi } | Invoke-Block -Retries $($env:CI ? 3 : 1)
-}
-
-{ pwsh -NoProfile -File $livebook --path $notebook --no-spi --fs-path "$ScriptDir/$projectName.fs" --export-only } | Invoke-Block
-
-Write-Output "alphabet/apps/hangul/build.ps1 / `$env:CI:'$env:CI'"
+$notebooks = @(Get-ChildItem -Filter *.spi | Where-Object { Select-String -LiteralPath $_.FullName -Pattern '^///> ' -Quiet } | ForEach-Object { '--path'; $_.FullName })
+$env:SPIRAL_CELLS_MEMO = '0'
+Push-Location (Join-Path $ScriptDir '../../deps/spiral/apps/cells')
+try { $cells = @(& pwsh -NoProfile -File (Join-Path 'spi' 'run_notebook.ps1') --gate @notebooks 2>&1 | ForEach-Object { "$_" }); $cellsExit = $LASTEXITCODE }
+finally { Pop-Location }
+$cells | ForEach-Object { Write-Output "alphabet/apps/hangul/build.ps1 / cells / $_" }
+if ($cellsExit -ne 0) { throw "alphabet/apps/hangul/build.ps1 / Spiral test cells exited $cellsExit" }
+if (!($cells -match '^spiral-tests total')) { throw "alphabet/apps/hangul/build.ps1 / Spiral test cells printed no spiral-tests total line" }
+Write-Output "HANGUL-OK"
