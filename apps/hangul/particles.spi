@@ -1,3 +1,4 @@
+///> zig
 ///- --package .
 :# particles static =
     :< testing
