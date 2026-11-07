@@ -1,0 +1,26 @@
+///- --package .
+:# convert static =
+    :< testing
+
+:< sm'_operators
+:< hanja
+:< syllables
+
+:~ ^ find_from (table : array_base (i32 * i32)) (code : i32) (i : i32) : option syllable =
+    ? i >= am'::length_base table ?> None |: entry_at table code i
+:& :~ entry_at (table : array_base (i32 * i32)) (code : i32) (i : i32) : option syllable =
+    := from, into = am'::index_base i table
+    ? from = code ?> as_syllable into |: find_from table code (i + 1i32)
+
+:~ hanja_reading (code : i32) : option syllable = find_from (hanja_to_hangul_table ()) code 0i32
+
+:~ ^ readings (codes : list i32) : list (option syllable) =
+    ?= codes ?|
+    | c :: rest => hanja_reading c :: readings rest
+    | [] => []
+
+///> rust
+:# hanja_read_as_hangul_syllables =
+    := gugeo = readings [ 22283i32; 35486i32 ]
+    (gugeo |> listm::map (\ r => optionm::map (\ s => code_of s) r), hanja_reading 44032i32)
+    |> _assert_eq ([ Some 44397i32; Some 50612i32 ], None)

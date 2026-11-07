@@ -1,0 +1,85 @@
+///- --package .
+:# particles static =
+    :< testing
+
+:< sm'_operators
+:< syllables
+
+:| particle =
+    | Topic
+    | Subject
+    | Object
+    | Direction
+    | Comitative
+
+:~ forms (p : particle) : list i32 * list i32 =
+    ?= p ?|
+    | Topic => [ 51008i32 ], [ 45716i32 ]
+    | Subject => [ 51060i32 ], [ 44032i32 ]
+    | Object => [ 51012i32 ], [ 47484i32 ]
+    | Direction => [ 51004i32; 47196i32 ], [ 47196i32 ]
+    | Comitative => [ 44284i32 ], [ 50752i32 ]
+
+:~ ^ last_code (codes : list i32) : option i32 =
+    ?= codes ?|
+    | c :: rest =>
+        ?= rest ?|
+        | [] => Some c
+        | _ => last_code rest
+    | [] => None
+
+:~ final_tail (codes : list i32) : option i32 =
+    ?= last_code codes ?|
+    | Some c =>
+        ?= as_syllable c ?|
+        | Some s =>
+            := _, _, t = split_jamo s
+            t
+        | None => None
+    | None => None
+
+:~ ends_with_consonant (codes : list i32) : bool =
+    ?= final_tail codes ?|
+    | Some _ => !+
+    | None => !-
+
+:~ takes_consonant_form (p : particle) (t : option i32) : bool =
+    ?= t ?|
+    | Some code =>
+        ?= p ?|
+        | Direction => code <> 4527i32
+        | _ => !+
+    | None => !-
+
+:~ ^ appended (a : list i32) (b : list i32) : list i32 =
+    ?= a ?|
+    | x :: rest => x :: appended rest b
+    | [] => b
+
+:~ with_particle (codes : list i32) (p : particle) : list i32 =
+    := after_consonant, after_vowel = forms p
+    appended codes (? takes_consonant_form p (final_tail codes) ?> after_consonant |: after_vowel)
+
+///> rust
+:# the_final_consonant_of_a_word_is_its_last_syllables_tail =
+    := gang = [ 44053i32 ]
+    := mulgogi = [ 47932i32; 44256i32; 44592i32 ]
+    (ends_with_consonant gang, ends_with_consonant mulgogi, final_tail gang, final_tail mulgogi, final_tail [ 97i32 ])
+    |> _assert_eq (!+, !-, Some 4540i32, None, None)
+
+///> rust
+:# a_particle_takes_its_consonant_form_after_a_final_consonant_except_direction_after_rieul =
+    (
+        with_particle [ 44053i32 ] Subject,
+        with_particle [ 47932i32; 44256i32; 44592i32 ] Topic,
+        with_particle [ 51665i32 ] Direction,
+        with_particle [ 49436i32; 50872i32 ] Direction,
+        with_particle [ 97i32 ] Object
+    )
+    |> _assert_eq (
+        [ 44053i32; 51060i32 ],
+        [ 47932i32; 44256i32; 44592i32; 45716i32 ],
+        [ 51665i32; 51004i32; 47196i32 ],
+        [ 49436i32; 50872i32; 47196i32 ],
+        [ 97i32; 47484i32 ]
+    )

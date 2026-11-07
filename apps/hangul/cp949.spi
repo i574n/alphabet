@@ -1,0 +1,119 @@
+///- --package .
+:# cp949 static =
+    :< testing
+
+:< sm'_operators
+:< cp949_codes
+
+:| decoded =
+    | Decoded : i32
+    | Unmapped : i32
+    | Truncated : i32
+
+:| encoded =
+    | Encoded : list i32
+    | Unencodable : i32
+
+:~ ^ lower_bound (table : array_base (i32 * i32)) (code : i32) (low : i32) (high : i32) : i32 =
+    ? low >= high ?> low |: narrowed table code low high
+:& :~ narrowed (table : array_base (i32 * i32)) (code : i32) (low : i32) (high : i32) : i32 =
+    := mid = low + (high - low) / 2i32
+    := c, _ = am'::index_base mid table
+    ? c >= code ?> lower_bound table code low mid |: lower_bound table code (mid + 1i32) high
+
+:~ matching_entry ((c, u) : i32 * i32) (code : i32) : option i32 = ? c = code ?> Some u |: None
+
+:~ ucs_of_cp949 (code : i32) : option i32 =
+    := table = cp949_table ()
+    := size = am'::length_base table
+    := i = lower_bound table code 0i32 size
+    ? i >= size ?> None |: matching_entry (am'::index_base i table) code
+
+:~ yields (found : option i32) (want : i32) : bool =
+    ?= found ?|
+    | Some x => x = want
+    | None => !-
+
+:~ ^ cp949_from (table : array_base (i32 * i32)) (ucs : i32) (i : i32) : option i32 =
+    ? i >= am'::length_base table ?> None |: cp949_at table ucs i
+:& :~ cp949_at (table : array_base (i32 * i32)) (ucs : i32) (i : i32) : option i32 =
+    := code, u = am'::index_base i table
+    ? u = ucs ?> Some code |: cp949_from table ucs (i + 1i32)
+
+:~ cp949_of_ucs (ucs : i32) : option i32 = cp949_from (cp949_table ()) ucs 0i32
+
+:~ ^ decode (bytes : list i32) : list decoded =
+    ?= bytes ?|
+    | b1 :: rest => ? b1 < 128i32 ?> Decoded b1 :: decode rest |: decode_pair b1 rest
+    | [] => []
+:& :~ decode_pair (b1 : i32) (rest : list i32) : list decoded =
+    ?= rest ?|
+    | b2 :: more =>
+        := code = b1 * 256i32 + b2
+        ?= ucs_of_cp949 code ?|
+        | Some u => Decoded u :: decode more
+        | None => Unmapped code :: decode more
+    | [] => [ Truncated b1 ]
+
+:~ encode_wide (c : i32) : encoded =
+    ?= cp949_of_ucs c ?|
+    | Some code => Encoded [ code / 256i32; code - (code / 256i32) * 256i32 ]
+    | None => Unencodable c
+
+:~ encode_char (c : i32) : encoded = ? c < 128i32 ?> Encoded [ c ] |: encode_wide c
+
+:~ encode (codes : list i32) : list encoded = listm::map (\ c => encode_char c) codes
+
+:~ lossy_unit (d : decoded) : i32 =
+    ?= d ?|
+    | Decoded u => u
+    | _ => 65533i32
+
+:~ ^ joined_bytes (a : list i32) (b : list i32) : list i32 =
+    ?= a ?|
+    | x :: rest => x :: joined_bytes rest b
+    | [] => b
+
+:~ ^ lossy_bytes (runs : list encoded) : list i32 =
+    ?= runs ?|
+    | r :: rest =>
+        ?= r ?|
+        | Encoded bs => joined_bytes bs (lossy_bytes rest)
+        | Unencodable _ => 63i32 :: lossy_bytes rest
+    | [] => []
+
+:~ ^ round_trips_from (table : array_base (i32 * i32)) (i : i32) (stride : i32) : bool =
+    ? i >= am'::length_base table ?> !+ |: round_trips_at table i stride
+:& :~ round_trips_at (table : array_base (i32 * i32)) (i : i32) (stride : i32) : bool =
+    := code, u = am'::index_base i table
+    := back = yields (ucs_of_cp949 code) u
+    := forth = ? i - (i / stride) * stride = 0i32 ?> yields (cp949_of_ucs u) code |: !+
+    back && forth && round_trips_from table (i + 1i32) stride
+
+///> rust
+:# cp949_bytes_decode_to_code_points_with_typed_failures =
+    (
+        decode [ 176i32; 161i32; 176i32; 162i32 ],
+        decode [ 72i32; 255i32; 255i32; 176i32 ],
+        decode [ 176i32; 161i32; 176i32; 162i32 ] |> listm::map (\ d => lossy_unit d)
+    )
+    |> _assert_eq (
+        [ Decoded 44032i32; Decoded 44033i32 ],
+        [ Decoded 72i32; Unmapped 65535i32; Truncated 176i32 ],
+        [ 44032i32; 44033i32 ]
+    )
+
+///> rust
+:# code_points_encode_to_cp949_bytes_or_name_what_cannot =
+    := hello = [ 72i32; 101i32; 108i32; 108i32; 111i32; 44i32; 32i32; 50504i32; 45397i32 ]
+    (lossy_bytes (encode [ 44032i32; 44033i32 ]), lossy_bytes (encode hello), encode [ 8212i32 ], lossy_bytes (encode [ 8212i32 ]))
+    |> _assert_eq (
+        [ 176i32; 161i32; 176i32; 162i32 ],
+        [ 72i32; 101i32; 108i32; 108i32; 111i32; 44i32; 32i32; 190i32; 200i32; 179i32; 231i32 ],
+        [ Unencodable 8212i32 ],
+        [ 63i32 ]
+    )
+
+///> rust
+:# every_table_entry_decodes_and_a_stride_of_them_encodes_back =
+    round_trips_from (cp949_table ()) 0i32 97i32 |> _assert_eq !+
