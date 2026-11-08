@@ -1,4 +1,3 @@
-///> zig
 ///- --package .
 :# convert static =
     :< testing

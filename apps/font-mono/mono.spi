@@ -1,0 +1,28 @@
+///- --package .
+:# mono static =
+    :< testing
+:< font_face
+:< font_glyph
+:< font_metrics
+
+:~ ^ count_glyphs_m (gs : list glyph_m) : u32 =
+    ?= gs ?| | _ :: rest => 1u32 + count_glyphs_m rest | [] => 0u32
+
+:= mono () : face monospace =
+    Monospace (mono_target (), 600u16, [
+        { codepoint = 111u32; outline = letter_o 600.0f64 };
+        { codepoint = 108u32; outline = letter_l 600.0f64 };
+        { codepoint = 105u32; outline = letter_i 600.0f64 };
+        { codepoint = 98u32; outline = letter_b 600.0f64 };
+        { codepoint = 100u32; outline = letter_d 600.0f64 };
+        { codepoint = 112u32; outline = letter_p 600.0f64 };
+        { codepoint = 113u32; outline = letter_q 600.0f64 }
+    ])
+
+:= glyph_count_m (f : face monospace) : u32 =
+    ?= f ?|
+    | Monospace (_, _, gs) => count_glyphs_m gs
+
+///> rust
+:# mono_has_seven_glyphs =
+    glyph_count_m (mono ()) |> _assert_eq 7u32

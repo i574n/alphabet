@@ -1,0 +1,72 @@
+///- --package .
+:# font_outline static =
+    :< testing
+
+:! cubic = ()
+:! quadratic = ()
+
+:== point = { x : f64; y : f64 }
+
+:| quad_seg =
+    | QLine : point
+    | QQuad : point * point
+
+:| cubic_seg =
+    | CLine : point
+    | CQuad : point * point
+    | CCubic : point * point * point
+
+:== contour_c = { start : point; segs : list cubic_seg }
+:== contour_q = { start : point; segs : list quad_seg }
+
+:| outline curve =
+    | OCubic :: list contour_c -> outline cubic
+    | OQuad :: list contour_q -> outline quadratic
+
+:= padd (a : point) (b : point) : point = { x = a::x + b::x; y = a::y + b::y }
+:= psub (a : point) (b : point) : point = { x = a::x - b::x; y = a::y - b::y }
+:= pscale (s : f64) (p : point) : point = { x = s * p::x; y = s * p::y }
+
+:= cubic_to_quad_ctrl (p0 : point) (c1 : point) (c2 : point) (p3 : point) : point =
+    pscale 0.25f64 (psub (padd (pscale 3.0f64 c1) (pscale 3.0f64 c2)) (padd p0 p3))
+
+:~ ^ lower_segs (cur : point) (segs : list cubic_seg) : list quad_seg =
+    ?= segs ?|
+    | s :: rest =>
+        ?= s ?|
+        | CLine e => QLine e :: lower_segs e rest
+        | CQuad (c, e) => QQuad (c, e) :: lower_segs e rest
+        | CCubic (c1, c2, e) => QQuad (cubic_to_quad_ctrl cur c1 c2 e, e) :: lower_segs e rest
+    | [] => []
+
+:= lower_contour (c : contour_c) : contour_q =
+    { start = c::start; segs = lower_segs c::start c::segs }
+
+:~ ^ lower_contours (cs : list contour_c) : list contour_q =
+    ?= cs ?|
+    | c :: rest => lower_contour c :: lower_contours rest
+    | [] => []
+
+:= lower_to_quads (o : outline cubic) : outline quadratic =
+    ?= o ?|
+    | OCubic contours => OQuad (lower_contours contours)
+
+:~ ^ len_q (segs : list quad_seg) : u32 =
+    ?= segs ?| | _ :: rest => 1u32 + len_q rest | [] => 0u32
+:~ ^ len_c (segs : list cubic_seg) : u32 =
+    ?= segs ?| | _ :: rest => 1u32 + len_c rest | [] => 0u32
+:~ ^ count_q (contours : list contour_q) : u32 =
+    ?= contours ?| | c :: rest => len_q c::segs + count_q rest | [] => 0u32
+:~ ^ count_c (contours : list contour_c) : u32 =
+    ?= contours ?| | c :: rest => len_c c::segs + count_c rest | [] => 0u32
+
+:= quad_seg_count (o : outline quadratic) : u32 = ?= o ?| | OQuad cs => count_q cs
+:= cubic_seg_count (o : outline cubic) : u32 = ?= o ?| | OCubic cs => count_c cs
+
+:= sample_o () : outline cubic =
+    OCubic [ { start = { x = 0.0f64; y = 0.0f64 }; segs = [ CCubic ({ x = 100.0f64; y = 50.0f64 }, { x = 100.0f64; y = 150.0f64 }, { x = 0.0f64; y = 200.0f64 }) ] } ]
+
+///> rust
+:# lowering_is_total_and_preserves_segment_count =
+    := ~o = sample_o ()
+    quad_seg_count (lower_to_quads o) |> _assert_eq (cubic_seg_count o)

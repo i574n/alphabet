@@ -1,0 +1,9 @@
+packageDir = '../deps/spiral/lib'
+packages = ['|core-', 'spiral-']
+modules = '''
+font_outline
+font_metrics
+font_face
+font_glyph
+font_json
+'''

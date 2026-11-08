@@ -1,0 +1,78 @@
+///- --package .
+:# font_glyph static =
+    :< testing
+:< font_outline
+
+:= pt (x : f64) (y : f64) : point = { x = x; y = y }
+
+:= ellipse_contour (cx : f64) (cy : f64) (rx : f64) (ry : f64) (ccw : bool) : contour_c =
+    := k = 0.5522847498307936f64
+    := s = ? ccw ?> 1.0f64 |: -1.0f64
+    { start = pt (cx + rx) cy;
+      segs = [
+        CCubic (pt (cx + rx) (cy + s * ry * k), pt (cx + rx * k) (cy + s * ry), pt cx (cy + s * ry));
+        CCubic (pt (cx - rx * k) (cy + s * ry), pt (cx - rx) (cy + s * ry * k), pt (cx - rx) cy);
+        CCubic (pt (cx - rx) (cy - s * ry * k), pt (cx - rx * k) (cy - s * ry), pt cx (cy - s * ry));
+        CCubic (pt (cx + rx * k) (cy - s * ry), pt (cx + rx) (cy - s * ry * k), pt (cx + rx) cy)
+      ] }
+
+:= rect_contour (x0 : f64) (y0 : f64) (x1 : f64) (y1 : f64) : contour_c =
+    { start = pt x0 y0;
+      segs = [ CLine (pt x1 y0); CLine (pt x1 y1); CLine (pt x0 y1) ] }
+
+:= letter_o (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := cy = 250.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx cy 200.0f64 256.0f64 !+;
+        ellipse_contour cx cy 118.0f64 166.0f64 !-
+    ])
+
+:= letter_l (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [ rect_contour 72.0f64 0.0f64 162.0f64 710.0f64 ])
+
+:= letter_i (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 500.0f64;
+        rect_contour 72.0f64 580.0f64 162.0f64 670.0f64
+    ])
+
+:= letter_b (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        ellipse_contour 322.0f64 250.0f64 165.0f64 256.0f64 !+;
+        ellipse_contour 322.0f64 250.0f64 85.0f64 166.0f64 !-
+    ])
+
+:= letter_d (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 413.0f64 0.0f64 503.0f64 710.0f64;
+        ellipse_contour 253.0f64 250.0f64 165.0f64 256.0f64 !+;
+        ellipse_contour 253.0f64 250.0f64 85.0f64 166.0f64 !-
+    ])
+
+:= letter_p (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 (-210.0f64) 162.0f64 500.0f64;
+        ellipse_contour 322.0f64 250.0f64 165.0f64 256.0f64 !+;
+        ellipse_contour 322.0f64 250.0f64 85.0f64 166.0f64 !-
+    ])
+
+:= letter_q (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 413.0f64 (-210.0f64) 503.0f64 500.0f64;
+        ellipse_contour 253.0f64 250.0f64 165.0f64 256.0f64 !+;
+        ellipse_contour 253.0f64 250.0f64 85.0f64 166.0f64 !-
+    ])
+
+///> rust
+:# letter_o_lowers_to_eight_quad_segments =
+    quad_seg_count (letter_o 565.0f64) |> _assert_eq 8u32
+
+///> rust
+:# stem_glyphs_have_expected_segment_counts =
+    (quad_seg_count (letter_l 235.0f64) + quad_seg_count (letter_i 235.0f64)) |> _assert_eq 9u32
+
+///> rust
+:# stem_bowl_glyphs_have_eleven_segments =
+    (quad_seg_count (letter_b 575.0f64) + quad_seg_count (letter_p 575.0f64)) |> _assert_eq 22u32

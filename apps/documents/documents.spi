@@ -1,4 +1,3 @@
-///> zig
 :< file_system_operators
 :< sm'_operators
 :< rust_operators
@@ -688,7 +687,6 @@ test run =
     }
 
 /// ## main
-
 := main (args : array_base string) =
     Info |> Some |> init_trace_state
     trace Info

@@ -11,7 +11,7 @@ $ErrorActionPreference = "Stop"
 
 $projectName = "documents"
 
-$livebook = Join-Path $ScriptDir "../../deps/spiral/apps/cells/spi/run_notebook.ps1"
+$livebook = Join-Path ($env:SPIRAL_CELLS_ROOT ? $env:SPIRAL_CELLS_ROOT : (Join-Path $ScriptDir "../../deps/spiral/apps/cells")) "spi/run_notebook.ps1"
 $spi = Join-Path $ScriptDir "$projectName.spi"
 $ipynb = Join-Path $ScriptDir "$projectName.spi.ipynb"
 if (!$fast -and !$SkipNotebook) {
@@ -23,7 +23,7 @@ $targetDir = GetTargetDir $projectName
 if (!(BuildSpiral "$ScriptDir/$projectName.spi" "$ScriptDir/$projectName.rs" "alphabet/apps/documents")) {
     throw "RUST-FAILED alphabet/apps/documents / compile"
 }
-{ cargo +nightly-2026-10-18 build --release } | Invoke-Block
+{ cargo +nightly-2026-11-05 build --release } | Invoke-Block
 $rustRunRoot = Join-Path ([IO.Path]::GetTempPath()) "alphabet-documents-run-$PID"
 Remove-Item $rustRunRoot -Recurse -Force -ErrorAction Ignore
 $rustSample = [ordered]@{

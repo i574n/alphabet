@@ -11,3 +11,9 @@ $ErrorActionPreference = "Stop"
 { pwsh ../apps/documents/build.ps1 } | Invoke-Block
 
 { pwsh ../apps/hangul/build.ps1 } | Invoke-Block
+
+{ pwsh ../lib/build.ps1 } | Invoke-Block
+
+{ pwsh ../apps/font-sans/build.ps1 } | Invoke-Block
+
+{ pwsh ../apps/font-mono/build.ps1 } | Invoke-Block

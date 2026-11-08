@@ -1,4 +1,3 @@
-///> zig
 ///- --package .
 :# cp949 static =
     :< testing
