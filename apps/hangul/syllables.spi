@@ -123,7 +123,11 @@
     ? within code 4352i32 4370i32 ?> Some code |: shifted 4352i32 (index_in (lead_compat ()) code 0i32)
 
 :~ vowel_of (code : i32) : option i32 =
-    ? within code 4449i32 4469i32 ?> Some code |? within code 12623i32 12643i32 ?> Some (code - 12623i32 + 4449i32) |: None
+    ? within code 4449i32 4469i32
+    ?> Some code
+    |? within code 12623i32 12643i32
+    ?> Some (code - 12623i32 + 4449i32)
+    |: None
 
 :~ tail_of (code : i32) : option i32 =
     ? within code 4520i32 4546i32 ?> Some code |: shifted 4520i32 (index_in (tail_compat ()) code 0i32)

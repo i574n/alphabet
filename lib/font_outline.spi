@@ -64,7 +64,13 @@
 := cubic_seg_count (o : outline cubic) : u32 = ?= o ?| | OCubic cs => count_c cs
 
 := sample_o () : outline cubic =
-    OCubic [ { start = { x = 0.0f64; y = 0.0f64 }; segs = [ CCubic ({ x = 100.0f64; y = 50.0f64 }, { x = 100.0f64; y = 150.0f64 }, { x = 0.0f64; y = 200.0f64 }) ] } ]
+    OCubic [
+        {
+            start = { x = 0.0f64; y = 0.0f64 }
+            segs =
+                [ CCubic ({ x = 100.0f64; y = 50.0f64 }, { x = 100.0f64; y = 150.0f64 }, { x = 0.0f64; y = 200.0f64 }) ]
+        }
+    ]
 
 ///> rust
 :# lowering_is_total_and_preserves_segment_count =

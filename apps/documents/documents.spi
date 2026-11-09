@@ -165,8 +165,7 @@ test documents static =
                     := i = i - n
                     ? i >= result_len
                     ?> acc
-                    |? code_fence || in_code_block
-                    ?>
+                    |? code_fence || in_code_block ?>
                         := result = acc ++# line
                         ? i = result_len - 1
                         ?> result
@@ -287,7 +286,10 @@ test documents static =
                         | dir :: rest =>
                             ?= dir |> file_system.read_dir_names |> resultm.unbox ?|
                             | Ok names =>
-                                := step (acc : list string * list string) (name : sm'.std_string) : list string * list string =
+                                := step
+                                    (acc : list string * list string) (name : sm'.std_string)
+                                    : list string * list string
+                                    =
                                     := pending, matched = acc
                                     := path = dir </> sm'.from_std_string name
                                     ? file_system.directory_exists path ?> (path :: pending, matched)
@@ -296,7 +298,7 @@ test documents static =
                                 := pending, matched = names |> am'.vec_fold' step (rest, found)
                                 walk pending matched
                             | Error _ => walk rest found
-                    walk [dist_dir] [] |> am'.new_vec
+                    walk [ dist_dir ] [] |> am'.new_vec
                 | _ => \ () =>
                     dist_dir
                     |> file_system.new_walk_dir

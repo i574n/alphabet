@@ -1,0 +1,41 @@
+///- --package .
+:# font_emit static =
+    :< testing
+:< rust_operators
+:< font_outline
+:< font_glyph
+
+:! bez_path = `(rust::rust_type `($'BezPath') `($'kurbo::BezPath') "type BezPath = class end")
+
+:= path_new () : bez_path = !\($'"kurbo::BezPath::new()"')
+:= path_moveto (p : bez_path) (x : f64) (y : f64) : bez_path = !\($'"{ let mut q = !p; q.move_to((!x, !y)); q }"')
+:= path_lineto (p : bez_path) (x : f64) (y : f64) : bez_path = !\($'"{ let mut q = !p; q.line_to((!x, !y)); q }"')
+:= path_quadto (p : bez_path) (cx : f64) (cy : f64) (x : f64) (y : f64) : bez_path =
+    !\($'"{ let mut q = !p; q.quad_to((!cx, !cy), (!x, !y)); q }"')
+:= path_close (p : bez_path) : bez_path = !\($'"{ let mut q = !p; q.close_path(); q }"')
+
+:~ ^ thread_segs (p : bez_path) (segs : list quad_seg) : bez_path =
+    ?= segs ?|
+    | s :: rest =>
+        ?= s ?|
+        | QLine e => thread_segs (path_lineto p e::x e::y) rest
+        | QQuad (c, e) => thread_segs (path_quadto p c::x c::y e::x e::y) rest
+    | [] => p
+
+:= thread_contour (p : bez_path) (c : contour_q) : bez_path =
+    := st = c::start
+    path_close (thread_segs (path_moveto p st::x st::y) c::segs)
+
+:~ ^ thread_contours (p : bez_path) (cs : list contour_q) : bez_path =
+    ?= cs ?|
+    | c :: rest => thread_contours (thread_contour p c) rest
+    | [] => p
+
+:= emit_glyf (o : outline quadratic) : bez_path =
+    ?= o ?|
+    | OQuad cs => thread_contours (path_new ()) cs
+
+:= main () =
+    := p = emit_glyf (letter_l 235.0f64)
+    !\($'"{ use write_fonts::tables::glyf::{GlyfLocaBuilder, SimpleGlyph}; let sg = SimpleGlyph::from_bezpath(&!p).unwrap(); let mut gl = GlyfLocaBuilder::new(); gl.add_glyph(&sg).unwrap(); let (glyf, loca, _f) = gl.build(); let mut b = write_fonts::FontBuilder::new(); b.add_table(&glyf).unwrap(); b.add_table(&loca).unwrap(); b.build().len() as i32 }"')
+    : i32
