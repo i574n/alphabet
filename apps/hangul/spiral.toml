@@ -1,0 +1,11 @@
+packageDir = '../../deps/spiral/lib'
+packages = ['|core-', 'spiral-']
+modules = '''
+hanja
+syllables
+convert
+particles
+strokes
+cp949_codes
+cp949
+'''

@@ -1,0 +1,27 @@
+///- --package .
+:# font_face static =
+    :< testing
+:< font_metrics
+:< font_outline
+
+:! proportional = ()
+:! monospace = ()
+
+:== glyph_p = { codepoint : u32; advance : u16; outline : outline quadratic }
+:== glyph_m = { codepoint : u32; outline : outline quadratic }
+
+:| face spacing =
+    | Proportional :: metrics * list glyph_p -> face proportional
+    | Monospace :: metrics * u16 * list glyph_m -> face monospace
+
+:= advance_p (g : glyph_p) : u16 = g::advance
+:= cell_width (f : face monospace) : u16 =
+    ?= f ?|
+    | Monospace (_, w, _) => w
+
+:= sample_mono () : face monospace = Monospace (mono_target (), 600u16, [])
+:= sample_sans () : face proportional = Proportional (chirp_sans (), [])
+
+///> rust
+:# a_monospace_face_has_one_cell_width =
+    cell_width (sample_mono ()) |> _assert_eq 600u16

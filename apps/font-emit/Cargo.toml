@@ -1,0 +1,14 @@
+cargo-features = ["edition2024"]
+
+[package]
+name = "font_emit"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+write-fonts = "0.55.0"
+kurbo = "0.13.1"
+
+[[bin]]
+name = "font_emit"
+path = "font_emit.rs"

@@ -1,0 +1,228 @@
+///- --package .
+:# syllables static =
+    :< testing
+
+:< sm'_operators
+
+:! syllable = i32
+
+:! lead = i32
+
+:! vowel = i32
+
+:! tail = i32
+
+:~ first_code () : i32 = 44032i32
+
+:~ last_code () : i32 = 55203i32
+
+:~ as_syllable (code : i32) : option syllable =
+    ? code >= first_code () && code <= last_code () ?> Some (syllable code) |: None
+
+:~ code_of ((syllable code) : syllable) : i32 = code
+
+:~ decompose ((syllable code) : syllable) : lead * vowel * tail =
+    := s = code - first_code ()
+    lead (s / 588i32), vowel ((s - (s / 588i32) * 588i32) / 28i32), tail (s - (s / 28i32) * 28i32)
+
+:~ compose ((lead l) : lead) ((vowel v) : vowel) ((tail t) : tail) : syllable =
+    syllable (first_code () + (l * 21i32 + v) * 28i32 + t)
+
+:~ split_jamo (s : syllable) : i32 * i32 * option i32 =
+    ?= decompose s ?|
+    | (lead l), (vowel v), (tail t) => 4352i32 + l, 4449i32 + v, (? t = 0i32 ?> None |: Some (4519i32 + t))
+
+:~ tail_index (t : option i32) : i32 =
+    ?= t ?|
+    | Some code => ? code >= 4520i32 ?> code - 4519i32 |: -1i32
+    | None => 0i32
+
+:~ join_jamo (l : i32) (m : i32) (t : option i32) : option syllable =
+    := li = l - 4352i32
+    := mi = m - 4449i32
+    := ti = tail_index t
+    := valid = li >= 0i32 && li < 19i32 && mi >= 0i32 && mi < 21i32 && ti >= 0i32 && ti < 28i32
+    ? valid ?> Some (compose (lead li) (vowel mi) (tail ti)) |: None
+
+:| letter =
+    | HangulSyllable : syllable
+    | JamoConsonant : i32
+    | JamoVowel : i32
+    | NotHangul
+
+:~ within (code : i32) (low : i32) (high : i32) : bool = code >= low && code <= high
+
+:~ classify_jamo (code : i32) : letter =
+    := consonant = within code 12593i32 12622i32 || within code 4352i32 4370i32 || within code 4520i32 4546i32
+    := vowel_jamo = within code 12623i32 12643i32 || within code 4449i32 4469i32
+    ? consonant ?> JamoConsonant code |? vowel_jamo ?> JamoVowel code |: NotHangul
+
+:~ classify (code : i32) : letter =
+    ?= as_syllable code ?|
+    | Some s => HangulSyllable s
+    | None => classify_jamo code
+
+:~ compat_vowel (code : i32) : option i32 =
+    ? within code 12623i32 12643i32
+    ?> Some code
+    |? within code 4449i32 4469i32
+    ?> Some (code - 4449i32 + 12623i32)
+    |: None
+
+:~ lead_compat () : list i32 =
+    [
+        12593i32; 12594i32; 12596i32; 12599i32; 12600i32; 12601i32; 12609i32; 12610i32; 12611i32; 12613i32
+        12614i32; 12615i32; 12616i32; 12617i32; 12618i32; 12619i32; 12620i32; 12621i32; 12622i32
+    ]
+
+:~ tail_compat () : list i32 =
+    [
+        12593i32; 12594i32; 12595i32; 12596i32; 12597i32; 12598i32; 12599i32; 12601i32; 12602i32; 12603i32
+        12604i32; 12605i32; 12606i32; 12607i32; 12608i32; 12609i32; 12610i32; 12612i32; 12613i32; 12614i32
+        12615i32; 12616i32; 12618i32; 12619i32; 12620i32; 12621i32; 12622i32
+    ]
+
+:~ ^ nth_code (codes : list i32) (i : i32) : option i32 =
+    ?= codes ?|
+    | c :: rest => ? i = 0i32 ?> Some c |: nth_code rest (i - 1i32)
+    | [] => None
+
+:~ compat_consonant (code : i32) : option i32 =
+    ? within code 12593i32 12622i32
+    ?> Some code
+    |? within code 4352i32 4370i32
+    ?> nth_code (lead_compat ()) (code - 4352i32)
+    |? within code 4520i32 4546i32
+    ?> nth_code (tail_compat ()) (code - 4520i32)
+    |: None
+
+:~ compat_jamo (code : i32) : option i32 =
+    ?= compat_vowel code ?|
+    | Some v => Some v
+    | None => compat_consonant code
+
+:~ compat_letter (c : option i32) : bool =
+    ?= c ?|
+    | Some x => within x 12593i32 12622i32
+    | None => !-
+
+:~ ^ all_compat_from (code : i32) (last : i32) : bool =
+    ? code > last ?> !+ |: compat_letter (compat_consonant code) && all_compat_from (code + 1i32) last
+
+:~ ^ index_in (codes : list i32) (code : i32) (i : i32) : option i32 =
+    ?= codes ?|
+    | c :: rest => ? c = code ?> Some i |: index_in rest code (i + 1i32)
+    | [] => None
+
+:~ shifted (base : i32) (i : option i32) : option i32 =
+    ?= i ?|
+    | Some k => Some (base + k)
+    | None => None
+
+:~ lead_of (code : i32) : option i32 =
+    ? within code 4352i32 4370i32 ?> Some code |: shifted 4352i32 (index_in (lead_compat ()) code 0i32)
+
+:~ vowel_of (code : i32) : option i32 =
+    ? within code 4449i32 4469i32
+    ?> Some code
+    |? within code 12623i32 12643i32
+    ?> Some (code - 12623i32 + 4449i32)
+    |: None
+
+:~ tail_of (code : i32) : option i32 =
+    ? within code 4520i32 4546i32 ?> Some code |: shifted 4520i32 (index_in (tail_compat ()) code 0i32)
+
+:~ join_letters (l : i32) (m : i32) (t : option i32) : option syllable =
+    ?= lead_of l, vowel_of m ?|
+    | Some li, Some mi =>
+        ?= t ?|
+        | None => join_jamo li mi None
+        | Some code =>
+            ?= tail_of code ?|
+            | Some ti => join_jamo li mi (Some ti)
+            | None => None
+    | _ => None
+
+:~ split_compat (s : syllable) : option i32 * option i32 * option i32 =
+    := l, m, t = split_jamo s
+    := tail_letter =
+        ?= t ?|
+        | Some code => compat_jamo code
+        | None => None
+    compat_jamo l, compat_jamo m, tail_letter
+
+:~ ^ round_trips_from (code : i32) : bool =
+    ?= as_syllable code ?|
+    | Some s =>
+        := l, v, t = decompose s
+        ? code_of (compose l v t) = code ?> round_trips_from (code + 1i32) |: !-
+    | None => code > last_code ()
+
+///> rust
+:# a_syllable_splits_into_lead_vowel_and_tail =
+    := parts = \ (code : i32) => as_syllable code |> optionm::map decompose
+    (parts 44032i32, parts 44397i32, parts 50612i32)
+    |> _assert_eq (
+        Some (lead 0i32, vowel 0i32, tail 0i32),
+        Some (lead 0i32, vowel 13i32, tail 1i32),
+        Some (lead 11i32, vowel 4i32, tail 0i32)
+    )
+
+///> rust
+:# every_syllable_recomposes_from_its_parts_and_nothing_else_is_one =
+    (round_trips_from (first_code ()), as_syllable 44031i32, as_syllable 55204i32) |> _assert_eq (!+, None, None)
+
+///> rust
+:# a_syllable_splits_into_conjoining_jamo_and_joins_back =
+    := split = \ (code : i32) => as_syllable code |> optionm::map split_jamo
+    := gug = split 44397i32
+    := eo = split 50612i32
+    := joined = join_jamo 4352i32 4462i32 (Some 4520i32) |> optionm::map code_of
+    (gug, eo, joined, join_jamo 4371i32 4449i32 None, join_jamo 4352i32 4449i32 (Some 4519i32))
+    |> _assert_eq (Some (4352i32, 4462i32, Some 4520i32), Some (4363i32, 4453i32, None), Some 44397i32, None, None)
+
+///> rust
+:# each_code_is_classified_once_as_syllable_consonant_vowel_or_not_hangul =
+    [ 44032i32; 12593i32; 12623i32; 4352i32; 4520i32; 4449i32; 97i32 ]
+    |> listm::map (\ c => classify c)
+    |> _assert_eq
+        [
+            HangulSyllable (syllable 44032i32)
+            JamoConsonant 12593i32
+            JamoVowel 12623i32
+            JamoConsonant 4352i32
+            JamoConsonant 4520i32
+            JamoVowel 4449i32
+            NotHangul
+        ]
+
+///> rust
+:# a_medial_vowel_maps_to_its_compatibility_letter =
+    (compat_vowel 4449i32, compat_vowel 4469i32, compat_vowel 12623i32, compat_vowel 4352i32)
+    |> _assert_eq (Some 12623i32, Some 12643i32, Some 12623i32, None)
+
+///> rust
+:# every_conjoining_jamo_maps_to_its_compatibility_letter =
+    := samples = [ 4352i32; 4449i32; 4527i32; 12610i32; 4540i32; 4363i32; 97i32 ] |> listm::map (\ c => compat_jamo c)
+    (samples, all_compat_from 4352i32 4370i32, all_compat_from 4520i32 4546i32, compat_jamo 4371i32)
+    |> _assert_eq (
+        [ Some 12593i32; Some 12623i32; Some 12601i32; Some 12610i32; Some 12615i32; Some 12615i32; None ],
+        !+,
+        !+,
+        None
+    )
+
+///> rust
+:# letters_join_from_either_jamo_block_and_split_back_to_compatibility_letters =
+    := seo = join_letters 4361i32 4453i32 None |> optionm::map code_of
+    := ul = join_letters 12615i32 4462i32 (Some 4527i32) |> optionm::map code_of
+    := pyeong = join_letters 4369i32 12629i32 (Some 12615i32) |> optionm::map code_of
+    := han = as_syllable 54620i32 |> optionm::map split_compat
+    (seo, ul, pyeong, han, join_letters 12593i32 97i32 None |> optionm::map code_of)
+    |> _assert_eq (
+        Some 49436i32,
+        Some 50872i32,
+        Some 54217i32,
+        Some (Some 12622i32, Some 12623i32, Some 12596i32),
+        None
+    )

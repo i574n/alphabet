@@ -1,0 +1,39 @@
+///- --package .
+:# font_json static =
+    :< testing
+:< font_outline
+
+:= point_json (p : point) : string =
+    sm'::concat_list "" [ "["; sm'::show (p::x); ","; sm'::show (p::y); "]" ]
+
+:= seg_json (s : quad_seg) : string =
+    ?= s ?|
+    | QLine p => sm'::concat_list "" [ "[0,"; point_json p; "]" ]
+    | QQuad (c, p) => sm'::concat_list "" [ "[1,"; point_json c; ","; point_json p; "]" ]
+
+:~ ^ segs_json (segs : list quad_seg) : string =
+    ?= segs ?|
+    | s :: rest =>
+        ?= rest ?|
+        | _ :: _ => sm'::concat_list "" [ seg_json s; ","; segs_json rest ]
+        | [] => seg_json s
+    | [] => ""
+
+:= contour_json (c : contour_q) : string =
+    sm'::concat_list "" [ "["; point_json (c::start); ",["; segs_json (c::segs); "]]" ]
+
+:~ ^ contours_json (cs : list contour_q) : string =
+    ?= cs ?|
+    | c :: rest =>
+        ?= rest ?|
+        | _ :: _ => sm'::concat_list "" [ contour_json c; ","; contours_json rest ]
+        | [] => contour_json c
+    | [] => ""
+
+:= outline_json (o : outline quadratic) : string =
+    ?= o ?|
+    | OQuad cs => sm'::concat_list "" [ "["; contours_json cs; "]" ]
+
+///> rust
+:# a_point_serializes =
+    point_json { x = 100.0f64; y = 0.0f64 } |> _assert_eq "[100.0,0.0]"

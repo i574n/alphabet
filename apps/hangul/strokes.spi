@@ -1,0 +1,70 @@
+///- --package .
+:# strokes static =
+    :< testing
+
+:< sm'_operators
+:< syllables
+
+:~ basic_strokes () : list (i32 * i32) =
+    [
+        12593i32, 1i32; 12596i32, 1i32; 12599i32, 2i32; 12601i32, 3i32; 12609i32, 3i32; 12610i32, 4i32
+        12613i32, 2i32; 12615i32, 1i32; 12616i32, 3i32; 12618i32, 4i32; 12619i32, 2i32; 12620i32, 3i32
+        12621i32, 4i32; 12622i32, 3i32; 12623i32, 2i32; 12625i32, 3i32; 12627i32, 2i32; 12629i32, 3i32
+        12631i32, 2i32; 12635i32, 3i32; 12636i32, 2i32; 12640i32, 3i32; 12641i32, 1i32; 12643i32, 1i32
+    ]
+
+:~ compounds () : list (i32 * list i32) =
+    [
+        12594i32, [ 12593i32; 12593i32 ]; 12595i32, [ 12593i32; 12613i32 ]; 12597i32, [ 12596i32; 12616i32 ]
+        12598i32, [ 12596i32; 12622i32 ]; 12600i32, [ 12599i32; 12599i32 ]; 12602i32, [ 12601i32; 12593i32 ]
+        12603i32, [ 12601i32; 12609i32 ]; 12604i32, [ 12601i32; 12610i32 ]; 12605i32, [ 12601i32; 12613i32 ]
+        12606i32, [ 12601i32; 12620i32 ]; 12607i32, [ 12601i32; 12621i32 ]; 12608i32, [ 12601i32; 12622i32 ]
+        12611i32, [ 12610i32; 12610i32 ]; 12612i32, [ 12610i32; 12613i32 ]; 12614i32, [ 12613i32; 12613i32 ]
+        12617i32, [ 12616i32; 12616i32 ]; 12624i32, [ 12623i32; 12643i32 ]; 12628i32, [ 12627i32; 12643i32 ]
+        12626i32, [ 12625i32; 12643i32 ]; 12630i32, [ 12629i32; 12643i32 ]; 12632i32, [ 12631i32; 12623i32 ]
+        12633i32, [ 12631i32; 12623i32; 12643i32 ]; 12634i32, [ 12631i32; 12643i32 ]
+        12637i32, [ 12636i32; 12627i32 ]; 12638i32, [ 12636i32; 12628i32 ]; 12639i32, [ 12636i32; 12643i32 ]
+        12642i32, [ 12641i32; 12643i32 ]
+    ]
+
+:~ ^ basic_of (table : list (i32 * i32)) (code : i32) : i32 =
+    ?= table ?|
+    | (c, n) :: rest => ? c = code ?> n |: basic_of rest code
+    | [] => 0i32
+
+:~ ^ parts_of (table : list (i32 * list i32)) (code : i32) : option (list i32) =
+    ?= table ?|
+    | (c, parts) :: rest => ? c = code ?> Some parts |: parts_of rest code
+    | [] => None
+
+:~ ^ letter_strokes (code : i32) : i32 =
+    ?= parts_of (compounds ()) code ?|
+    | Some parts => parts_strokes parts
+    | None => basic_of (basic_strokes ()) code
+:& :~ parts_strokes (parts : list i32) : i32 =
+    ?= parts ?|
+    | p :: rest => letter_strokes p + parts_strokes rest
+    | [] => 0i32
+
+:~ optional_strokes (letter : option i32) : i32 =
+    ?= letter ?|
+    | Some c => letter_strokes c
+    | None => 0i32
+
+:~ stroke (code : i32) : i32 =
+    ?= as_syllable code ?|
+    | Some s =>
+        := l, m, t = split_compat s
+        optional_strokes l + optional_strokes m + optional_strokes t
+    | None => optional_strokes (compat_jamo code)
+
+///> rust
+:# a_syllable_counts_the_strokes_of_its_letters =
+    [ 49464i32; 49345i32; 50500i32; 32i32; 50504i32; 45397i32 ]
+    |> listm::map (\ c => stroke c)
+    |> _assert_eq [ 5i32; 5i32; 3i32; 0i32; 4i32; 5i32 ]
+
+///> rust
+:# a_compound_letter_counts_its_parts_down_to_basic_letters =
+    (stroke 12617i32, stroke 12626i32, stroke 12633i32, stroke 12638i32, stroke 4352i32)
+    |> _assert_eq (6i32, 4i32, 5i32, 5i32, 1i32)

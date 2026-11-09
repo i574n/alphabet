@@ -1,0 +1,20 @@
+///- --package .
+:# font_metrics static =
+    :< testing
+
+:== metrics = { upem : u16; x_height : i16; cap_height : i16; ascent : i16; descent : i16; line_gap : i16 }
+
+:= chirp_sans () : metrics =
+    { upem = 1000u16; x_height = 500i16; cap_height = 710i16; ascent = 952i16; descent = -241i16; line_gap = 0i16 }
+
+:= mono_target () : metrics =
+    { upem = 1000u16; x_height = 536i16; cap_height = 715i16; ascent = 950i16; descent = -284i16; line_gap = 0i16 }
+
+///> rust
+:# sans_targets_chirp_upem =
+    := ~m = chirp_sans ()
+    (m)::upem |> _assert_eq 1000u16
+
+///> rust
+:# mono_xheight_is_taller_than_sans =
+    ((mono_target ())::x_height > (chirp_sans ())::x_height) |> _assert_eq !+

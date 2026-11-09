@@ -1,0 +1,28 @@
+///- --package .
+:# sans static =
+    :< testing
+:< font_face
+:< font_glyph
+:< font_metrics
+
+:~ ^ count_glyphs (gs : list glyph_p) : u32 =
+    ?= gs ?| | _ :: rest => 1u32 + count_glyphs rest | [] => 0u32
+
+:= sans () : face proportional =
+    Proportional (chirp_sans (), [
+        { codepoint = 111u32; advance = 565u16; outline = letter_o 565.0f64 };
+        { codepoint = 108u32; advance = 235u16; outline = letter_l 235.0f64 };
+        { codepoint = 105u32; advance = 235u16; outline = letter_i 235.0f64 };
+        { codepoint = 98u32; advance = 575u16; outline = letter_b 575.0f64 };
+        { codepoint = 100u32; advance = 575u16; outline = letter_d 575.0f64 };
+        { codepoint = 112u32; advance = 575u16; outline = letter_p 575.0f64 };
+        { codepoint = 113u32; advance = 575u16; outline = letter_q 575.0f64 }
+    ])
+
+:= glyph_count (f : face proportional) : u32 =
+    ?= f ?|
+    | Proportional (_, gs) => count_glyphs gs
+
+///> rust
+:# sans_has_seven_glyphs =
+    glyph_count (sans ()) |> _assert_eq 7u32
