@@ -16,6 +16,16 @@ $spi = Join-Path $ScriptDir "$projectName.spi"
 $ipynb = Join-Path $ScriptDir "$projectName.spi.ipynb"
 if (!$fast -and !$SkipNotebook) {
     { pwsh -NoProfile -File $livebook --path $spi --output-path $ipynb } | Invoke-Block -Retries $($env:CI ? 3 : 1)
+    $cells = Split-Path (Split-Path $livebook -Parent) -Parent
+    $mix = if ($IsWindows) { Join-Path (Split-Path (Get-Command mix).Source -Parent) 'mix.bat' } else { (Get-Command mix).Source }
+    $env:SPIRAL_CELLS_ALPHABET_ROOT = (Resolve-Path (Join-Path $ScriptDir '../..')).Path
+    Push-Location $cells
+    try { $roundTrip = @(& $mix test test/spiral/document_test.exs --only alphabet_corpus 2>&1 | ForEach-Object { "$_" }); $roundTripExit = $LASTEXITCODE }
+    finally { Pop-Location }
+    $roundTrip | Select-Object -Last 4 | ForEach-Object { Write-Output "alphabet/documents/build.ps1 / document round trip / $_" }
+    if ($roundTripExit -ne 0 -or -not ($roundTrip -match '\b[1-9]\d* tests?, 0 failures')) {
+        throw "CELLS-FAILED alphabet/documents / the document round trip over this checkout exited $roundTripExit or ran no test"
+    }
 }
 
 $targetDir = GetTargetDir $projectName
@@ -23,7 +33,7 @@ $targetDir = GetTargetDir $projectName
 if (!(BuildSpiral "$ScriptDir/$projectName.spi" "$ScriptDir/$projectName.rs" "alphabet/apps/documents")) {
     throw "RUST-FAILED alphabet/apps/documents / compile"
 }
-{ cargo +nightly-2026-11-05 build --release } | Invoke-Block
+{ cargo build --release } | Invoke-Block
 $rustRunRoot = Join-Path ([IO.Path]::GetTempPath()) "alphabet-documents-run-$PID"
 Remove-Item $rustRunRoot -Recurse -Force -ErrorAction Ignore
 $rustSample = [ordered]@{

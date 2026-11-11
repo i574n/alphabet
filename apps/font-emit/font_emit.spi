@@ -4,8 +4,12 @@
 :< rust_operators
 :< font_outline
 :< font_glyph
+:< font_face
 
 :! bez_path = `(rust::rust_type `($'BezPath') `($'kurbo::BezPath') "type BezPath = class end")
+:! glyf_b = `(rust::rust_type `($'GlyfB') `($'write_fonts::tables::glyf::GlyfLocaBuilder') "type GlyfB = class end")
+:! metric_v = `(rust::rust_type `($'MetricV') `($'Vec<write_fonts::tables::hmtx::LongMetric>') "type MetricV = class end")
+:! cmap_v = `(rust::rust_type `($'CmapV') `($'Vec<(char, write_fonts::types::GlyphId)>') "type CmapV = class end")
 
 := path_new () : bez_path = !\($'"kurbo::BezPath::new()"')
 := path_moveto (p : bez_path) (x : f64) (y : f64) : bez_path = !\($'"{ let mut q = !p; q.move_to((!x, !y)); q }"')
@@ -35,7 +39,481 @@
     ?= o ?|
     | OQuad cs => thread_contours (path_new ()) cs
 
+:= gb_new () : glyf_b = !\($'"{ let mut b = write_fonts::tables::glyf::GlyfLocaBuilder::new(); let mut nd = kurbo::BezPath::new(); nd.move_to((80.0, 0.0)); nd.line_to((520.0, 0.0)); nd.line_to((520.0, 700.0)); nd.line_to((80.0, 700.0)); nd.close_path(); nd.move_to((160.0, 100.0)); nd.line_to((160.0, 600.0)); nd.line_to((440.0, 600.0)); nd.line_to((440.0, 100.0)); nd.close_path(); b.add_glyph(&write_fonts::tables::glyf::SimpleGlyph::from_bezpath(&nd).unwrap()).unwrap(); b }"')
+:= gb_add (b : glyf_b) (p : bez_path) : glyf_b = !\($'"{ let mut g = !b; g.add_glyph(&write_fonts::tables::glyf::SimpleGlyph::from_bezpath(&!p).unwrap()).unwrap(); g }"')
+:= mv_new () : metric_v = !\($'"{ let mut v: Vec<write_fonts::tables::hmtx::LongMetric> = Vec::new(); v.push(write_fonts::tables::hmtx::LongMetric::new(500, 0)); v }"')
+:= mv_push (v : metric_v) (a : u16) : metric_v = !\($'"{ let mut m = !v; m.push(write_fonts::tables::hmtx::LongMetric::new(!a, 0)); m }"')
+:= cv_new () : cmap_v = !\($'"{ let v: Vec<(char, write_fonts::types::GlyphId)> = Vec::new(); v }"')
+:= cv_push (v : cmap_v) (cp : u32) (gid : u32) : cmap_v = !\($'"{ let mut m = !v; m.push((char::from_u32(!cp).unwrap(), write_fonts::types::GlyphId::new(!gid))); m }"')
+
+:~ ^ build_glyphs (gb : glyf_b) (mv : metric_v) (cv : cmap_v) (gid : u32) (gs : list glyph_p) : glyf_b * metric_v * cmap_v * u32 =
+    ?= gs ?|
+    | g :: rest =>
+        := bp = emit_glyf g::outline
+        build_glyphs (gb_add gb bp) (mv_push mv g::advance) (cv_push cv g::codepoint gid) (gid + 1u32) rest
+    | [] => (gb, mv, cv, gid)
+
+:~ ^ append_glyphs (a : list glyph_p) (b : list glyph_p) : list glyph_p =
+    ?= a ?|
+    | h :: t => h :: append_glyphs t b
+    | [] => b
+
+:~ ^ hangul_entries (s : u32) (n : u32) : list glyph_p =
+    ?= n ?|
+    | 0u32 => []
+    | _ => { codepoint = s; advance = 840u16; outline = syllable_outline s } :: hangul_entries (s + 1u32) (n - 1u32)
+
+:= finish (gb : glyf_b) (mv : metric_v) (cv : cmap_v) (nglyphs : u32) : i32 =
+    !\($'"{ use write_fonts::tables::{head::{Flags, Head, MacStyle}, hhea::Hhea, maxp::Maxp, post::Post, cmap::Cmap, hmtx::Hmtx, loca::LocaFormat}; use write_fonts::types::{FWord, Fixed, LongDateTime, UfWord}; use write_fonts::FontBuilder; use write_fonts::tables::os2::Os2; use write_fonts::tables::os2::SelectionFlags; use write_fonts::tables::name::Name; use write_fonts::tables::name::NameRecord; use write_fonts::types::NameId; use write_fonts::types::Tag; let (glyf, loca, loca_format) = (!gb).build(); let hmtx = Hmtx::new(!mv, Vec::new()); let cv_vec = !cv; let cmap = Cmap::from_mappings(cv_vec.clone()).unwrap(); let n = !nglyphs as u16; let upem: u16 = 1000; let ascent: i16 = 952; let descent: i16 = -241; let bbox_xmax: i16 = 575; let loc_fmt: i16 = match loca_format { LocaFormat::Short => 0, LocaFormat::Long => 1 }; let head = Head::new(Fixed::from_i32(1), 0, Flags::empty(), upem, LongDateTime::new(0), LongDateTime::new(0), 0, descent, bbox_xmax, ascent, MacStyle::empty(), 8, loc_fmt); let hhea = Hhea::new(FWord::new(ascent), FWord::new(descent), FWord::new(0), UfWord::new(575), FWord::new(0), FWord::new(0), FWord::new(bbox_xmax), 1, 0, 0, n); let maxp = { let mut mp = Maxp::new(n); mp.max_points = Some(512); mp.max_contours = Some(64); mp.max_composite_points = Some(0); mp.max_composite_contours = Some(0); mp.max_zones = Some(1); mp.max_twilight_points = Some(0); mp.max_storage = Some(0); mp.max_function_defs = Some(0); mp.max_instruction_defs = Some(0); mp.max_stack_elements = Some(0); mp.max_size_of_instructions = Some(0); mp.max_component_elements = Some(0); mp.max_component_depth = Some(0); mp }; let post = Post::new(Fixed::from_i32(0), FWord::new(-75), FWord::new(50), 0, 0, 0, 0, 0); let mut b = FontBuilder::new(); b.add_table(&head).unwrap(); b.add_table(&hhea).unwrap(); b.add_table(&maxp).unwrap(); b.add_table(&post).unwrap(); b.add_table(&hmtx).unwrap(); b.add_table(&cmap).unwrap(); b.add_table(&glyf).unwrap(); b.add_table(&loca).unwrap(); let mut os2 = Os2::default(); os2.us_weight_class = 400; os2.fs_type = 0; os2.fs_selection = SelectionFlags::from_bits_truncate(192); os2.s_typo_ascender = ascent; os2.s_typo_descender = descent; os2.s_typo_line_gap = 0; os2.us_win_ascent = ascent as u16; os2.us_win_descent = (-descent) as u16; os2.us_first_char_index = 32; os2.us_last_char_index = 126; os2.ach_vend_id = Tag::new(&[83u8, 97, 110, 115]); os2.ul_unicode_range_1 = 1; os2.ul_code_page_range_1 = Some(1); os2.ul_code_page_range_2 = Some(0); os2.sx_height = Some(500); os2.s_cap_height = Some(710); os2.us_default_char = Some(0); os2.us_break_char = Some(32); os2.us_max_context = Some(0); let name = Name::new([NameRecord::new(3, 1, 1033, NameId::new(1), String::from_utf8([83u8, 97, 110, 115].to_vec()).unwrap().into()), NameRecord::new(3, 1, 1033, NameId::new(2), String::from_utf8([82u8, 101, 103, 117, 108, 97, 114].to_vec()).unwrap().into()), NameRecord::new(3, 1, 1033, NameId::new(4), String::from_utf8([83u8, 97, 110, 115, 32, 82, 101, 103, 117, 108, 97, 114].to_vec()).unwrap().into()), NameRecord::new(3, 1, 1033, NameId::new(6), String::from_utf8([83u8, 97, 110, 115, 45, 82, 101, 103, 117, 108, 97, 114].to_vec()).unwrap().into())].to_vec()); b.add_table(&os2).unwrap(); b.add_table(&name).unwrap(); let bytes = { use write_fonts::tables::gsub::builders::{SingleSubBuilder, LigatureSubBuilder}; use write_fonts::tables::layout::builders::Builder; use write_fonts::tables::variations::ivs_builder::VariationStoreBuilder; use write_fonts::tables::gsub::{Gsub, SubstitutionLookup, SubstitutionLookupList}; use write_fonts::tables::layout::{Feature, FeatureList, FeatureRecord, LangSys, Lookup, LookupFlag, Script, ScriptList, ScriptRecord}; use write_fonts::types::GlyphId16; let fg = |cp: u32| -> u16 { cv_vec.iter().find(|(c, _)| *c as u32 == cp).map(|(_, g)| g.to_u32() as u16).unwrap_or(0) }; let mk = |ps: &[(u16, u16)]| { let mut sb = SingleSubBuilder::default(); for &(f, t) in ps { sb.insert(GlyphId16::new(f), GlyphId16::new(t)); } let mut vs = VariationStoreBuilder::new(0); Lookup::new(LookupFlag::empty(), sb.build(&mut vs)) }; let li: SubstitutionLookup = mk(&[(fg(0x0628), fg(0xFE91)), (fg(0x062A), fg(0xFE97)), (fg(0x062B), fg(0xFE9B)), (fg(0x0646), fg(0xFEE7)), (fg(0x064A), fg(0xFEF3)), (fg(0x0644), fg(0xFEDF)), (fg(0x0645), fg(0xFEE3)), (fg(0x062C), fg(0xFE9F)), (fg(0x062D), fg(0xFEA3)), (fg(0x062E), fg(0xFEA7)), (fg(0x0633), fg(0xFEB3)), (fg(0x0634), fg(0xFEB7)), (fg(0x0635), fg(0xFEBB)), (fg(0x0636), fg(0xFEBF)), (fg(0x0637), fg(0xFEC3)), (fg(0x0638), fg(0xFEC7)), (fg(0x0639), fg(0xFECB)), (fg(0x063A), fg(0xFECF)), (fg(0x0641), fg(0xFED3)), (fg(0x0642), fg(0xFED7)), (fg(0x0643), fg(0xFEDB)), (fg(0x0647), fg(0xFEEB))]).into(); let lm: SubstitutionLookup = mk(&[(fg(0x0628), fg(0xFE92)), (fg(0x062A), fg(0xFE98)), (fg(0x062B), fg(0xFE9C)), (fg(0x0646), fg(0xFEE8)), (fg(0x064A), fg(0xFEF4)), (fg(0x0644), fg(0xFEE0)), (fg(0x0645), fg(0xFEE4)), (fg(0x062C), fg(0xFEA0)), (fg(0x062D), fg(0xFEA4)), (fg(0x062E), fg(0xFEA8)), (fg(0x0633), fg(0xFEB4)), (fg(0x0634), fg(0xFEB8)), (fg(0x0635), fg(0xFEBC)), (fg(0x0636), fg(0xFEC0)), (fg(0x0637), fg(0xFEC4)), (fg(0x0638), fg(0xFEC8)), (fg(0x0639), fg(0xFECC)), (fg(0x063A), fg(0xFED0)), (fg(0x0641), fg(0xFED4)), (fg(0x0642), fg(0xFED8)), (fg(0x0643), fg(0xFEDC)), (fg(0x0647), fg(0xFEEC))]).into(); let lfn: SubstitutionLookup = mk(&[(fg(0x0628), fg(0xFE90)), (fg(0x062A), fg(0xFE96)), (fg(0x062B), fg(0xFE9A)), (fg(0x0646), fg(0xFEE6)), (fg(0x064A), fg(0xFEF2)), (fg(0x062F), fg(0xFEAA)), (fg(0x0630), fg(0xFEAC)), (fg(0x0631), fg(0xFEAE)), (fg(0x0632), fg(0xFEB0)), (fg(0x0644), fg(0xFEDE)), (fg(0x0645), fg(0xFEE2)), (fg(0x062C), fg(0xFE9E)), (fg(0x062D), fg(0xFEA2)), (fg(0x062E), fg(0xFEA6)), (fg(0x0633), fg(0xFEB2)), (fg(0x0634), fg(0xFEB6)), (fg(0x0635), fg(0xFEBA)), (fg(0x0636), fg(0xFEBE)), (fg(0x0637), fg(0xFEC2)), (fg(0x0638), fg(0xFEC6)), (fg(0x0639), fg(0xFECA)), (fg(0x063A), fg(0xFECE)), (fg(0x0641), fg(0xFED2)), (fg(0x0642), fg(0xFED6)), (fg(0x0643), fg(0xFEDA)), (fg(0x0647), fg(0xFEEA)), (fg(0x0648), fg(0xFEEE)), (fg(0x0629), fg(0xFE94)), (fg(0x0622), fg(0xFE82)), (fg(0x0623), fg(0xFE84)), (fg(0x0625), fg(0xFE88)), (fg(0x0649), fg(0xFEF0))]).into(); let lcj: SubstitutionLookup = { let mut lg = LigatureSubBuilder::default(); lg.insert([GlyphId16::new(fg(0x0915)), GlyphId16::new(fg(0x094D)), GlyphId16::new(fg(0x0936))].to_vec(), GlyphId16::new(fg(0xE000))); lg.insert([GlyphId16::new(fg(0x0924)), GlyphId16::new(fg(0x094D)), GlyphId16::new(fg(0x0930))].to_vec(), GlyphId16::new(fg(0xE001))); lg.insert([GlyphId16::new(fg(0x091C)), GlyphId16::new(fg(0x094D)), GlyphId16::new(fg(0x091E))].to_vec(), GlyphId16::new(fg(0xE002))); lg.insert([GlyphId16::new(fg(0x0926)), GlyphId16::new(fg(0x094D)), GlyphId16::new(fg(0x092F))].to_vec(), GlyphId16::new(fg(0xE003))); lg.insert([GlyphId16::new(fg(0x0936)), GlyphId16::new(fg(0x094D)), GlyphId16::new(fg(0x0930))].to_vec(), GlyphId16::new(fg(0xE004))); lg.insert([GlyphId16::new(fg(0x0938)), GlyphId16::new(fg(0x094D)), GlyphId16::new(fg(0x0924))].to_vec(), GlyphId16::new(fg(0xE005))); lg.insert([GlyphId16::new(fg(0x0928)), GlyphId16::new(fg(0x094D)), GlyphId16::new(fg(0x0924))].to_vec(), GlyphId16::new(fg(0xE006))); let mut vs2 = VariationStoreBuilder::new(0); Lookup::new(LookupFlag::empty(), lg.build(&mut vs2)).into() }; let lookups = SubstitutionLookupList::new([li, lm, lfn, lcj].to_vec()); let features = FeatureList::new([FeatureRecord::new(Tag::new(&[105u8, 110, 105, 116]), Feature::new(None, [0u16].to_vec())), FeatureRecord::new(Tag::new(&[109u8, 101, 100, 105]), Feature::new(None, [1u16].to_vec())), FeatureRecord::new(Tag::new(&[102u8, 105, 110, 97]), Feature::new(None, [2u16].to_vec())), FeatureRecord::new(Tag::new(&[99u8, 106, 99, 116]), Feature::new(None, [3u16].to_vec()))].to_vec()); let script = Script::new(Some(LangSys::new([0u16, 1, 2].to_vec())), Vec::new()); let dev2 = Script::new(Some(LangSys::new([3u16].to_vec())), Vec::new()); let scripts = ScriptList::new([ScriptRecord::new(Tag::new(&[97u8, 114, 97, 98]), script), ScriptRecord::new(Tag::new(&[100u8, 101, 118, 50]), dev2)].to_vec()); let gsub = Gsub::new(scripts, features, lookups); b.add_table(&gsub).unwrap(); { use write_fonts::tables::gpos::builders::{MarkToBaseBuilder, MarkToMarkBuilder, AnchorBuilder}; use write_fonts::tables::gpos::{Gpos, PositionLookup, PositionLookupList, MarkBasePos, MarkMarkPos}; let anu = fg(0x0902); let cb = fg(0x0901); if anu > 0 { let topb = [116u8, 111, 112]; let topc = std::str::from_utf8(&topb).unwrap(); let mut mb = MarkToBaseBuilder::default(); let _ = mb.insert_mark(GlyphId16::new(anu), topc, AnchorBuilder::new(48, 712)); if cb > 0 { let _ = mb.insert_mark(GlyphId16::new(cb), topc, AnchorBuilder::new(120, 712)); } for cp in [0x0915u32, 0x0916, 0x0917, 0x091A, 0x091C, 0x091E, 0x0924, 0x0926, 0x0928, 0x092A, 0x092C, 0x092E, 0x092F, 0x0930, 0x0932, 0x0935, 0x0936, 0x0938, 0x0939] { let bg = fg(cp); if bg > 0 { mb.insert_base(GlyphId16::new(bg), topc, AnchorBuilder::new(280, 712)); } } let em = fg(0x0947); if em > 0 { let _ = mb.insert_mark(GlyphId16::new(em), topc, AnchorBuilder::new(140, 712)); } let aim = fg(0x0948); if aim > 0 { let _ = mb.insert_mark(GlyphId16::new(aim), topc, AnchorBuilder::new(140, 712)); } let iim = fg(0x0940); if iim > 0 { mb.insert_base(GlyphId16::new(iim), topc, AnchorBuilder::new(240, 712)); } let aam = fg(0x093E); if aam > 0 { mb.insert_base(GlyphId16::new(aam), topc, AnchorBuilder::new(57, 712)); } let rm = fg(0x0943); if rm > 0 { let botb = [98u8, 111, 116]; let botc = std::str::from_utf8(&botb).unwrap(); let _ = mb.insert_mark(GlyphId16::new(rm), botc, AnchorBuilder::new(72, -20)); for (cp, sx) in [(0x0915u32, 280i16), (0x0916, 472), (0x0917, 300), (0x091A, 472), (0x091C, 472), (0x091E, 472), (0x0924, 472), (0x0926, 472), (0x0928, 472), (0x092A, 472), (0x092C, 472), (0x092E, 472), (0x092F, 472), (0x0930, 230), (0x0932, 472), (0x0935, 472), (0x0936, 472), (0x0938, 472), (0x0939, 472)] { let bg = fg(cp); if bg > 0 { mb.insert_base(GlyphId16::new(bg), botc, AnchorBuilder::new(sx, 0)); } } } let mut vsp = VariationStoreBuilder::new(0); let pl = PositionLookup::MarkToBase(Lookup::new(LookupFlag::empty(), mb.build(&mut vsp).into_iter().map(MarkBasePos::Format1).collect::<Vec<_>>())); let mut mm = MarkToMarkBuilder::default(); let _ = mm.insert_mark1(GlyphId16::new(anu), topc, AnchorBuilder::new(48, 712)); if cb > 0 { let _ = mm.insert_mark1(GlyphId16::new(cb), topc, AnchorBuilder::new(0, 712)); } if em > 0 { mm.insert_mark2(GlyphId16::new(em), topc, AnchorBuilder::new(238, 712)); } if aim > 0 { mm.insert_mark2(GlyphId16::new(aim), topc, AnchorBuilder::new(258, 712)); } let mml = PositionLookup::MarkToMark(Lookup::new(LookupFlag::empty(), mm.build(&mut vsp).into_iter().map(MarkMarkPos::Format1).collect::<Vec<_>>())); let pll = PositionLookupList::new([pl, mml].to_vec()); let gf = FeatureList::new([FeatureRecord::new(Tag::new(&[97u8, 98, 118, 109]), Feature::new(None, [0u16, 1].to_vec())), FeatureRecord::new(Tag::new(&[98u8, 108, 119, 109]), Feature::new(None, [0u16].to_vec()))].to_vec()); let gsc = Script::new(Some(LangSys::new([0u16, 1].to_vec())), Vec::new()); let gscl = ScriptList::new([ScriptRecord::new(Tag::new(&[100u8, 101, 118, 50]), gsc)].to_vec()); let gpos = Gpos::new(gscl, gf, pll); b.add_table(&gpos).unwrap(); } }; b.build() }; std::fs::write(String::from_utf8([115u8, 97, 110, 115, 46, 116, 116, 102].to_vec()).unwrap(), &bytes).unwrap(); use skrifa::{FontRef, MetadataProvider, instance::{Size, LocationRef}, metrics::GlyphMetrics, outline::{DrawSettings, OutlinePen} }; let font = FontRef::new(&bytes).unwrap(); { use skrifa::raw::TableProvider; let mp = font.maxp().unwrap(); let ok = mp.version() == skrifa::raw::types::Version16Dot16::VERSION_1_0 && mp.max_points().unwrap_or(0) > 0 && mp.max_contours().unwrap_or(0) > 0; if ok { } else { std::process::exit(3) } }; let gid = font.charmap().map(char::from_u32(111).unwrap()).unwrap(); let adv = GlyphMetrics::new(&font, Size::unscaled(), LocationRef::default()).advance_width(gid).unwrap_or(0.0) as i32; let mut rout = String::new(); { struct Flat { c: Vec<Vec<(f64, f64)>>, cur: (f64, f64) } impl Flat { fn pp(&mut self, p: (f64, f64)) { self.c.last_mut().unwrap().push(p); self.cur = p; } } impl OutlinePen for Flat { fn move_to(&mut self, x: f32, y: f32) { self.c.push(Vec::new()); self.cur = (x as f64, y as f64); self.c.last_mut().unwrap().push((x as f64, y as f64)); } fn line_to(&mut self, x: f32, y: f32) { self.pp((x as f64, y as f64)); } fn quad_to(&mut self, cx: f32, cy: f32, x: f32, y: f32) { let (x0, y0) = self.cur; let mut i = 1; while i <= 8 { let t = (i as f64) / 8.0; let u = 1.0 - t; self.pp((u*u*x0 + 2.0*u*t*(cx as f64) + t*t*(x as f64), u*u*y0 + 2.0*u*t*(cy as f64) + t*t*(y as f64))); i += 1; } } fn curve_to(&mut self, _: f32, _: f32, _: f32, _: f32, x: f32, y: f32) { self.pp((x as f64, y as f64)); } fn close(&mut self) {} } let og = font.outline_glyphs(); let mut gi = 0u16; while gi < n { let mut ff = Flat { c: Vec::new(), cur: (0.0, 0.0) }; if let Some(g) = og.get(skrifa::GlyphId::new(gi as u32)) { let _ = g.draw(DrawSettings::unhinted(Size::unscaled(), &[] as &[_]), &mut ff); } let mut hd = 0; while hd < 40 { rout.push(45u8 as char); hd += 1; } rout.push(10u8 as char); rout.push_str(&gi.to_string()); rout.push(10u8 as char); let mut rr = 0; while rr < 26 { let py = 860.0 - ((rr as f64) + 0.5) / 26.0 * 1040.0; let mut cc = 0; while cc < 40 { let px = ((cc as f64) + 0.5) / 40.0 * 620.0; let mut wn = 0i32; for ct in ff.c.iter() { let nn = ct.len(); let mut i = 0; while i < nn { let a = ct[i]; let b = ct[(i + 1) % nn]; let il = (b.0 - a.0) * (py - a.1) - (px - a.0) * (b.1 - a.1); if a.1 <= py { if b.1 > py && il > 0.0 { wn += 1; } } else if b.1 <= py && il < 0.0 { wn -= 1; } i += 1; } } rout.push(if wn.abs() > 0 { 35u8 as char } else { 46u8 as char }); cc += 1; } rout.push(10u8 as char); rr += 1; } gi += 1; } } std::fs::write(String::from_utf8([114u8, 101, 110, 100, 101, 114, 46, 116, 120, 116].to_vec()).unwrap(), rout.as_bytes()).unwrap(); if gid.to_u32() == 1 && adv == 565 { 42 } else { 13 } }"')
+
+:~ is_lc_latin (cp : u32) : bool =
+    (cp >= 97u32 && cp <= 122u32) || (cp >= 224u32 && cp <= 246u32) || (cp >= 248u32 && cp <= 255u32)
+
+:~ raise_lc (g : glyph_p) : glyph_p =
+    ? is_lc_latin g::codepoint
+    ?> { codepoint = g::codepoint; advance = g::advance; outline = scale_outline_y 1.046f64 g::outline }
+    |: g
+
+:~ ^ map_raise_lc (gs : list glyph_p) : list glyph_p =
+    ?= gs ?|
+    | g :: rest => raise_lc g :: map_raise_lc rest
+    | [] => []
+
 := main () =
-    := p = emit_glyf (letter_l 235.0f64)
-    !\($'"{ use write_fonts::tables::glyf::{GlyfLocaBuilder, SimpleGlyph}; let sg = SimpleGlyph::from_bezpath(&!p).unwrap(); let mut gl = GlyfLocaBuilder::new(); gl.add_glyph(&sg).unwrap(); let (glyf, loca, _f) = gl.build(); let mut b = write_fonts::FontBuilder::new(); b.add_table(&glyf).unwrap(); b.add_table(&loca).unwrap(); b.build().len() as i32 }"')
+    := glyphs : list glyph_p = [
+        { codepoint = 111u32; advance = 565u16; outline = letter_o 565.0f64 };
+        { codepoint = 108u32; advance = 235u16; outline = letter_l 235.0f64 };
+        { codepoint = 105u32; advance = 235u16; outline = letter_i 235.0f64 };
+        { codepoint = 98u32; advance = 575u16; outline = letter_b 575.0f64 };
+        { codepoint = 100u32; advance = 575u16; outline = letter_d 575.0f64 };
+        { codepoint = 112u32; advance = 575u16; outline = letter_p 575.0f64 };
+        { codepoint = 113u32; advance = 575u16; outline = letter_q 575.0f64 };
+        { codepoint = 110u32; advance = 480u16; outline = letter_n 480.0f64 };
+        { codepoint = 104u32; advance = 480u16; outline = letter_h 480.0f64 };
+        { codepoint = 109u32; advance = 670u16; outline = letter_m 670.0f64 };
+        { codepoint = 117u32; advance = 480u16; outline = letter_u 480.0f64 };
+        { codepoint = 118u32; advance = 480u16; outline = letter_v 480.0f64 };
+        { codepoint = 116u32; advance = 400u16; outline = letter_t 400.0f64 };
+        { codepoint = 119u32; advance = 680u16; outline = letter_w 680.0f64 };
+        { codepoint = 120u32; advance = 480u16; outline = letter_x 480.0f64 };
+        { codepoint = 122u32; advance = 480u16; outline = letter_z 480.0f64 };
+        { codepoint = 107u32; advance = 450u16; outline = letter_k 450.0f64 };
+        { codepoint = 121u32; advance = 480u16; outline = letter_y 480.0f64 };
+        { codepoint = 73u32; advance = 280u16; outline = letter_cap_i 280.0f64 };
+        { codepoint = 76u32; advance = 450u16; outline = letter_cap_l 450.0f64 };
+        { codepoint = 84u32; advance = 510u16; outline = letter_cap_t 510.0f64 };
+        { codepoint = 72u32; advance = 560u16; outline = letter_cap_h 560.0f64 };
+        { codepoint = 69u32; advance = 470u16; outline = letter_cap_e 470.0f64 };
+        { codepoint = 70u32; advance = 450u16; outline = letter_cap_f 450.0f64 };
+        { codepoint = 65u32; advance = 510u16; outline = letter_cap_a 510.0f64 };
+        { codepoint = 78u32; advance = 560u16; outline = letter_cap_n 560.0f64 };
+        { codepoint = 86u32; advance = 500u16; outline = letter_cap_v 500.0f64 };
+        { codepoint = 88u32; advance = 500u16; outline = letter_cap_x 500.0f64 };
+        { codepoint = 90u32; advance = 480u16; outline = letter_cap_z 480.0f64 };
+        { codepoint = 87u32; advance = 700u16; outline = letter_cap_w 700.0f64 };
+        { codepoint = 89u32; advance = 500u16; outline = letter_cap_y 500.0f64 };
+        { codepoint = 75u32; advance = 470u16; outline = letter_cap_k 470.0f64 };
+        { codepoint = 77u32; advance = 690u16; outline = letter_cap_m 690.0f64 };
+        { codepoint = 49u32; advance = 400u16; outline = digit_one 400.0f64 };
+        { codepoint = 56u32; advance = 520u16; outline = digit_eight 520.0f64 };
+        { codepoint = 55u32; advance = 480u16; outline = digit_seven 480.0f64 };
+        { codepoint = 52u32; advance = 520u16; outline = digit_four 520.0f64 };
+        { codepoint = 57u32; advance = 520u16; outline = digit_nine 520.0f64 };
+        { codepoint = 53u32; advance = 520u16; outline = digit_five 520.0f64 };
+        { codepoint = 54u32; advance = 520u16; outline = digit_six 520.0f64 };
+        { codepoint = 51u32; advance = 520u16; outline = digit_three 520.0f64 };
+        { codepoint = 50u32; advance = 520u16; outline = digit_two 520.0f64 };
+        { codepoint = 99u32; advance = 520u16; outline = letter_c 520.0f64 };
+        { codepoint = 67u32; advance = 600u16; outline = letter_cap_c 600.0f64 };
+        { codepoint = 79u32; advance = 620u16; outline = letter_cap_o 620.0f64 };
+        { codepoint = 85u32; advance = 590u16; outline = letter_cap_u 590.0f64 };
+        { codepoint = 68u32; advance = 620u16; outline = letter_cap_d 620.0f64 };
+        { codepoint = 81u32; advance = 620u16; outline = letter_cap_q 620.0f64 };
+        { codepoint = 80u32; advance = 560u16; outline = letter_cap_p 560.0f64 };
+        { codepoint = 82u32; advance = 580u16; outline = letter_cap_r 580.0f64 };
+        { codepoint = 66u32; advance = 580u16; outline = letter_cap_b 580.0f64 };
+        { codepoint = 71u32; advance = 620u16; outline = letter_cap_g 620.0f64 };
+        { codepoint = 74u32; advance = 440u16; outline = letter_cap_j 440.0f64 };
+        { codepoint = 114u32; advance = 340u16; outline = letter_r 340.0f64 };
+        { codepoint = 102u32; advance = 300u16; outline = letter_f 300.0f64 };
+        { codepoint = 106u32; advance = 290u16; outline = letter_j 290.0f64 };
+        { codepoint = 103u32; advance = 560u16; outline = letter_g 560.0f64 };
+        { codepoint = 97u32; advance = 560u16; outline = letter_a 560.0f64 };
+        { codepoint = 101u32; advance = 560u16; outline = letter_e 560.0f64 };
+        { codepoint = 115u32; advance = 480u16; outline = letter_s 480.0f64 };
+        { codepoint = 83u32; advance = 540u16; outline = letter_cap_s 540.0f64 };
+        { codepoint = 46u32; advance = 250u16; outline = letter_period 250.0f64 };
+        { codepoint = 64u32; advance = 880u16; outline = letter_at 880.0f64 };
+        { codepoint = 183u32; advance = 300u16; outline = letter_middot 300.0f64 };
+        { codepoint = 45u32; advance = 320u16; outline = letter_hyphen 320.0f64 };
+        { codepoint = 58u32; advance = 300u16; outline = letter_colon 300.0f64 };
+        { codepoint = 32u32; advance = 250u16; outline = letter_space 250.0f64 };
+        { codepoint = 33u32; advance = 250u16; outline = letter_exclaim 250.0f64 };
+        { codepoint = 48u32; advance = 565u16; outline = letter_zero 565.0f64 };
+        { codepoint = 35u32; advance = 560u16; outline = letter_hash 560.0f64 };
+        { codepoint = 1040u32; advance = 510u16; outline = letter_cap_a 510.0f64 };
+        { codepoint = 1042u32; advance = 580u16; outline = letter_cap_b 580.0f64 };
+        { codepoint = 1045u32; advance = 470u16; outline = letter_cap_e 470.0f64 };
+        { codepoint = 1050u32; advance = 470u16; outline = letter_cap_k 470.0f64 };
+        { codepoint = 1052u32; advance = 690u16; outline = letter_cap_m 690.0f64 };
+        { codepoint = 1053u32; advance = 560u16; outline = letter_cap_h 560.0f64 };
+        { codepoint = 1054u32; advance = 620u16; outline = letter_cap_o 620.0f64 };
+        { codepoint = 1056u32; advance = 560u16; outline = letter_cap_p 560.0f64 };
+        { codepoint = 1057u32; advance = 600u16; outline = letter_cap_c 600.0f64 };
+        { codepoint = 1058u32; advance = 510u16; outline = letter_cap_t 510.0f64 };
+        { codepoint = 1061u32; advance = 500u16; outline = letter_cap_x 500.0f64 };
+        { codepoint = 1043u32; advance = 470u16; outline = letter_cap_ghe 470.0f64 };
+        { codepoint = 1055u32; advance = 560u16; outline = letter_cap_pe 560.0f64 };
+        { codepoint = 1064u32; advance = 720u16; outline = letter_cap_sha 720.0f64 };
+        { codepoint = 1060u32; advance = 640u16; outline = letter_cap_ef 640.0f64 };
+        { codepoint = 1047u32; advance = 520u16; outline = digit_three 520.0f64 };
+        { codepoint = 1048u32; advance = 560u16; outline = letter_cap_icyr 560.0f64 };
+        { codepoint = 1062u32; advance = 560u16; outline = letter_cap_tse 560.0f64 };
+        { codepoint = 1065u32; advance = 720u16; outline = letter_cap_shcha 720.0f64 };
+        { codepoint = 1041u32; advance = 575u16; outline = letter_cap_be 575.0f64 };
+        { codepoint = 1066u32; advance = 560u16; outline = letter_cap_hard 560.0f64 };
+        { codepoint = 1067u32; advance = 640u16; outline = letter_cap_yery 640.0f64 };
+        { codepoint = 1068u32; advance = 540u16; outline = letter_cap_soft 540.0f64 };
+        { codepoint = 1070u32; advance = 720u16; outline = letter_cap_yu 720.0f64 };
+        { codepoint = 913u32; advance = 510u16; outline = letter_cap_a 510.0f64 };
+        { codepoint = 914u32; advance = 580u16; outline = letter_cap_b 580.0f64 };
+        { codepoint = 915u32; advance = 470u16; outline = letter_cap_ghe 470.0f64 };
+        { codepoint = 917u32; advance = 470u16; outline = letter_cap_e 470.0f64 };
+        { codepoint = 918u32; advance = 480u16; outline = letter_cap_z 480.0f64 };
+        { codepoint = 919u32; advance = 560u16; outline = letter_cap_h 560.0f64 };
+        { codepoint = 921u32; advance = 280u16; outline = letter_cap_i 280.0f64 };
+        { codepoint = 922u32; advance = 470u16; outline = letter_cap_k 470.0f64 };
+        { codepoint = 924u32; advance = 690u16; outline = letter_cap_m 690.0f64 };
+        { codepoint = 925u32; advance = 560u16; outline = letter_cap_n 560.0f64 };
+        { codepoint = 927u32; advance = 620u16; outline = letter_cap_o 620.0f64 };
+        { codepoint = 928u32; advance = 560u16; outline = letter_cap_pe 560.0f64 };
+        { codepoint = 929u32; advance = 560u16; outline = letter_cap_p 560.0f64 };
+        { codepoint = 932u32; advance = 510u16; outline = letter_cap_t 510.0f64 };
+        { codepoint = 933u32; advance = 500u16; outline = letter_cap_y 500.0f64 };
+        { codepoint = 934u32; advance = 640u16; outline = letter_cap_ef 640.0f64 };
+        { codepoint = 935u32; advance = 500u16; outline = letter_cap_x 500.0f64 };
+        { codepoint = 1072u32; advance = 560u16; outline = letter_a 560.0f64 };
+        { codepoint = 1077u32; advance = 560u16; outline = letter_e 560.0f64 };
+        { codepoint = 1086u32; advance = 565u16; outline = letter_o 565.0f64 };
+        { codepoint = 1088u32; advance = 575u16; outline = letter_p 575.0f64 };
+        { codepoint = 1089u32; advance = 520u16; outline = letter_c 520.0f64 };
+        { codepoint = 1091u32; advance = 480u16; outline = letter_y 480.0f64 };
+        { codepoint = 1093u32; advance = 480u16; outline = letter_x 480.0f64 };
+        { codepoint = 920u32; advance = 620u16; outline = letter_cap_theta 620.0f64 };
+        { codepoint = 926u32; advance = 540u16; outline = letter_cap_xi 540.0f64 };
+        { codepoint = 923u32; advance = 510u16; outline = letter_cap_lambda 510.0f64 };
+        { codepoint = 916u32; advance = 510u16; outline = letter_cap_delta 510.0f64 };
+        { codepoint = 1069u32; advance = 600u16; outline = letter_cap_ecyr 600.0f64 };
+        { codepoint = 931u32; advance = 530u16; outline = letter_cap_sigma 530.0f64 };
+        { codepoint = 959u32; advance = 565u16; outline = letter_o 565.0f64 };
+        { codepoint = 936u32; advance = 600u16; outline = letter_cap_psi 600.0f64 };
+        { codepoint = 937u32; advance = 640u16; outline = letter_cap_omega 640.0f64 };
+        { codepoint = 1071u32; advance = 560u16; outline = letter_cap_yacyr 560.0f64 };
+        { codepoint = 1044u32; advance = 600u16; outline = letter_cap_decyr 600.0f64 };
+        { codepoint = 1051u32; advance = 520u16; outline = letter_cap_elcyr 520.0f64 };
+        { codepoint = 1059u32; advance = 520u16; outline = letter_cap_ucyr 520.0f64 };
+        { codepoint = 1046u32; advance = 740u16; outline = letter_cap_zhe 740.0f64 };
+        { codepoint = 1049u32; advance = 480u16; outline = letter_cap_jcyr 480.0f64 };
+        { codepoint = 1063u32; advance = 560u16; outline = letter_cap_checyr 560.0f64 };
+        { codepoint = 1087u32; advance = 485u16; outline = letter_pecyr 485.0f64 };
+        { codepoint = 1085u32; advance = 485u16; outline = letter_encyr 485.0f64 };
+        { codepoint = 1096u32; advance = 585u16; outline = letter_shacyr 585.0f64 };
+        { codepoint = 1075u32; advance = 430u16; outline = letter_gecyr 430.0f64 };
+        { codepoint = 1080u32; advance = 485u16; outline = letter_icyr 485.0f64 };
+        { codepoint = 1090u32; advance = 470u16; outline = letter_tecyr 470.0f64 };
+        { codepoint = 1094u32; advance = 470u16; outline = letter_tsecyr 470.0f64 };
+        { codepoint = 1097u32; advance = 585u16; outline = letter_shchacyr 585.0f64 };
+        { codepoint = 1095u32; advance = 470u16; outline = letter_checyrlc 470.0f64 };
+        { codepoint = 1083u32; advance = 450u16; outline = letter_elcyrlc 450.0f64 };
+        { codepoint = 1082u32; advance = 450u16; outline = letter_kacyrlc 450.0f64 };
+        { codepoint = 1084u32; advance = 585u16; outline = letter_emcyrlc 585.0f64 };
+        { codepoint = 1078u32; advance = 600u16; outline = letter_zhecyrlc 600.0f64 };
+        { codepoint = 1100u32; advance = 420u16; outline = letter_softcyrlc 420.0f64 };
+        { codepoint = 1099u32; advance = 540u16; outline = letter_yerycyrlc 540.0f64 };
+        { codepoint = 1098u32; advance = 430u16; outline = letter_hardcyrlc 430.0f64 };
+        { codepoint = 1092u32; advance = 480u16; outline = letter_efcyrlc 480.0f64 };
+        { codepoint = 1102u32; advance = 600u16; outline = letter_yucyrlc 600.0f64 };
+        { codepoint = 1103u32; advance = 480u16; outline = letter_yacyrlc 480.0f64 };
+        { codepoint = 1081u32; advance = 485u16; outline = letter_jcyrlc 485.0f64 };
+        { codepoint = 1076u32; advance = 500u16; outline = letter_decyrlc 500.0f64 };
+        { codepoint = 1074u32; advance = 480u16; outline = letter_vecyrlc 480.0f64 };
+        { codepoint = 1073u32; advance = 430u16; outline = letter_becyrlc 430.0f64 };
+        { codepoint = 1079u32; advance = 470u16; outline = letter_zecyrlc 470.0f64 };
+        { codepoint = 1101u32; advance = 470u16; outline = letter_ecyrlc 470.0f64 };
+        { codepoint = 1105u32; advance = 560u16; outline = letter_yocyrlc 560.0f64 };
+        { codepoint = 945u32; advance = 540u16; outline = letter_alphagr 540.0f64 };
+        { codepoint = 946u32; advance = 480u16; outline = letter_betagr 480.0f64 };
+        { codepoint = 947u32; advance = 480u16; outline = letter_gammagr 480.0f64 };
+        { codepoint = 948u32; advance = 500u16; outline = letter_deltagr 500.0f64 };
+        { codepoint = 949u32; advance = 470u16; outline = letter_epsilongr 470.0f64 };
+        { codepoint = 952u32; advance = 500u16; outline = letter_thetagr 500.0f64 };
+        { codepoint = 960u32; advance = 510u16; outline = letter_pecyr 510.0f64 };
+        { codepoint = 964u32; advance = 470u16; outline = letter_tecyr 470.0f64 };
+        { codepoint = 953u32; advance = 200u16; outline = letter_iotagr 200.0f64 };
+        { codepoint = 957u32; advance = 480u16; outline = letter_nugr 480.0f64 };
+        { codepoint = 967u32; advance = 480u16; outline = letter_x 480.0f64 };
+        { codepoint = 955u32; advance = 500u16; outline = letter_lambdagr 500.0f64 };
+        { codepoint = 961u32; advance = 540u16; outline = letter_p 540.0f64 };
+        { codepoint = 966u32; advance = 540u16; outline = letter_efcyrlc 540.0f64 };
+        { codepoint = 951u32; advance = 480u16; outline = letter_etagr 480.0f64 };
+        { codepoint = 954u32; advance = 470u16; outline = letter_k 470.0f64 };
+        { codepoint = 965u32; advance = 490u16; outline = letter_u 490.0f64 };
+        { codepoint = 956u32; advance = 490u16; outline = letter_mugr 490.0f64 };
+        { codepoint = 963u32; advance = 520u16; outline = letter_sigmagr 520.0f64 };
+        { codepoint = 968u32; advance = 520u16; outline = letter_psigr 520.0f64 };
+        { codepoint = 969u32; advance = 540u16; outline = letter_omegagr 540.0f64 };
+        { codepoint = 950u32; advance = 450u16; outline = letter_zetagr 450.0f64 };
+        { codepoint = 958u32; advance = 450u16; outline = letter_xigr 450.0f64 };
+        { codepoint = 50500u32; advance = 840u16; outline = hangul_a_syllable 840.0f64 };
+        { codepoint = 50724u32; advance = 840u16; outline = hangul_o_syllable 840.0f64 };
+        { codepoint = 51060u32; advance = 840u16; outline = compose_vertical (jamo_ieung ()) (jamo_i ()) };
+        { codepoint = 44256u32; advance = 840u16; outline = compose_horizontal (jamo_giyeok ()) (jamo_o ()) };
+        { codepoint = 45208u32; advance = 840u16; outline = compose_vertical (jamo_nieun ()) (jamo_a ()) };
+        { codepoint = 45796u32; advance = 840u16; outline = compose_vertical (jamo_digeut ()) (jamo_a ()) };
+        { codepoint = 47560u32; advance = 840u16; outline = compose_vertical (jamo_mieum ()) (jamo_a ()) };
+        { codepoint = 48260u32; advance = 840u16; outline = compose_vertical (jamo_bieup ()) (jamo_eo ()) };
+        { codepoint = 49688u32; advance = 840u16; outline = compose_horizontal (jamo_siot ()) (jamo_u ()) };
+        { codepoint = 51200u32; advance = 840u16; outline = compose_vertical (jamo_jieut ()) (jamo_eo ()) };
+        { codepoint = 53076u32; advance = 840u16; outline = compose_horizontal (jamo_kieuk ()) (jamo_o ()) };
+        { codepoint = 53440u32; advance = 840u16; outline = compose_vertical (jamo_tieut ()) (jamo_a ()) };
+        { codepoint = 54616u32; advance = 840u16; outline = compose_vertical (jamo_hieut ()) (jamo_a ()) };
+        { codepoint = 44032u32; advance = 840u16; outline = syllable_outline 44032u32 };
+        { codepoint = 44396u32; advance = 840u16; outline = syllable_outline 44396u32 };
+        { codepoint = 44536u32; advance = 840u16; outline = syllable_outline 44536u32 };
+        { codepoint = 44060u32; advance = 840u16; outline = syllable_outline 44060u32 };
+        { codepoint = 54784u32; advance = 840u16; outline = syllable_outline 54784u32 };
+        { codepoint = 44368u32; advance = 840u16; outline = syllable_outline 44368u32 };
+        { codepoint = 44508u32; advance = 840u16; outline = syllable_outline 44508u32 };
+        { codepoint = 44036u32; advance = 840u16; outline = syllable_outline 44036u32 };
+        { codepoint = 44257u32; advance = 840u16; outline = syllable_outline 44257u32 };
+        { codepoint = 46972u32; advance = 840u16; outline = syllable_outline 46972u32 };
+        { codepoint = 52264u32; advance = 840u16; outline = syllable_outline 52264u32 };
+        { codepoint = 54028u32; advance = 840u16; outline = syllable_outline 54028u32 };
+        { codepoint = 44620u32; advance = 840u16; outline = syllable_outline 44620u32 };
+        { codepoint = 46384u32; advance = 840u16; outline = syllable_outline 46384u32 };
+        { codepoint = 44172u32; advance = 840u16; outline = syllable_outline 44172u32 };
+        { codepoint = 44284u32; advance = 840u16; outline = syllable_outline 44284u32 };
+        { codepoint = 50892u32; advance = 840u16; outline = syllable_outline 50892u32 };
+        { codepoint = 50773u32; advance = 840u16; outline = syllable_outline 50773u32 };
+        { codepoint = 233u32; advance = 565u16; outline = letter_eacute 565.0f64 };
+        { codepoint = 232u32; advance = 565u16; outline = letter_egrave 565.0f64 };
+        { codepoint = 235u32; advance = 565u16; outline = letter_ediaeresis 565.0f64 };
+        { codepoint = 224u32; advance = 560u16; outline = letter_agrave 560.0f64 };
+        { codepoint = 225u32; advance = 560u16; outline = letter_aacute 560.0f64 };
+        { codepoint = 226u32; advance = 560u16; outline = letter_acircumflex 560.0f64 };
+        { codepoint = 246u32; advance = 565u16; outline = letter_odiaeresis 565.0f64 };
+        { codepoint = 244u32; advance = 565u16; outline = letter_ocircumflex 565.0f64 };
+        { codepoint = 252u32; advance = 480u16; outline = letter_udiaeresis 480.0f64 };
+        { codepoint = 251u32; advance = 480u16; outline = letter_ucircumflex 480.0f64 };
+        { codepoint = 238u32; advance = 235u16; outline = letter_icircumflex 235.0f64 };
+        { codepoint = 237u32; advance = 235u16; outline = letter_iacute 235.0f64 };
+        { codepoint = 243u32; advance = 565u16; outline = letter_oacute 565.0f64 };
+        { codepoint = 250u32; advance = 480u16; outline = letter_uacute 480.0f64 };
+        { codepoint = 241u32; advance = 480u16; outline = letter_ntilde 480.0f64 };
+        { codepoint = 228u32; advance = 560u16; outline = letter_adiaeresis 560.0f64 };
+        { codepoint = 236u32; advance = 235u16; outline = letter_igrave 235.0f64 };
+        { codepoint = 242u32; advance = 565u16; outline = letter_ograve 565.0f64 };
+        { codepoint = 249u32; advance = 480u16; outline = letter_ugrave 480.0f64 };
+        { codepoint = 227u32; advance = 560u16; outline = letter_atilde 560.0f64 };
+        { codepoint = 245u32; advance = 565u16; outline = letter_otilde 565.0f64 };
+        { codepoint = 231u32; advance = 520u16; outline = letter_ccedilla 520.0f64 };
+        { codepoint = 201u32; advance = 470u16; outline = letter_cap_eacute 470.0f64 };
+        { codepoint = 193u32; advance = 510u16; outline = letter_cap_aacute 510.0f64 };
+        { codepoint = 192u32; advance = 510u16; outline = letter_cap_agrave 510.0f64 };
+        { codepoint = 196u32; advance = 510u16; outline = letter_cap_adiaeresis 510.0f64 };
+        { codepoint = 214u32; advance = 620u16; outline = letter_cap_odiaeresis 620.0f64 };
+        { codepoint = 220u32; advance = 590u16; outline = letter_cap_udiaeresis 590.0f64 };
+        { codepoint = 209u32; advance = 560u16; outline = letter_cap_ntilde 560.0f64 };
+        { codepoint = 199u32; advance = 600u16; outline = letter_cap_ccedilla 600.0f64 };
+        { codepoint = 194u32; advance = 510u16; outline = letter_cap_acircumflex 510.0f64 };
+        { codepoint = 202u32; advance = 470u16; outline = letter_cap_ecircumflex 470.0f64 };
+        { codepoint = 206u32; advance = 280u16; outline = letter_cap_icircumflex 280.0f64 };
+        { codepoint = 212u32; advance = 620u16; outline = letter_cap_ocircumflex 620.0f64 };
+        { codepoint = 219u32; advance = 590u16; outline = letter_cap_ucircumflex 590.0f64 };
+        { codepoint = 205u32; advance = 280u16; outline = letter_cap_iacute 280.0f64 };
+        { codepoint = 204u32; advance = 280u16; outline = letter_cap_igrave 280.0f64 };
+        { codepoint = 211u32; advance = 620u16; outline = letter_cap_oacute 620.0f64 };
+        { codepoint = 210u32; advance = 620u16; outline = letter_cap_ograve 620.0f64 };
+        { codepoint = 213u32; advance = 620u16; outline = letter_cap_otilde 620.0f64 };
+        { codepoint = 218u32; advance = 590u16; outline = letter_cap_uacute 590.0f64 };
+        { codepoint = 217u32; advance = 590u16; outline = letter_cap_ugrave 590.0f64 };
+        { codepoint = 200u32; advance = 470u16; outline = letter_cap_egrave 470.0f64 };
+        { codepoint = 195u32; advance = 510u16; outline = letter_cap_atilde 510.0f64 };
+        { codepoint = 1575u32; advance = 280u16; outline = ar_isolated (alef_ar ()) };
+        { codepoint = 1576u32; advance = 480u16; outline = ar_isolated (beh_ar ()) };
+        { codepoint = 1578u32; advance = 480u16; outline = ar_isolated (teh_ar ()) };
+        { codepoint = 65168u32; advance = 480u16; outline = ar_final (beh_ar ()) };
+        { codepoint = 65169u32; advance = 480u16; outline = ar_initial (beh_ar ()) };
+        { codepoint = 65170u32; advance = 480u16; outline = ar_medial (beh_ar ()) };
+        { codepoint = 65174u32; advance = 480u16; outline = ar_final (teh_ar ()) };
+        { codepoint = 65175u32; advance = 480u16; outline = ar_initial (teh_ar ()) };
+        { codepoint = 65176u32; advance = 480u16; outline = ar_medial (teh_ar ()) };
+        { codepoint = 1579u32; advance = 480u16; outline = ar_isolated (theh_ar ()) };
+        { codepoint = 65178u32; advance = 480u16; outline = ar_final (theh_ar ()) };
+        { codepoint = 65179u32; advance = 480u16; outline = ar_initial (theh_ar ()) };
+        { codepoint = 65180u32; advance = 480u16; outline = ar_medial (theh_ar ()) };
+        { codepoint = 1606u32; advance = 480u16; outline = ar_isolated (noon_ar ()) };
+        { codepoint = 65254u32; advance = 480u16; outline = ar_final (noon_ar ()) };
+        { codepoint = 65255u32; advance = 480u16; outline = ar_initial (noon_ar ()) };
+        { codepoint = 65256u32; advance = 480u16; outline = ar_medial (noon_ar ()) };
+        { codepoint = 1610u32; advance = 480u16; outline = ar_isolated (yeh_ar ()) };
+        { codepoint = 65266u32; advance = 480u16; outline = ar_final (yeh_ar ()) };
+        { codepoint = 65267u32; advance = 480u16; outline = ar_initial (yeh_ar ()) };
+        { codepoint = 65268u32; advance = 480u16; outline = ar_medial (yeh_ar ()) };
+        { codepoint = 1609u32; advance = 480u16; outline = ar_isolated (alefmaksura_ar ()) };
+        { codepoint = 65264u32; advance = 480u16; outline = ar_final (alefmaksura_ar ()) };
+        { codepoint = 1583u32; advance = 440u16; outline = ar_isolated (dal_ar ()) };
+        { codepoint = 65194u32; advance = 440u16; outline = ar_final (dal_ar ()) };
+        { codepoint = 1584u32; advance = 440u16; outline = ar_isolated (thal_ar ()) };
+        { codepoint = 65196u32; advance = 440u16; outline = ar_final (thal_ar ()) };
+        { codepoint = 1585u32; advance = 440u16; outline = ar_isolated (reh_ar ()) };
+        { codepoint = 65198u32; advance = 440u16; outline = ar_final (reh_ar ()) };
+        { codepoint = 1586u32; advance = 440u16; outline = ar_isolated (zain_ar ()) };
+        { codepoint = 65200u32; advance = 440u16; outline = ar_final (zain_ar ()) };
+        { codepoint = 1604u32; advance = 400u16; outline = ar_isolated (lam_ar ()) };
+        { codepoint = 65246u32; advance = 400u16; outline = ar_final (lam_ar ()) };
+        { codepoint = 65247u32; advance = 400u16; outline = ar_initial (lam_ar ()) };
+        { codepoint = 65248u32; advance = 400u16; outline = ar_medial (lam_ar ()) };
+        { codepoint = 1605u32; advance = 400u16; outline = ar_isolated (meem_ar ()) };
+        { codepoint = 65250u32; advance = 400u16; outline = ar_final (meem_ar ()) };
+        { codepoint = 65251u32; advance = 400u16; outline = ar_initial (meem_ar ()) };
+        { codepoint = 65252u32; advance = 400u16; outline = ar_medial (meem_ar ()) };
+        { codepoint = 1580u32; advance = 440u16; outline = ar_isolated (jeem_ar ()) };
+        { codepoint = 65182u32; advance = 440u16; outline = ar_final (jeem_ar ()) };
+        { codepoint = 65183u32; advance = 440u16; outline = ar_initial (jeem_ar ()) };
+        { codepoint = 65184u32; advance = 440u16; outline = ar_medial (jeem_ar ()) };
+        { codepoint = 1581u32; advance = 440u16; outline = ar_isolated (hah_ar ()) };
+        { codepoint = 65186u32; advance = 440u16; outline = ar_final (hah_ar ()) };
+        { codepoint = 65187u32; advance = 440u16; outline = ar_initial (hah_ar ()) };
+        { codepoint = 65188u32; advance = 440u16; outline = ar_medial (hah_ar ()) };
+        { codepoint = 1582u32; advance = 440u16; outline = ar_isolated (khah_ar ()) };
+        { codepoint = 65190u32; advance = 440u16; outline = ar_final (khah_ar ()) };
+        { codepoint = 65191u32; advance = 440u16; outline = ar_initial (khah_ar ()) };
+        { codepoint = 65192u32; advance = 440u16; outline = ar_medial (khah_ar ()) };
+        { codepoint = 1587u32; advance = 440u16; outline = ar_isolated (seen_ar ()) };
+        { codepoint = 65202u32; advance = 440u16; outline = ar_final (seen_ar ()) };
+        { codepoint = 65203u32; advance = 440u16; outline = ar_initial (seen_ar ()) };
+        { codepoint = 65204u32; advance = 440u16; outline = ar_medial (seen_ar ()) };
+        { codepoint = 1588u32; advance = 440u16; outline = ar_isolated (sheen_ar ()) };
+        { codepoint = 65206u32; advance = 440u16; outline = ar_final (sheen_ar ()) };
+        { codepoint = 65207u32; advance = 440u16; outline = ar_initial (sheen_ar ()) };
+        { codepoint = 65208u32; advance = 440u16; outline = ar_medial (sheen_ar ()) };
+        { codepoint = 1589u32; advance = 440u16; outline = ar_isolated (sad_ar ()) };
+        { codepoint = 65210u32; advance = 440u16; outline = ar_final (sad_ar ()) };
+        { codepoint = 65211u32; advance = 440u16; outline = ar_initial (sad_ar ()) };
+        { codepoint = 65212u32; advance = 440u16; outline = ar_medial (sad_ar ()) };
+        { codepoint = 1590u32; advance = 440u16; outline = ar_isolated (dad_ar ()) };
+        { codepoint = 65214u32; advance = 440u16; outline = ar_final (dad_ar ()) };
+        { codepoint = 65215u32; advance = 440u16; outline = ar_initial (dad_ar ()) };
+        { codepoint = 65216u32; advance = 440u16; outline = ar_medial (dad_ar ()) };
+        { codepoint = 1591u32; advance = 440u16; outline = ar_isolated (tah_ar ()) };
+        { codepoint = 65218u32; advance = 440u16; outline = ar_final (tah_ar ()) };
+        { codepoint = 65219u32; advance = 440u16; outline = ar_initial (tah_ar ()) };
+        { codepoint = 65220u32; advance = 440u16; outline = ar_medial (tah_ar ()) };
+        { codepoint = 1592u32; advance = 440u16; outline = ar_isolated (zah_ar ()) };
+        { codepoint = 65222u32; advance = 440u16; outline = ar_final (zah_ar ()) };
+        { codepoint = 65223u32; advance = 440u16; outline = ar_initial (zah_ar ()) };
+        { codepoint = 65224u32; advance = 440u16; outline = ar_medial (zah_ar ()) };
+        { codepoint = 1593u32; advance = 440u16; outline = ar_isolated (ain_ar ()) };
+        { codepoint = 65226u32; advance = 440u16; outline = ar_final (ain_ar ()) };
+        { codepoint = 65227u32; advance = 440u16; outline = ar_initial (ain_ar ()) };
+        { codepoint = 65228u32; advance = 440u16; outline = ar_medial (ain_ar ()) };
+        { codepoint = 1594u32; advance = 440u16; outline = ar_isolated (ghain_ar ()) };
+        { codepoint = 65230u32; advance = 440u16; outline = ar_final (ghain_ar ()) };
+        { codepoint = 65231u32; advance = 440u16; outline = ar_initial (ghain_ar ()) };
+        { codepoint = 65232u32; advance = 440u16; outline = ar_medial (ghain_ar ()) };
+        { codepoint = 1601u32; advance = 440u16; outline = ar_isolated (feh_ar ()) };
+        { codepoint = 65234u32; advance = 440u16; outline = ar_final (feh_ar ()) };
+        { codepoint = 65235u32; advance = 440u16; outline = ar_initial (feh_ar ()) };
+        { codepoint = 65236u32; advance = 440u16; outline = ar_medial (feh_ar ()) };
+        { codepoint = 1602u32; advance = 440u16; outline = ar_isolated (qaf_ar ()) };
+        { codepoint = 65238u32; advance = 440u16; outline = ar_final (qaf_ar ()) };
+        { codepoint = 65239u32; advance = 440u16; outline = ar_initial (qaf_ar ()) };
+        { codepoint = 65240u32; advance = 440u16; outline = ar_medial (qaf_ar ()) };
+        { codepoint = 1603u32; advance = 440u16; outline = ar_isolated (kaf_ar ()) };
+        { codepoint = 65242u32; advance = 440u16; outline = ar_final (kaf_ar ()) };
+        { codepoint = 65243u32; advance = 440u16; outline = ar_initial (kaf_ar ()) };
+        { codepoint = 65244u32; advance = 440u16; outline = ar_medial (kaf_ar ()) };
+        { codepoint = 1607u32; advance = 440u16; outline = ar_isolated (heh_ar ()) };
+        { codepoint = 65258u32; advance = 440u16; outline = ar_final (heh_ar ()) };
+        { codepoint = 65259u32; advance = 440u16; outline = ar_initial (heh_ar ()) };
+        { codepoint = 65260u32; advance = 440u16; outline = ar_medial (heh_ar ()) };
+        { codepoint = 1608u32; advance = 420u16; outline = ar_isolated (waw_ar ()) };
+        { codepoint = 65262u32; advance = 420u16; outline = ar_final (waw_ar ()) };
+        { codepoint = 1577u32; advance = 440u16; outline = ar_isolated (teh_marbuta_ar ()) };
+        { codepoint = 65172u32; advance = 440u16; outline = ar_final (teh_marbuta_ar ()) };
+        { codepoint = 1570u32; advance = 280u16; outline = ar_isolated (alef_madda_ar ()) };
+        { codepoint = 65154u32; advance = 280u16; outline = ar_final (alef_madda_ar ()) };
+        { codepoint = 1571u32; advance = 280u16; outline = ar_isolated (alef_hamza_above_ar ()) };
+        { codepoint = 65156u32; advance = 280u16; outline = ar_final (alef_hamza_above_ar ()) };
+        { codepoint = 1573u32; advance = 280u16; outline = ar_isolated (alef_hamza_below_ar ()) };
+        { codepoint = 65160u32; advance = 280u16; outline = ar_final (alef_hamza_below_ar ()) };
+        { codepoint = 2325u32; advance = 560u16; outline = deva_glyph (ka_deva ()) };
+        { codepoint = 2350u32; advance = 560u16; outline = deva_glyph (ma_deva ()) };
+        { codepoint = 2309u32; advance = 620u16; outline = deva_glyph (a_deva ()) };
+        { codepoint = 2366u32; advance = 120u16; outline = deva_glyph (matra_aa ()) };
+        { codepoint = 2367u32; advance = 120u16; outline = deva_glyph (matra_i ()) };
+        { codepoint = 2368u32; advance = 330u16; outline = deva_glyph (matra_ii ()) };
+        { codepoint = 2306u32; advance = 0u16; outline = deva_glyph (anusvara_deva ()) };
+        { codepoint = 2305u32; advance = 0u16; outline = deva_glyph (chandrabindu_deva ()) };
+        { codepoint = 2371u32; advance = 0u16; outline = deva_glyph (rmatra_deva ()) };
+        { codepoint = 2344u32; advance = 560u16; outline = deva_glyph (na_deva ()) };
+        { codepoint = 2340u32; advance = 560u16; outline = deva_glyph (ta_deva ()) };
+        { codepoint = 2352u32; advance = 480u16; outline = deva_glyph (ra_deva ()) };
+        { codepoint = 2354u32; advance = 560u16; outline = deva_glyph (la_deva ()) };
+        { codepoint = 2355u32; advance = 690u16; outline = deva_glyph (lla_deva ()) };
+        { codepoint = 2360u32; advance = 560u16; outline = deva_glyph (sa_deva ()) };
+        { codepoint = 2346u32; advance = 560u16; outline = deva_glyph (pa_deva ()) };
+        { codepoint = 2357u32; advance = 560u16; outline = deva_glyph (va_deva ()) };
+        { codepoint = 2342u32; advance = 560u16; outline = deva_glyph (da_deva ()) };
+        { codepoint = 2351u32; advance = 560u16; outline = deva_glyph (ya_deva ()) };
+        { codepoint = 2361u32; advance = 560u16; outline = deva_glyph (ha_deva ()) };
+        { codepoint = 2310u32; advance = 680u16; outline = deva_glyph (aa_deva ()) };
+        { codepoint = 2311u32; advance = 560u16; outline = deva_glyph (i_deva ()) };
+        { codepoint = 2313u32; advance = 560u16; outline = deva_glyph (u_deva ()) };
+        { codepoint = 2375u32; advance = 0u16; outline = deva_glyph (matra_e ()) };
+        { codepoint = 2379u32; advance = 280u16; outline = deva_glyph (matra_o ()) };
+        { codepoint = 2327u32; advance = 560u16; outline = deva_glyph (ga_deva ()) };
+        { codepoint = 2332u32; advance = 560u16; outline = deva_glyph (ja_deva ()) };
+        { codepoint = 2348u32; advance = 560u16; outline = deva_glyph (ba_deva ()) };
+        { codepoint = 2330u32; advance = 560u16; outline = deva_glyph (cha_deva ()) };
+        { codepoint = 2326u32; advance = 560u16; outline = deva_glyph (kha_deva ()) };
+        { codepoint = 2328u32; advance = 560u16; outline = deva_glyph (gha_deva ()) };
+        { codepoint = 2341u32; advance = 560u16; outline = deva_glyph (tha_deva ()) };
+        { codepoint = 2343u32; advance = 560u16; outline = deva_glyph (dha_deva ()) };
+        { codepoint = 2347u32; advance = 560u16; outline = deva_glyph (pha_deva ()) };
+        { codepoint = 2349u32; advance = 560u16; outline = deva_glyph (bha_deva ()) };
+        { codepoint = 2369u32; advance = 280u16; outline = deva_glyph (matra_u ()) };
+        { codepoint = 2370u32; advance = 280u16; outline = deva_glyph (matra_uu ()) };
+        { codepoint = 2376u32; advance = 0u16; outline = deva_glyph (matra_ai ()) };
+        { codepoint = 2380u32; advance = 280u16; outline = deva_glyph (matra_au ()) };
+        { codepoint = 2335u32; advance = 560u16; outline = deva_glyph (tta_deva ()) };
+        { codepoint = 2336u32; advance = 560u16; outline = deva_glyph (ttha_deva ()) };
+        { codepoint = 2337u32; advance = 560u16; outline = deva_glyph (dda_deva ()) };
+        { codepoint = 2338u32; advance = 560u16; outline = deva_glyph (ddha_deva ()) };
+        { codepoint = 2339u32; advance = 560u16; outline = deva_glyph (nna_deva ()) };
+        { codepoint = 2329u32; advance = 560u16; outline = deva_glyph (nga_deva ()) };
+        { codepoint = 2334u32; advance = 560u16; outline = deva_glyph (nya_deva ()) };
+        { codepoint = 2331u32; advance = 560u16; outline = deva_glyph (chha_deva ()) };
+        { codepoint = 2333u32; advance = 560u16; outline = deva_glyph (jha_deva ()) };
+        { codepoint = 2358u32; advance = 560u16; outline = deva_glyph (sha_deva ()) };
+        { codepoint = 2359u32; advance = 560u16; outline = deva_glyph (ssha_deva ()) };
+        { codepoint = 2319u32; advance = 560u16; outline = deva_glyph (e_deva ()) };
+        { codepoint = 2320u32; advance = 560u16; outline = deva_glyph (ai_deva ()) };
+        { codepoint = 2323u32; advance = 680u16; outline = deva_glyph (o_deva ()) };
+        { codepoint = 2324u32; advance = 680u16; outline = deva_glyph (au_deva ()) };
+        { codepoint = 2312u32; advance = 560u16; outline = deva_glyph (ii_deva ()) };
+        { codepoint = 2314u32; advance = 560u16; outline = deva_glyph (uu_deva ()) };
+        { codepoint = 2315u32; advance = 560u16; outline = deva_glyph (ri_deva ()) };
+        { codepoint = 2381u32; advance = 0u16; outline = virama_deva () };
+        { codepoint = 57344u32; advance = 660u16; outline = ksha_deva () };
+        { codepoint = 57345u32; advance = 640u16; outline = tra_deva () };
+        { codepoint = 57346u32; advance = 660u16; outline = jna_deva () };
+        { codepoint = 57347u32; advance = 660u16; outline = dya_deva () };
+        { codepoint = 57348u32; advance = 640u16; outline = shra_deva () };
+        { codepoint = 57349u32; advance = 640u16; outline = sta_deva () };
+        { codepoint = 57350u32; advance = 640u16; outline = nta_deva () }
+    ]
+    ?= build_glyphs (gb_new ()) (mv_new ()) (cv_new ()) 1u32 (map_raise_lc glyphs) ?|
+    | (gb, mv, cv, n) => finish gb mv cv n
     : i32

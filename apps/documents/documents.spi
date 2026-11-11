@@ -284,7 +284,7 @@ test documents static =
                         ?= dirs ?|
                         | [] => found
                         | dir :: rest =>
-                            ?= dir |> file_system.read_dir_names |> resultm.unbox ?|
+                            ?= dir |> file_system.read_directory_names |> resultm.unbox ?|
                             | Ok names =>
                                 := step
                                     (acc : list string * list string) (name : sm'.std_string)
@@ -292,8 +292,10 @@ test documents static =
                                     =
                                     := pending, matched = acc
                                     := path = dir </> sm'.from_std_string name
-                                    ? file_system.directory_exists path ?> (path :: pending, matched)
-                                    |? keep path ?> (pending, path :: matched)
+                                    ? file_system.directory_exists path
+                                    ?> (path :: pending, matched)
+                                    |? keep path
+                                    ?> (pending, path :: matched)
                                     |: (pending, matched)
                                 := pending, matched = names |> am'.vec_fold' step (rest, found)
                                 walk pending matched

@@ -3,9 +3,9 @@
     :< testing
 :< font_outline
 
-:= pt (x : f64) (y : f64) : point = { x = x; y = y }
+:~ pt (x : f64) (y : f64) : point = { x = x; y = y }
 
-:= ellipse_contour (cx : f64) (cy : f64) (rx : f64) (ry : f64) (ccw : bool) : contour_c =
+:~ ellipse_contour (cx : f64) (cy : f64) (rx : f64) (ry : f64) (ccw : bool) : contour_c =
     := k = 0.5522847498307936f64
     := s = ? ccw ?> 1.0f64 |: -1.0f64
     { start = pt (cx + rx) cy;
@@ -16,54 +16,3614 @@
         CCubic (pt (cx + rx * k) (cy - s * ry), pt (cx + rx) (cy - s * ry * k), pt (cx + rx) cy)
       ] }
 
-:= rect_contour (x0 : f64) (y0 : f64) (x1 : f64) (y1 : f64) : contour_c =
+:~ rect_contour (x0 : f64) (y0 : f64) (x1 : f64) (y1 : f64) : contour_c =
     { start = pt x0 y0;
         segs = [ CLine (pt x1 y0); CLine (pt x1 y1); CLine (pt x0 y1) ] }
 
-:= letter_o (advance : f64) : outline quadratic =
+:~ arch_contour (cx : f64) (ys : f64) (rxo : f64) (ryo : f64) (rxi : f64) (ryi : f64) : contour_c =
+    := k = 0.5522847498307936f64
+    { start = pt (cx - rxi) ys;
+        segs = [
+        CCubic (pt (cx - rxi) (ys + ryi * k), pt (cx - rxi * k) (ys + ryi), pt cx (ys + ryi));
+        CCubic (pt (cx + rxi * k) (ys + ryi), pt (cx + rxi) (ys + ryi * k), pt (cx + rxi) ys);
+        CLine (pt (cx + rxo) ys);
+        CCubic (pt (cx + rxo) (ys + ryo * k), pt (cx + rxo * k) (ys + ryo), pt cx (ys + ryo));
+        CCubic (pt (cx - rxo * k) (ys + ryo), pt (cx - rxo) (ys + ryo * k), pt (cx - rxo) ys);
+        CLine (pt (cx - rxi) ys)
+      ] }
+
+:~ arch_down_contour (cx : f64) (ys : f64) (rxo : f64) (ryo : f64) (rxi : f64) (ryi : f64) : contour_c =
+    := k = 0.5522847498307936f64
+    { start = pt (cx - rxo) ys;
+        segs = [
+        CCubic (pt (cx - rxo) (ys - ryo * k), pt (cx - rxo * k) (ys - ryo), pt cx (ys - ryo));
+        CCubic (pt (cx + rxo * k) (ys - ryo), pt (cx + rxo) (ys - ryo * k), pt (cx + rxo) ys);
+        CLine (pt (cx + rxi) ys);
+        CCubic (pt (cx + rxi) (ys - ryi * k), pt (cx + rxi * k) (ys - ryi), pt cx (ys - ryi));
+        CCubic (pt (cx - rxi * k) (ys - ryi), pt (cx - rxi) (ys - ryi * k), pt (cx - rxi) ys);
+        CLine (pt (cx - rxo) ys)
+      ] }
+
+:~ letter_u (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 130.0f64 162.0f64 500.0f64;
+        rect_contour 320.0f64 130.0f64 410.0f64 500.0f64;
+        arch_down_contour 241.0f64 150.0f64 169.0f64 150.0f64 79.0f64 60.0f64
+    ])
+
+:~ letter_n (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 370.0f64;
+        rect_contour 320.0f64 0.0f64 410.0f64 370.0f64;
+        arch_contour 241.0f64 350.0f64 169.0f64 150.0f64 79.0f64 60.0f64
+    ])
+
+:~ letter_h (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 320.0f64 0.0f64 410.0f64 370.0f64;
+        arch_contour 241.0f64 350.0f64 169.0f64 150.0f64 79.0f64 60.0f64
+    ])
+
+:~ poly4_contour (ax : f64) (ay : f64) (bx : f64) (by : f64) (cx : f64) (cy : f64) (dx : f64) (dy : f64) : contour_c =
+    { start = pt ax ay; segs = [ CLine (pt bx by); CLine (pt cx cy); CLine (pt dx dy) ] }
+
+:~ tf_point (sx : f64) (sy : f64) (dx : f64) (dy : f64) (p : point) : point =
+    { x = p::x * sx + dx; y = p::y * sy + dy }
+
+:= tf_seg (sx : f64) (sy : f64) (dx : f64) (dy : f64) (s : cubic_seg) : cubic_seg =
+    ?= s ?|
+    | CLine e => CLine (tf_point sx sy dx dy e)
+    | CQuad (c, e) => CQuad (tf_point sx sy dx dy c, tf_point sx sy dx dy e)
+    | CCubic (c1, c2, e) => CCubic (tf_point sx sy dx dy c1, tf_point sx sy dx dy c2, tf_point sx sy dx dy e)
+
+:~ ^ tf_segs (sx : f64) (sy : f64) (dx : f64) (dy : f64) (segs : list cubic_seg) : list cubic_seg =
+    ?= segs ?|
+    | s :: rest => tf_seg sx sy dx dy s :: tf_segs sx sy dx dy rest
+    | [] => []
+
+:~ transform_contour (sx : f64) (sy : f64) (dx : f64) (dy : f64) (c : contour_c) : contour_c =
+    { start = tf_point sx sy dx dy c::start; segs = tf_segs sx sy dx dy c::segs }
+
+:= scale_seg_q (sy : f64) (s : quad_seg) : quad_seg =
+    ?= s ?|
+    | QLine e => QLine (tf_point 1.0f64 sy 0.0f64 0.0f64 e)
+    | QQuad (c, e) => QQuad (tf_point 1.0f64 sy 0.0f64 0.0f64 c, tf_point 1.0f64 sy 0.0f64 0.0f64 e)
+
+:~ ^ scale_segs_q (sy : f64) (segs : list quad_seg) : list quad_seg =
+    ?= segs ?|
+    | s :: rest => scale_seg_q sy s :: scale_segs_q sy rest
+    | [] => []
+
+:~ scale_contour_q (sy : f64) (c : contour_q) : contour_q =
+    { start = tf_point 1.0f64 sy 0.0f64 0.0f64 c::start; segs = scale_segs_q sy c::segs }
+
+:~ ^ scale_contours_q (sy : f64) (cs : list contour_q) : list contour_q =
+    ?= cs ?|
+    | c :: rest => scale_contour_q sy c :: scale_contours_q sy rest
+    | [] => []
+
+:= scale_outline_y (sy : f64) (o : outline quadratic) : outline quadratic =
+    ?= o ?|
+    | OQuad cs => OQuad (scale_contours_q sy cs)
+
+:~ ^ cc_append (a : list contour_c) (b : list contour_c) : list contour_c =
+    ?= a ?|
+    | h :: t => h :: cc_append t b
+    | [] => b
+
+:~ ^ tf_contours (sx : f64) (sy : f64) (dx : f64) (dy : f64) (cs : list contour_c) : list contour_c =
+    ?= cs ?|
+    | c :: rest => transform_contour sx sy dx dy c :: tf_contours sx sy dx dy rest
+    | [] => []
+
+:~ compose_vertical (initial : list contour_c) (medial : list contour_c) : outline quadratic =
+    lower_to_quads (OCubic (cc_append (tf_contours 0.5f64 0.68f64 60.0f64 110.0f64 initial) (tf_contours 0.55f64 0.9f64 420.0f64 40.0f64 medial)))
+
+:~ jamo_ieung () : list contour_c =
+    [ ellipse_contour 250.0f64 250.0f64 180.0f64 180.0f64 !+;
+      ellipse_contour 250.0f64 250.0f64 105.0f64 105.0f64 !- ]
+
+:~ jamo_i () : list contour_c =
+    [ rect_contour 350.0f64 0.0f64 440.0f64 700.0f64 ]
+
+:~ compose_horizontal (initial : list contour_c) (medial : list contour_c) : outline quadratic =
+    lower_to_quads (OCubic (cc_append (tf_contours 0.6f64 0.46f64 180.0f64 380.0f64 initial) (tf_contours 0.92f64 0.46f64 30.0f64 20.0f64 medial)))
+
+:~ jamo_giyeok () : list contour_c =
+    [ rect_contour 80.0f64 620.0f64 620.0f64 700.0f64;
+      rect_contour 540.0f64 0.0f64 620.0f64 700.0f64 ]
+
+:~ jamo_o () : list contour_c =
+    [ rect_contour 40.0f64 40.0f64 660.0f64 120.0f64;
+      rect_contour 310.0f64 120.0f64 390.0f64 320.0f64 ]
+
+:~ jamo_nieun () : list contour_c =
+    [ rect_contour 90.0f64 0.0f64 180.0f64 700.0f64;
+      rect_contour 90.0f64 0.0f64 600.0f64 90.0f64 ]
+
+:~ jamo_a () : list contour_c =
+    [ rect_contour 330.0f64 0.0f64 420.0f64 700.0f64;
+      rect_contour 420.0f64 330.0f64 580.0f64 420.0f64 ]
+
+:~ jamo_digeut () : list contour_c =
+    [ rect_contour 90.0f64 620.0f64 600.0f64 700.0f64;
+      rect_contour 90.0f64 0.0f64 180.0f64 700.0f64;
+      rect_contour 90.0f64 0.0f64 600.0f64 90.0f64 ]
+
+:~ jamo_mieum () : list contour_c =
+    [ rect_contour 90.0f64 620.0f64 600.0f64 700.0f64;
+      rect_contour 90.0f64 0.0f64 600.0f64 90.0f64;
+      rect_contour 90.0f64 0.0f64 180.0f64 700.0f64;
+      rect_contour 510.0f64 0.0f64 600.0f64 700.0f64 ]
+
+:~ jamo_bieup () : list contour_c =
+    [ rect_contour 90.0f64 0.0f64 180.0f64 700.0f64;
+      rect_contour 510.0f64 0.0f64 600.0f64 700.0f64;
+      rect_contour 90.0f64 300.0f64 600.0f64 380.0f64;
+      rect_contour 90.0f64 0.0f64 600.0f64 90.0f64 ]
+
+:~ jamo_siot () : list contour_c =
+    [ poly4_contour 310.0f64 700.0f64 390.0f64 700.0f64 160.0f64 0.0f64 80.0f64 0.0f64;
+      poly4_contour 310.0f64 700.0f64 390.0f64 700.0f64 620.0f64 0.0f64 540.0f64 0.0f64 ]
+
+:~ jamo_eo () : list contour_c =
+    [ rect_contour 400.0f64 0.0f64 490.0f64 700.0f64;
+      rect_contour 240.0f64 330.0f64 400.0f64 420.0f64 ]
+
+:~ jamo_u () : list contour_c =
+    [ rect_contour 40.0f64 580.0f64 660.0f64 660.0f64;
+      rect_contour 310.0f64 380.0f64 390.0f64 580.0f64 ]
+
+:~ jamo_jieut () : list contour_c =
+    [ rect_contour 90.0f64 620.0f64 600.0f64 700.0f64;
+      poly4_contour 310.0f64 620.0f64 390.0f64 620.0f64 160.0f64 0.0f64 80.0f64 0.0f64;
+      poly4_contour 310.0f64 620.0f64 390.0f64 620.0f64 620.0f64 0.0f64 540.0f64 0.0f64 ]
+
+:~ jamo_kieuk () : list contour_c =
+    [ rect_contour 80.0f64 620.0f64 620.0f64 700.0f64;
+      rect_contour 540.0f64 0.0f64 620.0f64 700.0f64;
+      rect_contour 80.0f64 330.0f64 620.0f64 410.0f64 ]
+
+:~ jamo_tieut () : list contour_c =
+    [ rect_contour 90.0f64 620.0f64 600.0f64 700.0f64;
+      rect_contour 90.0f64 0.0f64 180.0f64 700.0f64;
+      rect_contour 90.0f64 0.0f64 600.0f64 90.0f64;
+      rect_contour 90.0f64 330.0f64 600.0f64 410.0f64 ]
+
+:~ jamo_hieut () : list contour_c =
+    [ ellipse_contour 350.0f64 170.0f64 160.0f64 160.0f64 !+;
+      ellipse_contour 350.0f64 170.0f64 95.0f64 95.0f64 !-;
+      rect_contour 110.0f64 410.0f64 600.0f64 490.0f64;
+      rect_contour 300.0f64 540.0f64 410.0f64 650.0f64 ]
+
+:~ jamo_eu () : list contour_c =
+    [ rect_contour 40.0f64 300.0f64 660.0f64 380.0f64 ]
+
+:~ jamo_ae () : list contour_c =
+    [ rect_contour 330.0f64 0.0f64 420.0f64 700.0f64;
+      rect_contour 420.0f64 330.0f64 530.0f64 420.0f64;
+      rect_contour 560.0f64 0.0f64 650.0f64 700.0f64 ]
+
+:~ jamo_ya () : list contour_c =
+    [ rect_contour 330.0f64 0.0f64 420.0f64 700.0f64;
+      rect_contour 420.0f64 220.0f64 580.0f64 300.0f64;
+      rect_contour 420.0f64 420.0f64 580.0f64 500.0f64 ]
+
+:~ jamo_yeo () : list contour_c =
+    [ rect_contour 400.0f64 0.0f64 490.0f64 700.0f64;
+      rect_contour 240.0f64 220.0f64 400.0f64 300.0f64;
+      rect_contour 240.0f64 420.0f64 400.0f64 500.0f64 ]
+
+:~ jamo_yo () : list contour_c =
+    [ rect_contour 40.0f64 40.0f64 660.0f64 120.0f64;
+      rect_contour 200.0f64 120.0f64 280.0f64 320.0f64;
+      rect_contour 420.0f64 120.0f64 500.0f64 320.0f64 ]
+
+:~ jamo_yu () : list contour_c =
+    [ rect_contour 40.0f64 580.0f64 660.0f64 660.0f64;
+      rect_contour 200.0f64 380.0f64 280.0f64 580.0f64;
+      rect_contour 420.0f64 380.0f64 500.0f64 580.0f64 ]
+
+:~ jamo_rieul () : list contour_c =
+    [ rect_contour 90.0f64 620.0f64 600.0f64 700.0f64;
+      rect_contour 510.0f64 440.0f64 600.0f64 700.0f64;
+      rect_contour 90.0f64 350.0f64 600.0f64 440.0f64;
+      rect_contour 90.0f64 90.0f64 180.0f64 440.0f64;
+      rect_contour 90.0f64 0.0f64 600.0f64 90.0f64 ]
+
+:~ jamo_chieut () : list contour_c =
+    [ rect_contour 260.0f64 640.0f64 440.0f64 700.0f64;
+      rect_contour 90.0f64 520.0f64 600.0f64 600.0f64;
+      poly4_contour 310.0f64 520.0f64 390.0f64 520.0f64 160.0f64 0.0f64 80.0f64 0.0f64;
+      poly4_contour 310.0f64 520.0f64 390.0f64 520.0f64 620.0f64 0.0f64 540.0f64 0.0f64 ]
+
+:~ jamo_pieup () : list contour_c =
+    [ rect_contour 90.0f64 620.0f64 600.0f64 700.0f64;
+      rect_contour 90.0f64 0.0f64 600.0f64 90.0f64;
+      rect_contour 180.0f64 90.0f64 260.0f64 620.0f64;
+      rect_contour 430.0f64 90.0f64 510.0f64 620.0f64 ]
+
+:~ jamo_ssanggiyeok () : list contour_c =
+    cc_append (tf_contours 0.46f64 1.0f64 0.0f64 0.0f64 (jamo_giyeok ())) (tf_contours 0.46f64 1.0f64 370.0f64 0.0f64 (jamo_giyeok ()))
+
+:~ jamo_ssangdigeut () : list contour_c =
+    cc_append (tf_contours 0.46f64 1.0f64 0.0f64 0.0f64 (jamo_digeut ())) (tf_contours 0.46f64 1.0f64 370.0f64 0.0f64 (jamo_digeut ()))
+
+:~ jamo_ssangbieup () : list contour_c =
+    cc_append (tf_contours 0.46f64 1.0f64 0.0f64 0.0f64 (jamo_bieup ())) (tf_contours 0.46f64 1.0f64 370.0f64 0.0f64 (jamo_bieup ()))
+
+:~ jamo_ssangsiot () : list contour_c =
+    cc_append (tf_contours 0.46f64 1.0f64 0.0f64 0.0f64 (jamo_siot ())) (tf_contours 0.46f64 1.0f64 370.0f64 0.0f64 (jamo_siot ()))
+
+:~ jamo_ssangjieut () : list contour_c =
+    cc_append (tf_contours 0.46f64 1.0f64 0.0f64 0.0f64 (jamo_jieut ())) (tf_contours 0.46f64 1.0f64 370.0f64 0.0f64 (jamo_jieut ()))
+
+:~ jamo_e () : list contour_c =
+    [ rect_contour 330.0f64 0.0f64 420.0f64 700.0f64;
+      rect_contour 420.0f64 330.0f64 560.0f64 420.0f64;
+      rect_contour 560.0f64 0.0f64 650.0f64 700.0f64 ]
+
+:~ jamo_yae () : list contour_c =
+    [ rect_contour 330.0f64 0.0f64 420.0f64 700.0f64;
+      rect_contour 420.0f64 220.0f64 540.0f64 300.0f64;
+      rect_contour 420.0f64 420.0f64 540.0f64 500.0f64;
+      rect_contour 560.0f64 0.0f64 650.0f64 700.0f64 ]
+
+:~ jamo_ye () : list contour_c =
+    [ rect_contour 330.0f64 0.0f64 420.0f64 700.0f64;
+      rect_contour 420.0f64 220.0f64 540.0f64 300.0f64;
+      rect_contour 420.0f64 420.0f64 540.0f64 500.0f64;
+      rect_contour 560.0f64 0.0f64 650.0f64 700.0f64 ]
+
+:= choseong (i : u32) : list contour_c =
+    ?= i ?|
+    | 0u32 => jamo_giyeok ()
+    | 2u32 => jamo_nieun ()
+    | 3u32 => jamo_digeut ()
+    | 6u32 => jamo_mieum ()
+    | 7u32 => jamo_bieup ()
+    | 5u32 => jamo_rieul ()
+    | 9u32 => jamo_siot ()
+    | 11u32 => jamo_ieung ()
+    | 12u32 => jamo_jieut ()
+    | 14u32 => jamo_chieut ()
+    | 15u32 => jamo_kieuk ()
+    | 16u32 => jamo_tieut ()
+    | 17u32 => jamo_pieup ()
+    | 18u32 => jamo_hieut ()
+    | 1u32 => jamo_ssanggiyeok ()
+    | 4u32 => jamo_ssangdigeut ()
+    | 8u32 => jamo_ssangbieup ()
+    | 10u32 => jamo_ssangsiot ()
+    | 13u32 => jamo_ssangjieut ()
+    | _ => jamo_ieung ()
+
+:= jungseong (j : u32) : list contour_c =
+    ?= j ?|
+    | 0u32 => jamo_a ()
+    | 1u32 => jamo_ae ()
+    | 2u32 => jamo_ya ()
+    | 3u32 => jamo_yae ()
+    | 4u32 => jamo_eo ()
+    | 5u32 => jamo_e ()
+    | 7u32 => jamo_ye ()
+    | 6u32 => jamo_yeo ()
+    | 8u32 => jamo_o ()
+    | 12u32 => jamo_yo ()
+    | 13u32 => jamo_u ()
+    | 17u32 => jamo_yu ()
+    | 18u32 => jamo_eu ()
+    | 20u32 => jamo_i ()
+    | _ => jamo_a ()
+
+:= medial_horizontal (j : u32) : bool =
+    ?= j ?|
+    | 8u32 => true
+    | 12u32 => true
+    | 13u32 => true
+    | 17u32 => true
+    | 18u32 => true
+    | _ => false
+
+:= jongseong (k : u32) : list contour_c =
+    ?= k ?|
+    | 1u32 => jamo_giyeok ()
+    | 4u32 => jamo_nieun ()
+    | 7u32 => jamo_digeut ()
+    | 8u32 => jamo_rieul ()
+    | 16u32 => jamo_mieum ()
+    | 17u32 => jamo_bieup ()
+    | 19u32 => jamo_siot ()
+    | 21u32 => jamo_ieung ()
+    | 22u32 => jamo_jieut ()
+    | 23u32 => jamo_chieut ()
+    | 24u32 => jamo_kieuk ()
+    | 25u32 => jamo_tieut ()
+    | 26u32 => jamo_pieup ()
+    | 27u32 => jamo_hieut ()
+    | _ => jamo_ieung ()
+
+:~ compose_vertical_final (initial : list contour_c) (medial : list contour_c) (final : list contour_c) : outline quadratic =
+    lower_to_quads (OCubic (cc_append (cc_append (tf_contours 0.42f64 0.5f64 50.0f64 290.0f64 initial) (tf_contours 0.45f64 0.62f64 430.0f64 270.0f64 medial)) (tf_contours 0.82f64 0.36f64 80.0f64 10.0f64 final)))
+
+:~ compose_horizontal_final (initial : list contour_c) (medial : list contour_c) (final : list contour_c) : outline quadratic =
+    lower_to_quads (OCubic (cc_append (cc_append (tf_contours 0.5f64 0.3f64 175.0f64 490.0f64 initial) (tf_contours 0.92f64 0.34f64 30.0f64 250.0f64 medial)) (tf_contours 0.8f64 0.3f64 90.0f64 15.0f64 final)))
+
+:= medial_compound (j : u32) : bool =
+    ?= j ?|
+    | 9u32 => true
+    | 10u32 => true
+    | 11u32 => true
+    | 14u32 => true
+    | 15u32 => true
+    | 16u32 => true
+    | 19u32 => true
+    | _ => false
+
+:= compound_h (j : u32) : list contour_c =
+    ?= j ?|
+    | 14u32 => jamo_u ()
+    | 15u32 => jamo_u ()
+    | 16u32 => jamo_u ()
+    | 19u32 => jamo_eu ()
+    | _ => jamo_o ()
+
+:= compound_v (j : u32) : list contour_c =
+    ?= j ?|
+    | 10u32 => jamo_ae ()
+    | 11u32 => jamo_i ()
+    | 14u32 => jamo_eo ()
+    | 15u32 => jamo_e ()
+    | 16u32 => jamo_i ()
+    | 19u32 => jamo_i ()
+    | _ => jamo_a ()
+
+:~ compose_compound (initial : list contour_c) (hv : list contour_c) (vv : list contour_c) : outline quadratic =
+    lower_to_quads (OCubic (cc_append (cc_append (tf_contours 0.38f64 0.46f64 55.0f64 340.0f64 initial) (tf_contours 0.64f64 0.56f64 30.0f64 18.0f64 hv)) (tf_contours 0.42f64 0.92f64 440.0f64 30.0f64 vv)))
+
+:~ compose_compound_final (initial : list contour_c) (hv : list contour_c) (vv : list contour_c) (final : list contour_c) : outline quadratic =
+    lower_to_quads (OCubic (cc_append (cc_append (cc_append (tf_contours 0.34f64 0.4f64 55.0f64 470.0f64 initial) (tf_contours 0.56f64 0.44f64 30.0f64 250.0f64 hv)) (tf_contours 0.4f64 0.66f64 440.0f64 240.0f64 vv)) (tf_contours 0.82f64 0.3f64 80.0f64 15.0f64 final)))
+
+:= syllable_outline (s : u32) : outline quadratic =
+    := si = s - 44032u32
+    := ini = si / 588u32
+    := med = (si % 588u32) / 28u32
+    := fin = si % 28u32
+    ?= fin ?|
+    | 0u32 => ? (medial_compound med) ?> compose_compound (choseong ini) (compound_h med) (compound_v med) |: (? (medial_horizontal med) ?> compose_horizontal (choseong ini) (jungseong med) |: compose_vertical (choseong ini) (jungseong med))
+    | _ => ? (medial_compound med) ?> compose_compound_final (choseong ini) (compound_h med) (compound_v med) (jongseong fin) |: (? (medial_horizontal med) ?> compose_horizontal_final (choseong ini) (jungseong med) (jongseong fin) |: compose_vertical_final (choseong ini) (jungseong med) (jongseong fin))
+
+:~ hangul_a_syllable (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        transform_contour 0.55f64 0.62f64 60.0f64 120.0f64 (ellipse_contour 250.0f64 250.0f64 180.0f64 180.0f64 !+);
+        transform_contour 0.55f64 0.62f64 60.0f64 120.0f64 (ellipse_contour 250.0f64 250.0f64 105.0f64 105.0f64 !-);
+        rect_contour 560.0f64 0.0f64 650.0f64 700.0f64;
+        rect_contour 650.0f64 320.0f64 780.0f64 400.0f64
+    ])
+
+:~ hangul_o_syllable (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        transform_contour 0.6f64 0.5f64 (cx - 270.0f64) 330.0f64 (ellipse_contour 250.0f64 250.0f64 180.0f64 180.0f64 !+);
+        transform_contour 0.6f64 0.5f64 (cx - 270.0f64) 330.0f64 (ellipse_contour 250.0f64 250.0f64 105.0f64 105.0f64 !-);
+        rect_contour (cx - 230.0f64) 40.0f64 (cx + 230.0f64) 110.0f64;
+        rect_contour (cx - 45.0f64) 110.0f64 (cx + 45.0f64) 250.0f64
+    ])
+
+:~ letter_v (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 195.0f64 0.0f64 285.0f64 0.0f64 145.0f64 500.0f64 55.0f64 500.0f64;
+        poly4_contour 195.0f64 0.0f64 285.0f64 0.0f64 425.0f64 500.0f64 335.0f64 500.0f64
+    ])
+
+:~ letter_cap_i (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [ rect_contour 95.0f64 0.0f64 185.0f64 710.0f64 ])
+
+:~ digit_nine (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 539.0f64 155.0f64 180.0f64 !+;
+        ellipse_contour cx 539.0f64 85.0f64 105.0f64 !-;
+        rect_contour (cx + 65.0f64) 0.0f64 (cx + 155.0f64) 490.0f64
+    ])
+
+:~ digit_seven (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 60.0f64 625.0f64 460.0f64 710.0f64;
+        poly4_contour 170.0f64 0.0f64 270.0f64 0.0f64 460.0f64 625.0f64 360.0f64 625.0f64
+    ])
+
+:~ digit_four (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 300.0f64 0.0f64 390.0f64 710.0f64;
+        poly4_contour 100.0f64 230.0f64 190.0f64 230.0f64 390.0f64 710.0f64 300.0f64 710.0f64;
+        rect_contour 100.0f64 230.0f64 440.0f64 315.0f64
+    ])
+
+:~ digit_eight (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 505.0f64 145.0f64 205.0f64 !+;
+        ellipse_contour cx 505.0f64 78.0f64 125.0f64 !-;
+        ellipse_contour cx 185.0f64 180.0f64 195.0f64 !+;
+        ellipse_contour cx 185.0f64 100.0f64 115.0f64 !-
+    ])
+
+:~ digit_one (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 200.0f64 0.0f64 290.0f64 710.0f64;
+        rect_contour 110.0f64 0.0f64 380.0f64 85.0f64;
+        poly4_contour 120.0f64 580.0f64 200.0f64 620.0f64 200.0f64 710.0f64 120.0f64 670.0f64
+    ])
+
+:~ letter_cap_a (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 40.0f64 0.0f64 130.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        poly4_contour 380.0f64 0.0f64 470.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        rect_contour 140.0f64 280.0f64 370.0f64 360.0f64
+    ])
+
+:~ letter_cap_n (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 400.0f64 0.0f64 490.0f64 710.0f64;
+        poly4_contour 72.0f64 710.0f64 202.0f64 710.0f64 490.0f64 0.0f64 360.0f64 0.0f64
+    ])
+
+:~ letter_cap_w (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 170.0f64 0.0f64 260.0f64 0.0f64 130.0f64 710.0f64 40.0f64 710.0f64;
+        poly4_contour 170.0f64 0.0f64 260.0f64 0.0f64 340.0f64 710.0f64 250.0f64 710.0f64;
+        poly4_contour 420.0f64 0.0f64 510.0f64 0.0f64 390.0f64 710.0f64 300.0f64 710.0f64;
+        poly4_contour 420.0f64 0.0f64 510.0f64 0.0f64 600.0f64 710.0f64 510.0f64 710.0f64
+    ])
+
+:~ letter_cap_y (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 195.0f64 300.0f64 285.0f64 300.0f64 145.0f64 710.0f64 55.0f64 710.0f64;
+        poly4_contour 195.0f64 300.0f64 285.0f64 300.0f64 425.0f64 710.0f64 335.0f64 710.0f64;
+        rect_contour 195.0f64 0.0f64 285.0f64 310.0f64
+    ])
+
+:~ letter_cap_k (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        poly4_contour 162.0f64 290.0f64 350.0f64 610.0f64 350.0f64 700.0f64 162.0f64 380.0f64;
+        poly4_contour 162.0f64 320.0f64 350.0f64 0.0f64 350.0f64 90.0f64 162.0f64 410.0f64
+    ])
+
+:~ letter_cap_m (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 528.0f64 0.0f64 618.0f64 710.0f64;
+        poly4_contour 72.0f64 710.0f64 162.0f64 710.0f64 390.0f64 180.0f64 300.0f64 180.0f64;
+        poly4_contour 300.0f64 180.0f64 390.0f64 180.0f64 618.0f64 710.0f64 528.0f64 710.0f64
+    ])
+
+:~ letter_cap_v (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 205.0f64 0.0f64 295.0f64 0.0f64 150.0f64 710.0f64 60.0f64 710.0f64;
+        poly4_contour 205.0f64 0.0f64 295.0f64 0.0f64 440.0f64 710.0f64 350.0f64 710.0f64
+    ])
+
+:~ letter_cap_x (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 335.0f64 0.0f64 425.0f64 0.0f64 145.0f64 710.0f64 55.0f64 710.0f64;
+        poly4_contour 55.0f64 0.0f64 145.0f64 0.0f64 425.0f64 710.0f64 335.0f64 710.0f64
+    ])
+
+:~ letter_cap_z (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 60.0f64 625.0f64 420.0f64 710.0f64;
+        rect_contour 60.0f64 0.0f64 420.0f64 85.0f64;
+        poly4_contour 60.0f64 0.0f64 150.0f64 0.0f64 420.0f64 710.0f64 330.0f64 710.0f64
+    ])
+
+:~ letter_cap_l (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 72.0f64 0.0f64 400.0f64 85.0f64
+    ])
+
+:~ letter_cap_t (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 40.0f64 625.0f64 470.0f64 710.0f64;
+        rect_contour 210.0f64 0.0f64 300.0f64 710.0f64
+    ])
+
+:~ letter_cap_ghe (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 72.0f64 625.0f64 440.0f64 710.0f64
+    ])
+
+:~ letter_cap_pe (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 398.0f64 0.0f64 488.0f64 710.0f64;
+        rect_contour 72.0f64 625.0f64 488.0f64 710.0f64
+    ])
+
+:~ letter_cap_sha (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 315.0f64 0.0f64 405.0f64 710.0f64;
+        rect_contour 558.0f64 0.0f64 648.0f64 710.0f64;
+        rect_contour 72.0f64 0.0f64 648.0f64 85.0f64
+    ])
+
+:~ letter_cap_ef (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 355.0f64 210.0f64 255.0f64 !+;
+        ellipse_contour cx 355.0f64 125.0f64 165.0f64 !-;
+        rect_contour (cx - 45.0f64) 0.0f64 (cx + 45.0f64) 710.0f64
+    ])
+
+:~ letter_cap_icyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 400.0f64 0.0f64 490.0f64 710.0f64;
+        poly4_contour 360.0f64 710.0f64 490.0f64 710.0f64 202.0f64 0.0f64 72.0f64 0.0f64
+    ])
+
+:~ letter_cap_tse (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 398.0f64 0.0f64 488.0f64 710.0f64;
+        rect_contour 72.0f64 0.0f64 488.0f64 85.0f64;
+        rect_contour 420.0f64 (-170.0f64) 488.0f64 85.0f64
+    ])
+
+:~ letter_cap_shcha (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 315.0f64 0.0f64 405.0f64 710.0f64;
+        rect_contour 558.0f64 0.0f64 648.0f64 710.0f64;
+        rect_contour 72.0f64 0.0f64 648.0f64 85.0f64;
+        rect_contour 580.0f64 (-170.0f64) 648.0f64 85.0f64
+    ])
+
+:~ letter_cap_be (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 72.0f64 625.0f64 420.0f64 710.0f64;
+        ellipse_contour 300.0f64 180.0f64 235.0f64 180.0f64 !+;
+        ellipse_contour 300.0f64 180.0f64 150.0f64 100.0f64 !-
+    ])
+
+:~ letter_cap_soft (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        ellipse_contour 285.0f64 175.0f64 210.0f64 175.0f64 !+;
+        ellipse_contour 285.0f64 175.0f64 130.0f64 100.0f64 !-
+    ])
+
+:~ letter_cap_yery (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        ellipse_contour 250.0f64 175.0f64 165.0f64 175.0f64 !+;
+        ellipse_contour 250.0f64 175.0f64 95.0f64 100.0f64 !-;
+        rect_contour 450.0f64 0.0f64 540.0f64 710.0f64
+    ])
+
+:~ letter_cap_hard (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 0.0f64 625.0f64 162.0f64 710.0f64;
+        ellipse_contour 285.0f64 175.0f64 210.0f64 175.0f64 !+;
+        ellipse_contour 285.0f64 175.0f64 130.0f64 100.0f64 !-
+    ])
+
+:~ letter_cap_yu (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 162.0f64 310.0f64 300.0f64 405.0f64;
+        ellipse_contour 480.0f64 355.0f64 190.0f64 355.0f64 !+;
+        ellipse_contour 480.0f64 355.0f64 110.0f64 255.0f64 !-
+    ])
+
+:~ letter_cap_theta (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 355.0f64 230.0f64 355.0f64 !+;
+        ellipse_contour cx 355.0f64 140.0f64 255.0f64 !-;
+        rect_contour (cx - 130.0f64) 320.0f64 (cx + 130.0f64) 400.0f64
+    ])
+
+:~ letter_cap_xi (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 60.0f64 625.0f64 480.0f64 710.0f64;
+        rect_contour 90.0f64 320.0f64 450.0f64 400.0f64;
+        rect_contour 60.0f64 0.0f64 480.0f64 85.0f64
+    ])
+
+:~ letter_cap_lambda (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 40.0f64 0.0f64 130.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        poly4_contour 380.0f64 0.0f64 470.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64
+    ])
+
+:~ letter_cap_delta (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 40.0f64 0.0f64 130.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        poly4_contour 380.0f64 0.0f64 470.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        rect_contour 40.0f64 0.0f64 470.0f64 85.0f64
+    ])
+
+:~ letter_cap_sigma (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 60.0f64 625.0f64 470.0f64 710.0f64;
+        poly4_contour 100.0f64 355.0f64 190.0f64 355.0f64 400.0f64 625.0f64 310.0f64 625.0f64;
+        poly4_contour 400.0f64 85.0f64 310.0f64 85.0f64 100.0f64 355.0f64 190.0f64 355.0f64;
+        rect_contour 60.0f64 0.0f64 470.0f64 85.0f64
+    ])
+
+:~ letter_cap_psi (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        rect_contour (cx - 45.0f64) 0.0f64 (cx + 45.0f64) 710.0f64;
+        rect_contour (cx - 245.0f64) 345.0f64 (cx - 155.0f64) 710.0f64;
+        rect_contour (cx + 155.0f64) 345.0f64 (cx + 245.0f64) 710.0f64;
+        rect_contour (cx - 245.0f64) 345.0f64 (cx + 245.0f64) 435.0f64
+    ])
+
+:~ letter_cap_omega (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        arch_contour cx 180.0f64 230.0f64 460.0f64 140.0f64 350.0f64;
+        rect_contour (cx - 250.0f64) 85.0f64 (cx - 80.0f64) 200.0f64;
+        rect_contour (cx + 80.0f64) 85.0f64 (cx + 250.0f64) 200.0f64
+    ])
+
+:~ letter_cap_yacyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 398.0f64 0.0f64 488.0f64 710.0f64;
+        ellipse_contour 260.0f64 520.0f64 230.0f64 185.0f64 !+;
+        ellipse_contour 260.0f64 520.0f64 145.0f64 100.0f64 !-;
+        poly4_contour 180.0f64 0.0f64 70.0f64 0.0f64 220.0f64 335.0f64 330.0f64 335.0f64
+    ])
+
+:~ letter_cap_decyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 130.0f64 85.0f64 220.0f64 630.0f64;
+        rect_contour 380.0f64 85.0f64 470.0f64 630.0f64;
+        rect_contour 130.0f64 540.0f64 470.0f64 630.0f64;
+        rect_contour 50.0f64 0.0f64 550.0f64 85.0f64;
+        rect_contour 70.0f64 (-120.0f64) 160.0f64 0.0f64;
+        rect_contour 440.0f64 (-120.0f64) 530.0f64 0.0f64
+    ])
+
+:~ letter_cap_elcyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 390.0f64 0.0f64 480.0f64 710.0f64;
+        poly4_contour 40.0f64 0.0f64 130.0f64 0.0f64 390.0f64 710.0f64 300.0f64 710.0f64
+    ])
+
+:~ letter_cap_ucyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 215.0f64 300.0f64 305.0f64 300.0f64 130.0f64 710.0f64 40.0f64 710.0f64;
+        poly4_contour 215.0f64 300.0f64 305.0f64 300.0f64 480.0f64 710.0f64 390.0f64 710.0f64;
+        rect_contour 215.0f64 (-150.0f64) 305.0f64 300.0f64
+    ])
+
+:~ letter_cap_zhe (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 325.0f64 0.0f64 415.0f64 710.0f64;
+        poly4_contour 40.0f64 0.0f64 130.0f64 0.0f64 370.0f64 355.0f64 280.0f64 355.0f64;
+        poly4_contour 610.0f64 0.0f64 700.0f64 0.0f64 460.0f64 355.0f64 370.0f64 355.0f64;
+        poly4_contour 280.0f64 355.0f64 370.0f64 355.0f64 130.0f64 710.0f64 40.0f64 710.0f64;
+        poly4_contour 370.0f64 355.0f64 460.0f64 355.0f64 700.0f64 710.0f64 610.0f64 710.0f64
+    ])
+
+:~ letter_cap_jcyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 400.0f64 0.0f64 490.0f64 710.0f64;
+        poly4_contour 360.0f64 710.0f64 490.0f64 710.0f64 202.0f64 0.0f64 72.0f64 0.0f64;
+        arch_down_contour 281.0f64 760.0f64 110.0f64 50.0f64 60.0f64 25.0f64
+    ])
+
+:~ letter_cap_checyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 400.0f64 0.0f64 490.0f64 710.0f64;
+        rect_contour 72.0f64 355.0f64 162.0f64 710.0f64;
+        rect_contour 72.0f64 355.0f64 490.0f64 445.0f64
+    ])
+
+:~ letter_pecyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        rect_contour 330.0f64 0.0f64 415.0f64 500.0f64;
+        rect_contour 70.0f64 415.0f64 415.0f64 500.0f64
+    ])
+
+:~ letter_encyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        rect_contour 330.0f64 0.0f64 415.0f64 500.0f64;
+        rect_contour 155.0f64 210.0f64 330.0f64 295.0f64
+    ])
+
+:~ letter_shacyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        rect_contour 250.0f64 0.0f64 335.0f64 500.0f64;
+        rect_contour 430.0f64 0.0f64 515.0f64 500.0f64;
+        rect_contour 70.0f64 0.0f64 515.0f64 85.0f64
+    ])
+
+:~ letter_gecyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        rect_contour 70.0f64 415.0f64 400.0f64 500.0f64
+    ])
+
+:~ letter_icyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        rect_contour 330.0f64 0.0f64 415.0f64 500.0f64;
+        poly4_contour 300.0f64 500.0f64 415.0f64 500.0f64 155.0f64 0.0f64 70.0f64 0.0f64
+    ])
+
+:~ letter_tecyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 40.0f64 415.0f64 430.0f64 500.0f64;
+        rect_contour 190.0f64 0.0f64 275.0f64 500.0f64
+    ])
+
+:~ letter_tsecyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        rect_contour 330.0f64 0.0f64 415.0f64 500.0f64;
+        rect_contour 70.0f64 0.0f64 415.0f64 85.0f64;
+        rect_contour 360.0f64 (-120.0f64) 430.0f64 0.0f64
+    ])
+
+:~ letter_shchacyr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        rect_contour 250.0f64 0.0f64 335.0f64 500.0f64;
+        rect_contour 430.0f64 0.0f64 515.0f64 500.0f64;
+        rect_contour 70.0f64 0.0f64 515.0f64 85.0f64;
+        rect_contour 460.0f64 (-120.0f64) 530.0f64 0.0f64
+    ])
+
+:~ letter_checyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 330.0f64 0.0f64 415.0f64 500.0f64;
+        rect_contour 70.0f64 250.0f64 155.0f64 500.0f64;
+        rect_contour 70.0f64 250.0f64 415.0f64 320.0f64
+    ])
+
+:~ letter_elcyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 330.0f64 0.0f64 415.0f64 500.0f64;
+        poly4_contour 40.0f64 0.0f64 130.0f64 0.0f64 330.0f64 500.0f64 250.0f64 500.0f64
+    ])
+
+:~ letter_kacyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        poly4_contour 155.0f64 250.0f64 240.0f64 250.0f64 400.0f64 500.0f64 315.0f64 500.0f64;
+        poly4_contour 315.0f64 0.0f64 400.0f64 0.0f64 240.0f64 250.0f64 155.0f64 250.0f64
+    ])
+
+:~ letter_emcyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        rect_contour 430.0f64 0.0f64 515.0f64 500.0f64;
+        poly4_contour 245.0f64 250.0f64 335.0f64 250.0f64 155.0f64 500.0f64 70.0f64 500.0f64;
+        poly4_contour 245.0f64 250.0f64 335.0f64 250.0f64 515.0f64 500.0f64 430.0f64 500.0f64
+    ])
+
+:~ letter_zhecyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 265.0f64 0.0f64 335.0f64 500.0f64;
+        poly4_contour 40.0f64 0.0f64 110.0f64 0.0f64 300.0f64 250.0f64 230.0f64 250.0f64;
+        poly4_contour 490.0f64 0.0f64 560.0f64 0.0f64 370.0f64 250.0f64 300.0f64 250.0f64;
+        poly4_contour 230.0f64 250.0f64 300.0f64 250.0f64 110.0f64 500.0f64 40.0f64 500.0f64;
+        poly4_contour 300.0f64 250.0f64 370.0f64 250.0f64 560.0f64 500.0f64 490.0f64 500.0f64
+    ])
+
+:~ letter_softcyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        ellipse_contour 265.0f64 140.0f64 145.0f64 140.0f64 !+;
+        ellipse_contour 265.0f64 140.0f64 85.0f64 80.0f64 !-
+    ])
+
+:~ letter_yerycyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        ellipse_contour 240.0f64 140.0f64 130.0f64 140.0f64 !+;
+        ellipse_contour 240.0f64 140.0f64 75.0f64 80.0f64 !-;
+        rect_contour 400.0f64 0.0f64 485.0f64 500.0f64
+    ])
+
+:~ letter_hardcyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        rect_contour 0.0f64 415.0f64 155.0f64 500.0f64;
+        ellipse_contour 265.0f64 140.0f64 145.0f64 140.0f64 !+;
+        ellipse_contour 265.0f64 140.0f64 85.0f64 80.0f64 !-
+    ])
+
+:~ letter_efcyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        ellipse_contour 240.0f64 250.0f64 155.0f64 180.0f64 !+;
+        ellipse_contour 240.0f64 250.0f64 90.0f64 110.0f64 !-;
+        rect_contour 205.0f64 (-100.0f64) 275.0f64 600.0f64
+    ])
+
+:~ letter_yucyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        rect_contour 155.0f64 210.0f64 250.0f64 290.0f64;
+        ellipse_contour 400.0f64 250.0f64 150.0f64 250.0f64 !+;
+        ellipse_contour 400.0f64 250.0f64 85.0f64 170.0f64 !-
+    ])
+
+:~ letter_yacyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 330.0f64 0.0f64 415.0f64 500.0f64;
+        ellipse_contour 220.0f64 360.0f64 150.0f64 130.0f64 !+;
+        ellipse_contour 220.0f64 360.0f64 90.0f64 70.0f64 !-;
+        poly4_contour 150.0f64 0.0f64 60.0f64 0.0f64 185.0f64 235.0f64 275.0f64 235.0f64
+    ])
+
+:~ letter_jcyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        rect_contour 330.0f64 0.0f64 415.0f64 500.0f64;
+        poly4_contour 300.0f64 500.0f64 415.0f64 500.0f64 155.0f64 0.0f64 70.0f64 0.0f64;
+        arch_down_contour 245.0f64 600.0f64 115.0f64 90.0f64 60.0f64 45.0f64
+    ])
+
+:~ letter_decyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 110.0f64 85.0f64 190.0f64 415.0f64;
+        rect_contour 310.0f64 85.0f64 390.0f64 415.0f64;
+        rect_contour 110.0f64 330.0f64 390.0f64 415.0f64;
+        rect_contour 50.0f64 0.0f64 450.0f64 85.0f64;
+        rect_contour 70.0f64 (-120.0f64) 150.0f64 0.0f64;
+        rect_contour 350.0f64 (-120.0f64) 430.0f64 0.0f64
+    ])
+
+:~ letter_vecyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 0.0f64 155.0f64 500.0f64;
+        ellipse_contour 265.0f64 375.0f64 140.0f64 125.0f64 !+;
+        ellipse_contour 265.0f64 375.0f64 75.0f64 65.0f64 !-;
+        ellipse_contour 285.0f64 135.0f64 160.0f64 135.0f64 !+;
+        ellipse_contour 285.0f64 135.0f64 95.0f64 75.0f64 !-
+    ])
+
+:~ letter_becyrlc (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 140.0f64 155.0f64 500.0f64;
+        rect_contour 70.0f64 415.0f64 340.0f64 500.0f64;
+        ellipse_contour 265.0f64 140.0f64 195.0f64 140.0f64 !+;
+        ellipse_contour 265.0f64 140.0f64 110.0f64 75.0f64 !-
+    ])
+
+:~ letter_cap_h (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 400.0f64 0.0f64 490.0f64 710.0f64;
+        rect_contour 162.0f64 320.0f64 400.0f64 405.0f64
+    ])
+
+:~ letter_cap_e (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 72.0f64 625.0f64 420.0f64 710.0f64;
+        rect_contour 72.0f64 320.0f64 380.0f64 405.0f64;
+        rect_contour 72.0f64 0.0f64 420.0f64 85.0f64
+    ])
+
+:~ letter_cap_f (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 72.0f64 625.0f64 420.0f64 710.0f64;
+        rect_contour 72.0f64 320.0f64 380.0f64 405.0f64
+    ])
+
+:~ letter_k (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        poly4_contour 162.0f64 180.0f64 350.0f64 410.0f64 350.0f64 495.0f64 162.0f64 265.0f64;
+        poly4_contour 162.0f64 230.0f64 350.0f64 0.0f64 350.0f64 85.0f64 162.0f64 315.0f64
+    ])
+
+:~ letter_y (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 195.0f64 150.0f64 285.0f64 150.0f64 145.0f64 500.0f64 55.0f64 500.0f64;
+        poly4_contour 195.0f64 150.0f64 285.0f64 150.0f64 425.0f64 500.0f64 335.0f64 500.0f64;
+        rect_contour 195.0f64 (-210.0f64) 285.0f64 160.0f64
+    ])
+
+:~ letter_x (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 335.0f64 0.0f64 425.0f64 0.0f64 145.0f64 500.0f64 55.0f64 500.0f64;
+        poly4_contour 55.0f64 0.0f64 145.0f64 0.0f64 425.0f64 500.0f64 335.0f64 500.0f64
+    ])
+
+:~ letter_z (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 60.0f64 430.0f64 420.0f64 500.0f64;
+        rect_contour 60.0f64 0.0f64 420.0f64 70.0f64;
+        poly4_contour 60.0f64 0.0f64 150.0f64 0.0f64 420.0f64 500.0f64 330.0f64 500.0f64
+    ])
+
+:~ letter_t (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 180.0f64 0.0f64 270.0f64 600.0f64;
+        rect_contour 90.0f64 440.0f64 360.0f64 510.0f64
+    ])
+
+:~ letter_w (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 170.0f64 0.0f64 260.0f64 0.0f64 130.0f64 500.0f64 40.0f64 500.0f64;
+        poly4_contour 170.0f64 0.0f64 260.0f64 0.0f64 340.0f64 500.0f64 250.0f64 500.0f64;
+        poly4_contour 420.0f64 0.0f64 510.0f64 0.0f64 390.0f64 500.0f64 300.0f64 500.0f64;
+        poly4_contour 420.0f64 0.0f64 510.0f64 0.0f64 600.0f64 500.0f64 510.0f64 500.0f64
+    ])
+
+:~ letter_m (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 370.0f64;
+        rect_contour 290.0f64 0.0f64 380.0f64 370.0f64;
+        rect_contour 508.0f64 0.0f64 598.0f64 370.0f64;
+        arch_contour 226.0f64 350.0f64 154.0f64 150.0f64 64.0f64 60.0f64;
+        arch_contour 444.0f64 350.0f64 154.0f64 150.0f64 64.0f64 60.0f64
+    ])
+
+:~ arc_seg (cx : f64) (cy : f64) (rx : f64) (ry : f64) (ca : f64) (sa : f64) (cb : f64) (sb : f64) (tt : f64) : cubic_seg =
+    CCubic (
+        pt (cx + rx * (ca - tt * sa)) (cy + ry * (sa + tt * ca)),
+        pt (cx + rx * (cb + tt * sb)) (cy + ry * (sb - tt * cb)),
+        pt (cx + rx * cb) (cy + ry * sb)
+    )
+
+:~ arc_ring_c (cx : f64) (cy : f64) (rxo : f64) (ryo : f64) (rxi : f64) (ryi : f64) : contour_c =
+    := s = 0.70710678f64
+    := sn = -0.70710678f64
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    { start = pt (cx + rxo * s) (cy + ryo * s);
+        segs = [
+        arc_seg cx cy rxo ryo s s sn s tt;
+        arc_seg cx cy rxo ryo sn s sn sn tt;
+        arc_seg cx cy rxo ryo sn sn s sn tt;
+        CLine (pt (cx + rxi * s) (cy - ryi * s));
+        arc_seg cx cy rxi ryi s sn sn sn tn;
+        arc_seg cx cy rxi ryi sn sn sn s tn;
+        arc_seg cx cy rxi ryi sn s s s tn
+      ] }
+
+:~ letter_c (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [ arc_ring_c cx 250.0f64 205.0f64 206.0f64 120.0f64 121.0f64 ])
+
+:~ letter_cap_c (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [ arc_ring_c cx 355.0f64 235.0f64 294.0f64 145.0f64 194.0f64 ])
+
+:~ letter_cap_o (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 355.0f64 230.0f64 355.0f64 !+;
+        ellipse_contour cx 355.0f64 140.0f64 255.0f64 !-
+    ])
+
+:~ letter_cap_r (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        ellipse_contour 300.0f64 520.0f64 230.0f64 185.0f64 !+;
+        ellipse_contour 300.0f64 520.0f64 145.0f64 100.0f64 !-;
+        poly4_contour 230.0f64 335.0f64 340.0f64 335.0f64 490.0f64 0.0f64 380.0f64 0.0f64
+    ])
+
+:~ letter_cap_b (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        ellipse_contour 290.0f64 530.0f64 215.0f64 175.0f64 !+;
+        ellipse_contour 290.0f64 530.0f64 130.0f64 95.0f64 !-;
+        ellipse_contour 300.0f64 180.0f64 235.0f64 180.0f64 !+;
+        ellipse_contour 300.0f64 180.0f64 150.0f64 100.0f64 !-
+    ])
+
+:~ letter_cap_q (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 355.0f64 230.0f64 355.0f64 !+;
+        ellipse_contour cx 355.0f64 140.0f64 255.0f64 !-;
+        poly4_contour (cx + 40.0f64) 170.0f64 (cx + 130.0f64) 170.0f64 (cx + 250.0f64) (-70.0f64) (cx + 160.0f64) (-70.0f64)
+    ])
+
+:~ letter_cap_p (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        ellipse_contour 300.0f64 520.0f64 230.0f64 185.0f64 !+;
+        ellipse_contour 300.0f64 520.0f64 145.0f64 100.0f64 !-
+    ])
+
+:~ letter_cap_u (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 180.0f64 162.0f64 710.0f64;
+        rect_contour 430.0f64 180.0f64 520.0f64 710.0f64;
+        arch_down_contour 296.0f64 200.0f64 224.0f64 200.0f64 134.0f64 110.0f64
+    ])
+
+:~ open_ring_lr (cx : f64) (cy : f64) (rxo : f64) (ryo : f64) (rxi : f64) (ryi : f64) : contour_c =
+    := s = 0.70710678f64
+    := sn = -0.70710678f64
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    := t4 = 0.26521649f64
+    := t4n = -0.26521649f64
+    { start = pt (cx + rxo) cy;
+        segs = [
+        arc_seg cx cy rxo ryo 1.0f64 0.0f64 0.0f64 1.0f64 tt;
+        arc_seg cx cy rxo ryo 0.0f64 1.0f64 (-1.0f64) 0.0f64 tt;
+        arc_seg cx cy rxo ryo (-1.0f64) 0.0f64 0.0f64 (-1.0f64) tt;
+        arc_seg cx cy rxo ryo 0.0f64 (-1.0f64) s sn t4;
+        CLine (pt (cx + rxi * s) (cy - ryi * s));
+        arc_seg cx cy rxi ryi s sn 0.0f64 (-1.0f64) t4n;
+        arc_seg cx cy rxi ryi 0.0f64 (-1.0f64) (-1.0f64) 0.0f64 tn;
+        arc_seg cx cy rxi ryi (-1.0f64) 0.0f64 0.0f64 1.0f64 tn;
+        arc_seg cx cy rxi ryi 0.0f64 1.0f64 1.0f64 0.0f64 tn
+      ] }
+
+:~ open_ring_ul (cx : f64) (cy : f64) (rxo : f64) (ryo : f64) (rxi : f64) (ryi : f64) : contour_c =
+    := s = 0.70710678f64
+    := sn = -0.70710678f64
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    := t4 = 0.26521649f64
+    := t4n = -0.26521649f64
+    { start = pt (cx - rxo) cy;
+        segs = [
+        arc_seg cx cy rxo ryo (-1.0f64) 0.0f64 0.0f64 (-1.0f64) tt;
+        arc_seg cx cy rxo ryo 0.0f64 (-1.0f64) 1.0f64 0.0f64 tt;
+        arc_seg cx cy rxo ryo 1.0f64 0.0f64 0.0f64 1.0f64 tt;
+        arc_seg cx cy rxo ryo 0.0f64 1.0f64 sn s t4;
+        CLine (pt (cx - rxi * s) (cy + ryi * s));
+        arc_seg cx cy rxi ryi sn s 0.0f64 1.0f64 t4n;
+        arc_seg cx cy rxi ryi 0.0f64 1.0f64 1.0f64 0.0f64 tn;
+        arc_seg cx cy rxi ryi 1.0f64 0.0f64 0.0f64 (-1.0f64) tn;
+        arc_seg cx cy rxi ryi 0.0f64 (-1.0f64) (-1.0f64) 0.0f64 tn
+      ] }
+
+:~ letter_s (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        open_ring_lr cx 371.0f64 135.0f64 145.0f64 68.0f64 78.0f64;
+        open_ring_ul cx 129.0f64 135.0f64 145.0f64 68.0f64 78.0f64
+    ])
+
+:~ letter_cap_s (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        open_ring_lr cx 560.0f64 160.0f64 175.0f64 80.0f64 90.0f64;
+        open_ring_ul cx 150.0f64 160.0f64 175.0f64 80.0f64 90.0f64
+    ])
+
+:~ digit_five (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        rect_contour 120.0f64 630.0f64 460.0f64 710.0f64;
+        rect_contour 120.0f64 360.0f64 210.0f64 710.0f64;
+        open_ring_ul 270.0f64 170.0f64 180.0f64 175.0f64 100.0f64 95.0f64
+    ])
+
+:~ digit_six (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 180.0f64 155.0f64 180.0f64 !+;
+        ellipse_contour cx 180.0f64 85.0f64 105.0f64 !-;
+        rect_contour (cx - 155.0f64) 170.0f64 (cx - 65.0f64) 719.0f64
+    ])
+
+:~ digit_three (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := s = 0.70710678f64
+    := sn = -0.70710678f64
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    lower_to_quads (OCubic [
+        { start = pt (cx - 150.0f64 * s) (495.0f64 - 175.0f64 * s);
+            segs = [
+            arc_seg cx 495.0f64 150.0f64 175.0f64 sn sn s sn tt;
+            arc_seg cx 495.0f64 150.0f64 175.0f64 s sn s s tt;
+            arc_seg cx 495.0f64 150.0f64 175.0f64 s s sn s tt;
+            CLine (pt (cx - 72.0f64 * s) (495.0f64 + 98.0f64 * s));
+            arc_seg cx 495.0f64 72.0f64 98.0f64 sn s s s tn;
+            arc_seg cx 495.0f64 72.0f64 98.0f64 s s s sn tn;
+            arc_seg cx 495.0f64 72.0f64 98.0f64 s sn sn sn tn
+          ] };
+        { start = pt (cx - 175.0f64 * s) (240.0f64 - 195.0f64 * s);
+            segs = [
+            arc_seg cx 240.0f64 175.0f64 195.0f64 sn sn s sn tt;
+            arc_seg cx 240.0f64 175.0f64 195.0f64 s sn s s tt;
+            arc_seg cx 240.0f64 175.0f64 195.0f64 s s sn s tt;
+            CLine (pt (cx - 92.0f64 * s) (240.0f64 + 112.0f64 * s));
+            arc_seg cx 240.0f64 92.0f64 112.0f64 sn s s s tn;
+            arc_seg cx 240.0f64 92.0f64 112.0f64 s s s sn tn;
+            arc_seg cx 240.0f64 92.0f64 112.0f64 s sn sn sn tn
+          ] }
+    ])
+
+:~ letter_zecyrlc (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := s = 0.70710678f64
+    := sn = -0.70710678f64
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    lower_to_quads (OCubic [
+        { start = pt (cx - 120.0f64 * s) (360.0f64 - 140.0f64 * s);
+            segs = [
+            arc_seg cx 360.0f64 120.0f64 140.0f64 sn sn s sn tt;
+            arc_seg cx 360.0f64 120.0f64 140.0f64 s sn s s tt;
+            arc_seg cx 360.0f64 120.0f64 140.0f64 s s sn s tt;
+            CLine (pt (cx - 58.0f64 * s) (360.0f64 + 78.0f64 * s));
+            arc_seg cx 360.0f64 58.0f64 78.0f64 sn s s s tn;
+            arc_seg cx 360.0f64 58.0f64 78.0f64 s s s sn tn;
+            arc_seg cx 360.0f64 58.0f64 78.0f64 s sn sn sn tn
+          ] };
+        { start = pt (cx - 135.0f64 * s) (150.0f64 - 150.0f64 * s);
+            segs = [
+            arc_seg cx 150.0f64 135.0f64 150.0f64 sn sn s sn tt;
+            arc_seg cx 150.0f64 135.0f64 150.0f64 s sn s s tt;
+            arc_seg cx 150.0f64 135.0f64 150.0f64 s s sn s tt;
+            CLine (pt (cx - 70.0f64 * s) (150.0f64 + 88.0f64 * s));
+            arc_seg cx 150.0f64 70.0f64 88.0f64 sn s s s tn;
+            arc_seg cx 150.0f64 70.0f64 88.0f64 s s s sn tn;
+            arc_seg cx 150.0f64 70.0f64 88.0f64 s sn sn sn tn
+          ] }
+    ])
+
+:~ letter_cap_ecyr (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := s = 0.70710678f64
+    := sn = -0.70710678f64
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    lower_to_quads (OCubic [
+        { start = pt (cx - 215.0f64 * s) (355.0f64 - 355.0f64 * s);
+            segs = [
+            arc_seg cx 355.0f64 215.0f64 355.0f64 sn sn s sn tt;
+            arc_seg cx 355.0f64 215.0f64 355.0f64 s sn s s tt;
+            arc_seg cx 355.0f64 215.0f64 355.0f64 s s sn s tt;
+            CLine (pt (cx - 130.0f64 * s) (355.0f64 + 255.0f64 * s));
+            arc_seg cx 355.0f64 130.0f64 255.0f64 sn s s s tn;
+            arc_seg cx 355.0f64 130.0f64 255.0f64 s s s sn tn;
+            arc_seg cx 355.0f64 130.0f64 255.0f64 s sn sn sn tn
+          ] };
+        rect_contour (cx - 40.0f64) 320.0f64 (cx + 150.0f64) 400.0f64
+    ])
+
+:~ letter_ecyrlc (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := s = 0.70710678f64
+    := sn = -0.70710678f64
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    lower_to_quads (OCubic [
+        { start = pt (cx - 155.0f64 * s) (250.0f64 - 250.0f64 * s);
+            segs = [
+            arc_seg cx 250.0f64 155.0f64 250.0f64 sn sn s sn tt;
+            arc_seg cx 250.0f64 155.0f64 250.0f64 s sn s s tt;
+            arc_seg cx 250.0f64 155.0f64 250.0f64 s s sn s tt;
+            CLine (pt (cx - 90.0f64 * s) (250.0f64 + 175.0f64 * s));
+            arc_seg cx 250.0f64 90.0f64 175.0f64 sn s s s tn;
+            arc_seg cx 250.0f64 90.0f64 175.0f64 s s s sn tn;
+            arc_seg cx 250.0f64 90.0f64 175.0f64 s sn sn sn tn
+          ] };
+        rect_contour (cx - 30.0f64) 215.0f64 (cx + 115.0f64) 290.0f64
+    ])
+
+:~ digit_two (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := s = 0.70710678f64
+    := sn = -0.70710678f64
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    lower_to_quads (OCubic [
+        { start = pt cx (485.0f64 - 222.0f64);
+            segs = [
+            arc_seg cx 485.0f64 170.0f64 222.0f64 0.0f64 (-1.0f64) 1.0f64 0.0f64 tt;
+            arc_seg cx 485.0f64 170.0f64 222.0f64 1.0f64 0.0f64 0.0f64 1.0f64 tt;
+            arc_seg cx 485.0f64 170.0f64 222.0f64 0.0f64 1.0f64 (-1.0f64) 0.0f64 tt;
+            CLine (pt (cx - 90.0f64) 485.0f64);
+            arc_seg cx 485.0f64 90.0f64 145.0f64 (-1.0f64) 0.0f64 0.0f64 1.0f64 tn;
+            arc_seg cx 485.0f64 90.0f64 145.0f64 0.0f64 1.0f64 1.0f64 0.0f64 tn;
+            arc_seg cx 485.0f64 90.0f64 145.0f64 1.0f64 0.0f64 0.0f64 (-1.0f64) tn
+          ] };
+        poly4_contour 120.0f64 100.0f64 215.0f64 100.0f64 410.0f64 360.0f64 315.0f64 360.0f64;
+        rect_contour 95.0f64 0.0f64 455.0f64 100.0f64
+    ])
+
+:~ letter_e (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := cy = 250.0f64
+    := s = 0.70710678f64
+    := sn = -0.70710678f64
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    := t4 = 0.26521649f64
+    := t4n = -0.26521649f64
+    := rxo = 180.0f64
+    := ryo = 266.0f64
+    := rxi = 100.0f64
+    := ryi = 186.0f64
+    lower_to_quads (OCubic [
+        { start = pt (cx + rxo) cy;
+            segs = [
+            arc_seg cx cy rxo ryo 1.0f64 0.0f64 0.0f64 1.0f64 tt;
+            arc_seg cx cy rxo ryo 0.0f64 1.0f64 (-1.0f64) 0.0f64 tt;
+            arc_seg cx cy rxo ryo (-1.0f64) 0.0f64 0.0f64 (-1.0f64) tt;
+            arc_seg cx cy rxo ryo 0.0f64 (-1.0f64) s sn t4;
+            CLine (pt (cx + rxi * s) (cy - ryi * s));
+            arc_seg cx cy rxi ryi s sn 0.0f64 (-1.0f64) t4n;
+            arc_seg cx cy rxi ryi 0.0f64 (-1.0f64) (-1.0f64) 0.0f64 tn;
+            arc_seg cx cy rxi ryi (-1.0f64) 0.0f64 0.0f64 1.0f64 tn;
+            arc_seg cx cy rxi ryi 0.0f64 1.0f64 1.0f64 0.0f64 tn
+          ] };
+        rect_contour (cx - 110.0f64) 215.0f64 (cx + rxo) 300.0f64
+    ])
+
+:~ letter_yocyrlc (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := cy = 250.0f64
+    := s = 0.70710678f64
+    := sn = -0.70710678f64
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    := t4 = 0.26521649f64
+    := t4n = -0.26521649f64
+    := rxo = 180.0f64
+    := ryo = 230.0f64
+    := rxi = 100.0f64
+    := ryi = 150.0f64
+    lower_to_quads (OCubic [
+        { start = pt (cx + rxo) cy;
+            segs = [
+            arc_seg cx cy rxo ryo 1.0f64 0.0f64 0.0f64 1.0f64 tt;
+            arc_seg cx cy rxo ryo 0.0f64 1.0f64 (-1.0f64) 0.0f64 tt;
+            arc_seg cx cy rxo ryo (-1.0f64) 0.0f64 0.0f64 (-1.0f64) tt;
+            arc_seg cx cy rxo ryo 0.0f64 (-1.0f64) s sn t4;
+            CLine (pt (cx + rxi * s) (cy - ryi * s));
+            arc_seg cx cy rxi ryi s sn 0.0f64 (-1.0f64) t4n;
+            arc_seg cx cy rxi ryi 0.0f64 (-1.0f64) (-1.0f64) 0.0f64 tn;
+            arc_seg cx cy rxi ryi (-1.0f64) 0.0f64 0.0f64 1.0f64 tn;
+            arc_seg cx cy rxi ryi 0.0f64 1.0f64 1.0f64 0.0f64 tn
+          ] };
+        rect_contour (cx - 110.0f64) 215.0f64 (cx + rxo) 300.0f64;
+        rect_contour (cx - 100.0f64) 560.0f64 (cx - 45.0f64) 625.0f64;
+        rect_contour (cx + 45.0f64) 560.0f64 (cx + 100.0f64) 625.0f64
+    ])
+
+:~ letter_eacute (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := cy = 250.0f64
+    := s = 0.70710678f64
+    := sn = -0.70710678f64
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    := t4 = 0.26521649f64
+    := t4n = -0.26521649f64
+    := rxo = 180.0f64
+    := ryo = 230.0f64
+    := rxi = 100.0f64
+    := ryi = 150.0f64
+    lower_to_quads (OCubic [
+        { start = pt (cx + rxo) cy;
+            segs = [
+            arc_seg cx cy rxo ryo 1.0f64 0.0f64 0.0f64 1.0f64 tt;
+            arc_seg cx cy rxo ryo 0.0f64 1.0f64 (-1.0f64) 0.0f64 tt;
+            arc_seg cx cy rxo ryo (-1.0f64) 0.0f64 0.0f64 (-1.0f64) tt;
+            arc_seg cx cy rxo ryo 0.0f64 (-1.0f64) s sn t4;
+            CLine (pt (cx + rxi * s) (cy - ryi * s));
+            arc_seg cx cy rxi ryi s sn 0.0f64 (-1.0f64) t4n;
+            arc_seg cx cy rxi ryi 0.0f64 (-1.0f64) (-1.0f64) 0.0f64 tn;
+            arc_seg cx cy rxi ryi (-1.0f64) 0.0f64 0.0f64 1.0f64 tn;
+            arc_seg cx cy rxi ryi 0.0f64 1.0f64 1.0f64 0.0f64 tn
+          ] };
+        rect_contour (cx - 110.0f64) 215.0f64 (cx + rxo) 300.0f64;
+        poly4_contour (cx - 25.0f64) 555.0f64 (cx + 35.0f64) 555.0f64 (cx + 85.0f64) 640.0f64 (cx + 25.0f64) 640.0f64
+    ])
+
+:~ letter_egrave (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := cy = 250.0f64
+    := s = 0.70710678f64
+    := sn = -0.70710678f64
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    := t4 = 0.26521649f64
+    := t4n = -0.26521649f64
+    := rxo = 180.0f64
+    := ryo = 230.0f64
+    := rxi = 100.0f64
+    := ryi = 150.0f64
+    lower_to_quads (OCubic [
+        { start = pt (cx + rxo) cy;
+            segs = [
+            arc_seg cx cy rxo ryo 1.0f64 0.0f64 0.0f64 1.0f64 tt;
+            arc_seg cx cy rxo ryo 0.0f64 1.0f64 (-1.0f64) 0.0f64 tt;
+            arc_seg cx cy rxo ryo (-1.0f64) 0.0f64 0.0f64 (-1.0f64) tt;
+            arc_seg cx cy rxo ryo 0.0f64 (-1.0f64) s sn t4;
+            CLine (pt (cx + rxi * s) (cy - ryi * s));
+            arc_seg cx cy rxi ryi s sn 0.0f64 (-1.0f64) t4n;
+            arc_seg cx cy rxi ryi 0.0f64 (-1.0f64) (-1.0f64) 0.0f64 tn;
+            arc_seg cx cy rxi ryi (-1.0f64) 0.0f64 0.0f64 1.0f64 tn;
+            arc_seg cx cy rxi ryi 0.0f64 1.0f64 1.0f64 0.0f64 tn
+          ] };
+        rect_contour (cx - 110.0f64) 215.0f64 (cx + rxo) 300.0f64;
+        poly4_contour (cx + 25.0f64) 555.0f64 (cx - 35.0f64) 555.0f64 (cx - 85.0f64) 640.0f64 (cx - 25.0f64) 640.0f64
+    ])
+
+:~ letter_ediaeresis (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := cy = 250.0f64
+    := s = 0.70710678f64
+    := sn = -0.70710678f64
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    := t4 = 0.26521649f64
+    := t4n = -0.26521649f64
+    := rxo = 180.0f64
+    := ryo = 230.0f64
+    := rxi = 100.0f64
+    := ryi = 150.0f64
+    lower_to_quads (OCubic [
+        { start = pt (cx + rxo) cy;
+            segs = [
+            arc_seg cx cy rxo ryo 1.0f64 0.0f64 0.0f64 1.0f64 tt;
+            arc_seg cx cy rxo ryo 0.0f64 1.0f64 (-1.0f64) 0.0f64 tt;
+            arc_seg cx cy rxo ryo (-1.0f64) 0.0f64 0.0f64 (-1.0f64) tt;
+            arc_seg cx cy rxo ryo 0.0f64 (-1.0f64) s sn t4;
+            CLine (pt (cx + rxi * s) (cy - ryi * s));
+            arc_seg cx cy rxi ryi s sn 0.0f64 (-1.0f64) t4n;
+            arc_seg cx cy rxi ryi 0.0f64 (-1.0f64) (-1.0f64) 0.0f64 tn;
+            arc_seg cx cy rxi ryi (-1.0f64) 0.0f64 0.0f64 1.0f64 tn;
+            arc_seg cx cy rxi ryi 0.0f64 1.0f64 1.0f64 0.0f64 tn
+          ] };
+        rect_contour (cx - 110.0f64) 215.0f64 (cx + rxo) 300.0f64;
+        rect_contour (cx - 100.0f64) 560.0f64 (cx - 45.0f64) 625.0f64;
+        rect_contour (cx + 45.0f64) 560.0f64 (cx + 100.0f64) 625.0f64
+    ])
+
+:~ letter_alphagr (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour (cx - 20.0f64) 250.0f64 160.0f64 245.0f64 !+;
+        ellipse_contour (cx - 20.0f64) 250.0f64 88.0f64 160.0f64 !-;
+        rect_contour (cx + 100.0f64) 0.0f64 (cx + 185.0f64) 500.0f64
+    ])
+
+:~ letter_betagr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 70.0f64 (-180.0f64) 155.0f64 680.0f64;
+        ellipse_contour 265.0f64 480.0f64 140.0f64 170.0f64 !+;
+        ellipse_contour 265.0f64 480.0f64 75.0f64 95.0f64 !-;
+        ellipse_contour 285.0f64 175.0f64 160.0f64 175.0f64 !+;
+        ellipse_contour 285.0f64 175.0f64 90.0f64 100.0f64 !-
+    ])
+
+:~ letter_gammagr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 195.0f64 150.0f64 285.0f64 150.0f64 145.0f64 500.0f64 55.0f64 500.0f64;
+        poly4_contour 195.0f64 150.0f64 285.0f64 150.0f64 425.0f64 500.0f64 335.0f64 500.0f64;
+        poly4_contour 195.0f64 150.0f64 285.0f64 150.0f64 185.0f64 (-150.0f64) 95.0f64 (-150.0f64)
+    ])
+
+:~ letter_deltagr (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 185.0f64 160.0f64 185.0f64 !+;
+        ellipse_contour cx 185.0f64 88.0f64 110.0f64 !-;
+        poly4_contour (cx + 60.0f64) 340.0f64 (cx + 140.0f64) 370.0f64 (cx - 30.0f64) 520.0f64 (cx - 90.0f64) 480.0f64
+    ])
+
+:~ letter_epsilongr (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        arc_ring_c cx 250.0f64 205.0f64 256.0f64 120.0f64 171.0f64;
+        rect_contour (cx - 130.0f64) 212.0f64 (cx + 80.0f64) 288.0f64
+    ])
+
+:~ letter_thetagr (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 250.0f64 150.0f64 245.0f64 !+;
+        ellipse_contour cx 250.0f64 88.0f64 165.0f64 !-;
+        rect_contour (cx - 115.0f64) 212.0f64 (cx + 115.0f64) 288.0f64
+    ])
+
+:~ letter_iotagr (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [ rect_contour (cx - 42.0f64) 0.0f64 (cx + 42.0f64) 500.0f64 ])
+
+:~ letter_nugr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 195.0f64 0.0f64 285.0f64 0.0f64 145.0f64 500.0f64 55.0f64 500.0f64;
+        poly4_contour 195.0f64 0.0f64 285.0f64 0.0f64 425.0f64 500.0f64 335.0f64 500.0f64
+    ])
+
+:~ letter_lambdagr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 40.0f64 0.0f64 130.0f64 0.0f64 350.0f64 650.0f64 260.0f64 650.0f64;
+        poly4_contour 230.0f64 340.0f64 310.0f64 340.0f64 470.0f64 0.0f64 390.0f64 0.0f64
+    ])
+
+:~ letter_etagr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 370.0f64;
+        rect_contour 320.0f64 (-150.0f64) 410.0f64 370.0f64;
+        arch_contour 241.0f64 350.0f64 169.0f64 150.0f64 79.0f64 60.0f64
+    ])
+
+:~ letter_mugr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 (-150.0f64) 162.0f64 500.0f64;
+        rect_contour 320.0f64 130.0f64 410.0f64 500.0f64;
+        arch_down_contour 241.0f64 150.0f64 169.0f64 150.0f64 79.0f64 60.0f64
+    ])
+
+:~ letter_sigmagr (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour (cx - 30.0f64) 250.0f64 150.0f64 245.0f64 !+;
+        ellipse_contour (cx - 30.0f64) 250.0f64 85.0f64 160.0f64 !-;
+        rect_contour (cx + 30.0f64) 420.0f64 (cx + 200.0f64) 500.0f64
+    ])
+
+:~ letter_psigr (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        rect_contour (cx - 42.0f64) (-150.0f64) (cx + 42.0f64) 500.0f64;
+        arch_down_contour cx 500.0f64 200.0f64 250.0f64 140.0f64 190.0f64
+    ])
+
+:~ letter_omegagr (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour (cx - 125.0f64) 230.0f64 150.0f64 270.0f64 !+;
+        ellipse_contour (cx + 125.0f64) 230.0f64 150.0f64 270.0f64 !+;
+        ellipse_contour (cx - 125.0f64) 210.0f64 80.0f64 330.0f64 !-;
+        ellipse_contour (cx + 125.0f64) 210.0f64 80.0f64 330.0f64 !-
+    ])
+
+:~ letter_zetagr (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 90.0f64 430.0f64 400.0f64 500.0f64;
+        poly4_contour 300.0f64 430.0f64 400.0f64 430.0f64 150.0f64 60.0f64 60.0f64 60.0f64;
+        arch_down_contour 105.0f64 60.0f64 75.0f64 150.0f64 40.0f64 90.0f64
+    ])
+
+:~ letter_xigr (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := s = 0.70710678f64
+    := sn = -0.70710678f64
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    lower_to_quads (OCubic [
+        { start = pt (cx - 120.0f64 * s) (410.0f64 - 140.0f64 * s);
+            segs = [
+            arc_seg cx 410.0f64 120.0f64 140.0f64 sn sn s sn tt;
+            arc_seg cx 410.0f64 120.0f64 140.0f64 s sn s s tt;
+            arc_seg cx 410.0f64 120.0f64 140.0f64 s s sn s tt;
+            CLine (pt (cx - 58.0f64 * s) (410.0f64 + 78.0f64 * s));
+            arc_seg cx 410.0f64 58.0f64 78.0f64 sn s s s tn;
+            arc_seg cx 410.0f64 58.0f64 78.0f64 s s s sn tn;
+            arc_seg cx 410.0f64 58.0f64 78.0f64 s sn sn sn tn
+          ] };
+        { start = pt (cx - 135.0f64 * s) (220.0f64 - 150.0f64 * s);
+            segs = [
+            arc_seg cx 220.0f64 135.0f64 150.0f64 sn sn s sn tt;
+            arc_seg cx 220.0f64 135.0f64 150.0f64 s sn s s tt;
+            arc_seg cx 220.0f64 135.0f64 150.0f64 s s sn s tt;
+            CLine (pt (cx - 70.0f64 * s) (220.0f64 + 88.0f64 * s));
+            arc_seg cx 220.0f64 70.0f64 88.0f64 sn s s s tn;
+            arc_seg cx 220.0f64 70.0f64 88.0f64 s s s sn tn;
+            arc_seg cx 220.0f64 70.0f64 88.0f64 s sn sn sn tn
+          ] };
+        arch_down_contour (cx - 20.0f64) 70.0f64 80.0f64 220.0f64 40.0f64 160.0f64
+    ])
+
+:~ letter_a (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        rect_contour (cx + 90.0f64) 0.0f64 (cx + 180.0f64) 500.0f64;
+        ellipse_contour (cx - 30.0f64) 155.0f64 155.0f64 155.0f64 !+;
+        ellipse_contour (cx - 30.0f64) 155.0f64 82.0f64 82.0f64 !-;
+        arch_contour cx 300.0f64 180.0f64 190.0f64 90.0f64 130.0f64
+    ])
+
+:~ letter_aacute (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        rect_contour (cx + 90.0f64) 0.0f64 (cx + 180.0f64) 500.0f64;
+        ellipse_contour (cx - 30.0f64) 155.0f64 155.0f64 155.0f64 !+;
+        ellipse_contour (cx - 30.0f64) 155.0f64 82.0f64 82.0f64 !-;
+        arch_contour cx 300.0f64 180.0f64 190.0f64 90.0f64 130.0f64;
+        poly4_contour (cx - 25.0f64) 555.0f64 (cx + 35.0f64) 555.0f64 (cx + 85.0f64) 640.0f64 (cx + 25.0f64) 640.0f64
+    ])
+
+:~ letter_agrave (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        rect_contour (cx + 90.0f64) 0.0f64 (cx + 180.0f64) 500.0f64;
+        ellipse_contour (cx - 30.0f64) 155.0f64 155.0f64 155.0f64 !+;
+        ellipse_contour (cx - 30.0f64) 155.0f64 82.0f64 82.0f64 !-;
+        arch_contour cx 300.0f64 180.0f64 190.0f64 90.0f64 130.0f64;
+        poly4_contour (cx + 25.0f64) 555.0f64 (cx - 35.0f64) 555.0f64 (cx - 85.0f64) 640.0f64 (cx - 25.0f64) 640.0f64
+    ])
+
+:~ letter_acircumflex (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        rect_contour (cx + 90.0f64) 0.0f64 (cx + 180.0f64) 500.0f64;
+        ellipse_contour (cx - 30.0f64) 155.0f64 155.0f64 155.0f64 !+;
+        ellipse_contour (cx - 30.0f64) 155.0f64 82.0f64 82.0f64 !-;
+        arch_contour cx 300.0f64 180.0f64 190.0f64 90.0f64 130.0f64;
+        poly4_contour (cx - 20.0f64) 560.0f64 (cx + 5.0f64) 560.0f64 (cx + 35.0f64) 650.0f64 (cx + 10.0f64) 650.0f64;
+        poly4_contour (cx + 10.0f64) 650.0f64 (cx + 35.0f64) 650.0f64 (cx + 65.0f64) 560.0f64 (cx + 40.0f64) 560.0f64
+    ])
+
+:~ letter_odiaeresis (advance : f64) : outline quadratic =
     := cx = advance / 2.0f64
     := cy = 250.0f64
     lower_to_quads (OCubic [
-        ellipse_contour cx cy 200.0f64 256.0f64 !+;
+        ellipse_contour cx cy 200.0f64 266.0f64 !+;
+        ellipse_contour cx cy 118.0f64 166.0f64 !-;
+        rect_contour (cx - 100.0f64) 560.0f64 (cx - 45.0f64) 625.0f64;
+        rect_contour (cx + 45.0f64) 560.0f64 (cx + 100.0f64) 625.0f64
+    ])
+
+:~ letter_ocircumflex (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := cy = 250.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx cy 200.0f64 266.0f64 !+;
+        ellipse_contour cx cy 118.0f64 166.0f64 !-;
+        poly4_contour (cx - 50.0f64) 560.0f64 (cx - 15.0f64) 560.0f64 (cx + 10.0f64) 650.0f64 (cx - 25.0f64) 650.0f64;
+        poly4_contour (cx - 10.0f64) 650.0f64 (cx + 25.0f64) 650.0f64 (cx + 50.0f64) 560.0f64 (cx + 15.0f64) 560.0f64
+    ])
+
+:~ letter_udiaeresis (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 130.0f64 162.0f64 500.0f64;
+        rect_contour 320.0f64 130.0f64 410.0f64 500.0f64;
+        arch_down_contour 241.0f64 150.0f64 169.0f64 150.0f64 79.0f64 60.0f64;
+        rect_contour 141.0f64 560.0f64 196.0f64 625.0f64;
+        rect_contour 286.0f64 560.0f64 341.0f64 625.0f64
+    ])
+
+:~ letter_ucircumflex (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 130.0f64 162.0f64 500.0f64;
+        rect_contour 320.0f64 130.0f64 410.0f64 500.0f64;
+        arch_down_contour 241.0f64 150.0f64 169.0f64 150.0f64 79.0f64 60.0f64;
+        poly4_contour 191.0f64 560.0f64 226.0f64 560.0f64 251.0f64 650.0f64 216.0f64 650.0f64;
+        poly4_contour 231.0f64 650.0f64 266.0f64 650.0f64 291.0f64 560.0f64 256.0f64 560.0f64
+    ])
+
+:~ letter_icircumflex (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 500.0f64;
+        poly4_contour 67.0f64 560.0f64 102.0f64 560.0f64 127.0f64 650.0f64 92.0f64 650.0f64;
+        poly4_contour 107.0f64 650.0f64 142.0f64 650.0f64 167.0f64 560.0f64 132.0f64 560.0f64
+    ])
+
+:~ letter_iacute (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 500.0f64;
+        poly4_contour 87.0f64 555.0f64 137.0f64 555.0f64 162.0f64 640.0f64 112.0f64 640.0f64
+    ])
+
+:~ letter_oacute (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := cy = 250.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx cy 200.0f64 266.0f64 !+;
+        ellipse_contour cx cy 118.0f64 166.0f64 !-;
+        poly4_contour (cx - 25.0f64) 555.0f64 (cx + 35.0f64) 555.0f64 (cx + 85.0f64) 640.0f64 (cx + 25.0f64) 640.0f64
+    ])
+
+:~ letter_uacute (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 130.0f64 162.0f64 500.0f64;
+        rect_contour 320.0f64 130.0f64 410.0f64 500.0f64;
+        arch_down_contour 241.0f64 150.0f64 169.0f64 150.0f64 79.0f64 60.0f64;
+        poly4_contour 211.0f64 555.0f64 261.0f64 555.0f64 286.0f64 640.0f64 236.0f64 640.0f64
+    ])
+
+:~ letter_ntilde (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 370.0f64;
+        rect_contour 320.0f64 0.0f64 410.0f64 370.0f64;
+        arch_contour 241.0f64 350.0f64 169.0f64 150.0f64 79.0f64 60.0f64;
+        rect_contour 151.0f64 608.0f64 248.0f64 645.0f64;
+        rect_contour 234.0f64 583.0f64 331.0f64 620.0f64
+    ])
+
+:~ letter_adiaeresis (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        rect_contour (cx + 90.0f64) 0.0f64 (cx + 180.0f64) 500.0f64;
+        ellipse_contour (cx - 30.0f64) 155.0f64 155.0f64 155.0f64 !+;
+        ellipse_contour (cx - 30.0f64) 155.0f64 82.0f64 82.0f64 !-;
+        arch_contour cx 300.0f64 180.0f64 190.0f64 90.0f64 130.0f64;
+        rect_contour (cx - 100.0f64) 560.0f64 (cx - 45.0f64) 625.0f64;
+        rect_contour (cx + 45.0f64) 560.0f64 (cx + 100.0f64) 625.0f64
+    ])
+
+:~ letter_igrave (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 500.0f64;
+        poly4_contour 147.0f64 555.0f64 97.0f64 555.0f64 72.0f64 640.0f64 122.0f64 640.0f64
+    ])
+
+:~ letter_ograve (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := cy = 250.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx cy 200.0f64 266.0f64 !+;
+        ellipse_contour cx cy 118.0f64 166.0f64 !-;
+        poly4_contour (cx + 25.0f64) 555.0f64 (cx - 35.0f64) 555.0f64 (cx - 85.0f64) 640.0f64 (cx - 25.0f64) 640.0f64
+    ])
+
+:~ letter_ugrave (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 130.0f64 162.0f64 500.0f64;
+        rect_contour 320.0f64 130.0f64 410.0f64 500.0f64;
+        arch_down_contour 241.0f64 150.0f64 169.0f64 150.0f64 79.0f64 60.0f64;
+        poly4_contour 266.0f64 555.0f64 206.0f64 555.0f64 156.0f64 640.0f64 216.0f64 640.0f64
+    ])
+
+:~ letter_atilde (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        rect_contour (cx + 90.0f64) 0.0f64 (cx + 180.0f64) 500.0f64;
+        ellipse_contour (cx - 30.0f64) 155.0f64 155.0f64 155.0f64 !+;
+        ellipse_contour (cx - 30.0f64) 155.0f64 82.0f64 82.0f64 !-;
+        arch_contour cx 300.0f64 180.0f64 190.0f64 90.0f64 130.0f64;
+        rect_contour (cx - 90.0f64) 608.0f64 (cx + 7.0f64) 645.0f64;
+        rect_contour (cx - 7.0f64) 583.0f64 (cx + 90.0f64) 620.0f64
+    ])
+
+:~ letter_otilde (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := cy = 250.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx cy 200.0f64 266.0f64 !+;
+        ellipse_contour cx cy 118.0f64 166.0f64 !-;
+        rect_contour (cx - 90.0f64) 608.0f64 (cx + 7.0f64) 645.0f64;
+        rect_contour (cx - 7.0f64) 583.0f64 (cx + 90.0f64) 620.0f64
+    ])
+
+:~ letter_ccedilla (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        arc_ring_c cx 250.0f64 205.0f64 256.0f64 120.0f64 171.0f64;
+        rect_contour (cx - 15.0f64) (-90.0f64) (cx + 15.0f64) 10.0f64;
+        poly4_contour (cx - 15.0f64) (-90.0f64) (cx + 15.0f64) (-90.0f64) (cx - 25.0f64) (-150.0f64) (cx - 55.0f64) (-120.0f64)
+    ])
+
+:~ letter_cap_eacute (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 72.0f64 625.0f64 420.0f64 710.0f64;
+        rect_contour 72.0f64 320.0f64 380.0f64 405.0f64;
+        rect_contour 72.0f64 0.0f64 420.0f64 85.0f64;
+        poly4_contour 221.0f64 740.0f64 281.0f64 740.0f64 331.0f64 825.0f64 271.0f64 825.0f64
+    ])
+
+:~ letter_cap_aacute (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 40.0f64 0.0f64 130.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        poly4_contour 380.0f64 0.0f64 470.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        rect_contour 140.0f64 280.0f64 370.0f64 360.0f64;
+        poly4_contour 230.0f64 740.0f64 290.0f64 740.0f64 340.0f64 825.0f64 280.0f64 825.0f64
+    ])
+
+:~ letter_cap_agrave (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 40.0f64 0.0f64 130.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        poly4_contour 380.0f64 0.0f64 470.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        rect_contour 140.0f64 280.0f64 370.0f64 360.0f64;
+        poly4_contour 280.0f64 740.0f64 220.0f64 740.0f64 170.0f64 825.0f64 230.0f64 825.0f64
+    ])
+
+:~ letter_cap_adiaeresis (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 40.0f64 0.0f64 130.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        poly4_contour 380.0f64 0.0f64 470.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        rect_contour 140.0f64 280.0f64 370.0f64 360.0f64;
+        rect_contour 180.0f64 745.0f64 235.0f64 805.0f64;
+        rect_contour 275.0f64 745.0f64 330.0f64 805.0f64
+    ])
+
+:~ letter_cap_odiaeresis (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 355.0f64 230.0f64 355.0f64 !+;
+        ellipse_contour cx 355.0f64 140.0f64 255.0f64 !-;
+        rect_contour (cx - 75.0f64) 745.0f64 (cx - 20.0f64) 805.0f64;
+        rect_contour (cx + 20.0f64) 745.0f64 (cx + 75.0f64) 805.0f64
+    ])
+
+:~ letter_cap_udiaeresis (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 180.0f64 162.0f64 710.0f64;
+        rect_contour 430.0f64 180.0f64 520.0f64 710.0f64;
+        arch_down_contour 296.0f64 200.0f64 224.0f64 200.0f64 134.0f64 110.0f64;
+        rect_contour 221.0f64 745.0f64 276.0f64 805.0f64;
+        rect_contour 316.0f64 745.0f64 371.0f64 805.0f64
+    ])
+
+:~ letter_cap_ntilde (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 400.0f64 0.0f64 490.0f64 710.0f64;
+        poly4_contour 72.0f64 710.0f64 202.0f64 710.0f64 490.0f64 0.0f64 360.0f64 0.0f64;
+        rect_contour 191.0f64 770.0f64 288.0f64 805.0f64;
+        rect_contour 274.0f64 745.0f64 371.0f64 782.0f64
+    ])
+
+:~ letter_cap_ccedilla (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        arc_ring_c cx 355.0f64 235.0f64 294.0f64 145.0f64 194.0f64;
+        rect_contour (cx - 15.0f64) (-90.0f64) (cx + 15.0f64) 10.0f64;
+        poly4_contour (cx - 15.0f64) (-90.0f64) (cx + 15.0f64) (-90.0f64) (cx - 25.0f64) (-150.0f64) (cx - 55.0f64) (-120.0f64)
+    ])
+
+:~ letter_cap_acircumflex (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 40.0f64 0.0f64 130.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        poly4_contour 380.0f64 0.0f64 470.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        rect_contour 140.0f64 280.0f64 370.0f64 360.0f64;
+        poly4_contour 205.0f64 740.0f64 240.0f64 740.0f64 265.0f64 825.0f64 230.0f64 825.0f64;
+        poly4_contour 245.0f64 825.0f64 280.0f64 825.0f64 305.0f64 740.0f64 270.0f64 740.0f64
+    ])
+
+:~ letter_cap_ecircumflex (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 72.0f64 625.0f64 420.0f64 710.0f64;
+        rect_contour 72.0f64 320.0f64 380.0f64 405.0f64;
+        rect_contour 72.0f64 0.0f64 420.0f64 85.0f64;
+        poly4_contour 196.0f64 740.0f64 231.0f64 740.0f64 256.0f64 825.0f64 221.0f64 825.0f64;
+        poly4_contour 236.0f64 825.0f64 271.0f64 825.0f64 296.0f64 740.0f64 261.0f64 740.0f64
+    ])
+
+:~ letter_cap_icircumflex (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 95.0f64 0.0f64 185.0f64 710.0f64;
+        poly4_contour 90.0f64 740.0f64 125.0f64 740.0f64 150.0f64 825.0f64 115.0f64 825.0f64;
+        poly4_contour 130.0f64 825.0f64 165.0f64 825.0f64 190.0f64 740.0f64 155.0f64 740.0f64
+    ])
+
+:~ letter_cap_ocircumflex (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 355.0f64 230.0f64 355.0f64 !+;
+        ellipse_contour cx 355.0f64 140.0f64 255.0f64 !-;
+        poly4_contour (cx - 50.0f64) 740.0f64 (cx - 15.0f64) 740.0f64 (cx + 10.0f64) 825.0f64 (cx - 25.0f64) 825.0f64;
+        poly4_contour (cx - 10.0f64) 825.0f64 (cx + 25.0f64) 825.0f64 (cx + 50.0f64) 740.0f64 (cx + 15.0f64) 740.0f64
+    ])
+
+:~ letter_cap_ucircumflex (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 180.0f64 162.0f64 710.0f64;
+        rect_contour 430.0f64 180.0f64 520.0f64 710.0f64;
+        arch_down_contour 296.0f64 200.0f64 224.0f64 200.0f64 134.0f64 110.0f64;
+        poly4_contour 246.0f64 740.0f64 281.0f64 740.0f64 306.0f64 825.0f64 271.0f64 825.0f64;
+        poly4_contour 286.0f64 825.0f64 321.0f64 825.0f64 346.0f64 740.0f64 311.0f64 740.0f64
+    ])
+
+:~ letter_cap_iacute (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 95.0f64 0.0f64 185.0f64 710.0f64;
+        poly4_contour 110.0f64 740.0f64 160.0f64 740.0f64 185.0f64 825.0f64 135.0f64 825.0f64
+    ])
+
+:~ letter_cap_igrave (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 95.0f64 0.0f64 185.0f64 710.0f64;
+        poly4_contour 170.0f64 740.0f64 120.0f64 740.0f64 95.0f64 825.0f64 145.0f64 825.0f64
+    ])
+
+:~ letter_cap_oacute (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 355.0f64 230.0f64 355.0f64 !+;
+        ellipse_contour cx 355.0f64 140.0f64 255.0f64 !-;
+        poly4_contour (cx - 30.0f64) 740.0f64 (cx + 20.0f64) 740.0f64 (cx + 45.0f64) 825.0f64 (cx - 5.0f64) 825.0f64
+    ])
+
+:~ letter_cap_ograve (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 355.0f64 230.0f64 355.0f64 !+;
+        ellipse_contour cx 355.0f64 140.0f64 255.0f64 !-;
+        poly4_contour (cx + 30.0f64) 740.0f64 (cx - 20.0f64) 740.0f64 (cx - 45.0f64) 825.0f64 (cx + 5.0f64) 825.0f64
+    ])
+
+:~ letter_cap_otilde (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 355.0f64 230.0f64 355.0f64 !+;
+        ellipse_contour cx 355.0f64 140.0f64 255.0f64 !-;
+        rect_contour (cx - 90.0f64) 770.0f64 (cx + 7.0f64) 805.0f64;
+        rect_contour (cx - 7.0f64) 745.0f64 (cx + 90.0f64) 782.0f64
+    ])
+
+:~ letter_cap_uacute (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 180.0f64 162.0f64 710.0f64;
+        rect_contour 430.0f64 180.0f64 520.0f64 710.0f64;
+        arch_down_contour 296.0f64 200.0f64 224.0f64 200.0f64 134.0f64 110.0f64;
+        poly4_contour 266.0f64 740.0f64 316.0f64 740.0f64 341.0f64 825.0f64 291.0f64 825.0f64
+    ])
+
+:~ letter_cap_ugrave (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 180.0f64 162.0f64 710.0f64;
+        rect_contour 430.0f64 180.0f64 520.0f64 710.0f64;
+        arch_down_contour 296.0f64 200.0f64 224.0f64 200.0f64 134.0f64 110.0f64;
+        poly4_contour 326.0f64 740.0f64 276.0f64 740.0f64 251.0f64 825.0f64 301.0f64 825.0f64
+    ])
+
+:~ letter_cap_egrave (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        rect_contour 72.0f64 625.0f64 420.0f64 710.0f64;
+        rect_contour 72.0f64 320.0f64 380.0f64 405.0f64;
+        rect_contour 72.0f64 0.0f64 420.0f64 85.0f64;
+        poly4_contour 276.0f64 740.0f64 226.0f64 740.0f64 201.0f64 825.0f64 251.0f64 825.0f64
+    ])
+
+:~ letter_cap_atilde (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        poly4_contour 40.0f64 0.0f64 130.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        poly4_contour 380.0f64 0.0f64 470.0f64 0.0f64 300.0f64 710.0f64 210.0f64 710.0f64;
+        rect_contour 140.0f64 280.0f64 370.0f64 360.0f64;
+        rect_contour 165.0f64 770.0f64 262.0f64 805.0f64;
+        rect_contour 248.0f64 745.0f64 345.0f64 782.0f64
+    ])
+
+:| dual_j = DualJ
+
+:| right_j = RightJ
+
+:== arabic_forms4 = { isol : outline quadratic; init : outline quadratic; medi : outline quadratic; fina : outline quadratic }
+
+:== arabic_forms2 = { isol : outline quadratic; fina : outline quadratic }
+
+:| arabic j =
+    | Dual :: arabic_forms4 -> arabic dual_j
+    | Right :: arabic_forms2 -> arabic right_j
+
+:= ar_isolated \* j. (a : arabic j) : outline quadratic =
+    ?= a ?|
+    | Dual f => f::isol
+    | Right f => f::isol
+
+:= ar_final \* j. (a : arabic j) : outline quadratic =
+    ?= a ?|
+    | Dual f => f::fina
+    | Right f => f::fina
+
+:= ar_initial (a : arabic dual_j) : outline quadratic =
+    ?= a ?|
+    | Dual f => f::init
+
+:= ar_medial (a : arabic dual_j) : outline quadratic =
+    ?= a ?|
+    | Dual f => f::medi
+
+:~ ar_lconn () : contour_c = rect_contour 0.0f64 0.0f64 70.0f64 55.0f64
+
+:~ ar_rconn () : contour_c = rect_contour 410.0f64 0.0f64 480.0f64 55.0f64
+
+:~ beh_ar () : arabic dual_j =
+    := base = [
+        arch_down_contour 240.0f64 110.0f64 250.0f64 100.0f64 205.0f64 45.0f64;
+        rect_contour 208.0f64 (-150.0f64) 272.0f64 (-80.0f64)
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ teh_ar () : arabic dual_j =
+    := base = [
+        arch_down_contour 240.0f64 110.0f64 250.0f64 100.0f64 205.0f64 45.0f64;
+        rect_contour 145.0f64 215.0f64 205.0f64 275.0f64;
+        rect_contour 275.0f64 215.0f64 335.0f64 275.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ alef_ar () : arabic right_j =
+    := base = [ rect_contour 112.0f64 0.0f64 168.0f64 600.0f64 ]
+    Right {
+        isol = lower_to_quads (OCubic base);
+        fina = lower_to_quads (OCubic (cc_append base [ rect_contour 168.0f64 0.0f64 280.0f64 55.0f64 ]))
+    }
+
+:~ theh_ar () : arabic dual_j =
+    := base = [
+        arch_down_contour 240.0f64 110.0f64 250.0f64 100.0f64 205.0f64 45.0f64;
+        rect_contour 145.0f64 215.0f64 205.0f64 275.0f64;
+        rect_contour 275.0f64 215.0f64 335.0f64 275.0f64;
+        rect_contour 210.0f64 285.0f64 270.0f64 345.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ noon_ar () : arabic dual_j =
+    := base = [
+        arch_down_contour 240.0f64 110.0f64 250.0f64 100.0f64 205.0f64 45.0f64;
+        rect_contour 210.0f64 215.0f64 270.0f64 275.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ yeh_ar () : arabic dual_j =
+    := base = [
+        arch_down_contour 240.0f64 110.0f64 250.0f64 100.0f64 205.0f64 45.0f64;
+        rect_contour 145.0f64 (-150.0f64) 205.0f64 (-90.0f64);
+        rect_contour 275.0f64 (-150.0f64) 335.0f64 (-90.0f64)
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ alefmaksura_ar () : arabic right_j =
+    := base = [
+        arch_down_contour 240.0f64 110.0f64 250.0f64 100.0f64 205.0f64 45.0f64
+      ]
+    Right {
+        isol = lower_to_quads (OCubic base);
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ dal_ar () : arabic right_j =
+    := base = [
+        rect_contour 150.0f64 300.0f64 410.0f64 355.0f64;
+        rect_contour 150.0f64 0.0f64 205.0f64 355.0f64
+      ]
+    Right {
+        isol = lower_to_quads (OCubic base);
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ thal_ar () : arabic right_j =
+    := base = [
+        rect_contour 150.0f64 300.0f64 410.0f64 355.0f64;
+        rect_contour 150.0f64 0.0f64 205.0f64 355.0f64;
+        rect_contour 250.0f64 420.0f64 310.0f64 480.0f64
+      ]
+    Right {
+        isol = lower_to_quads (OCubic base);
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ reh_ar () : arabic right_j =
+    := base = [
+        rect_contour 200.0f64 (-180.0f64) 255.0f64 300.0f64;
+        rect_contour 200.0f64 245.0f64 400.0f64 300.0f64
+      ]
+    Right {
+        isol = lower_to_quads (OCubic base);
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ zain_ar () : arabic right_j =
+    := base = [
+        rect_contour 200.0f64 (-180.0f64) 255.0f64 300.0f64;
+        rect_contour 200.0f64 245.0f64 400.0f64 300.0f64;
+        rect_contour 270.0f64 360.0f64 330.0f64 420.0f64
+      ]
+    Right {
+        isol = lower_to_quads (OCubic base);
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ lam_ar () : arabic dual_j =
+    := base = [
+        rect_contour 180.0f64 0.0f64 235.0f64 600.0f64;
+        rect_contour 180.0f64 0.0f64 300.0f64 55.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ meem_ar () : arabic dual_j =
+    := base = [
+        rect_contour 180.0f64 0.0f64 300.0f64 130.0f64;
+        rect_contour 235.0f64 (-180.0f64) 290.0f64 10.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ hah_ar () : arabic dual_j =
+    := base = [
+        rect_contour 150.0f64 245.0f64 410.0f64 300.0f64;
+        rect_contour 355.0f64 (-170.0f64) 410.0f64 300.0f64;
+        rect_contour 150.0f64 (-170.0f64) 410.0f64 (-115.0f64)
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ jeem_ar () : arabic dual_j =
+    := base = [
+        rect_contour 150.0f64 245.0f64 410.0f64 300.0f64;
+        rect_contour 355.0f64 (-170.0f64) 410.0f64 300.0f64;
+        rect_contour 150.0f64 (-170.0f64) 410.0f64 (-115.0f64);
+        rect_contour 250.0f64 (-70.0f64) 310.0f64 (-10.0f64)
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ khah_ar () : arabic dual_j =
+    := base = [
+        rect_contour 150.0f64 245.0f64 410.0f64 300.0f64;
+        rect_contour 355.0f64 (-170.0f64) 410.0f64 300.0f64;
+        rect_contour 150.0f64 (-170.0f64) 410.0f64 (-115.0f64);
+        rect_contour 250.0f64 360.0f64 310.0f64 420.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ seen_ar () : arabic dual_j =
+    := base = [
+        rect_contour 120.0f64 0.0f64 400.0f64 55.0f64;
+        rect_contour 140.0f64 55.0f64 175.0f64 180.0f64;
+        rect_contour 250.0f64 55.0f64 285.0f64 180.0f64;
+        rect_contour 360.0f64 55.0f64 395.0f64 180.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ sheen_ar () : arabic dual_j =
+    := base = [
+        rect_contour 120.0f64 0.0f64 400.0f64 55.0f64;
+        rect_contour 140.0f64 55.0f64 175.0f64 180.0f64;
+        rect_contour 250.0f64 55.0f64 285.0f64 180.0f64;
+        rect_contour 360.0f64 55.0f64 395.0f64 180.0f64;
+        rect_contour 200.0f64 260.0f64 250.0f64 310.0f64;
+        rect_contour 280.0f64 260.0f64 330.0f64 310.0f64;
+        rect_contour 240.0f64 330.0f64 290.0f64 380.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ sad_ar () : arabic dual_j =
+    := base = [
+        rect_contour 120.0f64 0.0f64 175.0f64 200.0f64;
+        rect_contour 120.0f64 200.0f64 320.0f64 255.0f64;
+        rect_contour 265.0f64 0.0f64 320.0f64 255.0f64;
+        rect_contour 120.0f64 0.0f64 410.0f64 55.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ dad_ar () : arabic dual_j =
+    := base = [
+        rect_contour 120.0f64 0.0f64 175.0f64 200.0f64;
+        rect_contour 120.0f64 200.0f64 320.0f64 255.0f64;
+        rect_contour 265.0f64 0.0f64 320.0f64 255.0f64;
+        rect_contour 120.0f64 0.0f64 410.0f64 55.0f64;
+        rect_contour 180.0f64 300.0f64 240.0f64 360.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ tah_ar () : arabic dual_j =
+    := base = [
+        rect_contour 150.0f64 0.0f64 205.0f64 220.0f64;
+        rect_contour 150.0f64 165.0f64 330.0f64 220.0f64;
+        rect_contour 275.0f64 0.0f64 330.0f64 220.0f64;
+        rect_contour 150.0f64 0.0f64 410.0f64 55.0f64;
+        rect_contour 230.0f64 0.0f64 285.0f64 600.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ zah_ar () : arabic dual_j =
+    := base = [
+        rect_contour 150.0f64 0.0f64 205.0f64 220.0f64;
+        rect_contour 150.0f64 165.0f64 330.0f64 220.0f64;
+        rect_contour 275.0f64 0.0f64 330.0f64 220.0f64;
+        rect_contour 150.0f64 0.0f64 410.0f64 55.0f64;
+        rect_contour 230.0f64 0.0f64 285.0f64 600.0f64;
+        rect_contour 360.0f64 300.0f64 420.0f64 360.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ ain_ar () : arabic dual_j =
+    := base = [
+        rect_contour 180.0f64 200.0f64 240.0f64 360.0f64;
+        rect_contour 180.0f64 305.0f64 360.0f64 360.0f64;
+        rect_contour 180.0f64 55.0f64 360.0f64 110.0f64;
+        rect_contour 120.0f64 0.0f64 410.0f64 55.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ ghain_ar () : arabic dual_j =
+    := base = [
+        rect_contour 180.0f64 200.0f64 240.0f64 360.0f64;
+        rect_contour 180.0f64 305.0f64 360.0f64 360.0f64;
+        rect_contour 180.0f64 55.0f64 360.0f64 110.0f64;
+        rect_contour 120.0f64 0.0f64 410.0f64 55.0f64;
+        rect_contour 250.0f64 400.0f64 310.0f64 460.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ feh_ar () : arabic dual_j =
+    := base = [
+        rect_contour 180.0f64 150.0f64 235.0f64 340.0f64;
+        rect_contour 180.0f64 285.0f64 360.0f64 340.0f64;
+        rect_contour 305.0f64 150.0f64 360.0f64 340.0f64;
+        rect_contour 180.0f64 150.0f64 360.0f64 205.0f64;
+        rect_contour 120.0f64 95.0f64 360.0f64 150.0f64;
+        rect_contour 250.0f64 380.0f64 310.0f64 440.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ qaf_ar () : arabic dual_j =
+    := base = [
+        rect_contour 180.0f64 150.0f64 235.0f64 340.0f64;
+        rect_contour 180.0f64 285.0f64 360.0f64 340.0f64;
+        rect_contour 305.0f64 150.0f64 360.0f64 340.0f64;
+        rect_contour 180.0f64 150.0f64 360.0f64 205.0f64;
+        rect_contour 120.0f64 95.0f64 360.0f64 150.0f64;
+        rect_contour 210.0f64 380.0f64 265.0f64 435.0f64;
+        rect_contour 290.0f64 380.0f64 345.0f64 435.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ kaf_ar () : arabic dual_j =
+    := base = [
+        rect_contour 180.0f64 0.0f64 235.0f64 600.0f64;
+        rect_contour 180.0f64 0.0f64 400.0f64 55.0f64;
+        rect_contour 235.0f64 300.0f64 400.0f64 355.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ heh_ar () : arabic dual_j =
+    := base = [
+        rect_contour 180.0f64 55.0f64 235.0f64 400.0f64;
+        rect_contour 180.0f64 345.0f64 350.0f64 400.0f64;
+        rect_contour 295.0f64 55.0f64 350.0f64 400.0f64;
+        rect_contour 180.0f64 55.0f64 350.0f64 110.0f64
+      ]
+    Dual {
+        isol = lower_to_quads (OCubic base);
+        init = lower_to_quads (OCubic (cc_append base [ ar_lconn () ]));
+        medi = lower_to_quads (OCubic (cc_append base [ ar_lconn (); ar_rconn () ]));
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ waw_ar () : arabic right_j =
+    := base = [
+        rect_contour 180.0f64 200.0f64 235.0f64 400.0f64;
+        rect_contour 180.0f64 345.0f64 350.0f64 400.0f64;
+        rect_contour 295.0f64 200.0f64 350.0f64 400.0f64;
+        rect_contour 180.0f64 200.0f64 350.0f64 255.0f64;
+        rect_contour 230.0f64 (-180.0f64) 285.0f64 255.0f64
+      ]
+    Right {
+        isol = lower_to_quads (OCubic base);
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ teh_marbuta_ar () : arabic right_j =
+    := base = [
+        rect_contour 180.0f64 55.0f64 235.0f64 380.0f64;
+        rect_contour 180.0f64 325.0f64 350.0f64 380.0f64;
+        rect_contour 295.0f64 55.0f64 350.0f64 380.0f64;
+        rect_contour 180.0f64 55.0f64 350.0f64 110.0f64;
+        rect_contour 210.0f64 420.0f64 250.0f64 460.0f64;
+        rect_contour 280.0f64 420.0f64 320.0f64 460.0f64
+      ]
+    Right {
+        isol = lower_to_quads (OCubic base);
+        fina = lower_to_quads (OCubic (cc_append base [ ar_rconn () ]))
+    }
+
+:~ alef_madda_ar () : arabic right_j =
+    := base = [
+        rect_contour 112.0f64 0.0f64 168.0f64 600.0f64;
+        rect_contour 70.0f64 650.0f64 210.0f64 700.0f64
+      ]
+    Right {
+        isol = lower_to_quads (OCubic base);
+        fina = lower_to_quads (OCubic (cc_append base [ rect_contour 168.0f64 0.0f64 280.0f64 55.0f64 ]))
+    }
+
+:~ alef_hamza_above_ar () : arabic right_j =
+    := base = [
+        rect_contour 112.0f64 0.0f64 168.0f64 600.0f64;
+        rect_contour 120.0f64 640.0f64 185.0f64 700.0f64
+      ]
+    Right {
+        isol = lower_to_quads (OCubic base);
+        fina = lower_to_quads (OCubic (cc_append base [ rect_contour 168.0f64 0.0f64 280.0f64 55.0f64 ]))
+    }
+
+:~ alef_hamza_below_ar () : arabic right_j =
+    := base = [
+        rect_contour 112.0f64 0.0f64 168.0f64 600.0f64;
+        rect_contour 120.0f64 (-100.0f64) 185.0f64 (-40.0f64)
+      ]
+    Right {
+        isol = lower_to_quads (OCubic base);
+        fina = lower_to_quads (OCubic (cc_append base [ rect_contour 168.0f64 0.0f64 280.0f64 55.0f64 ]))
+    }
+
+///> rust
+:# arabic_joining_forms_are_typed =
+    := b = beh_ar ()
+    := a = alef_ar ()
+    (quad_seg_count (ar_medial b) > quad_seg_count (ar_isolated b), quad_seg_count (ar_final b) > quad_seg_count (ar_isolated b), quad_seg_count (ar_isolated a) > 0u32, quad_seg_count (ar_final a) > quad_seg_count (ar_isolated a))
+    |> _assert_eq (true, true, true, true)
+
+:| cons_c = ConsC
+
+:| indvow_c = IndVowC
+
+:| matra_c = MatraC
+
+:| matra_pos = MPre | MPost | MAbove | MBelow
+
+:| deva c =
+    | DevaCons :: outline quadratic -> deva cons_c
+    | DevaVow :: outline quadratic -> deva indvow_c
+    | DevaMatra :: { glyph : outline quadratic; pos : matra_pos } -> deva matra_c
+
+:= deva_glyph \* c. (d : deva c) : outline quadratic =
+    ?= d ?|
+    | DevaCons o => o
+    | DevaVow o => o
+    | DevaMatra m => m::glyph
+
+:= deva_base (d : deva cons_c) : outline quadratic =
+    ?= d ?|
+    | DevaCons o => o
+
+:= matra_position (m : deva matra_c) : matra_pos =
+    ?= m ?|
+    | DevaMatra r => r::pos
+
+:~ ka_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 300.0f64 475.0f64 355.0f64;
+        rect_contour 175.0f64 355.0f64 230.0f64 600.0f64;
+        arch_down_contour 150.0f64 120.0f64 130.0f64 110.0f64 80.0f64 55.0f64
+    ]))
+
+:~ ma_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 180.0f64 230.0f64 600.0f64;
+        arch_down_contour 300.0f64 180.0f64 150.0f64 130.0f64 100.0f64 75.0f64
+    ]))
+
+:~ a_deva () : deva indvow_c =
+    DevaVow (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 590.0f64 655.0f64;
+        rect_contour 535.0f64 0.0f64 590.0f64 655.0f64;
+        rect_contour 280.0f64 300.0f64 535.0f64 355.0f64;
+        arch_down_contour 200.0f64 430.0f64 150.0f64 120.0f64 100.0f64 65.0f64;
+        arch_down_contour 200.0f64 120.0f64 150.0f64 120.0f64 100.0f64 65.0f64
+    ]))
+
+:~ matra_aa () : deva matra_c =
+    DevaMatra {
+        glyph = lower_to_quads (OCubic [ rect_contour 30.0f64 0.0f64 85.0f64 655.0f64 ]);
+        pos = MPost
+    }
+
+:~ matra_i () : deva matra_c =
+    DevaMatra {
+        glyph = lower_to_quads (OCubic [
+            rect_contour 30.0f64 0.0f64 85.0f64 655.0f64;
+            rect_contour 30.0f64 600.0f64 300.0f64 655.0f64
+        ]);
+        pos = MPre
+    }
+
+:~ matra_ii () : deva matra_c =
+    DevaMatra {
+        glyph = lower_to_quads (OCubic [
+            rect_contour 245.0f64 0.0f64 300.0f64 655.0f64;
+            rect_contour 30.0f64 600.0f64 300.0f64 655.0f64
+        ]);
+        pos = MPost
+    }
+
+:~ anusvara_deva () : deva matra_c =
+    DevaMatra {
+        glyph = lower_to_quads (OCubic [ ellipse_contour 0.0f64 760.0f64 48.0f64 48.0f64 !+ ]);
+        pos = MAbove
+    }
+
+:~ chandrabindu_deva () : deva matra_c =
+    DevaMatra {
+        glyph = lower_to_quads (OCubic [
+            rect_contour (-120.0f64) 690.0f64 120.0f64 718.0f64;
+            rect_contour (-120.0f64) 690.0f64 (-92.0f64) 760.0f64;
+            rect_contour 92.0f64 690.0f64 120.0f64 760.0f64;
+            ellipse_contour 0.0f64 815.0f64 25.0f64 25.0f64 !+
+        ]);
+        pos = MAbove
+    }
+
+:~ rmatra_deva () : deva matra_c =
+    DevaMatra {
+        glyph = lower_to_quads (OCubic [
+            ellipse_contour 0.0f64 (-95.0f64) 72.0f64 62.0f64 !+;
+            ellipse_contour 22.0f64 (-82.0f64) 44.0f64 44.0f64 !-
+        ]);
+        pos = MBelow
+    }
+
+:~ na_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 220.0f64 230.0f64 600.0f64;
+        arch_down_contour 290.0f64 120.0f64 170.0f64 120.0f64 115.0f64 60.0f64
+    ]))
+
+:~ ta_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        rect_contour 240.0f64 120.0f64 295.0f64 600.0f64;
+        arch_down_contour 160.0f64 300.0f64 120.0f64 110.0f64 70.0f64 55.0f64
+    ]))
+
+:~ ra_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 450.0f64 655.0f64;
+        rect_contour 230.0f64 0.0f64 290.0f64 600.0f64;
+        rect_contour 90.0f64 330.0f64 230.0f64 385.0f64
+    ]))
+
+:~ la_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 200.0f64 230.0f64 600.0f64;
+        arch_down_contour 280.0f64 110.0f64 160.0f64 130.0f64 105.0f64 70.0f64;
+        rect_contour 90.0f64 430.0f64 175.0f64 485.0f64
+    ]))
+
+:~ lla_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 60.0f64 600.0f64 630.0f64 655.0f64;
+        ellipse_contour 220.0f64 300.0f64 160.0f64 300.0f64 !+;
+        ellipse_contour 220.0f64 300.0f64 100.0f64 240.0f64 !-;
+        ellipse_contour 470.0f64 300.0f64 160.0f64 300.0f64 !+;
+        ellipse_contour 470.0f64 300.0f64 100.0f64 240.0f64 !-
+    ]))
+
+:~ sa_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 120.0f64 230.0f64 600.0f64;
+        arch_down_contour 320.0f64 360.0f64 140.0f64 120.0f64 90.0f64 60.0f64;
+        rect_contour 175.0f64 120.0f64 360.0f64 175.0f64
+    ]))
+
+:~ pa_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 0.0f64 230.0f64 600.0f64;
+        rect_contour 175.0f64 0.0f64 475.0f64 55.0f64
+    ]))
+
+:~ va_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        ellipse_contour 260.0f64 210.0f64 150.0f64 190.0f64 !+;
+        ellipse_contour 260.0f64 210.0f64 85.0f64 110.0f64 !-
+    ]))
+
+:~ da_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        rect_contour 130.0f64 420.0f64 475.0f64 475.0f64;
+        arch_down_contour 300.0f64 120.0f64 180.0f64 180.0f64 125.0f64 120.0f64
+    ]))
+
+:~ ya_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        arch_down_contour 180.0f64 180.0f64 140.0f64 150.0f64 95.0f64 95.0f64;
+        rect_contour 320.0f64 120.0f64 375.0f64 600.0f64
+    ]))
+
+:~ ha_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 250.0f64 230.0f64 600.0f64;
+        arch_down_contour 300.0f64 120.0f64 180.0f64 150.0f64 125.0f64 90.0f64;
+        rect_contour 230.0f64 250.0f64 360.0f64 305.0f64
+    ]))
+
+:~ aa_deva () : deva indvow_c =
+    DevaVow (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 650.0f64 655.0f64;
+        rect_contour 535.0f64 0.0f64 590.0f64 655.0f64;
+        rect_contour 280.0f64 300.0f64 535.0f64 355.0f64;
+        arch_down_contour 200.0f64 430.0f64 150.0f64 120.0f64 100.0f64 65.0f64;
+        arch_down_contour 200.0f64 120.0f64 150.0f64 120.0f64 100.0f64 65.0f64;
+        rect_contour 620.0f64 0.0f64 650.0f64 655.0f64
+    ]))
+
+:~ i_deva () : deva indvow_c =
+    DevaVow (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        arch_down_contour 250.0f64 250.0f64 200.0f64 180.0f64 150.0f64 130.0f64;
+        rect_contour 430.0f64 100.0f64 485.0f64 600.0f64
+    ]))
+
+:~ u_deva () : deva indvow_c =
+    DevaVow (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 300.0f64 230.0f64 600.0f64;
+        arch_down_contour 300.0f64 150.0f64 200.0f64 180.0f64 145.0f64 125.0f64
+    ]))
+
+:~ matra_e () : deva matra_c =
+    DevaMatra {
+        glyph = lower_to_quads (OCubic [ rect_contour 60.0f64 700.0f64 220.0f64 760.0f64 ]);
+        pos = MAbove
+    }
+
+:~ matra_o () : deva matra_c =
+    DevaMatra {
+        glyph = lower_to_quads (OCubic [
+            rect_contour 30.0f64 0.0f64 85.0f64 655.0f64;
+            rect_contour 60.0f64 700.0f64 220.0f64 760.0f64
+        ]);
+        pos = MPost
+    }
+
+:~ ga_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 180.0f64 230.0f64 600.0f64;
+        arch_down_contour 320.0f64 150.0f64 200.0f64 170.0f64 145.0f64 115.0f64;
+        rect_contour 440.0f64 150.0f64 495.0f64 400.0f64
+    ]))
+
+:~ ja_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        arch_down_contour 180.0f64 350.0f64 150.0f64 150.0f64 100.0f64 100.0f64;
+        rect_contour 230.0f64 150.0f64 420.0f64 205.0f64
+    ]))
+
+:~ ba_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 120.0f64 230.0f64 600.0f64;
+        arch_down_contour 320.0f64 120.0f64 150.0f64 130.0f64 95.0f64 75.0f64;
+        rect_contour 230.0f64 330.0f64 400.0f64 385.0f64
+    ]))
+
+:~ cha_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        arch_down_contour 250.0f64 200.0f64 200.0f64 200.0f64 150.0f64 150.0f64
+    ]))
+
+:~ kha_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        arch_down_contour 200.0f64 300.0f64 170.0f64 170.0f64 120.0f64 120.0f64;
+        rect_contour 175.0f64 0.0f64 230.0f64 300.0f64
+    ]))
+
+:~ gha_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        ellipse_contour 250.0f64 280.0f64 180.0f64 220.0f64 !+;
+        ellipse_contour 250.0f64 280.0f64 110.0f64 140.0f64 !-
+    ]))
+
+:~ tha_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        ellipse_contour 250.0f64 250.0f64 160.0f64 200.0f64 !+;
+        ellipse_contour 250.0f64 250.0f64 95.0f64 120.0f64 !-;
+        rect_contour 90.0f64 420.0f64 410.0f64 475.0f64
+    ]))
+
+:~ dha_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 120.0f64 230.0f64 600.0f64;
+        arch_down_contour 320.0f64 120.0f64 150.0f64 130.0f64 95.0f64 75.0f64;
+        rect_contour 230.0f64 420.0f64 400.0f64 475.0f64
+    ]))
+
+:~ pha_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 180.0f64 230.0f64 600.0f64;
+        rect_contour 175.0f64 180.0f64 400.0f64 235.0f64;
+        arch_down_contour 320.0f64 350.0f64 110.0f64 110.0f64 70.0f64 70.0f64
+    ]))
+
+:~ bha_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 120.0f64 230.0f64 600.0f64;
+        rect_contour 230.0f64 300.0f64 420.0f64 355.0f64;
+        arch_down_contour 300.0f64 120.0f64 130.0f64 110.0f64 80.0f64 70.0f64
+    ]))
+
+:~ matra_u () : deva matra_c =
+    DevaMatra {
+        glyph = lower_to_quads (OCubic [ arch_down_contour 150.0f64 (-120.0f64) 90.0f64 90.0f64 50.0f64 50.0f64 ]);
+        pos = MBelow
+    }
+
+:~ matra_uu () : deva matra_c =
+    DevaMatra {
+        glyph = lower_to_quads (OCubic [ arch_down_contour 150.0f64 (-210.0f64) 95.0f64 115.0f64 55.0f64 65.0f64 ]);
+        pos = MBelow
+    }
+
+:~ matra_ai () : deva matra_c =
+    DevaMatra {
+        glyph = lower_to_quads (OCubic [
+            rect_contour 60.0f64 700.0f64 130.0f64 770.0f64;
+            rect_contour 170.0f64 700.0f64 240.0f64 770.0f64
+        ]);
+        pos = MAbove
+    }
+
+:~ matra_au () : deva matra_c =
+    DevaMatra {
+        glyph = lower_to_quads (OCubic [
+            rect_contour 30.0f64 0.0f64 85.0f64 655.0f64;
+            rect_contour 60.0f64 700.0f64 130.0f64 770.0f64;
+            rect_contour 170.0f64 700.0f64 240.0f64 770.0f64
+        ]);
+        pos = MPost
+    }
+
+:~ tta_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        arch_down_contour 230.0f64 180.0f64 190.0f64 200.0f64 140.0f64 150.0f64
+    ]))
+
+:~ ttha_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        ellipse_contour 265.0f64 280.0f64 175.0f64 215.0f64 !+;
+        ellipse_contour 265.0f64 280.0f64 105.0f64 135.0f64 !-
+    ]))
+
+:~ dda_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 230.0f64 200.0f64 285.0f64 600.0f64;
+        arch_down_contour 320.0f64 200.0f64 180.0f64 160.0f64 125.0f64 105.0f64
+    ]))
+
+:~ ddha_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 230.0f64 200.0f64 285.0f64 600.0f64;
+        arch_down_contour 320.0f64 200.0f64 180.0f64 160.0f64 125.0f64 105.0f64;
+        rect_contour 120.0f64 350.0f64 230.0f64 405.0f64
+    ]))
+
+:~ nna_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        arch_down_contour 180.0f64 250.0f64 150.0f64 180.0f64 100.0f64 130.0f64;
+        rect_contour 300.0f64 120.0f64 355.0f64 500.0f64
+    ]))
+
+:~ nga_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        arch_down_contour 250.0f64 150.0f64 200.0f64 170.0f64 150.0f64 120.0f64;
+        rect_contour 240.0f64 720.0f64 300.0f64 780.0f64
+    ]))
+
+:~ nya_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        arch_down_contour 170.0f64 300.0f64 140.0f64 150.0f64 95.0f64 100.0f64;
+        arch_down_contour 340.0f64 150.0f64 140.0f64 150.0f64 95.0f64 100.0f64
+    ]))
+
+:~ chha_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        ellipse_contour 230.0f64 320.0f64 150.0f64 190.0f64 !+;
+        ellipse_contour 230.0f64 320.0f64 90.0f64 115.0f64 !-;
+        rect_contour 400.0f64 100.0f64 455.0f64 450.0f64
+    ]))
+
+:~ jha_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        arch_down_contour 180.0f64 350.0f64 150.0f64 150.0f64 100.0f64 100.0f64;
+        rect_contour 230.0f64 150.0f64 420.0f64 205.0f64;
+        rect_contour 230.0f64 0.0f64 285.0f64 150.0f64
+    ]))
+
+:~ sha_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 200.0f64 230.0f64 600.0f64;
+        arch_down_contour 300.0f64 200.0f64 150.0f64 150.0f64 100.0f64 100.0f64;
+        rect_contour 90.0f64 300.0f64 175.0f64 355.0f64
+    ]))
+
+:~ ssha_deva () : deva cons_c =
+    DevaCons (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        ellipse_contour 240.0f64 290.0f64 160.0f64 200.0f64 !+;
+        ellipse_contour 240.0f64 290.0f64 95.0f64 120.0f64 !-
+    ]))
+
+:~ e_deva () : deva indvow_c =
+    DevaVow (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        arch_down_contour 230.0f64 180.0f64 190.0f64 190.0f64 140.0f64 140.0f64;
+        rect_contour 90.0f64 350.0f64 230.0f64 405.0f64
+    ]))
+
+:~ ai_deva () : deva indvow_c =
+    DevaVow (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 475.0f64 0.0f64 530.0f64 655.0f64;
+        arch_down_contour 230.0f64 180.0f64 190.0f64 190.0f64 140.0f64 140.0f64;
+        rect_contour 90.0f64 350.0f64 230.0f64 405.0f64;
+        rect_contour 200.0f64 720.0f64 320.0f64 775.0f64
+    ]))
+
+:~ o_deva () : deva indvow_c =
+    DevaVow (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 650.0f64 655.0f64;
+        rect_contour 535.0f64 0.0f64 590.0f64 655.0f64;
+        rect_contour 280.0f64 300.0f64 535.0f64 355.0f64;
+        arch_down_contour 200.0f64 120.0f64 150.0f64 120.0f64 100.0f64 65.0f64;
+        rect_contour 620.0f64 0.0f64 650.0f64 655.0f64
+    ]))
+
+:~ au_deva () : deva indvow_c =
+    DevaVow (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 650.0f64 655.0f64;
+        rect_contour 535.0f64 0.0f64 590.0f64 655.0f64;
+        rect_contour 280.0f64 300.0f64 535.0f64 355.0f64;
+        arch_down_contour 200.0f64 120.0f64 150.0f64 120.0f64 100.0f64 65.0f64;
+        rect_contour 620.0f64 0.0f64 650.0f64 655.0f64;
+        rect_contour 350.0f64 720.0f64 470.0f64 775.0f64
+    ]))
+
+:~ ii_deva () : deva indvow_c =
+    DevaVow (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        arch_down_contour 250.0f64 250.0f64 200.0f64 180.0f64 150.0f64 130.0f64;
+        rect_contour 430.0f64 100.0f64 485.0f64 600.0f64;
+        rect_contour 240.0f64 720.0f64 360.0f64 775.0f64
+    ]))
+
+:~ uu_deva () : deva indvow_c =
+    DevaVow (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 175.0f64 300.0f64 230.0f64 600.0f64;
+        arch_down_contour 300.0f64 150.0f64 200.0f64 180.0f64 145.0f64 125.0f64;
+        arch_down_contour 300.0f64 (-70.0f64) 120.0f64 70.0f64 70.0f64 45.0f64
+    ]))
+
+:~ ri_deva () : deva indvow_c =
+    DevaVow (lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 530.0f64 655.0f64;
+        rect_contour 230.0f64 0.0f64 285.0f64 600.0f64;
+        arch_down_contour 150.0f64 350.0f64 120.0f64 130.0f64 75.0f64 85.0f64;
+        arch_down_contour 380.0f64 200.0f64 130.0f64 130.0f64 85.0f64 90.0f64
+    ]))
+
+:~ virama_deva () : outline quadratic =
+    lower_to_quads (OCubic [ rect_contour 250.0f64 (-140.0f64) 310.0f64 (-50.0f64) ])
+
+:~ ksha_deva () : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 630.0f64 655.0f64;
+        rect_contour 175.0f64 300.0f64 230.0f64 600.0f64;
+        rect_contour 175.0f64 300.0f64 290.0f64 355.0f64;
+        arch_down_contour 150.0f64 120.0f64 120.0f64 110.0f64 75.0f64 60.0f64;
+        rect_contour 575.0f64 0.0f64 630.0f64 655.0f64;
+        ellipse_contour 400.0f64 250.0f64 120.0f64 150.0f64 !+;
+        ellipse_contour 400.0f64 250.0f64 70.0f64 90.0f64 !-
+    ])
+
+:~ tra_deva () : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 630.0f64 655.0f64;
+        rect_contour 240.0f64 120.0f64 295.0f64 600.0f64;
+        arch_down_contour 160.0f64 300.0f64 120.0f64 110.0f64 70.0f64 55.0f64;
+        rect_contour 450.0f64 0.0f64 505.0f64 600.0f64;
+        rect_contour 370.0f64 330.0f64 450.0f64 385.0f64
+    ])
+
+:~ jna_deva () : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 630.0f64 655.0f64;
+        arch_down_contour 180.0f64 350.0f64 150.0f64 150.0f64 100.0f64 100.0f64;
+        rect_contour 230.0f64 150.0f64 420.0f64 205.0f64;
+        rect_contour 575.0f64 0.0f64 630.0f64 655.0f64;
+        arch_down_contour 450.0f64 300.0f64 120.0f64 130.0f64 75.0f64 80.0f64
+    ])
+
+:~ dya_deva () : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 630.0f64 655.0f64;
+        rect_contour 130.0f64 420.0f64 320.0f64 475.0f64;
+        arch_down_contour 230.0f64 150.0f64 160.0f64 150.0f64 110.0f64 100.0f64;
+        rect_contour 575.0f64 0.0f64 630.0f64 655.0f64;
+        rect_contour 420.0f64 120.0f64 475.0f64 600.0f64;
+        arch_down_contour 490.0f64 200.0f64 110.0f64 120.0f64 70.0f64 75.0f64
+    ])
+
+:~ shra_deva () : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 630.0f64 655.0f64;
+        rect_contour 175.0f64 200.0f64 230.0f64 600.0f64;
+        arch_down_contour 290.0f64 200.0f64 130.0f64 140.0f64 85.0f64 90.0f64;
+        rect_contour 90.0f64 300.0f64 175.0f64 355.0f64;
+        rect_contour 500.0f64 0.0f64 555.0f64 600.0f64;
+        rect_contour 420.0f64 330.0f64 500.0f64 385.0f64
+    ])
+
+:~ sta_deva () : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 630.0f64 655.0f64;
+        rect_contour 110.0f64 350.0f64 165.0f64 600.0f64;
+        arch_down_contour 230.0f64 420.0f64 150.0f64 160.0f64 110.0f64 100.0f64;
+        rect_contour 300.0f64 0.0f64 355.0f64 600.0f64;
+        arch_down_contour 420.0f64 150.0f64 130.0f64 140.0f64 90.0f64 95.0f64;
+        rect_contour 420.0f64 300.0f64 575.0f64 355.0f64
+    ])
+
+:~ nta_deva () : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 30.0f64 600.0f64 630.0f64 655.0f64;
+        rect_contour 110.0f64 0.0f64 165.0f64 600.0f64;
+        arch_down_contour 230.0f64 300.0f64 140.0f64 150.0f64 100.0f64 90.0f64;
+        rect_contour 300.0f64 0.0f64 355.0f64 600.0f64;
+        arch_down_contour 420.0f64 150.0f64 130.0f64 140.0f64 90.0f64 95.0f64;
+        rect_contour 420.0f64 300.0f64 575.0f64 355.0f64
+    ])
+
+///> rust
+:# devanagari_category_is_typed =
+    := k = ka_deva ()
+    := aa = matra_aa ()
+    := iv = matra_i ()
+    := aa_post = ?= matra_position aa ?| | MPost => true | _ => false
+    := iv_pre = ?= matra_position iv ?| | MPre => true | _ => false
+    (quad_seg_count (deva_base k) > 0u32, aa_post, iv_pre, quad_seg_count (deva_glyph iv) > quad_seg_count (deva_glyph aa))
+    |> _assert_eq (true, true, true, true)
+
+:== deva_cluster = { lead : deva cons_c; more : list (deva cons_c) }
+
+:~ ^ cons_len (xs : list (deva cons_c)) : i32 =
+    ?= xs ?|
+    | _ :: t => 1i32 + cons_len t
+    | [] => 0i32
+
+:~ cluster_len (c : deva_cluster) : i32 = 1i32 + cons_len (c::more)
+
+///> rust
+:# devanagari_conjunct_is_typed =
+    := ksha = { lead = ka_deva (); more = [ sa_deva () ] }
+    := kta = { lead = ka_deva (); more = [ ta_deva (); sa_deva () ] }
+    (cluster_len ksha, cluster_len kta)
+    |> _assert_eq (2i32, 3i32)
+
+:| deva_syllable =
+    | Inherent :: deva_cluster -> deva_syllable
+    | WithMatra :: { onset : deva_cluster; sign : deva matra_c } -> deva_syllable
+
+:= syllable_onset_len (s : deva_syllable) : i32 =
+    ?= s ?|
+    | Inherent c => cluster_len c
+    | WithMatra r => cluster_len (r::onset)
+
+///> rust
+:# devanagari_akshara_is_typed =
+    := ki = WithMatra { onset = { lead = ka_deva (); more = [] }; sign = matra_i () }
+    := kta = Inherent { lead = ka_deva (); more = [ ta_deva () ] }
+    (syllable_onset_len ki, syllable_onset_len kta)
+    |> _assert_eq (1i32, 2i32)
+
+:~ ^ cons_glyphs (xs : list (deva cons_c)) : list (outline quadratic) =
+    ?= xs ?|
+    | h :: t => (deva_glyph h) :: cons_glyphs t
+    | [] => []
+
+:~ ^ outl_append (xs : list (outline quadratic)) (ys : list (outline quadratic)) : list (outline quadratic) =
+    ?= xs ?|
+    | h :: t => h :: outl_append t ys
+    | [] => ys
+
+:~ cluster_glyphs (c : deva_cluster) : list (outline quadratic) =
+    (deva_glyph (c::lead)) :: cons_glyphs (c::more)
+
+:= syllable_visual_order (s : deva_syllable) : list (outline quadratic) =
+    ?= s ?|
+    | Inherent c => cluster_glyphs c
+    | WithMatra r =>
+        := base_glyphs = cluster_glyphs (r::onset)
+        := m = deva_glyph (r::sign)
+        ?= matra_position (r::sign) ?|
+        | MPre => m :: base_glyphs
+        | _ => outl_append base_glyphs [ m ]
+
+///> rust
+:# devanagari_reorder_prebase_matra =
+    := ki = WithMatra { onset = { lead = ka_deva (); more = [] }; sign = matra_i () }
+    := ka_aa = WithMatra { onset = { lead = ka_deva (); more = [] }; sign = matra_aa () }
+    := ki_first = ?= syllable_visual_order ki ?| | h :: _ => quad_seg_count h | [] => 0u32
+    := kaaa_first = ?= syllable_visual_order ka_aa ?| | h :: _ => quad_seg_count h | [] => 0u32
+    (ki_first = quad_seg_count (deva_glyph (matra_i ())), kaaa_first = quad_seg_count (deva_glyph (ka_deva ())))
+    |> _assert_eq (true, true)
+
+:~ letter_g (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 300.0f64 165.0f64 190.0f64 !+;
+        ellipse_contour cx 300.0f64 95.0f64 115.0f64 !-;
+        rect_contour (cx + 75.0f64) (-40.0f64) (cx + 165.0f64) 320.0f64;
+        arch_down_contour (cx + 25.0f64) (-40.0f64) 140.0f64 100.0f64 50.0f64 50.0f64
+    ])
+
+:~ letter_r (advance : f64) : outline quadratic =
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 500.0f64;
+        { start = pt 362.0f64 350.0f64;
+            segs = [
+            arc_seg 162.0f64 350.0f64 200.0f64 150.0f64 1.0f64 0.0f64 0.0f64 1.0f64 tt;
+            CLine (pt 162.0f64 420.0f64);
+            arc_seg 162.0f64 350.0f64 110.0f64 70.0f64 0.0f64 1.0f64 1.0f64 0.0f64 tn
+          ] }
+    ])
+
+:~ letter_j (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 180.0f64 580.0f64 270.0f64 670.0f64;
+        rect_contour 180.0f64 (-60.0f64) 270.0f64 500.0f64;
+        arch_down_contour 130.0f64 (-60.0f64) 140.0f64 120.0f64 50.0f64 60.0f64
+    ])
+
+:~ letter_f (advance : f64) : outline quadratic =
+    := tt = 0.55228475f64
+    := tn = -0.55228475f64
+    lower_to_quads (OCubic [
+        rect_contour 130.0f64 0.0f64 220.0f64 560.0f64;
+        { start = pt 420.0f64 560.0f64;
+            segs = [
+            arc_seg 220.0f64 560.0f64 200.0f64 150.0f64 1.0f64 0.0f64 0.0f64 1.0f64 tt;
+            CLine (pt 220.0f64 630.0f64);
+            arc_seg 220.0f64 560.0f64 110.0f64 70.0f64 0.0f64 1.0f64 1.0f64 0.0f64 tn
+          ] };
+        rect_contour 50.0f64 430.0f64 320.0f64 510.0f64
+    ])
+
+:~ letter_cap_j (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 300.0f64 150.0f64 390.0f64 710.0f64;
+        arch_down_contour 210.0f64 150.0f64 180.0f64 150.0f64 90.0f64 60.0f64
+    ])
+
+:~ letter_cap_g (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        arc_ring_c cx 355.0f64 235.0f64 294.0f64 145.0f64 194.0f64;
+        rect_contour (cx + 55.0f64) 300.0f64 (cx + 235.0f64) 390.0f64;
+        rect_contour (cx + 145.0f64) 300.0f64 (cx + 235.0f64) 500.0f64
+    ])
+
+:~ letter_cap_d (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
+        ellipse_contour 310.0f64 355.0f64 245.0f64 355.0f64 !+;
+        ellipse_contour 310.0f64 355.0f64 155.0f64 255.0f64 !-
+    ])
+
+:~ letter_o (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    := cy = 250.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx cy 200.0f64 266.0f64 !+;
         ellipse_contour cx cy 118.0f64 166.0f64 !-
     ])
 
-:= letter_l (advance : f64) : outline quadratic =
+:~ letter_l (advance : f64) : outline quadratic =
     lower_to_quads (OCubic [ rect_contour 72.0f64 0.0f64 162.0f64 710.0f64 ])
 
-:= letter_i (advance : f64) : outline quadratic =
+:~ letter_i (advance : f64) : outline quadratic =
     lower_to_quads (OCubic [
         rect_contour 72.0f64 0.0f64 162.0f64 500.0f64;
         rect_contour 72.0f64 580.0f64 162.0f64 670.0f64
     ])
 
-:= letter_b (advance : f64) : outline quadratic =
+:~ letter_b (advance : f64) : outline quadratic =
     lower_to_quads (OCubic [
         rect_contour 72.0f64 0.0f64 162.0f64 710.0f64;
         ellipse_contour 322.0f64 250.0f64 165.0f64 256.0f64 !+;
         ellipse_contour 322.0f64 250.0f64 85.0f64 166.0f64 !-
     ])
 
-:= letter_d (advance : f64) : outline quadratic =
+:~ letter_d (advance : f64) : outline quadratic =
     lower_to_quads (OCubic [
         rect_contour 413.0f64 0.0f64 503.0f64 710.0f64;
         ellipse_contour 253.0f64 250.0f64 165.0f64 256.0f64 !+;
         ellipse_contour 253.0f64 250.0f64 85.0f64 166.0f64 !-
     ])
 
-:= letter_p (advance : f64) : outline quadratic =
+:~ letter_p (advance : f64) : outline quadratic =
     lower_to_quads (OCubic [
         rect_contour 72.0f64 (-210.0f64) 162.0f64 500.0f64;
         ellipse_contour 322.0f64 250.0f64 165.0f64 256.0f64 !+;
         ellipse_contour 322.0f64 250.0f64 85.0f64 166.0f64 !-
     ])
 
-:= letter_q (advance : f64) : outline quadratic =
+:~ letter_q (advance : f64) : outline quadratic =
     lower_to_quads (OCubic [
         rect_contour 413.0f64 (-210.0f64) 503.0f64 500.0f64;
-        ellipse_contour 253.0f64 250.0f64 165.0f64 256.0f64 !+;
+        ellipse_contour 253.0f64 250.0f64 165.0f64 266.0f64 !+;
         ellipse_contour 253.0f64 250.0f64 85.0f64 166.0f64 !-
     ])
+
+:~ letter_period (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [ ellipse_contour 125.0f64 55.0f64 55.0f64 55.0f64 !+ ])
+
+:~ letter_middot (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [ ellipse_contour cx 310.0f64 67.0f64 67.0f64 !+ ])
+
+:~ letter_at (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 275.0f64 390.0f64 390.0f64 !+;
+        ellipse_contour cx 275.0f64 325.0f64 325.0f64 !-;
+        ellipse_contour (cx - 50.0f64) 275.0f64 150.0f64 160.0f64 !+;
+        ellipse_contour (cx - 50.0f64) 275.0f64 85.0f64 95.0f64 !-;
+        rect_contour (cx + 55.0f64) (-20.0f64) (cx + 115.0f64) 430.0f64;
+        rect_contour (cx + 115.0f64) (-20.0f64) (cx + 255.0f64) 45.0f64
+    ])
+
+:~ letter_hyphen (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [ rect_contour 40.0f64 230.0f64 280.0f64 300.0f64 ])
+
+:~ letter_colon (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        ellipse_contour 125.0f64 55.0f64 55.0f64 55.0f64 !+;
+        ellipse_contour 125.0f64 355.0f64 55.0f64 55.0f64 !+
+    ])
+
+:~ letter_space (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [])
+
+:~ letter_exclaim (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 95.0f64 170.0f64 155.0f64 700.0f64;
+        ellipse_contour 125.0f64 55.0f64 40.0f64 40.0f64 !+
+    ])
+
+:~ letter_zero (advance : f64) : outline quadratic =
+    := cx = advance / 2.0f64
+    lower_to_quads (OCubic [
+        ellipse_contour cx 350.0f64 170.0f64 356.0f64 !+;
+        ellipse_contour cx 350.0f64 95.0f64 266.0f64 !-
+    ])
+
+:~ letter_hash (advance : f64) : outline quadratic =
+    lower_to_quads (OCubic [
+        rect_contour 150.0f64 0.0f64 230.0f64 700.0f64;
+        rect_contour 330.0f64 0.0f64 410.0f64 700.0f64;
+        rect_contour 60.0f64 230.0f64 500.0f64 300.0f64;
+        rect_contour 60.0f64 430.0f64 500.0f64 500.0f64
+    ])
+
+///> rust
+:# period_is_a_filled_dot_of_four_quads =
+    quad_seg_count (letter_period 250.0f64) |> _assert_eq 4u32
+
+///> rust
+:# hyphen_is_a_bar_of_three_quads =
+    quad_seg_count (letter_hyphen 320.0f64) |> _assert_eq 3u32
+
+///> rust
+:# colon_is_two_dots_of_eight_quads =
+    quad_seg_count (letter_colon 300.0f64) |> _assert_eq 8u32
+
+///> rust
+:# space_is_empty_zero_quads =
+    quad_seg_count (letter_space 250.0f64) |> _assert_eq 0u32
+
+///> rust
+:# exclaim_is_bar_and_dot_seven_quads =
+    quad_seg_count (letter_exclaim 250.0f64) |> _assert_eq 7u32
+
+///> rust
+:# zero_is_two_ellipses_eight_quads =
+    quad_seg_count (letter_zero 565.0f64) |> _assert_eq 8u32
+
+///> rust
+:# hash_is_four_bars_twelve_quads =
+    quad_seg_count (letter_hash 560.0f64) |> _assert_eq 12u32
+
+///> rust
+:# u_is_two_stems_and_a_down_arch_twelve_quads =
+    quad_seg_count (letter_u 480.0f64) |> _assert_eq 12u32
+
+///> rust
+:# v_is_two_diagonal_strokes_six_quads =
+    quad_seg_count (letter_v 480.0f64) |> _assert_eq 6u32
+
+///> rust
+:# t_is_stem_and_crossbar_six_quads =
+    quad_seg_count (letter_t 400.0f64) |> _assert_eq 6u32
+
+///> rust
+:# x_is_two_crossing_strokes_six_quads =
+    quad_seg_count (letter_x 480.0f64) |> _assert_eq 6u32
+
+///> rust
+:# k_is_stem_arm_and_leg_nine_quads =
+    quad_seg_count (letter_k 450.0f64) |> _assert_eq 9u32
+
+///> rust
+:# cap_a_n_have_expected_stroke_counts =
+    (quad_seg_count (letter_cap_a 510.0f64) + quad_seg_count (letter_cap_n 560.0f64)) |> _assert_eq 18u32
+
+///> rust
+:# cap_v_x_z_have_expected_stroke_counts =
+    (quad_seg_count (letter_cap_v 500.0f64) + quad_seg_count (letter_cap_x 500.0f64) + quad_seg_count (letter_cap_z 480.0f64)) |> _assert_eq 21u32
+
+///> rust
+:# digit_one_is_stem_base_and_flag_nine_quads =
+    quad_seg_count (digit_one 400.0f64) |> _assert_eq 9u32
+
+///> rust
+:# r_is_stem_and_arc_shoulder_six_quads =
+    quad_seg_count (letter_r 340.0f64) |> _assert_eq 6u32
+
+///> rust
+:# g_is_bowl_stem_and_down_hook_seventeen_quads =
+    quad_seg_count (letter_g 560.0f64) |> _assert_eq 17u32
+
+///> rust
+:# a_is_double_story_bowl_stem_arch_seventeen_quads =
+    quad_seg_count (letter_a 560.0f64) |> _assert_eq 17u32
+
+///> rust
+:# e_is_open_ring_and_crossbar_twelve_quads =
+    quad_seg_count (letter_e 560.0f64) |> _assert_eq 12u32
+
+///> rust
+:# s_is_two_rotated_bowls_eighteen_quads =
+    quad_seg_count (letter_s 480.0f64) |> _assert_eq 18u32
+
+///> rust
+:# cap_s_is_two_rotated_bowls_eighteen_quads =
+    quad_seg_count (letter_cap_s 520.0f64) |> _assert_eq 18u32
+
+///> rust
+:# f_is_stem_shoulder_crossbar_nine_quads =
+    quad_seg_count (letter_f 300.0f64) |> _assert_eq 9u32
+
+///> rust
+:# j_is_dot_stem_and_down_hook_twelve_quads =
+    quad_seg_count (letter_j 290.0f64) |> _assert_eq 12u32
+
+///> rust
+:# digit_eight_is_two_rings_sixteen_quads =
+    quad_seg_count (digit_eight 520.0f64) |> _assert_eq 16u32
+
+///> rust
+:# digit_seven_and_four_have_expected_counts =
+    (quad_seg_count (digit_seven 480.0f64) + quad_seg_count (digit_four 520.0f64)) |> _assert_eq 15u32
+
+///> rust
+:# digit_nine_is_bowl_and_tail_eleven_quads =
+    quad_seg_count (digit_nine 520.0f64) |> _assert_eq 11u32
+
+///> rust
+:# digit_five_is_bar_stem_and_belly_fifteen_quads =
+    quad_seg_count (digit_five 520.0f64) |> _assert_eq 15u32
+
+///> rust
+:# digit_six_is_bowl_and_stem_eleven_quads =
+    quad_seg_count (digit_six 520.0f64) |> _assert_eq 11u32
+
+///> rust
+:# digit_three_is_two_open_left_bowls_fourteen_quads =
+    quad_seg_count (digit_three 520.0f64) |> _assert_eq 14u32
+
+///> rust
+:# digit_two_is_head_diagonal_bar_thirteen_quads =
+    quad_seg_count (digit_two 520.0f64) |> _assert_eq 13u32
+
+///> rust
+:# cap_ghe_is_stem_and_top_bar_six_quads =
+    quad_seg_count (letter_cap_ghe 470.0f64) |> _assert_eq 6u32
+
+///> rust
+:# cap_pe_is_two_stems_and_top_bar_nine_quads =
+    quad_seg_count (letter_cap_pe 560.0f64) |> _assert_eq 9u32
+
+///> rust
+:# cap_sha_is_three_stems_and_bottom_bar_twelve_quads =
+    quad_seg_count (letter_cap_sha 720.0f64) |> _assert_eq 12u32
+
+///> rust
+:# cap_ef_is_bowl_and_vertical_bar_eleven_quads =
+    quad_seg_count (letter_cap_ef 640.0f64) |> _assert_eq 11u32
+
+///> rust
+:# cap_icyr_is_two_stems_and_reverse_diagonal_nine_quads =
+    quad_seg_count (letter_cap_icyr 560.0f64) |> _assert_eq 9u32
+
+///> rust
+:# cap_tse_is_two_stems_bar_tail_twelve_quads =
+    quad_seg_count (letter_cap_tse 560.0f64) |> _assert_eq 12u32
+
+///> rust
+:# cap_shcha_is_three_stems_bar_tail_fifteen_quads =
+    quad_seg_count (letter_cap_shcha 720.0f64) |> _assert_eq 15u32
+
+///> rust
+:# cap_be_is_stem_top_bar_and_bowl_fourteen_quads =
+    quad_seg_count (letter_cap_be 575.0f64) |> _assert_eq 14u32
+
+///> rust
+:# cap_soft_is_stem_and_bowl_eleven_quads =
+    quad_seg_count (letter_cap_soft 540.0f64) |> _assert_eq 11u32
+
+///> rust
+:# cap_yery_is_soft_plus_stem_fourteen_quads =
+    quad_seg_count (letter_cap_yery 640.0f64) |> _assert_eq 14u32
+
+///> rust
+:# cap_hard_is_arm_stem_and_bowl_fourteen_quads =
+    quad_seg_count (letter_cap_hard 560.0f64) |> _assert_eq 14u32
+
+///> rust
+:# cap_yu_is_stem_connector_and_circle_fourteen_quads =
+    quad_seg_count (letter_cap_yu 720.0f64) |> _assert_eq 14u32
+
+///> rust
+:# cap_theta_is_ring_and_middle_bar_eleven_quads =
+    quad_seg_count (letter_cap_theta 620.0f64) |> _assert_eq 11u32
+
+///> rust
+:# cap_xi_is_three_bars_nine_quads =
+    quad_seg_count (letter_cap_xi 540.0f64) |> _assert_eq 9u32
+
+///> rust
+:# cap_lambda_is_two_legs_six_quads =
+    quad_seg_count (letter_cap_lambda 510.0f64) |> _assert_eq 6u32
+
+///> rust
+:# cap_delta_is_two_legs_and_base_nine_quads =
+    quad_seg_count (letter_cap_delta 510.0f64) |> _assert_eq 9u32
+
+///> rust
+:# cap_ecyr_is_open_left_ring_and_tongue_ten_quads =
+    quad_seg_count (letter_cap_ecyr 600.0f64) |> _assert_eq 10u32
+
+///> rust
+:# cap_sigma_is_two_bars_and_two_diagonals_twelve_quads =
+    quad_seg_count (letter_cap_sigma 530.0f64) |> _assert_eq 12u32
+
+///> rust
+:# cap_psi_is_stem_two_arms_and_connector_twelve_quads =
+    quad_seg_count (letter_cap_psi 600.0f64) |> _assert_eq 12u32
+
+///> rust
+:# cap_omega_is_arch_and_two_feet_twelve_quads =
+    quad_seg_count (letter_cap_omega 640.0f64) |> _assert_eq 12u32
+
+///> rust
+:# cap_yacyr_is_mirrored_r_fourteen_quads =
+    quad_seg_count (letter_cap_yacyr 560.0f64) |> _assert_eq 14u32
+
+///> rust
+:# cap_decyr_is_pi_base_and_feet_eighteen_quads =
+    quad_seg_count (letter_cap_decyr 600.0f64) |> _assert_eq 18u32
+
+///> rust
+:# cap_elcyr_is_stem_and_diagonal_leg_six_quads =
+    quad_seg_count (letter_cap_elcyr 520.0f64) |> _assert_eq 6u32
+
+///> rust
+:# cap_ucyr_is_two_arms_and_tail_nine_quads =
+    quad_seg_count (letter_cap_ucyr 520.0f64) |> _assert_eq 9u32
+
+///> rust
+:# cap_zhe_is_stem_and_four_arms_fifteen_quads =
+    quad_seg_count (letter_cap_zhe 740.0f64) |> _assert_eq 15u32
+
+///> rust
+:# cap_jcyr_is_i_and_breve_fifteen_quads =
+    quad_seg_count (letter_cap_jcyr 480.0f64) |> _assert_eq 15u32
+
+///> rust
+:# cap_checyr_is_stem_half_stem_and_bar_nine_quads =
+    quad_seg_count (letter_cap_checyr 560.0f64) |> _assert_eq 9u32
+
+///> rust
+:# pecyr_is_two_stems_and_top_bar_nine_quads =
+    quad_seg_count (letter_pecyr 485.0f64) |> _assert_eq 9u32
+
+///> rust
+:# encyr_is_two_stems_and_mid_bar_nine_quads =
+    quad_seg_count (letter_encyr 485.0f64) |> _assert_eq 9u32
+
+///> rust
+:# shacyr_is_three_stems_and_bottom_bar_twelve_quads =
+    quad_seg_count (letter_shacyr 585.0f64) |> _assert_eq 12u32
+
+///> rust
+:# gecyr_is_stem_and_top_bar_six_quads =
+    quad_seg_count (letter_gecyr 430.0f64) |> _assert_eq 6u32
+
+///> rust
+:# icyr_is_two_stems_and_diagonal_nine_quads =
+    quad_seg_count (letter_icyr 485.0f64) |> _assert_eq 9u32
+
+///> rust
+:# tecyr_is_top_bar_and_stem_six_quads =
+    quad_seg_count (letter_tecyr 470.0f64) |> _assert_eq 6u32
+
+///> rust
+:# tsecyr_is_two_stems_bar_tail_twelve_quads =
+    quad_seg_count (letter_tsecyr 470.0f64) |> _assert_eq 12u32
+
+///> rust
+:# shchacyr_is_three_stems_bar_tail_fifteen_quads =
+    quad_seg_count (letter_shchacyr 585.0f64) |> _assert_eq 15u32
+
+///> rust
+:# checyrlc_is_stem_halfstem_bar_nine_quads =
+    quad_seg_count (letter_checyrlc 470.0f64) |> _assert_eq 9u32
+
+///> rust
+:# elcyrlc_is_stem_and_leg_six_quads =
+    quad_seg_count (letter_elcyrlc 450.0f64) |> _assert_eq 6u32
+
+///> rust
+:# kacyrlc_is_stem_arm_leg_nine_quads =
+    quad_seg_count (letter_kacyrlc 450.0f64) |> _assert_eq 9u32
+
+///> rust
+:# emcyrlc_is_two_stems_and_v_twelve_quads =
+    quad_seg_count (letter_emcyrlc 585.0f64) |> _assert_eq 12u32
+
+///> rust
+:# zhecyrlc_is_stem_and_four_arms_fifteen_quads =
+    quad_seg_count (letter_zhecyrlc 600.0f64) |> _assert_eq 15u32
+
+///> rust
+:# softcyrlc_is_stem_and_bowl_eleven_quads =
+    quad_seg_count (letter_softcyrlc 420.0f64) |> _assert_eq 11u32
+
+///> rust
+:# yerycyrlc_is_soft_plus_stem_fourteen_quads =
+    quad_seg_count (letter_yerycyrlc 540.0f64) |> _assert_eq 14u32
+
+///> rust
+:# hardcyrlc_is_arm_stem_bowl_fourteen_quads =
+    quad_seg_count (letter_hardcyrlc 430.0f64) |> _assert_eq 14u32
+
+///> rust
+:# efcyrlc_is_bowl_and_bar_eleven_quads =
+    quad_seg_count (letter_efcyrlc 480.0f64) |> _assert_eq 11u32
+
+///> rust
+:# yucyrlc_is_stem_connector_circle_fourteen_quads =
+    quad_seg_count (letter_yucyrlc 600.0f64) |> _assert_eq 14u32
+
+///> rust
+:# yacyrlc_is_mirrored_r_fourteen_quads =
+    quad_seg_count (letter_yacyrlc 480.0f64) |> _assert_eq 14u32
+
+///> rust
+:# jcyrlc_is_i_and_breve_fifteen_quads =
+    quad_seg_count (letter_jcyrlc 485.0f64) |> _assert_eq 15u32
+
+///> rust
+:# decyrlc_is_pi_base_feet_eighteen_quads =
+    quad_seg_count (letter_decyrlc 500.0f64) |> _assert_eq 18u32
+
+///> rust
+:# vecyrlc_is_stem_two_bowls_nineteen_quads =
+    quad_seg_count (letter_vecyrlc 480.0f64) |> _assert_eq 19u32
+
+///> rust
+:# becyrlc_is_bowl_stem_flag_fourteen_quads =
+    quad_seg_count (letter_becyrlc 430.0f64) |> _assert_eq 14u32
+
+///> rust
+:# zecyrlc_is_scaled_three_fourteen_quads =
+    quad_seg_count (letter_zecyrlc 470.0f64) |> _assert_eq 14u32
+
+///> rust
+:# ecyrlc_is_open_bowl_tongue_ten_quads =
+    quad_seg_count (letter_ecyrlc 470.0f64) |> _assert_eq 10u32
+
+///> rust
+:# yocyrlc_is_e_plus_two_dots_eighteen_quads =
+    quad_seg_count (letter_yocyrlc 560.0f64) |> _assert_eq 18u32
+
+///> rust
+:# alphagr_is_bowl_stem_eleven_quads =
+    quad_seg_count (letter_alphagr 540.0f64) |> _assert_eq 11u32
+
+///> rust
+:# betagr_is_stem_two_bowls_nineteen_quads =
+    quad_seg_count (letter_betagr 480.0f64) |> _assert_eq 19u32
+
+///> rust
+:# gammagr_is_v_plus_slant_tail_nine_quads =
+    quad_seg_count (letter_gammagr 480.0f64) |> _assert_eq 9u32
+
+///> rust
+:# deltagr_is_round_body_top_hook_eleven_quads =
+    quad_seg_count (letter_deltagr 500.0f64) |> _assert_eq 11u32
+
+///> rust
+:# epsilongr_is_c_plus_mid_tongue_ten_quads =
+    quad_seg_count (letter_epsilongr 480.0f64) |> _assert_eq 10u32
+
+///> rust
+:# thetagr_is_hollow_ellipse_mid_bar_eleven_quads =
+    quad_seg_count (letter_thetagr 500.0f64) |> _assert_eq 11u32
+
+///> rust
+:# iotagr_is_thin_stem_three_quads =
+    quad_seg_count (letter_iotagr 200.0f64) |> _assert_eq 3u32
+
+///> rust
+:# nugr_is_v_six_quads =
+    quad_seg_count (letter_nugr 480.0f64) |> _assert_eq 6u32
+
+///> rust
+:# lambdagr_is_diag_plus_branch_six_quads =
+    quad_seg_count (letter_lambdagr 500.0f64) |> _assert_eq 6u32
+
+///> rust
+:# etagr_is_n_with_right_descender_twelve_quads =
+    quad_seg_count (letter_etagr 480.0f64) |> _assert_eq 12u32
+
+///> rust
+:# mugr_is_u_with_left_descender_twelve_quads =
+    quad_seg_count (letter_mugr 480.0f64) |> _assert_eq 12u32
+
+///> rust
+:# sigmagr_is_bowl_top_tail_eleven_quads =
+    quad_seg_count (letter_sigmagr 500.0f64) |> _assert_eq 11u32
+
+///> rust
+:# psigr_is_stem_top_cup_nine_quads =
+    quad_seg_count (letter_psigr 500.0f64) |> _assert_eq 9u32
+
+///> rust
+:# omegagr_is_double_lobe_sixteen_quads =
+    quad_seg_count (letter_omegagr 510.0f64) |> _assert_eq 16u32
+
+///> rust
+:# zetagr_is_bar_diag_descender_twelve_quads =
+    quad_seg_count (letter_zetagr 480.0f64) |> _assert_eq 12u32
+
+///> rust
+:# xigr_is_two_bowls_descender_twenty_quads =
+    quad_seg_count (letter_xigr 450.0f64) |> _assert_eq 20u32
+
+///> rust
+:# c_is_an_open_arc_ring_seven_quads =
+    quad_seg_count (letter_c 520.0f64) |> _assert_eq 7u32
+
+///> rust
+:# cap_c_and_cap_o_have_expected_arc_counts =
+    (quad_seg_count (letter_cap_c 600.0f64) + quad_seg_count (letter_cap_o 620.0f64)) |> _assert_eq 15u32
+
+///> rust
+:# cap_g_is_ring_plus_spur_thirteen_quads =
+    quad_seg_count (letter_cap_g 620.0f64) |> _assert_eq 13u32
+
+///> rust
+:# cap_j_is_stem_and_down_hook_nine_quads =
+    quad_seg_count (letter_cap_j 440.0f64) |> _assert_eq 9u32
+
+///> rust
+:# cap_u_and_cap_d_have_expected_counts =
+    (quad_seg_count (letter_cap_u 590.0f64) + quad_seg_count (letter_cap_d 620.0f64)) |> _assert_eq 23u32
+
+///> rust
+:# cap_q_and_cap_p_have_expected_counts =
+    (quad_seg_count (letter_cap_q 620.0f64) + quad_seg_count (letter_cap_p 560.0f64)) |> _assert_eq 22u32
+
+///> rust
+:# cap_r_and_cap_b_have_expected_counts =
+    (quad_seg_count (letter_cap_r 580.0f64) + quad_seg_count (letter_cap_b 580.0f64)) |> _assert_eq 33u32
+
+///> rust
+:# cap_w_y_k_m_have_expected_stroke_counts =
+    (quad_seg_count (letter_cap_w 700.0f64) + quad_seg_count (letter_cap_y 500.0f64) + quad_seg_count (letter_cap_k 470.0f64) + quad_seg_count (letter_cap_m 690.0f64)) |> _assert_eq 42u32
+
+///> rust
+:# cap_letters_have_expected_bar_counts =
+    (quad_seg_count (letter_cap_i 280.0f64) + quad_seg_count (letter_cap_l 450.0f64) + quad_seg_count (letter_cap_t 510.0f64)) |> _assert_eq 15u32
+
+///> rust
+:# cap_e_f_h_have_expected_bar_counts =
+    (quad_seg_count (letter_cap_e 470.0f64) + quad_seg_count (letter_cap_f 450.0f64) + quad_seg_count (letter_cap_h 560.0f64)) |> _assert_eq 30u32
+
+///> rust
+:# y_is_two_strokes_and_a_descender_nine_quads =
+    quad_seg_count (letter_y 480.0f64) |> _assert_eq 9u32
+
+///> rust
+:# z_is_two_bars_and_a_diagonal_nine_quads =
+    quad_seg_count (letter_z 480.0f64) |> _assert_eq 9u32
+
+///> rust
+:# w_is_four_diagonal_strokes_twelve_quads =
+    quad_seg_count (letter_w 680.0f64) |> _assert_eq 12u32
+
+///> rust
+:# n_is_two_stems_and_an_arch_twelve_quads =
+    quad_seg_count (letter_n 480.0f64) |> _assert_eq 12u32
+
+///> rust
+:# h_is_tall_stem_leg_and_arch_twelve_quads =
+    quad_seg_count (letter_h 480.0f64) |> _assert_eq 12u32
+
+///> rust
+:# m_is_three_stems_and_two_arches_twentyone_quads =
+    quad_seg_count (letter_m 670.0f64) |> _assert_eq 21u32
 
 ///> rust
 :# letter_o_lowers_to_eight_quad_segments =
@@ -76,3 +3636,19 @@
 ///> rust
 :# stem_bowl_glyphs_have_eleven_segments =
     (quad_seg_count (letter_b 575.0f64) + quad_seg_count (letter_p 575.0f64)) |> _assert_eq 22u32
+
+///> rust
+:# ar_initial_rejects_a_right_joining_letter fails "Unification" =
+    ar_initial (alef_ar ())
+
+///> rust
+:# ar_medial_rejects_a_right_joining_letter fails "Unification" =
+    ar_medial (dal_ar ())
+
+///> rust
+:# deva_base_rejects_an_independent_vowel fails "Unification" =
+    deva_base (a_deva ())
+
+///> rust
+:# deva_base_rejects_a_dependent_matra fails "Unification" =
+    deva_base (matra_aa ())

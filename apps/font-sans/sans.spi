@@ -16,7 +16,11 @@
         { codepoint = 98u32; advance = 575u16; outline = letter_b 575.0f64 };
         { codepoint = 100u32; advance = 575u16; outline = letter_d 575.0f64 };
         { codepoint = 112u32; advance = 575u16; outline = letter_p 575.0f64 };
-        { codepoint = 113u32; advance = 575u16; outline = letter_q 575.0f64 }
+        { codepoint = 113u32; advance = 575u16; outline = letter_q 575.0f64 };
+        { codepoint = 46u32; advance = 250u16; outline = letter_period 250.0f64 };
+        { codepoint = 45u32; advance = 320u16; outline = letter_hyphen 320.0f64 };
+        { codepoint = 58u32; advance = 300u16; outline = letter_colon 300.0f64 };
+        { codepoint = 32u32; advance = 250u16; outline = letter_space 250.0f64 }
     ])
 
 := glyph_count (f : face proportional) : u32 =
@@ -24,5 +28,5 @@
     | Proportional (_, gs) => count_glyphs gs
 
 ///> rust
-:# sans_has_seven_glyphs =
-    glyph_count (sans ()) |> _assert_eq 7u32
+:# sans_has_eleven_glyphs =
+    glyph_count (sans ()) |> _assert_eq 11u32

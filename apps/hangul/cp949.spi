@@ -113,11 +113,11 @@
         lossy_bytes (encode [ 8212i32 ])
     )
     |> _assert_eq (
-           [ 176i32; 161i32; 176i32; 162i32 ],
-           [ 72i32; 101i32; 108i32; 108i32; 111i32; 44i32; 32i32; 190i32; 200i32; 179i32; 231i32 ],
-           [ Unencodable 8212i32 ],
-           [ 63i32 ]
-       )
+        [ 176i32; 161i32; 176i32; 162i32 ],
+        [ 72i32; 101i32; 108i32; 108i32; 111i32; 44i32; 32i32; 190i32; 200i32; 179i32; 231i32 ],
+        [ Unencodable 8212i32 ],
+        [ 63i32 ]
+    )
 
 ///> rust
 :# every_table_entry_decodes_and_a_stride_of_them_encodes_back =
